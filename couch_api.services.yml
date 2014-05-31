@@ -1,0 +1,16 @@
+services:
+  couch_api.normalizer.content_entity:
+    class: Drupal\couch_api\Normalizer\ContentEntityNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+    arguments: ['@entity.manager']
+  couch_api.normalizer.repository:
+    class: Drupal\couch_api\Normalizer\RepositoryNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+    arguments: ['@entity.manager']
+  paramconverter.entity_uuid:
+    class: Drupal\couch_api\ParamConverter\EntityUuidConverter
+    arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
+    tags:
+      - { name: paramconverter, priority: 10 }
