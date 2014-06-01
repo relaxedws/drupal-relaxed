@@ -2,22 +2,31 @@
 
 namespace Drupal\couch_api\Normalizer;
 
-use Drupal\serialization\Normalizer\EntityNormalizer;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @todo Don't extend EntityNormalizer. Follow the pattern of
  *   \Drupal\hal\Entity\Normalizer\ContentEntityNormalizer
  */
-class ContentEntityNormalizer extends EntityNormalizer {
+class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInterface {
 
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
+
+  /**
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   */
+  public function __construct(EntityManagerInterface $entity_manager) {
+    $this->entityManager = $entity_manager;
+  }
 
   /**
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    $data = parent::normalize($entity, $format, $context);
+    $data = array();
     // New or mocked entities might not have a UUID yet.
     if (!empty($entity->uuid())) {
       $data['_id'] = $entity->uuid();
@@ -26,10 +35,13 @@ class ContentEntityNormalizer extends EntityNormalizer {
     if (!empty($entity->_revs_info->rev)) {
       $data['_rev'] = $entity->_revs_info->rev;
     }
-    $data['_entity_type'] = $entity->getEntityTypeId();
+    $data['_entity_type'] = $context['entity_type'] = $entity->getEntityTypeId();
 
-    if (empty($context['revs_info']) && isset($data['_revs_info'])) {
-      unset($data['_revs_info']);
+    foreach ($entity as $name => $field) {
+      $field_data = $this->serializer->normalize($field, $format, $context);
+      if ($field_data !== NULL) {
+        $data[$name] = $field_data;
+      }
     }
     return $data;
   }
@@ -53,7 +65,7 @@ class ContentEntityNormalizer extends EntityNormalizer {
       throw new UnexpectedValueException('Entity type parameter must be included in context.');
     }
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
-  
+
     // The bundle property behaves differently from other entity properties.
     // i.e. the nested structure with a 'value' key does not work.
     if ($entity_type->hasKey('bundle')) {
@@ -77,7 +89,7 @@ class ContentEntityNormalizer extends EntityNormalizer {
         unset($data[$key]);
       }
     }
-  
+
     return $this->entityManager->getStorage($entity_type_id)->create($data);
   }
 }

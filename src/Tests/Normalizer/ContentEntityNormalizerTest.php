@@ -50,6 +50,8 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
   }
 
   public function testNormalize() {
+    $entity = entity_load('entity_test_mulrev', 1);
+
     $expected = array(
       'id' => array(
         array('value' => 1),
@@ -81,15 +83,17 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           'format' => $this->values['field_test_text']['format'],
         ),
       ),
-      '_id' => $this->entity->uuid(),
-      '_rev' => $this->entity->_revs_info->rev,
-      '_entity_type' => $this->entity->getEntityTypeId(),
+      '_id' => $entity->uuid(),
+      '_rev' => $entity->_revs_info->rev,
+      '_deleted' => $entity->_deleted->value,
+      '_local_seq' => $entity->_local_seq->id,
+      '_entity_type' => $entity->getEntityTypeId(),
     );
 
     $normalized = $this->serializer->normalize($this->entity);
 
-    foreach (array_keys($expected) as $fieldName) {
-      $this->assertEqual($expected[$fieldName], $normalized[$fieldName], "Field $fieldName is normalized correctly.");
+    foreach (array_keys($expected) as $key) {
+      $this->assertEqual($expected[$key], $normalized[$key], "Field $key is normalized correctly.");
     }
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
 
