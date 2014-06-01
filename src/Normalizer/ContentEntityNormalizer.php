@@ -28,7 +28,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   public function normalize($entity, $format = NULL, array $context = array()) {
     $data = array();
     // New or mocked entities might not have a UUID yet.
-    if (!empty($entity->uuid())) {
+    if ($entity->uuid()) {
       $data['_id'] = $entity->uuid();
     }
     // New or mocked entities might not have a rev yet.
