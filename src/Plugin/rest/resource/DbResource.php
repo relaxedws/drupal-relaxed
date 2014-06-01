@@ -97,7 +97,7 @@ class DbResource extends ResourceBase {
     }
 
     // Check for conflicts.
-    if (!empty($entity->uuid())) {
+    if ($entity->uuid()) {
       $entry = \Drupal::service('entity.uuid_index')->get($entity->uuid());
       if (!empty($entry)) {
         throw new ConflictHttpException();

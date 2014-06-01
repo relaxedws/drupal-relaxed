@@ -14,7 +14,7 @@ class DbResourceTest extends RESTTestBase {
     return array(
       'name' => '/db',
       'description' => 'Tests the /db resource.',
-      'group' => 'Couch API Resources',
+      'group' => 'Couch API',
     );
   }
 

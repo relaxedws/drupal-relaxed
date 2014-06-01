@@ -1,0 +1,57 @@
+language: php
+
+php:
+  - 5.4
+  - 5.5
+
+mysql:
+  database: drupal
+  username: root
+  encoding: utf8
+
+env:
+  - PATH=$PATH:/home/travis/.composer/vendor/bin
+
+before_install:
+  # Update Composer so that the Drush installation doesn't fail.
+  - composer selfupdate
+
+install:
+  # Install Apache.
+  - sudo apt-get install apache2 libapache2-mod-fastcgi
+
+  # Set up PHP-FPM.
+  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+  - sudo a2enmod rewrite actions fastcgi alias
+  - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+
+  # Set up the Apache vhost.
+  - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/default
+  - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal?g" --in-place /etc/apache2/sites-available/default
+  - sudo service apache2 restart
+
+  # Install Drush.
+  - composer global require drush/drush:dev-master
+
+before_script:
+  # Checkout a directory structure with all dependencies.
+  - git clone --depth 1 --branch 2274153-resttestbase-head-request-1 http://git.drupal.org/sandbox/dixon/1084068.git $TRAVIS_BUILD_DIR/../drupal
+  - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/sandbox/dixon/2277729.git $TRAVIS_BUILD_DIR/../drupal/modules/uuid
+  - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/sandbox/dixon/2277735.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
+  - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/sandbox/dixon/2277733.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
+  - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/couch_api
+
+  # Install the site that will host our tests.
+  - cd $TRAVIS_BUILD_DIR/../drupal
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/drupal testing
+
+  # Enable required modules and ignore any output to not break the test.
+  - drush --yes pm-enable simpletest couch_api || true
+
+script:
+  # Run the tests and make sure we exit with the right status.
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://127.0.0.1 "UUID Extensions,Key-value Extensions,Multiversion,Couch API" | tee /tmp/test.txt
+  - TEST_EXIT=${PIPESTATUS[0]}
+  - TEST_SIMPLETEST=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
+  - if [ $TEST_EXIT -eq 0 ] && [ $TEST_SIMPLETEST -eq 0 ]; then exit 0; else exit 1; fi

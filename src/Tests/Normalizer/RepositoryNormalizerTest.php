@@ -41,6 +41,7 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
 
   public function testNormalize() {
     $expected = array(
+      'id' => 1,
       'db_name' => $this->entity->name(),
     );
     $normalized = $this->serializer->normalize($this->entity);
