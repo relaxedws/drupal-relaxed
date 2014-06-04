@@ -24,7 +24,7 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest($this->entity->name(), 'HEAD', NULL);
+    $response = $this->httpRequest($this->repository->name(), 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertTrue(empty($response), 'HEAD request returned no body.');
@@ -39,13 +39,13 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest($this->entity->name(), 'GET', NULL);
+    $response = $this->httpRequest($this->repository->name(), 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
-    $this->assertEqual($data['db_name'], $this->entity->name(), 'GET request returned correct db_name.');
+    $this->assertEqual($data['db_name'], $this->repository->name(), 'GET request returned correct db_name.');
   }
 
   public function testPut() {
@@ -91,12 +91,12 @@ class DbResourceTest extends ResourceTestBase {
       $entity = entity_create($entity_type);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
-      $response = $this->httpRequest($this->entity->name(), 'POST', $serialized);
+      $response = $this->httpRequest($this->repository->name(), 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when posting new entity');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
 
-      $response = $this->httpRequest($this->entity->name(), 'POST', $serialized);
+      $response = $this->httpRequest($this->repository->name(), 'POST', $serialized);
       $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }

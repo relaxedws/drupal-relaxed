@@ -4,7 +4,7 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\rest\Tests\RESTTestBase;
 
-class ResourceTestBase extends RESTTestBase {
+abstract class ResourceTestBase extends RESTTestBase {
 
   public static $modules = array('rest', 'entity_test', 'relaxed');
 
@@ -17,14 +17,6 @@ class ResourceTestBase extends RESTTestBase {
    * @var \Drupal\multiversion\Entity\RepositoryInterface
    */
   protected $repository;
-
-  public static function getInfo() {
-    return array(
-        'name' => '/db/doc',
-        'description' => 'Tests the /db/doc resource.',
-        'group' => 'Relaxed API',
-    );
-  }
 
   protected function setUp() {
     parent::setUp();
@@ -46,6 +38,9 @@ class ResourceTestBase extends RESTTestBase {
     return parent::httpRequest($this->apiRoot . '/' . $url, $method, $body, $this->defaultMimeType);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function entityPermissions($entity_type, $operation) {
     $return = parent::entityPermissions($entity_type, $operation);
 
@@ -64,5 +59,108 @@ class ResourceTestBase extends RESTTestBase {
       }
     }
     return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove once https://drupal.org/node/2274153 has been committed.
+   */
+  protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL) {
+    if (!isset($mime_type)) {
+      $mime_type = $this->defaultMimeType;
+    }
+    if (!in_array($method, array('GET', 'HEAD', 'OPTIONS', 'TRACE'))) {
+      // GET the CSRF token first for writing requests.
+      $token = $this->drupalGet('rest/session/token');
+    }
+    $curl_options = array();
+    switch ($method) {
+      case 'GET':
+        // Set query if there are additional GET parameters.
+        $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
+        $curl_options = array(
+          CURLOPT_HTTPGET => TRUE,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_URL => url($url, $options),
+          CURLOPT_NOBODY => FALSE,
+          CURLOPT_HTTPHEADER => array('Accept: ' . $mime_type),
+        );
+        break;
+
+        case 'HEAD':
+          $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
+          $curl_options = array(
+            CURLOPT_HTTPGET => FALSE,
+            CURLOPT_CUSTOMREQUEST => 'HEAD',
+            CURLOPT_URL => url($url, $options),
+            CURLOPT_NOBODY => TRUE,
+            CURLOPT_HTTPHEADER => array('Accept: ' . $mime_type),
+          );
+          break;
+
+      case 'POST':
+        $curl_options = array(
+          CURLOPT_HTTPGET => FALSE,
+          CURLOPT_POST => TRUE,
+          CURLOPT_POSTFIELDS => $body,
+          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_NOBODY => FALSE,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: ' . $mime_type,
+            'X-CSRF-Token: ' . $token,
+          ),
+        );
+        break;
+
+      case 'PUT':
+        $curl_options = array(
+          CURLOPT_HTTPGET => FALSE,
+          CURLOPT_CUSTOMREQUEST => 'PUT',
+          CURLOPT_POSTFIELDS => $body,
+          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_NOBODY => FALSE,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: ' . $mime_type,
+            'X-CSRF-Token: ' . $token,
+          ),
+        );
+        break;
+
+      case 'PATCH':
+        $curl_options = array(
+          CURLOPT_HTTPGET => FALSE,
+          CURLOPT_CUSTOMREQUEST => 'PATCH',
+          CURLOPT_POSTFIELDS => $body,
+          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_NOBODY => FALSE,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: ' . $mime_type,
+            'X-CSRF-Token: ' . $token,
+          ),
+        );
+        break;
+
+      case 'DELETE':
+        $curl_options = array(
+          CURLOPT_HTTPGET => FALSE,
+          CURLOPT_CUSTOMREQUEST => 'DELETE',
+          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_NOBODY => FALSE,
+          CURLOPT_HTTPHEADER => array('X-CSRF-Token: ' . $token),
+        );
+        break;
+    }
+
+    $response = $this->curlExec($curl_options);
+    $headers = $this->drupalGetHeaders();
+    $headers = implode("\n", $headers);
+
+    $this->verbose($method . ' request to: ' . $url .
+      '<hr />Code: ' . curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE) .
+      '<hr />Response headers: ' . $headers .
+      '<hr />Response body: ' . $response);
+
+    return $response;
   }
 }
