@@ -1,7 +1,0 @@
-couch_api.settings:
-  type: mapping
-  label: 'Multiversion settings'
-  mapping:
-    api_root:
-      type: string
-      label: "Absolute base path to the Couch API root, without trailing slash."

@@ -1,0 +1,28 @@
+services:
+  relaxed.normalizer.content_entity:
+    class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+    arguments: ['@entity.manager']
+  relaxed.normalizer.repository:
+    class: Drupal\relaxed\Normalizer\RepositoryNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+    arguments: ['@entity.manager']
+  relaxed.normalizer.deleted_flag_item_list:
+    class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.local_sequence_item_list:
+    class: Drupal\relaxed\Normalizer\LocalSequenceItemListNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.revision_info_item_list:
+    class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  paramconverter.entity_uuid:
+    class: Drupal\relaxed\ParamConverter\EntityUuidConverter
+    arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
+    tags:
+      - { name: paramconverter, priority: 10 }

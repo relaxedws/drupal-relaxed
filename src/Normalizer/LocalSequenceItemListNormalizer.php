@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Normalizer;
+namespace Drupal\relaxed\Normalizer;
 
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;

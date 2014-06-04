@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Normalizer;
+namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;

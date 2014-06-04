@@ -40,18 +40,18 @@ before_script:
   - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/sandbox/dixon/2277729.git $TRAVIS_BUILD_DIR/../drupal/modules/uuid
   - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/sandbox/dixon/2277735.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
   - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/sandbox/dixon/2277733.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
-  - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/couch_api
+  - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
 
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/drupal testing
 
   # Enable required modules and ignore any output to not break the test.
-  - drush --yes pm-enable simpletest couch_api || true
+  - drush --yes pm-enable simpletest relaxed || true
 
 script:
   # Run the tests and make sure we exit with the right status.
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://127.0.0.1 "UUID Extensions,Key-value Extensions,Multiversion,Couch API" | tee /tmp/test.txt
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://127.0.0.1 "UUID Extensions,Key-value Extensions,Multiversion,Relaxed API" | tee /tmp/test.txt
   - TEST_EXIT=${PIPESTATUS[0]}
   - TEST_SIMPLETEST=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
   - if [ $TEST_EXIT -eq 0 ] && [ $TEST_SIMPLETEST -eq 0 ]; then exit 0; else exit 1; fi

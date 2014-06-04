@@ -1,0 +1,8 @@
+name: 'Relaxed API tests'
+type: module
+description: 'Configures a site for external testing.'
+package: Testing
+version: VERSION
+core: 8.x
+dependencies:
+  - relaxed

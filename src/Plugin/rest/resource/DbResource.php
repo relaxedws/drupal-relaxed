@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
 /**
  * @RestResource(
- *   id = "couch:root:db",
+ *   id = "relaxed:root:db",
  *   label = "Couch database",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\RepositoryInterface",

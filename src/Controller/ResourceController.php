@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Controller;
+namespace Drupal\relaxed\Controller;
 
 use Drupal\Core\Entity\EntityInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
@@ -26,7 +26,7 @@ class ResourceController implements ContainerAwareInterface {
   protected $serializer;
 
   /**
-   * @var \Drupal\couch_api\ResourceManagerInterface
+   * @var \Drupal\relaxed\ResourceManagerInterface
    */
   protected $resourceManager;
 

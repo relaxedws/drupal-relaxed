@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Tests\Normalizer;
+namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
@@ -8,7 +8,7 @@ use Drupal\serialization\Tests\NormalizerTestBase;
 
 class RepositoryNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'uuid', 'rest', 'couch_api');
+  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'uuid', 'rest', 'relaxed');
 
   protected $entityClass = 'Drupal\multiversion\Entity\Repository';
 
@@ -21,7 +21,7 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
     return array(
       'name'  => 'Repository serialization',
       'description'  => 'Tests the repository serialization format used for Couch API.',
-      'group' => 'Couch API'
+      'group' => 'Relaxed API'
     );
   }
 

@@ -1,0 +1,11 @@
+name: Relaxed API
+type: module
+description: 'Provides a RESTful API that exposes all content entities over UUID endpoints. Utility endpoints are also provided subscribing to changes and handling content replication.'
+package: Web services
+version: VERSION
+core: 8.x
+dependencies:
+  - rest
+  - serialization
+  - multiversion
+  - uuid

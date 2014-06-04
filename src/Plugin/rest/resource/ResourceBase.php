@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\couch_api\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\couch_api\ResourceManagerInterface;
+use Drupal\relaxed\ResourceManagerInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -15,7 +15,7 @@ abstract class ResourceBase extends CoreResourceBase {
   public function routes() {
     $collection = new RouteCollection();
     $definition = $this->getPluginDefinition();
-    $api_root = trim(\Drupal::config('couch_api.settings')->get('api_root'), '/');
+    $api_root = trim(\Drupal::config('relaxed.settings')->get('api_root'), '/');
     $route_name = strtr($this->pluginId, ':', '.');
 
     foreach ($this->availableMethods() as $method) {
@@ -27,7 +27,7 @@ abstract class ResourceBase extends CoreResourceBase {
 
       $method_lower = strtolower($method);
       $route = new Route($api_root . $definition['uri_paths']['canonical'], array(
-        '_controller' => 'Drupal\couch_api\Controller\ResourceController::handle',
+        '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
         '_plugin' => $this->pluginId,
       ), array(
         '_method' => $method,

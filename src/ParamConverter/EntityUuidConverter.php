@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\ParamConverter;
+namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;

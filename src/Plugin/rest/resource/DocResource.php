@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -12,9 +12,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
- *   id = "couch:root",
+ *   id = "relaxed:root",
  *   derivative_id = "!db:doc",
- *   derivative = "Drupal\couch_api\Plugin\Derivative\DbDerivative",
+ *   derivative = "Drupal\relaxed\Plugin\Derivative\DbDerivative",
  *   label = "!db documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * )
  */
 class DocResource extends ResourceBase {
-  
+
   /**
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    */
@@ -43,7 +43,7 @@ class DocResource extends ResourceBase {
     }
     // @todo Create a event handler and override the ETag that's set by core.
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse(NULL, 200, array('X-CouchDB-ETag' => $entity->_revs_info->rev));
+    return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => $entity->_revs_info->rev));
   }
 
   /**
@@ -63,7 +63,7 @@ class DocResource extends ResourceBase {
     }
     // @todo Create a event handler and override the ETag that's set by core.
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse($entity, 200, array('X-CouchDB-ETag' => $entity->_revs_info->rev));
+    return new ResourceResponse($entity, 200, array('X-Relaxed-ETag' => $entity->_revs_info->rev));
   }
 
   /**

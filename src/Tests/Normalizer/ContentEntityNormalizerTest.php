@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Tests\Normalizer;
+namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
@@ -8,7 +8,7 @@ use Drupal\serialization\Tests\NormalizerTestBase;
 
 class ContentEntityNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'couch_api');
+  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'relaxed');
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
@@ -21,7 +21,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     return array(
       'name'  => 'Content serialization',
       'description'  => 'Tests the content serialization format used for Couch API.',
-      'group' => 'Couch API'
+      'group' => 'Relaxed API'
     );
   }
 

@@ -1,0 +1,7 @@
+relaxed.settings:
+  type: mapping
+  label: 'Relaxed API settings'
+  mapping:
+    api_root:
+      type: string
+      label: "Absolute base path to the API root, without trailing slash."

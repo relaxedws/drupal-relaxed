@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\couch_api\Plugin\Derivative;
+namespace Drupal\relaxed\Plugin\Derivative;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityManagerInterface;

@@ -1,0 +1,48 @@
+resources:
+  relaxed:root:db:
+    HEAD:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    PUT:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    DELETE:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+  relaxed:root:default:doc:
+    HEAD:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    PUT:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+    DELETE:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie

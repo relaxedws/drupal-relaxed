@@ -5,7 +5,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Implements hook_entity_insert().
  */
-function couch_api_entity_insert(EntityInterface $entity) {
+function relaxed_entity_insert(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'repository') {
     \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
   }
@@ -14,7 +14,7 @@ function couch_api_entity_insert(EntityInterface $entity) {
 /**
  * Implements hook_entity_update().
  */
-function couch_api_entity_update(EntityInterface $entity) {
+function relaxed_entity_update(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'repository') {
     \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
   }
@@ -23,7 +23,7 @@ function couch_api_entity_update(EntityInterface $entity) {
 /**
  * Implements hook_entity_delete().
  */
-function couch_api_entity_delete(EntityInterface $entity) {
+function relaxed_entity_delete(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'repository') {
     \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
   }
