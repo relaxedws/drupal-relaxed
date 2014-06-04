@@ -20,7 +20,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'Content serialization',
-      'description'  => 'Tests the content serialization format used for Couch API.',
+      'description'  => 'Tests the content serialization format.',
       'group' => 'Relaxed API'
     );
   }

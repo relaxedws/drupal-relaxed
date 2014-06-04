@@ -74,7 +74,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $data[$bundle_key] = $type;
     }
 
-    // Attributes specific to the Couch API overwrites Drupal specific fields.
     if (isset($data['_id'])) {
       // @todo Fetch the uuid key from the entity definition.
       $data['uuid'] = array(array('value' => $data['_id']));

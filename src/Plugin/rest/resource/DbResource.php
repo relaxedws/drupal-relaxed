@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 /**
  * @RestResource(
  *   id = "relaxed:root:db",
- *   label = "Couch database",
+ *   label = "Repository",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\RepositoryInterface",
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",

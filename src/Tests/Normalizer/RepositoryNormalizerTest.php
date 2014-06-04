@@ -20,7 +20,7 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'Repository serialization',
-      'description'  => 'Tests the repository serialization format used for Couch API.',
+      'description'  => 'Tests the repository serialization format.',
       'group' => 'Relaxed API'
     );
   }

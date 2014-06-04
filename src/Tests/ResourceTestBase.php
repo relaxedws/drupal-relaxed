@@ -4,7 +4,7 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\rest\Tests\RESTTestBase;
 
-class RelaxedTestBase extends RESTTestBase {
+class ResourceTestBase extends RESTTestBase {
 
   public static $modules = array('rest', 'entity_test', 'relaxed');
 
