@@ -33,11 +33,6 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->repository->save();
   }
 
-  protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL) {
-    // Prepend the API root configuration to simplifiy for the tests.
-    return parent::httpRequest($this->apiRoot . '/' . $url, $method, $body, $this->defaultMimeType);
-  }
-
   /**
    * {@inheritdoc}
    */
@@ -64,9 +59,14 @@ abstract class ResourceTestBase extends RESTTestBase {
   /**
    * {@inheritdoc}
    *
-   * @todo Remove once https://drupal.org/node/2274153 has been committed.
+   * @todo Remove the bulk of function body when https://drupal.org/node/2274153
+   *   has been committed. However, the prepending of self::apiRoot needs to be
+   *   kept.
    */
   protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL) {
+    // Keep in overridden method when removing the bulk of this method.
+    $url = $this->apiRoot . '/' . $url;
+
     if (!isset($mime_type)) {
       $mime_type = $this->defaultMimeType;
     }
