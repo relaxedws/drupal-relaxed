@@ -50,7 +50,7 @@ before_script:
 
 script:
   # Run the tests and make sure we exit with the right status.
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://127.0.0.1 "Key-value Extensions,Multiversion,Relaxed API" | tee /tmp/test.txt
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://127.0.0.1 "Relaxed API" | tee /tmp/test.txt
   - TEST_EXIT=${PIPESTATUS[0]}
   - TEST_SIMPLETEST=$(! egrep -i "([0-9]+ fails)|(Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
   - if [ $TEST_EXIT -eq 0 ] && [ $TEST_SIMPLETEST -eq 0 ]; then exit 0; else exit 1; fi
