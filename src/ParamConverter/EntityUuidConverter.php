@@ -7,8 +7,8 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
+use Drupal\multiversion\Entity\UuidIndex;
 use Drupal\multiversion\Entity\RevisionIndex;
-use Drupal\uuid\Entity\UuidIndex;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -20,7 +20,7 @@ class EntityUuidConverter implements ParamConverterInterface {
   protected $entityManager;
 
   /**
-   * @var \Drupal\uuid\Entity\UuidIndex
+   * @var \Drupal\multiversion\Entity\UuidIndex
    */
   protected $uuidIndex;
 
