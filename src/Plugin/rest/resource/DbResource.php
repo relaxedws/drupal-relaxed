@@ -4,7 +4,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\multiversion\Entity\RepositoryInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -16,9 +16,9 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 /**
  * @RestResource(
  *   id = "relaxed:root:db",
- *   label = "Repository",
+ *   label = "Workspace",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\RepositoryInterface",
+ *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   uri_paths = {
@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   uri_parameters = {
  *     "canonical" = {
  *       "db" = {
- *         "type" = "entity_uuid:repository",
+ *         "type" = "entity_uuid:workspace",
  *       }
  *     }
  *   }
@@ -36,20 +36,20 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 class DbResource extends ResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\RepositoryInterface $entity
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $entity
    */
   public function head($entity) {
-    if (!$entity instanceof RepositoryInterface) {
+    if (!$entity instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
     return new ResourceResponse(NULL, 200);
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\RepositoryInterface $entity
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $entity
    */
   public function get($entity) {
-    if (!$entity instanceof RepositoryInterface) {
+    if (!$entity instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
     // @todo: Access check.
@@ -57,12 +57,12 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\RepositoryInterface $name
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $name
    */
   public function put($name) {
     // If the name parameter was upcasted to an entity it means it an entity
     // already exists.
-    if ($name instanceof RepositoryInterface) {
+    if ($name instanceof WorkspaceInterface) {
       throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
     }
     elseif (!is_string($name)) {
@@ -72,7 +72,7 @@ class DbResource extends ResourceBase {
     try {
       // @todo Consider using the container injected in parent::create()
       $entity = \Drupal::service('entity.manager')
-        ->getStorage('repository')
+        ->getStorage('workspace')
         ->create(array('name' => $name))
         ->save();
     }
@@ -83,13 +83,13 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\RepositoryInterface $repository
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    */
-  public function post($repository, ContentEntityInterface $entity = NULL) {
-    // If the repository parameter is a string it means it could not be upcasted
+  public function post($workspace, ContentEntityInterface $entity = NULL) {
+    // If the workspace parameter is a string it means it could not be upcasted
     // to an entity because none exiisted.
-    if (is_string($repository)) {
+    if (is_string($workspace)) {
       throw new NotFoundHttpException(t('Database does not exist')); 
     }
     elseif (empty($entity)) {
@@ -127,9 +127,9 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param \Drupal\multiversion\Entity\RepositoryInterface $entity
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface $entity
    */
-  public function delete(RepositoryInterface $entity) {
+  public function delete(WorkspaceInterface $entity) {
     try {
       // @todo: Access check.
       $entity->delete();

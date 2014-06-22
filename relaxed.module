@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Implements hook_entity_insert().
  */
 function relaxed_entity_insert(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'repository') {
+  if ($entity->getEntityTypeId() == 'workspace') {
     \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
   }
 }
@@ -15,7 +15,7 @@ function relaxed_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function relaxed_entity_update(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'repository') {
+  if ($entity->getEntityTypeId() == 'workspace') {
     \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
   }
 }
@@ -24,7 +24,7 @@ function relaxed_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function relaxed_entity_delete(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'repository') {
+  if ($entity->getEntityTypeId() == 'workspace') {
     \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
   }
 }

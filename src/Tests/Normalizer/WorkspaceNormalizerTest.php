@@ -6,11 +6,11 @@ use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
 use Drupal\serialization\Tests\NormalizerTestBase;
 
-class RepositoryNormalizerTest extends NormalizerTestBase {
+class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'uuid', 'rest', 'relaxed');
 
-  protected $entityClass = 'Drupal\multiversion\Entity\Repository';
+  protected $entityClass = 'Drupal\multiversion\Entity\Workspace';
 
   /**
    * @var \Symfony\Component\Serializer\SerializerInterface
@@ -19,8 +19,8 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
 
   public static function getInfo() {
     return array(
-      'name'  => 'Repository serialization',
-      'description'  => 'Tests the repository serialization format.',
+      'name'  => 'Workspace serialization',
+      'description'  => 'Tests the workspace serialization format.',
       'group' => 'Relaxed API'
     );
   }
@@ -28,12 +28,12 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installSchema('key_value', array('key_value_sorted'));
-    $this->installSchema('multiversion', array('repository'));
+    $this->installSchema('multiversion', array('workspace'));
 
     \Drupal::service('multiversion.manager')
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
 
-    $this->entity = entity_create('repository', array('name' => $this->randomName()));
+    $this->entity = entity_create('workspace', array('name' => $this->randomName()));
     $this->entity->save();
 
     $this->serializer = $this->container->get('serializer');

@@ -4,15 +4,15 @@ namespace Drupal\relaxed\Normalizer;
 
 use Drupal\serialization\Normalizer\EntityNormalizer;
 
-class RepositoryNormalizer extends EntityNormalizer {
+class WorkspaceNormalizer extends EntityNormalizer {
 
-  protected $supportedInterfaceOrClass = array('Drupal\multiversion\Entity\RepositoryInterface');
+  protected $supportedInterfaceOrClass = array('Drupal\multiversion\Entity\WorkspaceInterface');
 
   /**
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    $context['entity_type'] = 'repository';
+    $context['entity_type'] = 'workspace';
     $data = parent::normalize($entity, $format, $context);
 
     if (isset($data['name'])) {
@@ -30,6 +30,6 @@ class RepositoryNormalizer extends EntityNormalizer {
       $data['name'] = $data['db_name'];
       unset($data['db_name']);
     }
-    return $this->entityManager->getStorage('repository')->create($data);
+    return $this->entityManager->getStorage('workspace')->create($data);
   }
 }

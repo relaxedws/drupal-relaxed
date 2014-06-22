@@ -19,12 +19,12 @@ class DbResourceTest extends ResourceTestBase {
     $this->enableService('relaxed:root:db', 'GET');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('repository', 'view');
+    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'restful get relaxed:root:db';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest($this->repository->name(), 'HEAD', NULL);
+    $response = $this->httpRequest($this->workspace->name(), 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertTrue(empty($response), 'HEAD request returned no body.');
@@ -34,25 +34,25 @@ class DbResourceTest extends ResourceTestBase {
     $this->enableService('relaxed:root:db', 'GET');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('repository', 'view');
+    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'restful get relaxed:root:db';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest($this->repository->name(), 'GET', NULL);
+    $response = $this->httpRequest($this->workspace->name(), 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
-    $this->assertEqual($data['db_name'], $this->repository->name(), 'GET request returned correct db_name.');
+    $this->assertEqual($data['db_name'], $this->workspace->name(), 'GET request returned correct db_name.');
   }
 
   public function testPut() {
     $this->enableService('relaxed:root:db', 'PUT');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('repository', 'create');
+    $permissions = $this->entityPermissions('workspace', 'create');
     $permissions[] = 'restful put relaxed:root:db';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
@@ -63,13 +63,13 @@ class DbResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
 
-    $entity = entity_load_by_uuid('repository', $name);
+    $entity = entity_load_by_uuid('workspace', $name);
     $this->assertTrue(!empty($entity), 'The entity being PUT was loaded.');
 
-    $entity = entity_create('repository', array('name' => $this->randomName()));
+    $entity = entity_create('workspace', array('name' => $this->randomName()));
     $entity->save();
 
-    // Test putting an existing repository.
+    // Test putting an existing workspace.
     $response = $this->httpRequest($entity->name(), 'PUT', NULL);
     $this->assertResponse('412', 'HTTP response code is correct for existing database');
     $data = Json::decode($response);
@@ -91,26 +91,26 @@ class DbResourceTest extends ResourceTestBase {
       $entity = entity_create($entity_type);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
-      $response = $this->httpRequest($this->repository->name(), 'POST', $serialized);
+      $response = $this->httpRequest($this->workspace->name(), 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when posting new entity');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
 
-      $response = $this->httpRequest($this->repository->name(), 'POST', $serialized);
+      $response = $this->httpRequest($this->workspace->name(), 'POST', $serialized);
       $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }
 
   public function testDelete() {
     $this->enableService('relaxed:root:db', 'DELETE');
-  
+
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('repository', 'delete');
+    $permissions = $this->entityPermissions('workspace', 'delete');
     $permissions[] = 'restful delete relaxed:root:db';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $entity = entity_create('repository', array('name' => $this->randomName()));
+    $entity = entity_create('workspace', array('name' => $this->randomName()));
     $entity->save();
 
     $response = $this->httpRequest($entity->name(), 'DELETE', NULL);
@@ -118,7 +118,7 @@ class DbResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
-    $entity = entity_load('repository', $entity->id());
+    $entity = entity_load('workspace', $entity->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
   }
 }

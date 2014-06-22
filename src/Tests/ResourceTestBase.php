@@ -14,9 +14,9 @@ abstract class ResourceTestBase extends RESTTestBase {
   protected $api_root;
 
   /**
-   * @var \Drupal\multiversion\Entity\RepositoryInterface
+   * @var \Drupal\multiversion\Entity\WorkspaceInterface
    */
-  protected $repository;
+  protected $workspace;
 
   protected function setUp() {
     parent::setUp();
@@ -29,8 +29,8 @@ abstract class ResourceTestBase extends RESTTestBase {
     \Drupal::service('multiversion.manager')
     ->attachRequiredFields('entity_test_rev', 'entity_test_rev');
 
-    $this->repository = entity_create('repository', array('name' => $this->randomName()));
-    $this->repository->save();
+    $this->workspace = entity_create('workspace', array('name' => $this->randomName()));
+    $this->workspace->save();
   }
 
   /**
