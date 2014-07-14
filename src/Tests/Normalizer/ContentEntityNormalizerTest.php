@@ -6,6 +6,11 @@ use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
 use Drupal\serialization\Tests\NormalizerTestBase;
 
+/**
+ * Tests the content serialization format.
+ *
+ * @group relaxed
+ */
 class ContentEntityNormalizerTest extends NormalizerTestBase {
 
   public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'relaxed');
@@ -16,14 +21,6 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
    * @var \Symfony\Component\Serializer\SerializerInterface
    */
   protected $serializer;
-
-  public static function getInfo() {
-    return array(
-      'name'  => 'Content serialization',
-      'description'  => 'Tests the content serialization format.',
-      'group' => 'Relaxed API'
-    );
-  }
 
   protected function setUp() {
     parent::setUp();

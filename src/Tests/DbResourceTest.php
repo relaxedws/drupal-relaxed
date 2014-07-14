@@ -4,15 +4,12 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
 
+/**
+ * Tests the /db resource.
+ *
+ * @group relaxed
+ */
 class DbResourceTest extends ResourceTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => '/db',
-      'description' => 'Tests the /db resource.',
-      'group' => 'Relaxed API',
-    );
-  }
 
   public function testHead() {
     // HEAD and GET is handled by the same resource.

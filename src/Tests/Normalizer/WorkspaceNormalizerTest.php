@@ -6,6 +6,11 @@ use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
 use Drupal\serialization\Tests\NormalizerTestBase;
 
+/**
+ * Tests the workspace serialization format.
+ *
+ * @group relaxed
+ */
 class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'uuid', 'rest', 'relaxed');
@@ -16,14 +21,6 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
    * @var \Symfony\Component\Serializer\SerializerInterface
    */
   protected $serializer;
-
-  public static function getInfo() {
-    return array(
-      'name'  => 'Workspace serialization',
-      'description'  => 'Tests the workspace serialization format.',
-      'group' => 'Relaxed API'
-    );
-  }
 
   protected function setUp() {
     parent::setUp();

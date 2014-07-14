@@ -5,17 +5,12 @@ namespace Drupal\relaxed\Tests;
 use Drupal\Component\Serialization\Json;
 
 /**
+ * Tests the /db/doc resource.
+ *
+ * @group relaxed
  * @todo Test more entity types, at least node, taxonomy term, comment and user.
  */
 class DocResourceTest extends ResourceTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => '/db/doc',
-      'description' => 'Tests the /db/doc resource.',
-      'group' => 'Relaxed API',
-    );
-  }
 
   public function testHead() {
     $db = $this->workspace->name();
