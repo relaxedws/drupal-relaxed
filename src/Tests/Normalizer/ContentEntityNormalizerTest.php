@@ -33,10 +33,10 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
 
     // Create a test entity to serialize.
     $this->values = array(
-      'name' => $this->randomName(),
+      'name' => $this->randomMachineName(),
       'user_id' => 0,
       'field_test_text' => array(
-        'value' => $this->randomName(),
+        'value' => $this->randomMachineName(),
         'format' => 'full_html',
       ),
     );

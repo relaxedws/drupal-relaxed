@@ -36,7 +36,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertHeader('x-relaxed-etag', $first_rev);
       $this->assertTrue(empty($response), 'HEAD request returned no body.');
 
-      $new_name = $this->randomName();
+      $new_name = $this->randomMachineName();
       $entity->name = $new_name;
       $entity->save();
       $second_rev = $entity->_revs_info->rev;

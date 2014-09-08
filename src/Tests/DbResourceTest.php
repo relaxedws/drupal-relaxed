@@ -54,7 +54,7 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $name = $this->randomName();
+    $name = $this->randomMachineName();
     $response = $this->httpRequest($name, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
@@ -63,7 +63,7 @@ class DbResourceTest extends ResourceTestBase {
     $entity = entity_load_by_uuid('workspace', $name);
     $this->assertTrue(!empty($entity), 'The entity being PUT was loaded.');
 
-    $entity = entity_create('workspace', array('name' => $this->randomName()));
+    $entity = entity_create('workspace', array('name' => $this->randomMachineName()));
     $entity->save();
 
     // Test putting an existing workspace.
@@ -107,7 +107,7 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $entity = entity_create('workspace', array('name' => $this->randomName()));
+    $entity = entity_create('workspace', array('name' => $this->randomMachineName()));
     $entity->save();
 
     $response = $this->httpRequest($entity->name(), 'DELETE', NULL);
