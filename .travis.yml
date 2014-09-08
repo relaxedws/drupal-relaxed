@@ -11,33 +11,43 @@ mysql:
   username: root
   encoding: utf8
 
+env:
+  - PATH=$PATH:/home/travis/.composer/vendor/bin
+
+before_install:
+  # Update Composer so that the Drush installation doesn't fail.
+  - composer selfupdate
+
 install:
-  # Install Apache
+  # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi
 
-  # Configure PHP
-  - echo -e "opcache.enable_cli=1\ncgi.fix_pathinfo=1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+  # Set up PHP-FPM.
+  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+  - sudo a2enmod rewrite actions fastcgi alias
+  - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
 
-  # Configure Apache
+  # Set up the Apache vhost.
   - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/default
   - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal?g" --in-place /etc/apache2/sites-available/default
-  - sudo a2enmod rewrite actions fastcgi alias && sudo service apache2 restart
+  - sudo service apache2 restart
 
-  # Download Drush and Drupal
+  # Install Drush.
   - composer global require drush/drush:dev-master
-  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
 
-  # Download dependencies
-#  - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/project/multiversion.git modules/multiversion
-#  - git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/project/key_value.git modules/key_value
+before_script:
+  # Checkout a directory structure with all dependencies.
+  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
   - git clone --branch 8.0.x-compatibility https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
   - git clone --branch 8.0.x-compatibility https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
 
-  # Install the host site
+  # Install the site that will host our tests.
+  - cd $TRAVIS_BUILD_DIR/../drupal
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/drupal testing
+
+  # Enable required modules and ignore any output to not break the test.
   - drush --yes pm-enable relaxed
 
 
