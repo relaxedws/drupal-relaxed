@@ -50,7 +50,6 @@ before_script:
   # Enable required modules and ignore any output to not break the test.
   - drush --yes pm-enable relaxed
 
-
 script:
   # Enable Simpletest and run Simpletest tests.
   - drush en --yes simpletest
