@@ -1,9 +1,9 @@
 language: php
 
-cache: apt
+#cache: apt
 
 php:
-  #- 5.4
+  - 5.4
   - 5.5
 
 mysql:
