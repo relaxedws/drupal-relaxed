@@ -29,7 +29,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     \Drupal::service('multiversion.manager')
     ->attachRequiredFields('entity_test_rev', 'entity_test_rev');
 
-    $this->workspace = entity_create('workspace', array('name' => $this->randomMachineName()));
+    $this->workspace = entity_create('workspace', array('id' => drupal_strtolower($this->randomMachineName()), 'name' => $this->randomMachineName()));
     $this->workspace->save();
   }
 

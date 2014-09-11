@@ -30,7 +30,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     \Drupal::service('multiversion.manager')
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
 
-    $this->entity = entity_create('workspace', array('name' => $this->randomMachineName()));
+    $this->entity = entity_create('workspace', array('id' => drupal_strtolower($this->randomMachineName()), 'name' => $this->randomMachineName()));
     $this->entity->save();
 
     $this->serializer = $this->container->get('serializer');
