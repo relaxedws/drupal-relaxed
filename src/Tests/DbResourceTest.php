@@ -63,7 +63,8 @@ class DbResourceTest extends ResourceTestBase {
     $entity = \Drupal::entityManager()->loadEntityByUuid('workspace', $name);
     $this->assertTrue(!empty($entity), 'The entity being PUT was loaded.');
 
-    $entity = entity_create('workspace', array('id' => drupal_strtolower($this->randomMachineName()), 'name' => $this->randomMachineName()));
+    $name = $this->randomMachineName();
+    $entity = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
     $entity->save();
 
     // Test putting an existing workspace.
@@ -107,7 +108,8 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $entity = entity_create('workspace', array('id' => drupal_strtolower($this->randomMachineName()), 'name' => $this->randomMachineName()));
+    $name = $this->randomMachineName();
+    $entity = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
     $entity->save();
 
     $response = $this->httpRequest($entity->name(), 'DELETE', NULL);

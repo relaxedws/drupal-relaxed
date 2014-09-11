@@ -25,12 +25,13 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installSchema('key_value', array('key_value_sorted'));
-    $this->installSchema('multiversion', array('workspace'));
+    //$this->installSchema('multiversion', array('workspace'));
 
     \Drupal::service('multiversion.manager')
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
 
-    $this->entity = entity_create('workspace', array('id' => drupal_strtolower($this->randomMachineName()), 'name' => $this->randomMachineName()));
+    $name = $this->randomMachineName();
+    $this->entity = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
     $this->entity->save();
 
     $this->serializer = $this->container->get('serializer');
@@ -38,7 +39,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   public function testNormalize() {
     $expected = array(
-      'id' => 1,
+      'id' => drupal_strtolower($this->entity->name()),
       'db_name' => $this->entity->name(),
     );
     $normalized = $this->serializer->normalize($this->entity);
