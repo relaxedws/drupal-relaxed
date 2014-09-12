@@ -90,7 +90,6 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       $entity = entity_create($entity_type);
-      $entity->save();
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized);
