@@ -64,7 +64,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->assertTrue(!empty($entity), 'The entity being PUT was loaded.');
 
     $name = $this->randomMachineName();
-    $entity = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
+    $entity = $this->createWorkspace($name);
     $entity->save();
 
     // Test putting an existing workspace.
@@ -109,7 +109,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     $name = $this->randomMachineName();
-    $entity = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
+    $entity = $this->createWorkspace($name);
     $entity->save();
 
     $response = $this->httpRequest($entity->name(), 'DELETE', NULL);
@@ -120,4 +120,5 @@ class DbResourceTest extends ResourceTestBase {
     $entity = entity_load('workspace', $entity->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
   }
+
 }

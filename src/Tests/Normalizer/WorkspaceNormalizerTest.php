@@ -31,7 +31,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
 
     $name = $this->randomMachineName();
-    $this->entity = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
+    $this->entity = $this->createWorkspace($name);
     $this->entity->save();
 
     $this->serializer = $this->container->get('serializer');
@@ -62,5 +62,18 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
     $this->assertTrue($denormalized instanceof $this->entityClass, String::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
     $this->assertIdentical($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');
+  }
+
+  /**
+   * Creates a custom workspace entity.
+   */
+  protected function createWorkspace($name) {
+    $entity = entity_create('workspace', array(
+      'id' => drupal_strtolower($name),
+      'name' => $name,
+      'label' => $name,
+      'uuid' => $name
+    ));
+    return $entity;
   }
 }

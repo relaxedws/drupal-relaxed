@@ -30,7 +30,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     ->attachRequiredFields('entity_test_rev', 'entity_test_rev');
 
     $name = $this->randomMachineName();
-    $this->workspace = entity_create('workspace', array('id' => drupal_strtolower($name), 'name' => $name));
+    $this->workspace = $this->createWorkspace($name);
     $this->workspace->save();
   }
 
@@ -163,5 +163,18 @@ abstract class ResourceTestBase extends RESTTestBase {
       '<hr />Response body: ' . $response);
 
     return $response;
+  }
+
+  /**
+   * Creates a custom workspace entity.
+   */
+  protected function createWorkspace($name) {
+    $entity = entity_create('workspace', array(
+      'id' => drupal_strtolower($name),
+      'name' => $name,
+      'label' => $name,
+      'uuid' => $name
+    ));
+    return $entity;
   }
 }
