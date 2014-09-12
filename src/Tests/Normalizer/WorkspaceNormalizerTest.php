@@ -40,9 +40,11 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
   public function testNormalize() {
     $expected = array(
       'id' => drupal_strtolower($this->entity->name()),
+      'label' => $this->entity->name(),
       'db_name' => $this->entity->name(),
     );
     $normalized = $this->serializer->normalize($this->entity);
+
     foreach (array_keys($expected) as $fieldName) {
       $this->assertEqual($expected[$fieldName], $normalized[$fieldName], "Field $fieldName is normalized correctly.");
     }
