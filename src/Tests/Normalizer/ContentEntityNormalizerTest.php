@@ -60,7 +60,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
         array('value' => $this->entity->uuid()),
       ),
       'langcode' => array(
-        array('value' => Language::LANGCODE_NOT_SPECIFIED),
+        array('value' => 'en'),
       ),
       'name' => array(
         array('value' => $this->values['name']),
