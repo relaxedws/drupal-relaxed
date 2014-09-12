@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @RestResource(
  *   id = "relaxed:root",
  *   derivative_id = "!db:doc",
- *   derivative = "Drupal\relaxed\Plugin\Derivative\DbDerivative",
+ *   deriver = "Drupal\relaxed\Plugin\Derivative\DbDerivative",
  *   label = "!db documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
