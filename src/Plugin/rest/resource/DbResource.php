@@ -36,7 +36,10 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 class DbResource extends ResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $entity
+   * @param $entity
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function head($entity) {
     if (!$entity instanceof WorkspaceInterface) {
@@ -46,7 +49,10 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $entity
+   * @param $entity
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($entity) {
     if (!$entity instanceof WorkspaceInterface) {
@@ -57,7 +63,12 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $name
+   * @param $name
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
   public function put($name) {
     // If the name parameter was upcasted to an entity it means it an entity
@@ -73,7 +84,7 @@ class DbResource extends ResourceBase {
       // @todo Consider using the container injected in parent::create()
       $entity = \Drupal::service('entity.manager')
         ->getStorage('workspace')
-        ->create(array('name' => $name))
+        ->create(array('name' => $name, 'id' => drupal_strtolower($name), 'uuid' => $name))
         ->save();
     }
     catch (EntityStorageException $e) {
@@ -83,8 +94,15 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param $workspace
+   * @param ContentEntityInterface $entity
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
   public function post($workspace, ContentEntityInterface $entity = NULL) {
     // If the workspace parameter is a string it means it could not be upcasted
@@ -127,7 +145,10 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param \Drupal\multiversion\Entity\WorkspaceInterface $entity
+   * @param WorkspaceInterface $entity
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function delete(WorkspaceInterface $entity) {
     try {
