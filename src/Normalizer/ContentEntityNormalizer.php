@@ -70,8 +70,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // i.e. the nested structure with a 'value' key does not work.
     if ($entity_type->hasKey('bundle')) {
       $bundle_key = $entity_type->getKey('bundle');
-      $type = $data[$bundle_key][0]['value'];
-      $data[$bundle_key] = $type;
+      if (isset($data[$bundle_key][0]['value'])) {
+        $type = $data[$bundle_key][0]['value'];
+        $data[$bundle_key] = $type;
+      }
     }
 
     if (isset($data['_id'])) {
