@@ -59,5 +59,4 @@ script:
   # Simpletest does not exit with code 0 on success, so we will need to analyze
   # the output to ascertain whether the tests passed.
   - TEST_SIMPLETEST=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
-  - sudo cat /var/log/apache2/error.log
   - if [ $TEST_EXIT -eq 0 ] && [ $TEST_SIMPLETEST -eq 0 ]; then exit 0; else exit 1; fi
