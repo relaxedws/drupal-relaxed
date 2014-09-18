@@ -4,11 +4,11 @@ namespace Drupal\relaxed\Plugin\Derivative;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Plugin\Discovery\ContainerDerivativeInterface;
-use Drupal\multiversion\Entity\RepositoryInterface;
+use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DbDerivative implements ContainerDerivativeInterface {
+class DbDerivative implements ContainerDeriverInterface {
 
   /**
    * @var array
@@ -55,7 +55,7 @@ class DbDerivative implements ContainerDerivativeInterface {
    */
   public function getDerivativeDefinitions($base_definition) {
     // Load all repositories.
-    $entities = $this->entityManager->getStorage('repository')->loadMultiple(NULL);
+    $entities = $this->entityManager->getStorage('workspace')->loadMultiple(NULL);
     foreach ($entities as $entity) {
       $derivative_id = $this->format($base_definition['derivative_id'], $entity);
       $this->derivatives[$derivative_id] = array(
@@ -72,7 +72,7 @@ class DbDerivative implements ContainerDerivativeInterface {
     return $this->derivatives;
   }
 
-  protected function format($string, RepositoryInterface $entity) {
+  protected function format($string, WorkspaceInterface $entity) {
     return String::format($string, array('!db' => $entity->name()));
   }
 }

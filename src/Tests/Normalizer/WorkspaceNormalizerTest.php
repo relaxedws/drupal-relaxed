@@ -6,34 +6,31 @@ use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
 use Drupal\serialization\Tests\NormalizerTestBase;
 
-class RepositoryNormalizerTest extends NormalizerTestBase {
+/**
+ * Tests the workspace serialization format.
+ *
+ * @group relaxed
+ */
+class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'uuid', 'rest', 'relaxed');
 
-  protected $entityClass = 'Drupal\multiversion\Entity\Repository';
+  protected $entityClass = 'Drupal\multiversion\Entity\Workspace';
 
   /**
    * @var \Symfony\Component\Serializer\SerializerInterface
    */
   protected $serializer;
 
-  public static function getInfo() {
-    return array(
-      'name'  => 'Repository serialization',
-      'description'  => 'Tests the repository serialization format.',
-      'group' => 'Relaxed API'
-    );
-  }
-
   protected function setUp() {
     parent::setUp();
     $this->installSchema('key_value', array('key_value_sorted'));
-    $this->installSchema('multiversion', array('repository'));
 
     \Drupal::service('multiversion.manager')
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
 
-    $this->entity = entity_create('repository', array('name' => $this->randomName()));
+    $name = $this->randomMachineName();
+    $this->entity = $this->createWorkspace($name);
     $this->entity->save();
 
     $this->serializer = $this->container->get('serializer');
@@ -41,10 +38,12 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
 
   public function testNormalize() {
     $expected = array(
-      'id' => 1,
+      'id' => drupal_strtolower($this->entity->name()),
+      'label' => $this->entity->name(),
       'db_name' => $this->entity->name(),
     );
     $normalized = $this->serializer->normalize($this->entity);
+
     foreach (array_keys($expected) as $fieldName) {
       $this->assertEqual($expected[$fieldName], $normalized[$fieldName], "Field $fieldName is normalized correctly.");
     }
@@ -64,5 +63,18 @@ class RepositoryNormalizerTest extends NormalizerTestBase {
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
     $this->assertTrue($denormalized instanceof $this->entityClass, String::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
     $this->assertIdentical($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');
+  }
+
+  /**
+   * Creates a custom workspace entity.
+   */
+  protected function createWorkspace($name) {
+    $entity = entity_create('workspace', array(
+      'id' => drupal_strtolower($name),
+      'name' => $name,
+      'label' => $name,
+      'uuid' => $name
+    ));
+    return $entity;
   }
 }

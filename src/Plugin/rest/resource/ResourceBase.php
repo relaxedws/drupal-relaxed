@@ -37,7 +37,7 @@ abstract class ResourceBase extends CoreResourceBase {
       ));
 
       if (isset($definition['uri_paths'][$method_lower])) {
-        $route->setPattern($definition['uri_paths'][$method_lower]);
+        $route->setPath($definition['uri_paths'][$method_lower]);
       }
 
       if (isset($definition['uri_parameters'][$method_lower])) {

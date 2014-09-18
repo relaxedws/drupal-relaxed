@@ -4,8 +4,8 @@ services:
     tags:
       - { name: normalizer, priority: 10 }
     arguments: ['@entity.manager']
-  relaxed.normalizer.repository:
-    class: Drupal\relaxed\Normalizer\RepositoryNormalizer
+  relaxed.normalizer.workspace:
+    class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
       - { name: normalizer, priority: 10 }
     arguments: ['@entity.manager']

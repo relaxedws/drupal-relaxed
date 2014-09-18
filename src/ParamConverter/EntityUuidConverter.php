@@ -9,7 +9,6 @@ use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Drupal\multiversion\Entity\UuidIndex;
 use Drupal\multiversion\Entity\RevisionIndex;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 class EntityUuidConverter implements ParamConverterInterface {
@@ -44,10 +43,11 @@ class EntityUuidConverter implements ParamConverterInterface {
    * @return string | \Drupal\Core\Entity\EntityInterface
    *   The entity if it exists in the database or else the original UUID string.
    */
-  public function convert($uuid, $definition, $name, array $defaults, Request $request) {
+  public function convert($uuid, $definition, $name, array $defaults) {
     $entity_type_id = substr($definition['type'], strlen($this->key . ':'));
     $entity_id = NULL;
     $revision_id = NULL;
+    $request = \Drupal::request();
 
     // Figure out if we should load a specific revision or not.
     if (!$rev = $request->query->get('rev')) {

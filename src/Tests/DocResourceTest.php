@@ -5,20 +5,15 @@ namespace Drupal\relaxed\Tests;
 use Drupal\Component\Serialization\Json;
 
 /**
+ * Tests the /db/doc resource.
+ *
+ * @group relaxed
  * @todo Test more entity types, at least node, taxonomy term, comment and user.
  */
 class DocResourceTest extends ResourceTestBase {
 
-  public static function getInfo() {
-    return array(
-      'name' => '/db/doc',
-      'description' => 'Tests the /db/doc resource.',
-      'group' => 'Relaxed API',
-    );
-  }
-
   public function testHead() {
-    $db = $this->repository->name();
+    $db = $this->workspace->name();
 
     // HEAD and GET is handled by the same resource.
     $this->enableService("relaxed:root:$db:doc", 'GET');
@@ -29,7 +24,7 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = "restful get relaxed:root:$db:doc";
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
-  
+
       $entity = entity_create($entity_type);
       $entity->save();
       $first_rev = $entity->_revs_info->rev;
@@ -41,7 +36,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertHeader('x-relaxed-etag', $first_rev);
       $this->assertTrue(empty($response), 'HEAD request returned no body.');
 
-      $new_name = $this->randomName();
+      $new_name = $this->randomMachineName();
       $entity->name = $new_name;
       $entity->save();
       $second_rev = $entity->_revs_info->rev;
@@ -55,7 +50,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testGet() {
-    $db = $this->repository->name();
+    $db = $this->workspace->name();
 
     $this->enableService("relaxed:root:$db:doc", 'GET');
     $entity_types = array('entity_test_rev');
@@ -82,7 +77,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $db = $this->repository->name();
+    $db = $this->workspace->name();
 
     $this->enableService("relaxed:root:$db:doc", 'PUT');
     $serializer = $this->container->get('serializer');
@@ -93,7 +88,7 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = "restful put relaxed:root:$db:doc";
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
-    
+
       $entity = entity_create($entity_type);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
@@ -105,7 +100,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testDelete() {
-    $db = $this->repository->name();
+    $db = $this->workspace->name();
 
     $this->enableService("relaxed:root:$db:doc", 'DELETE');
     $entity_types = array('entity_test_rev');

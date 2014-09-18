@@ -14,9 +14,9 @@ abstract class ResourceTestBase extends RESTTestBase {
   protected $api_root;
 
   /**
-   * @var \Drupal\multiversion\Entity\RepositoryInterface
+   * @var \Drupal\multiversion\Entity\WorkspaceInterface
    */
-  protected $repository;
+  protected $workspace;
 
   protected function setUp() {
     parent::setUp();
@@ -29,8 +29,9 @@ abstract class ResourceTestBase extends RESTTestBase {
     \Drupal::service('multiversion.manager')
     ->attachRequiredFields('entity_test_rev', 'entity_test_rev');
 
-    $this->repository = entity_create('repository', array('name' => $this->randomName()));
-    $this->repository->save();
+    $name = $this->randomMachineName();
+    $this->workspace = $this->createWorkspace($name);
+    $this->workspace->save();
   }
 
   /**
@@ -162,5 +163,18 @@ abstract class ResourceTestBase extends RESTTestBase {
       '<hr />Response body: ' . $response);
 
     return $response;
+  }
+
+  /**
+   * Creates a custom workspace entity.
+   */
+  protected function createWorkspace($name) {
+    $entity = entity_create('workspace', array(
+      'id' => drupal_strtolower($name),
+      'name' => $name,
+      'label' => $name,
+      'uuid' => $name
+    ));
+    return $entity;
   }
 }
