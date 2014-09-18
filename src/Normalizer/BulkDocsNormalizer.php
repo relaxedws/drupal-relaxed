@@ -40,7 +40,7 @@ class BulkDocsNormalizer extends ContentEntityNormalizer {
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     $result = array();
-    if (is_array($data)) {
+    if (is_array($data) && !isset($data['uuid'])) {
       foreach ($data as $field) {
         $result[] = parent::denormalize($field, $class, $format, $context);
       }
