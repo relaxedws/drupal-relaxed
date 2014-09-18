@@ -32,9 +32,14 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $serialized = $serializer->serialize($entities, $this->defaultFormat);
 
       $response = $this->httpRequest($this->workspace->name() . '/bulk-docs', 'POST', $serialized);
-      $this->assertResponse('201', 'HTTP response code is correct when posting or updating new entities');
+      $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
-      $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
+      if (is_array($data)) {
+        foreach ($data as $key => $entity_info) {
+          $entity_number = $key+1;
+          $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
+        }
+      }
     }
   }
 
@@ -46,7 +51,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     while ($number >= 1) {
       $entity = entity_create($entity_type);
-      $entity->save();
       $entities[] = $entity;
       $number--;
     }
