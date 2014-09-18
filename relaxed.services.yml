@@ -7,7 +7,7 @@ services:
   relaxed.normalizer.bulk_docs:
       class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
       tags:
-        - { name: normalizer, priority: 10 }
+        - { name: normalizer, priority: 20 }
       arguments: ['@entity.manager']
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer

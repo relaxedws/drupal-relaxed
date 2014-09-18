@@ -112,17 +112,15 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   public function testDenormalize() {
     $normalized = $this->serializer->normalize($this->testEntities);
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
-    $this->assertTrue($denormalized instanceof $this->entityClass, String::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
-
-//    if (isset($denormalized->values) && !empty($denormalized->values)) {
-//      $entity_number = 1;
-//      foreach ($denormalized->values as $key => $entity) {
-//        $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities[$key]->getEntityTypeId(), 'Expected entity type found.');
-//        $this->assertIdentical($entity->bundle(), $this->testEntities[$key]->bundle(), 'Expected entity bundle found.');
-//        $this->assertIdentical($entity->uuid(), $this->testEntities[$key]->uuid(), 'Expected entity UUID found.');
-//        $entity_number++;
-//      }
-//    }
+    if (is_array($denormalized)) {
+      foreach ($denormalized as $key => $entity) {
+        $entity_number = $key+1;
+        $this->assertTrue($entity instanceof $this->entityClass, String::format("Denormalized entity number $entity_number is an instance of @class", array('@class' => $this->entityClass)));
+        $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities[$key]->getEntityTypeId(), "Expected entity type foundfor entity number $entity_number.");
+        $this->assertIdentical($entity->bundle(), $this->testEntities[$key]->bundle(), "Expected entity bundle found for entity number $entity_number.");
+        $this->assertIdentical($entity->uuid(), $this->testEntities[$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");
+      }
+    }
 
     // @todo Test context switches.
   }

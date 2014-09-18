@@ -44,44 +44,29 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 class BulkDocsResource extends ResourceBase {
 
   public function post($workspace, array $entities = array()) {
-    // If the workspace parameter is a string it means it could not be upcasted
-    // to an entity because none existed.
-    if (is_string($workspace)) {
-      throw new NotFoundHttpException(t('Database does not exist'));
-    }
-    elseif (empty($entities)) {
+    $result = array();
+
+    if  (empty($entities)) {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
-    // Check for conflicts.
     foreach ($entities as $entity) {
-      if ($entity->uuid()) {
-        $entry = \Drupal::service('entity.uuid_index')->get($entity->uuid());
-        if (!empty($entry)) {
-          throw new ConflictHttpException();
-        }
-      }
-
-      // Check entity and field level access.
-      if (!$entity->access('create')) {
-        throw new AccessDeniedHttpException();
-      }
-      foreach ($entity as $field_name => $field) {
-        if (!$field->access('create')) {
-          throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
-        }
-      }
-
       // Validate the received data before saving.
       $this->validate($entity);
       try {
         $entity->save();
         $rev = $entity->_revs_info->rev;
-        return new ResourceResponse(array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev), 201, array('ETag' => $rev));
+        $result[] = array(
+          'ok' => TRUE,
+          'id' => $entity->uuid(),
+          'rev' => $rev
+        );
       }
       catch (EntityStorageException $e) {
         throw new HttpException(500, NULL, $e);
       }
     }
+
+    return new ResourceResponse($result, 201);
   }
 }

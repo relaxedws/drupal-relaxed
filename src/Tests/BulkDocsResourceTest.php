@@ -13,8 +13,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
   protected function setUp() {
     parent::setUp();
-
-    // @todo: Add entities to the workspace.
   }
 
   public function testPost() {
@@ -34,12 +32,9 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $serialized = $serializer->serialize($entities, $this->defaultFormat);
 
       $response = $this->httpRequest($this->workspace->name() . '/bulk-docs', 'POST', $serialized);
-      $this->assertResponse('201', 'HTTP response code is correct when posting new entities');
+      $this->assertResponse('201', 'HTTP response code is correct when posting or updating new entities');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
-
-      $response = $this->httpRequest($this->workspace->name() . '/bulk-docs', 'POST', $serialized);
-      $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }
 
