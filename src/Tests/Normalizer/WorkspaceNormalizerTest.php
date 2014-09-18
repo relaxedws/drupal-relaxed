@@ -25,7 +25,6 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installSchema('key_value', array('key_value_sorted'));
-    //$this->installSchema('multiversion', array('workspace'));
 
     \Drupal::service('multiversion.manager')
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
