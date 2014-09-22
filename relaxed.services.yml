@@ -3,12 +3,12 @@ services:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
     tags:
       - { name: normalizer, priority: 10 }
-    arguments: ['@entity.manager']
+    arguments: ['@entity.manager', '@entity.uuid_index']
   relaxed.normalizer.bulk_docs:
       class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
       tags:
         - { name: normalizer, priority: 20 }
-      arguments: ['@entity.manager']
+      arguments: ['@entity.manager', '@entity.uuid_index']
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:

@@ -12,13 +12,6 @@ class BulkDocsNormalizer extends ContentEntityNormalizer {
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
 
   /**
-   * @param EntityManagerInterface $entity_manager
-   */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->entityManager = $entity_manager;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {

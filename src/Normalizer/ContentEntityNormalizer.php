@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\multiversion\Entity\UuidIndex;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -17,9 +18,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\multiversion\Entity\UuidIndex $uuid_index
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index) {
     $this->entityManager = $entity_manager;
+    $this->uuidIndex = $uuid_index;
   }
 
   /**
@@ -91,6 +94,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    return $this->entityManager->getStorage($entity_type_id)->create($data);
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $this->entityManager->getStorage($entity_type_id)->create($data);
+
+    // Check if the entity already exists to know what state we should set.
+    if ($item = $this->uuidIndex->get($entity->uuid())) {
+      $entity->enforceIsNew(FALSE);
+      $entity->setNewRevision(FALSE);
+    }
+    return $entity;
   }
 }
