@@ -54,6 +54,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     $entity_type_id = NULL;
+    $entity_uuid = NULL;
+    $entity_id = NULL;
+
     // Look for the entity type ID.
     if (!empty($context['entity_type'])) {
       $entity_type_id = $context['entity_type'];
@@ -62,29 +65,49 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity_type_id = $data['_entity_type'];
     }
 
-    // @todo When we depend on schemaless.module we should be graceful and
-    // fall back to schemaless_doc entity type.
-    if (empty($entity_type_id)) {
-      throw new UnexpectedValueException('Entity type parameter must be included in context.');
+    // Resolve the UUID.
+    // @todo Needs test
+    if (!empty($data['uuid'][0]['value']) && !empty($data['_id']) && ($data['uuid'][0]['value'] != $data['_id'])) {
+      throw new UnexpectedValueException('The uuid and _id values does not match.');
     }
-    $entity_type = $this->entityManager->getDefinition($entity_type_id);
+    if (!empty($data['uuid'][0]['value'])) {
+      $entity_uuid = $data['uuid'][0]['value'];
+    }
+    elseif (!empty($data['_id'])) {
+      $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
+    }
 
-    // The bundle property behaves differently from other entity properties.
-    // i.e. the nested structure with a 'value' key does not work.
-    if ($entity_type->hasKey('bundle')) {
-      $bundle_key = $entity_type->getKey('bundle');
-      if (isset($data[$bundle_key][0]['value'])) {
-        $type = $data[$bundle_key][0]['value'];
-        $data[$bundle_key] = $type;
+    // Map data from the UUID index.
+    // @todo Needs test.
+    if (!empty($entity_uuid)) {
+      if ($record = $this->uuidIndex->get($entity_uuid)) {
+        $entity_id = $record['entity_id'];
+        if (empty($entity_type_id)) {
+          $entity_type_id = $record['entity_type'];
+        }
+        elseif ($entity_type_id != $record['entity_type']) {
+          throw new UnexpectedValueException('The _entity_type value does not match the existing UUID record.');
+        }
       }
     }
 
-    if (isset($data['_id'])) {
-      // @todo Fetch the uuid key from the entity definition.
-      $data['uuid'] = array(array('value' => $data['_id']));
+    if (empty($entity_type_id)) {
+      throw new UnexpectedValueException('The _entity_type value is missing.');
     }
-    if (isset($data['_rev'])) {
-      $data['_revs_info'] = array(array('rev' => $data['_rev']));
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
+
+    if ($entity_id) {
+      $data[$entity_type->getKey('id')] = $entity_id;
+    }
+    // The bundle property behaves differently from other entity properties.
+    // i.e. the nested structure with a 'value' key does not work.
+    // @todo Does this still apply?
+    if ($entity_type->hasKey('bundle')) {
+      $bundle_key = $entity_type->getKey('bundle');
+      if (!empty($data[$bundle_key][0]['value'])) {
+        $type = $data[$bundle_key][0]['value'];
+        $data[$bundle_key] = $type;
+      }
     }
 
     // Clean-up attributes we don't needs anymore.
@@ -97,8 +120,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->entityManager->getStorage($entity_type_id)->create($data);
 
-    // Check if the entity already exists to know what state we should set.
-    if ($item = $this->uuidIndex->get($entity->uuid())) {
+    if ($entity_id) {
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
     }
