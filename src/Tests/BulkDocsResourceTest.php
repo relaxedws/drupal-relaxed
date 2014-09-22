@@ -15,7 +15,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     parent::setUp();
   }
 
-  public function testPost() {
+  public function testPostCreate() {
     $db = $this->workspace->name();
     $this->enableService("relaxed:bulk_docs:$db", 'POST');
     $serializer = $this->container->get('serializer');
@@ -43,14 +43,57 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
   }
 
+  public function testPostUpdate() {
+    $db = $this->workspace->name();
+    $this->enableService("relaxed:bulk_docs:$db", 'POST');
+    $serializer = $this->container->get('serializer');
+
+    $entity_type = 'entity_test_rev';
+
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions($entity_type, 'update');
+    $permissions[] = "restful post relaxed:bulk_docs:$db";
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    /*$values = array(
+      'field_test_text' => array(
+        array(
+          'value' => $this->randomString(),
+          'format' => 'plain_text',
+        )
+      )
+    );*/
+    $entities = $this->createTestEntities($entity_type, TRUE);
+
+    $patched_entities = array();
+    foreach ($entities as $key => $entity) {
+      $patched_entities[$key] = entity_load($entity_type, $entity->id(), TRUE);
+      $patched_entities[$key]->set('field_test_text', array(
+            0 => array(
+              'value' => $this->randomString(),
+              'format' => 'plain_text',
+            )));
+    }
+
+    $patched_entities[1]->delete();
+
+    $serialized = $serializer->serialize($patched_entities, $this->defaultFormat);
+    $response = $this->httpRequest($this->workspace->name() . '/bulk-docs', 'POST', $serialized);
+    $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
+  }
+
   /**
    * Creates test entities.
    */
-  protected function createTestEntities($entity_type, $number = 3) {
+  protected function createTestEntities($entity_type, $save = FALSE, $number = 3) {
     $entities = array();
 
     while ($number >= 1) {
       $entity = entity_create($entity_type);
+      if ($save) {
+        $entity->save();
+      }
       $entities[] = $entity;
       $number--;
     }
