@@ -31,7 +31,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $entities = $this->createTestEntities($entity_type);
       $serialized = $serializer->serialize($entities, $this->defaultFormat);
 
-      $response = $this->httpRequest($this->workspace->name() . '/bulk-docs', 'POST', $serialized);
+      $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
       if (is_array($data)) {
@@ -76,7 +76,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
 
     $serialized = $serializer->serialize($patched_entities, $this->defaultFormat);
-    $response = $this->httpRequest($this->workspace->name() . '/bulk-docs', 'POST', $serialized);
+    $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response);
     if (is_array($data)) {

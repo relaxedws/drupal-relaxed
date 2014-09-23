@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   uri_paths = {
- *     "canonical" = "/{db}/bulk-docs",
+ *     "canonical" = "/{db}/_bulk_docs",
  *   },
  *   uri_parameters = {
  *     "canonical" = {
