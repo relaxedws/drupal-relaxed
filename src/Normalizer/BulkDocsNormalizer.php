@@ -2,6 +2,11 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\serialization\Normalizer\NormalizerBase;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
 class BulkDocsNormalizer extends ContentEntityNormalizer {
 
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
@@ -11,9 +16,9 @@ class BulkDocsNormalizer extends ContentEntityNormalizer {
    */
   public function normalize($data, $format = NULL, array $context = array()) {
     $result = array();
-    if (is_array($data)) {
-      foreach ($data as $field) {
-        $result[] = parent::normalize($field, $format, $context);
+    if (is_array($data) && isset($data['docs'])) {
+      foreach ($data['docs'] as $field) {
+        $result['docs'][] = parent::normalize($field, $format, $context);
       }
     }
     else {
@@ -28,9 +33,9 @@ class BulkDocsNormalizer extends ContentEntityNormalizer {
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     $result = array();
-    if (is_array($data) && !isset($data['uuid'])) {
-      foreach ($data as $field) {
-        $result[] = parent::denormalize($field, $class, $format, $context);
+    if (is_array($data) && isset($data['docs'])) {
+      foreach ($data['docs'] as $field) {
+        $result['docs'][] = parent::denormalize($field, $class, $format, $context);
       }
     }
     else {

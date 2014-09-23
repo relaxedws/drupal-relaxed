@@ -28,12 +28,14 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $entities = $this->createTestEntities($entity_type);
+      $entities = array();
+      $entities['docs'] = $this->createTestEntities($entity_type);
       $serialized = $serializer->serialize($entities, $this->defaultFormat);
 
       $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
+      $this->assertTrue(is_array($data), 'Data format is correct.');
       foreach ($data as $key => $entity_info) {
         $entity_number = $key+1;
         $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
@@ -57,8 +59,8 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $entities = $this->createTestEntities($entity_type, TRUE);
     $patched_entities = array();
     foreach ($entities as $key => $entity) {
-      $patched_entities[$key] = entity_load($entity_type, $entity->id(), TRUE);
-      $patched_entities[$key]->set(
+      $patched_entities['docs'][$key] = entity_load($entity_type, $entity->id(), TRUE);
+      $patched_entities['docs'][$key]->set(
         'field_test_text',
         array(
           0 => array(
@@ -69,7 +71,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       );
       if ($key == 1) {
         // Delete an entity.
-        $patched_entities[$key]->delete();
+        $patched_entities['docs'][$key]->delete();
       }
     }
 
@@ -77,13 +79,14 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response);
+    $this->assertTrue(is_array($data), 'Data format is correct.');
     foreach ($data as $key => $entity_info) {
       $entity_number = $key+1;
       $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
-      $this->assertEqual($entity_info['id'], $patched_entities[$key]->uuid(), "POST request returned correct ID for entity number $entity_number.");
+      $this->assertEqual($entity_info['id'], $patched_entities['docs'][$key]->uuid(), "POST request returned correct ID for entity number $entity_number.");
     }
 
-    foreach ($patched_entities as $key => $patched_entity) {
+    foreach ($patched_entities['docs'] as $key => $patched_entity) {
       $entity_number = $key+1;
       $entity = entity_load($entity_type, $patched_entity->id());
       if ($key == 1) {

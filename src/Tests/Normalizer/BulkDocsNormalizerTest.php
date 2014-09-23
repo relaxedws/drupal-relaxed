@@ -43,7 +43,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
     \Drupal::service('multiversion.manager')
       ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
 
-    $this->testEntities = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
+    $this->testEntities['docs'] = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
     $this->serializer = $this->container->get('serializer');
   }
 
@@ -60,7 +60,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
           array('value' => $key+1),
         ),
         'uuid' => array(
-          array('value' => $this->testEntities[$key]->uuid()),
+          array('value' => $this->testEntities['docs'][$key]->uuid()),
         ),
         'langcode' => array(
           array('value' => 'en'),
@@ -93,9 +93,9 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
     $entity_number = 1;
     foreach ($expected as $key => $expected_entity) {
       foreach (array_keys($expected_entity) as $entity_key) {
-        $this->assertEqual($expected_entity[$entity_key], $normalized[$key][$entity_key], "Field $entity_key is normalized correctly for entity number $entity_number.");
+        $this->assertEqual($expected_entity[$entity_key], $normalized['docs'][$key][$entity_key], "Field $entity_key is normalized correctly for entity number $entity_number.");
       }
-      $this->assertEqual(array_diff_key($normalized[$key], $expected[$key]), array(), 'No unexpected data is added to the normalized array.');
+      $this->assertEqual(array_diff_key($normalized['docs'][$key], $expected[$key]), array(), 'No unexpected data is added to the normalized array.');
       $entity_number++;
     }
   }
@@ -111,14 +111,13 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   public function testDenormalize() {
     $normalized = $this->serializer->normalize($this->testEntities);
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
-    if (is_array($denormalized)) {
-      foreach ($denormalized as $key => $entity) {
-        $entity_number = $key+1;
-        $this->assertTrue($entity instanceof $this->entityClass, String::format("Denormalized entity number $entity_number is an instance of @class", array('@class' => $this->entityClass)));
-        $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities[$key]->getEntityTypeId(), "Expected entity type foundfor entity number $entity_number.");
-        $this->assertIdentical($entity->bundle(), $this->testEntities[$key]->bundle(), "Expected entity bundle found for entity number $entity_number.");
-        $this->assertIdentical($entity->uuid(), $this->testEntities[$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");
-      }
+    $this->assertTrue(is_array($denormalized) && isset($denormalized['docs']), 'Denormalized data is an array.');
+    foreach ($denormalized['docs'] as $key => $entity) {
+      $entity_number = $key+1;
+      $this->assertTrue($entity instanceof $this->entityClass, String::format("Denormalized entity number $entity_number is an instance of @class", array('@class' => $this->entityClass)));
+      $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities['docs'][$key]->getEntityTypeId(), "Expected entity type foundfor entity number $entity_number.");
+      $this->assertIdentical($entity->bundle(), $this->testEntities['docs'][$key]->bundle(), "Expected entity bundle found for entity number $entity_number.");
+      $this->assertIdentical($entity->uuid(), $this->testEntities['docs'][$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");
     }
 
     // @todo Test context switches.
