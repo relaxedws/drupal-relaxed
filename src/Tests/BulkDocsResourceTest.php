@@ -34,11 +34,9 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
-      if (is_array($data)) {
-        foreach ($data as $key => $entity_info) {
-          $entity_number = $key+1;
-          $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
-        }
+      foreach ($data as $key => $entity_info) {
+        $entity_number = $key+1;
+        $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
       }
     }
   }
@@ -79,12 +77,10 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response);
-    if (is_array($data)) {
-      foreach ($data as $key => $entity_info) {
-        $entity_number = $key+1;
-        $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
-        $this->assertEqual($entity_info['id'], $patched_entities[$key]->uuid(), "POST request returned correct ID for entity number $entity_number.");
-      }
+    foreach ($data as $key => $entity_info) {
+      $entity_number = $key+1;
+      $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
+      $this->assertEqual($entity_info['id'], $patched_entities[$key]->uuid(), "POST request returned correct ID for entity number $entity_number.");
     }
 
     foreach ($patched_entities as $key => $patched_entity) {
