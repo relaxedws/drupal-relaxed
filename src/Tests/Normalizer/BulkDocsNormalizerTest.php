@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
 use Drupal\serialization\Tests\NormalizerTestBase;
 

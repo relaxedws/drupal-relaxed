@@ -2,11 +2,6 @@
 
 namespace Drupal\relaxed\Normalizer;
 
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\serialization\Normalizer\NormalizerBase;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-
 class BulkDocsNormalizer extends ContentEntityNormalizer {
 
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
