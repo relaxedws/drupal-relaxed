@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Drupal\relaxed\Plugin\Derivative;
 
 use Drupal\Component\Utility\String;
@@ -8,7 +9,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DbDerivative implements ContainerDeriverInterface {
+class BulkDocsDerivative implements ContainerDeriverInterface {
 
   /**
    * @var array
