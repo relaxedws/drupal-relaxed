@@ -26,6 +26,10 @@ services:
     class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
     tags:
       - { name: normalizer, priority: 10 }
+  relaxed.normalizer.revs_diff_normalizer:
+      class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
+      tags:
+        - { name: normalizer, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
     arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']

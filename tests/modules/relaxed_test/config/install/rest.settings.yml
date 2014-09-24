@@ -46,7 +46,13 @@ resources:
         - json
       supported_auth:
         - cookie
-  relaxed:root:db:bulk_docs:
+  relaxed:bulk_docs:default:
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+  relaxed:revs_diff:default:
     POST:
       supported_formats:
         - json
