@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\multiversion\Entity\RevisionIndex;
 use Drupal\relaxed\RevisionDiff\RevisionDiff;
 
 /**
@@ -12,11 +11,6 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
  * @group relaxed
  */
 class RevsDiffResourceTest extends ResourceTestBase {
-
-  public function setUp() {
-    parent::setUp();
-
-  }
 
   public function testPost() {
     $db = $this->workspace->name();
@@ -36,7 +30,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
           0 => array(
             'value' => $this->randomString(),
             'format' => 'plain_text',
-          )
+          ),
         )
       );
       $entity->save();
@@ -48,7 +42,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
           0 => array(
             'value' => $this->randomString(12),
             'format' => 'plain_text',
-          )
+          ),
         )
       );
       $entity->save();
@@ -60,7 +54,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
           0 => array(
             'value' => $this->randomString(25),
             'format' => 'plain_text',
-          )
+          ),
         )
       );
       $entity->save();

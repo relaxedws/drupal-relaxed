@@ -44,7 +44,7 @@ class RevsDiffResource extends ResourceBase {
     if (is_string($workspace)) {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
-    if  (empty($data)) {
+    if (empty($data)) {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
