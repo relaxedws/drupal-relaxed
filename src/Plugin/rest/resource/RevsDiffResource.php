@@ -41,6 +41,8 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
 class RevsDiffResource extends ResourceBase {
 
   public function post($workspace, $data) {
+    $missing = array();
+
     if (is_string($workspace)) {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
@@ -50,9 +52,9 @@ class RevsDiffResource extends ResourceBase {
 
     $rev_index = \Drupal::service('entity.rev_index');
     $revs_diff = new RevisionDiff($rev_index, $data);
-
-    $missing = $revs_diff->entities($data)->getMissing();
+    $missing = $revs_diff->getMissing();
 
     return new ResourceResponse($missing, 200);
   }
+
 }

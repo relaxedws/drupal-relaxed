@@ -16,7 +16,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {
-    return $data->entities;
+    return $data->getEntityKeys();
   }
 
   /**
