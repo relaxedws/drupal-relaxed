@@ -18,9 +18,7 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
 /**
  * @RestResource(
  *   id = "relaxed:revs_diff",
- *   derivative_id = "!db",
- *   deriver = "Drupal\relaxed\Plugin\Derivative\RevsDiffDerivative",
- *   label = "!db documents",
+ *   label = "Revisions diff",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *     "post" = "Drupal\relaxed\RevisionDiff\RevisionDiffInterface",
@@ -31,8 +29,7 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
  *   uri_parameters = {
  *     "canonical" = {
  *       "db" = {
- *         "type" = "entity_uuid",
- *         "rev" = TRUE,
+ *         "type" = "entity_uuid:workspace",
  *       }
  *     }
  *   }

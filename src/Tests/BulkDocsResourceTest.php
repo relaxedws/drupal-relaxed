@@ -17,14 +17,14 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
   public function testPostCreate() {
     $db = $this->workspace->name();
-    $this->enableService("relaxed:bulk_docs:$db", 'POST');
+    $this->enableService('relaxed:bulk_docs', 'POST');
     $serializer = $this->container->get('serializer');
 
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
-      $permissions[] = "restful post relaxed:bulk_docs:$db";
+      $permissions[] = 'restful post relaxed:bulk_docs';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -32,7 +32,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $entities['docs'] = $this->createTestEntities($entity_type);
       $serialized = $serializer->serialize($entities, $this->defaultFormat);
 
-      $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
+      $response = $this->httpRequest("$db/_bulk_docs", 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
       $this->assertTrue(is_array($data), 'Data format is correct.');
@@ -45,14 +45,14 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
   public function testPostUpdate() {
     $db = $this->workspace->name();
-    $this->enableService("relaxed:bulk_docs:$db", 'POST');
+    $this->enableService('relaxed:bulk_docs', 'POST');
     $serializer = $this->container->get('serializer');
 
     $entity_type = 'entity_test_rev';
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions($entity_type, 'update');
-    $permissions[] = "restful post relaxed:bulk_docs:$db";
+    $permissions[] = 'restful post relaxed:bulk_docs';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -76,7 +76,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
 
     $serialized = $serializer->serialize($patched_entities, $this->defaultFormat);
-    $response = $this->httpRequest($this->workspace->name() . '/_bulk_docs', 'POST', $serialized);
+    $response = $this->httpRequest("$db/_bulk_docs", 'POST', $serialized);
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response);
     $this->assertTrue(is_array($data), 'Data format is correct.');

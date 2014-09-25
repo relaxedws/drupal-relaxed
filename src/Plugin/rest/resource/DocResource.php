@@ -12,18 +12,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
- *   id = "relaxed:root",
- *   derivative_id = "!db:doc",
- *   deriver = "Drupal\relaxed\Plugin\Derivative\DbDerivative",
- *   label = "!db documents",
+ *   id = "relaxed:doc",
+ *   label = "Document",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   uri_paths = {
- *     "canonical" = "/!db/{docid}",
+ *     "canonical" = "/{db}/{docid}",
  *   },
  *   uri_parameters = {
  *     "canonical" = {
+ *       "doc" = {
+ *         "type" = "entity_uuid:workspace",
+ *       },
  *       "docid" = {
  *         "type" = "entity_uuid",
  *         "rev" = TRUE,
@@ -37,7 +38,7 @@ class DocResource extends ResourceBase {
   /**
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    */
-  public function head($entity) {
+  public function head($workspace, $entity) {
     if (!$entity instanceof ContentEntityInterface) {
       throw new NotFoundHttpException();
     }
@@ -49,7 +50,7 @@ class DocResource extends ResourceBase {
   /**
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    */
-  public function get($entity) {
+  public function get($workspace, $entity) {
     if (!$entity instanceof ContentEntityInterface) {
       throw new NotFoundHttpException();
     }
@@ -70,7 +71,7 @@ class DocResource extends ResourceBase {
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    */
-  public function put($existing_entity, ContentEntityInterface $received_entity = NULL) {
+  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity = NULL) {
     if (!$received_entity instanceof ContentEntityInterface) {
       throw new BadRequestHttpException(t('No content received'));
     }
@@ -100,7 +101,7 @@ class DocResource extends ResourceBase {
   /**
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    */
-  public function delete(ContentEntityInterface $entity) {
+  public function delete($workspace, ContentEntityInterface $entity) {
     try {
       // @todo: Access check.
       $entity->delete();

@@ -1,5 +1,5 @@
 resources:
-  relaxed:root:db:
+  relaxed:db:
     HEAD:
       supported_formats:
         - json
@@ -25,7 +25,7 @@ resources:
         - json
       supported_auth:
         - cookie
-  relaxed:root:default:doc:
+  relaxed:doc:default:
     HEAD:
       supported_formats:
         - json
