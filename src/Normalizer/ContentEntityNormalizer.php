@@ -46,6 +46,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         $data[$name] = $field_data;
       }
     }
+
+    // Override the normalization for a few special fields, just so that we
+    // follow the API spec.
+    foreach (array('_deleted', '_local_seq') as $field) {
+      $data[$field] = $entity->{$field}->value;
+    }
     return $data;
   }
 
@@ -76,6 +82,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     elseif (!empty($data['_id'])) {
       $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
     }
+    // We need to nest the data for the _deleted field in its Drupal-specific
+    // structure since it's un-nested to follow the API spec when normalized.
+    if (!empty($data['_deleted'])) {
+      $data['_deleted'][0]['value'] = $data['_deleted'];
+    }
 
     // Map data from the UUID index.
     // @todo Needs test.
@@ -97,6 +108,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
 
     if ($entity_id) {
+      // @todo Needs test.
       $data[$entity_type->getKey('id')] = $entity_id;
     }
     // The bundle property behaves differently from other entity properties.
@@ -111,7 +123,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_entity_type') as $key) {
+    foreach (array('_id', '_rev', '_entity_type', '_local_seq') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }

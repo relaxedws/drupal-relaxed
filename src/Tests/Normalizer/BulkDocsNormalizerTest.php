@@ -84,7 +84,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
         '_id' => $entity->uuid(),
         '_rev' => $entity->_revs_info->rev,
         '_deleted' => $entity->_deleted->value,
-        '_local_seq' => $entity->_local_seq->id,
+        '_local_seq' => $entity->_local_seq->value,
         '_entity_type' => $entity->getEntityTypeId(),
       );
     }
