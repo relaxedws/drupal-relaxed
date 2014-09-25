@@ -26,8 +26,9 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     parent::setUp();
     $this->installSchema('key_value', array('key_value_sorted'));
 
-    \Drupal::service('multiversion.manager')
-      ->attachRequiredFields('entity_test_mulrev', 'entity_test_mulrev');
+    $this->container
+      ->get('entity.definition_update_manager')
+      ->applyUpdates();
 
     $name = $this->randomMachineName();
     $this->entity = $this->createWorkspace($name);
