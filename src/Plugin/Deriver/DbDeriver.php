@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\Derivative;
+namespace Drupal\relaxed\Plugin\Deriver;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -8,7 +8,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DbDerivative implements ContainerDeriverInterface {
+class DbDeriver implements ContainerDeriverInterface {
 
   /**
    * @var array
@@ -57,23 +57,20 @@ class DbDerivative implements ContainerDeriverInterface {
     // Load all repositories.
     $entities = $this->entityManager->getStorage('workspace')->loadMultiple(NULL);
     foreach ($entities as $entity) {
-      $derivative_id = $this->format($base_definition['derivative_id'], $entity);
-      $this->derivatives[$derivative_id] = array(
-        'id' => $base_definition['id'] . ':' . $derivative_id,
-        'label' => $this->format($base_definition['label'], $entity),
+      $workspace_name = $entity->name();
+      // Format the plugin ID and label.
+      $this->derivatives[$workspace_name] = array(
+        'id' => $base_definition['id'] . ':' . $workspace_name,
+        'label' => String::format($base_definition['label'], array('!db' => $workspace_name)),
       );
       // Format all URI paths.
       foreach ($base_definition['uri_paths'] as $rel => $path) {
-        $this->derivatives[$derivative_id]['uri_paths'][$rel] = $this->format($path, $entity);
+        $this->derivatives[$workspace_name]['uri_paths'][$rel] = strtr($path, array('{db}' => $workspace_name));
       }
       // Merge in the rest of the definition.
-      $this->derivatives[$derivative_id] += $base_definition;
+      $this->derivatives[$workspace_name] += $base_definition;
     }
 
     return $this->derivatives;
-  }
-
-  protected function format($string, WorkspaceInterface $entity) {
-    return String::format($string, array('!db' => $entity->name()));
   }
 }

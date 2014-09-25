@@ -15,9 +15,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * @RestResource(
  *   id = "relaxed:bulk_docs",
- *   derivative_id = "!db",
- *   deriver = "Drupal\relaxed\Plugin\Derivative\BulkDocsDerivative",
- *   label = "!db documents",
+ *   deriver = "Drupal\relaxed\Plugin\Deriver\DbDeriver",
+ *   label = "!db bulk documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",

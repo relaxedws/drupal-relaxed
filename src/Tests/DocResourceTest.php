@@ -16,12 +16,12 @@ class DocResourceTest extends ResourceTestBase {
     $db = $this->workspace->name();
 
     // HEAD and GET is handled by the same resource.
-    $this->enableService("relaxed:root:$db:doc", 'GET');
+    $this->enableService("relaxed:doc:$db", 'GET');
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
-      $permissions[] = "restful get relaxed:root:$db:doc";
+      $permissions[] = "restful get relaxed:doc:$db";
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -52,12 +52,12 @@ class DocResourceTest extends ResourceTestBase {
   public function testGet() {
     $db = $this->workspace->name();
 
-    $this->enableService("relaxed:root:$db:doc", 'GET');
+    $this->enableService("relaxed:doc:$db", 'GET');
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
-      $permissions[] = "restful get relaxed:root:$db:doc";
+      $permissions[] = "restful get relaxed:doc:$db";
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -79,13 +79,13 @@ class DocResourceTest extends ResourceTestBase {
   public function testPut() {
     $db = $this->workspace->name();
 
-    $this->enableService("relaxed:root:$db:doc", 'PUT');
+    $this->enableService("relaxed:doc:$db", 'PUT');
     $serializer = $this->container->get('serializer');
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
-      $permissions[] = "restful put relaxed:root:$db:doc";
+      $permissions[] = "restful put relaxed:doc:$db";
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -102,12 +102,12 @@ class DocResourceTest extends ResourceTestBase {
   public function testDelete() {
     $db = $this->workspace->name();
 
-    $this->enableService("relaxed:root:$db:doc", 'DELETE');
+    $this->enableService("relaxed:doc:$db", 'DELETE');
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'delete');
-      $permissions[] = "restful delete relaxed:root:$db:doc";
+      $permissions[] = "restful delete relaxed:doc:$db";
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 

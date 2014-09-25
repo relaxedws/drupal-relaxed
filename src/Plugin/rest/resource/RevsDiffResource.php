@@ -18,9 +18,8 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
 /**
  * @RestResource(
  *   id = "relaxed:revs_diff",
- *   derivative_id = "!db",
- *   deriver = "Drupal\relaxed\Plugin\Derivative\RevsDiffDerivative",
- *   label = "!db documents",
+ *   deriver = "Drupal\relaxed\Plugin\Deriver\DbDeriver",
+ *   label = "!db revision diff",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *     "post" = "Drupal\relaxed\RevisionDiff\RevisionDiffInterface",

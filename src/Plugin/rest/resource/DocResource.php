@@ -12,15 +12,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
- *   id = "relaxed:root",
- *   derivative_id = "!db:doc",
- *   deriver = "Drupal\relaxed\Plugin\Derivative\DbDerivative",
+ *   id = "relaxed:doc",
+ *   deriver = "Drupal\relaxed\Plugin\Deriver\DbDerivative",
  *   label = "!db documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   uri_paths = {
- *     "canonical" = "/!db/{docid}",
+ *     "canonical" = "/{db}/{docid}",
  *   },
  *   uri_parameters = {
  *     "canonical" = {
