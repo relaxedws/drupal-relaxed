@@ -84,8 +84,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
-    if (!empty($data['_deleted'])) {
-      $data['_deleted'][0]['value'] = $data['_deleted'];
+    if (isset($data['_deleted'])) {
+      $data['_deleted'] = array(array('value' => $data['_deleted']));
     }
 
     // Map data from the UUID index.
