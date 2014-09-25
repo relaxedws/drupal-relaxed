@@ -25,9 +25,9 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->defaultAuth = array('cookie');
     $this->apiRoot = \Drupal::config('relaxed.settings')->get('api_root');
 
-    // @todo: Remove once multiversion_install() is implemented.
-    \Drupal::service('multiversion.manager')
-    ->attachRequiredFields('entity_test_rev', 'entity_test_rev');
+    $this->container
+      ->get('entity.definition_update_manager')
+      ->applyUpdates();
 
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);
