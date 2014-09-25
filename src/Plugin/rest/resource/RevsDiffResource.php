@@ -50,9 +50,8 @@ class RevsDiffResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
-    $rev_index = \Drupal::service('entity.rev_index');
-    $revs_diff = new RevisionDiff($rev_index, $data);
-    $missing = $revs_diff->getMissing();
+    $revs_diff = \Drupal::service('relaxed.revs_diff');
+    $missing = $revs_diff->setEntityKeys($data)->getMissing();
 
     return new ResourceResponse($missing, 200);
   }

@@ -13,9 +13,8 @@ class RevisionDiff implements RevisionDiffInterface {
 
   public $entityKeys = array();
 
-  public function __construct(RevisionIndex $rev_index, array $entity_keys) {
+  public function __construct(RevisionIndex $rev_index) {
     $this->revisionIndex = $rev_index;
-    $this->setEntityKeys($entity_keys);
   }
 
   /**
@@ -23,6 +22,7 @@ class RevisionDiff implements RevisionDiffInterface {
    */
   public function setEntityKeys(array $entity_keys) {
     $this->entityKeys = $entity_keys;
+    return $this;
   }
 
   /**

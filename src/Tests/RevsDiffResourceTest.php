@@ -72,8 +72,8 @@ class RevsDiffResourceTest extends ResourceTestBase {
         }
       }
 
-      $rev_index = \Drupal::service('entity.rev_index');
-      $revs_diff = new RevisionDiff($rev_index, $data);
+      $revs_diff = \Drupal::service('relaxed.revs_diff');
+      $revs_diff->setEntityKeys($data);
 
       $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
 
@@ -163,8 +163,8 @@ class RevsDiffResourceTest extends ResourceTestBase {
         '44-1214293f06b11ea6da4c9da0594444zz',
       );
 
-      $rev_index = \Drupal::service('entity.rev_index');
-      $revs_diff = new RevisionDiff($rev_index, $data);
+      $revs_diff = \Drupal::service('relaxed.revs_diff');
+      $revs_diff->setEntityKeys($data);
 
       $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
 

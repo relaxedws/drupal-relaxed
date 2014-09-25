@@ -5,10 +5,10 @@ services:
       - { name: normalizer, priority: 10 }
     arguments: ['@entity.manager', '@entity.uuid_index']
   relaxed.normalizer.bulk_docs:
-      class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
-      tags:
-        - { name: normalizer, priority: 20 }
-      arguments: ['@entity.manager', '@entity.uuid_index']
+    class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
+    tags:
+      - { name: normalizer, priority: 20 }
+    arguments: ['@entity.manager', '@entity.uuid_index']
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
@@ -27,9 +27,12 @@ services:
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.revs_diff_normalizer:
-      class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
-      tags:
-        - { name: normalizer, priority: 20 }
+    class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
+    tags:
+      - { name: normalizer, priority: 20 }
+  relaxed.revs_diff:
+    class: Drupal\relaxed\RevisionDiff\RevisionDiff
+    arguments: ['@entity.rev_index']
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
     arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
