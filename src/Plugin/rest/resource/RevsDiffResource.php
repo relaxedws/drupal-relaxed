@@ -19,7 +19,7 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
  * @RestResource(
  *   id = "relaxed:revs_diff",
  *   deriver = "Drupal\relaxed\Plugin\Deriver\DbDeriver",
- *   label = "!db revision diff",
+ *   label = "!db revisions diff",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *     "post" = "Drupal\relaxed\RevisionDiff\RevisionDiffInterface",
