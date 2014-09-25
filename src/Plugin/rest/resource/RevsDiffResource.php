@@ -41,8 +41,6 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
 class RevsDiffResource extends ResourceBase {
 
   public function post($workspace, $data) {
-    $missing = array();
-
     if (is_string($workspace)) {
       throw new BadRequestHttpException(t('Database does not exist'));
     }

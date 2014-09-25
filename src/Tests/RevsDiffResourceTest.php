@@ -74,7 +74,6 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
       $revs_diff = \Drupal::service('relaxed.revs_diff');
       $revs_diff->setEntityKeys($data);
-
       $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
 
       $response = $this->httpRequest(
@@ -165,7 +164,6 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
       $revs_diff = \Drupal::service('relaxed.revs_diff');
       $revs_diff->setEntityKeys($data);
-
       $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
 
       $response = $this->httpRequest(
