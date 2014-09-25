@@ -85,8 +85,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
   }
 
   public function testPostMissingRevisions() {
-    $db = $this->workspace->name();
-    $this->enableService("relaxed:revs_diff:$db", 'POST');
+    $this->enableService('relaxed:revs_diff', 'POST');
     $serializer = $this->container->get('serializer');
 
     $entity_types = array('entity_test_rev');
