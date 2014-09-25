@@ -8,7 +8,7 @@
 namespace Drupal\relaxed\RevisionDiff;
 
 interface RevisionDiffInterface {
-  
+
   /**
    * @param array $entity_keys
    */

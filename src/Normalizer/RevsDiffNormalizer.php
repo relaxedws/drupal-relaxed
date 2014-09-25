@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
