@@ -145,6 +145,9 @@ class RevsDiffResourceTest extends ResourceTestBase {
           $rev_number++;
         }
       }
+
+      // Add invalid revision to test missing
+      // revisions for the first entity.
       $data[$id] = $missing_keys[$id] = array(
         '11-1214293f06b11ea6da4c9da0591111zz'
       );
@@ -152,10 +155,10 @@ class RevsDiffResourceTest extends ResourceTestBase {
       // Create a second new test entity.
       $entity = entity_create($entity_type);
       $entity->save();
-
       $id = $entity->uuid();
 
-      // Add invalid revision to test missing revisions.
+      // Add invalid revision to test missing
+      // revisions fot the second entity.
       $data[$id] = $missing_keys[$id] = array(
         '22-1214293f06b11ea6da4c9da0592222zz',
         '33-1214293f06b11ea6da4c9da0593333zz',
