@@ -78,12 +78,16 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           'format' => $this->values['field_test_text']['format'],
         ),
       ),
+      '_local' => array(
+        array(
+          'value' => $entity->_local->value,
+        )
+      ),
       '_id' => $entity->uuid(),
       '_rev' => $entity->_revs_info->rev,
       '_deleted' => $entity->_deleted->value,
       '_local_seq' => $entity->_local_seq->value,
       '_entity_type' => $entity->getEntityTypeId(),
-      '_local' => $entity->_local->value,
     );
 
     $normalized = $this->serializer->normalize($this->entity);
