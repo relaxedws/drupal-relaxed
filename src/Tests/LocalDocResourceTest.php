@@ -12,7 +12,6 @@ use Drupal\Component\Serialization\Json;
  */
 class LocalDocResourceTest extends ResourceTestBase {
 
-  /*
   public function testHead() {
     $db = $this->workspace->name();
 
@@ -63,7 +62,6 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
   }
-*/
 
   public function testPut() {
     $db = $this->workspace->name();
