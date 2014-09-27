@@ -37,6 +37,8 @@ class DocResource extends ResourceBase {
 
   /**
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $entity) {
     if (!$entity instanceof ContentEntityInterface) {
@@ -49,6 +51,8 @@ class DocResource extends ResourceBase {
 
   /**
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $entity) {
     if (!$entity instanceof ContentEntityInterface) {
@@ -70,6 +74,8 @@ class DocResource extends ResourceBase {
   /**
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity = NULL) {
     if (!$received_entity instanceof ContentEntityInterface) {
@@ -100,6 +106,8 @@ class DocResource extends ResourceBase {
 
   /**
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function delete($workspace, ContentEntityInterface $entity) {
     try {

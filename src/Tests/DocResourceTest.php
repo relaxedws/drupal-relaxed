@@ -25,6 +25,9 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      $this->httpRequest("$db/bogus", 'HEAD', NULL);
+      $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
+
       $entity = entity_create($entity_type);
       $entity->save();
       $first_rev = $entity->_revs_info->rev;
@@ -60,6 +63,9 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = 'restful get relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
+
+      $this->httpRequest("$db/bogus", 'GET', NULL);
+      $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
 
       $entity = entity_create($entity_type);
       $entity->save();

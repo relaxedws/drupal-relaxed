@@ -83,6 +83,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
       '_deleted' => $entity->_deleted->value,
       '_local_seq' => $entity->_local_seq->value,
       '_entity_type' => $entity->getEntityTypeId(),
+      '_local' => $entity->_local->value,
     );
 
     $normalized = $this->serializer->normalize($this->entity);

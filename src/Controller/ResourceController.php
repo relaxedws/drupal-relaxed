@@ -97,10 +97,10 @@ class ResourceController implements ContainerAwareInterface {
    *   provide both error and reason message.
    */
   public function errorResponse(\Exception $e) {
+    // Default to 400 Bad Request.
     $status = 400;
     $error = 'bad_request';
     $reason = $e->getMessage();
-    $format = $this->request->getContentType();
 
     if ($e instanceof HttpExceptionInterface) {
       $status = $e->getStatusCode();
@@ -119,9 +119,16 @@ class ResourceController implements ContainerAwareInterface {
       $error = 'file_exists';
     }
 
-    $data = array('error' => $error, 'reason' => $reason);
-    $content = $this->serializer()->serialize($data, $format);
-    return new Response($content, $status, array('Content-Type' => $this->request->getMimeType($format)));
+    $content = '';
+    $headers = array();
+    // We shouldn't respond with content for HEAD requests.
+    if ($this->request->getMethod() != 'HEAD') {
+      $format = $this->getFormat();
+      $headers = array('Content-Type' => $this->request->getMimeType($format));
+      $data = array('error' => $error, 'reason' => $reason);
+      $content = $this->serializer()->serialize($data, $format);
+    }
+    return new Response($content, $status, $headers);
   }
 
   /**
