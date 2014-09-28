@@ -22,7 +22,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  *   fieldable = FALSE,
  *   entity_keys = {
  *     "id" = "id",
- *     "uuid" = "uuid",
+ *     "uuid" = "session_id",
  *     "revision" = "revision_id",
  *   }
  * )
@@ -38,11 +38,6 @@ class ReplicationLog extends ContentEntityBase implements ReplicationLogInterfac
       ->setDescription(t('The ID of the replication log entity.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the replication log entity.'))
-      ->setReadOnly(TRUE);
 
     $fields['revision_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
