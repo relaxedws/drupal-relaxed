@@ -43,7 +43,7 @@ class ReplicationHistoryItem extends FieldItemBase {
       ->setDescription(t('Number of documents written.'))
       ->setRequired(FALSE);
 
-    $properties['end_last_seq'] = DataDefinition::create('float')
+    $properties['end_last_seq'] = DataDefinition::create('integer')
       ->setLabel(t('End sequence'))
       ->setDescription(t('Sequence ID where the replication ended.'))
       ->setRequired(FALSE);
@@ -63,7 +63,7 @@ class ReplicationHistoryItem extends FieldItemBase {
       ->setDescription(t('Number of missing documents found.'))
       ->setRequired(FALSE);
 
-    $properties['recorded_seq'] = DataDefinition::create('float')
+    $properties['recorded_seq'] = DataDefinition::create('integer')
       ->setLabel(t('Recorded sequence'))
       ->setDescription(t('Recorded intermediate sequence.'))
       ->setRequired(TRUE);
@@ -73,7 +73,7 @@ class ReplicationHistoryItem extends FieldItemBase {
       ->setDescription(t('Unique session ID for the replication.'))
       ->setRequired(TRUE);
 
-    $properties['start_last_seq'] = DataDefinition::create('float')
+    $properties['start_last_seq'] = DataDefinition::create('integer')
       ->setLabel(t('Start sequence'))
       ->setDescription(t('Sequence ID where the replication started.'))
       ->setRequired(FALSE);
@@ -108,7 +108,7 @@ class ReplicationHistoryItem extends FieldItemBase {
           'not null' => FALSE,
         ),
         'end_last_seq' => array(
-          'type' => 'float',
+          'type' => 'int',
           'size' => 'big',
           'not null' => FALSE,
         ),
@@ -128,7 +128,7 @@ class ReplicationHistoryItem extends FieldItemBase {
           'not null' => FALSE,
         ),
         'recorded_seq' => array(
-          'type' => 'float',
+          'type' => 'int',
           'size' => 'big',
           'not null' => TRUE,
           'default' => 0,
@@ -139,7 +139,7 @@ class ReplicationHistoryItem extends FieldItemBase {
           'not null' => TRUE,
         ),
         'start_last_seq' => array(
-          'type' => 'float',
+          'type' => 'int',
           'size' => 'big',
           'not null' => FALSE,
         ),

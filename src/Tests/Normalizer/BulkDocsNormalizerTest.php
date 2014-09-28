@@ -83,13 +83,13 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
         ),
         '_local' => array(
           array(
-            'value' => $entity->_local->value,
+            'value' => $entity->_local->first()->get('value')->getCastedValue(),
           )
         ),
         '_id' => $entity->uuid(),
-        '_rev' => $entity->_revs_info->rev,
-        '_deleted' => $entity->_deleted->value,
-        '_local_seq' => $entity->_local_seq->value,
+        '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
+        '_deleted' => $entity->_deleted->first()->get('value')->getCastedValue(),
+        '_local_seq' => $entity->_local_seq->first()->get('value')->getCastedValue(),
         '_entity_type' => $entity->getEntityTypeId(),
       );
     }
