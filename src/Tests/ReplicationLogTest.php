@@ -26,6 +26,7 @@ class ReplicationLogTest extends MultiversionWebTestBase {
     $entity = entity_create('replication_log');
 
     $entity->save();
-    $this->assertTrue(!empty($entity->id()), 'Entity was saved.');
+    $entity_id = $entity->id();
+    $this->assertTrue(!empty($entity_id), 'Entity was saved.');
   }
 }
