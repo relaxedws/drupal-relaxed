@@ -24,7 +24,8 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  *     "id" = "id",
  *     "uuid" = "session_id",
  *     "revision" = "revision_id",
- *   }
+ *   },
+ *   local = TRUE,
  * )
  */
 class ReplicationLog extends ContentEntityBase implements ReplicationLogInterface {
@@ -49,9 +50,10 @@ class ReplicationLog extends ContentEntityBase implements ReplicationLogInterfac
       ->setLabel(t('Replication log history'))
       ->setDescription(t('The version id of the test entity.'))
       ->setReadOnly(TRUE)
+      ->setRequired(TRUE)
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
-    $fields['session_id'] = BaseFieldDefinition::create('string')
+    $fields['session_id'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('Replication session ID'))
       ->setDescription(t('The unique session ID of the last replication. Shortcut to the session_id in the last history item.'))
       ->setReadOnly(TRUE);
@@ -59,6 +61,7 @@ class ReplicationLog extends ContentEntityBase implements ReplicationLogInterfac
     $fields['source_last_seq'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Last processed checkpoint'))
       ->setDescription(t('The last processed checkpoint. Shortcut to the source_last_seq in the last history item.'))
+      ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
     return $fields;

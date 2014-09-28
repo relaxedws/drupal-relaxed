@@ -32,6 +32,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     }
  *   }
  * )
+ *
+ * @todo We should probably make it not possible to save '_local' documents
+ *   through this resource.
  */
 class DocResource extends ResourceBase {
 
