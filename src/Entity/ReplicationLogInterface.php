@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\multiversion\Entity;
+namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 

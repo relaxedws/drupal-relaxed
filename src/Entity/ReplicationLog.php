@@ -1,23 +1,25 @@
 <?php
 
-namespace Drupal\multiversion\Entity;
+namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * The content workspace entity class.
  *
- * It's config entity not a content entity because those are contained within a workspace itself.
- *
- * @ConfigEntityType(
+ * @ContentEntityType(
  *   id = "replication_log",
  *   label = @Translation("Replication log"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\SqlContentEntityStorage",
  *   },
+ *   base_table = "replication_log",
+ *   revision_table = "replication_log_revision",
+ *   fieldable = FALSE,
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
@@ -25,7 +27,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  *   }
  * )
  */
-class ReplicationLog extends ContentEntityBase implements CheckpointInterface {
+class ReplicationLog extends ContentEntityBase implements ReplicationLogInterface {
 
   /**
    * {@inheritdoc}
