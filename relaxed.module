@@ -1,1 +1,3 @@
 <?php
+
+use Drupal\Core\Entity\EntityInterface;
