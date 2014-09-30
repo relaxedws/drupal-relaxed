@@ -79,6 +79,11 @@ class DocResourceTest extends ResourceTestBase {
       // Only assert one example property here, other properties should be
       // checked in serialization tests.
       $this->assertEqual($data['_rev'], $entity->_revs_info->rev, 'GET request returned correct revision hash.');
+
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('revs' => TRUE));
+      $data = Json::decode($response);
+      $rev = $data['_revisions']['start'] . '-' . $data['_revisions']['ids'][0];
+      $this->assertEqual($rev, $entity->_revs_info->rev, 'GET request returned revision list.');
     }
   }
 
@@ -129,4 +134,5 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
     }
   }
+
 }

@@ -47,6 +47,19 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    if (!empty($context['revs'])) {
+      $parts = explode('-', $entity->_revs_info->rev);
+      $data['_revisions'] = array(
+        'ids' => array(),
+        'start' => $parts[0],
+      );
+      foreach ($entity->_revs_info as $item) {
+        $parts = explode('-', $item->rev);
+        array_shift($parts);
+        $data['_revisions']['ids'][] = implode('-', $parts);
+      }
+    }
+
     // @todo Remove fields that doesn't make sense to the API spec, such as
     // local entity and revision IDs.
 

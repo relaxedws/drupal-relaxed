@@ -167,7 +167,8 @@ class ResourceController implements ContainerAwareInterface {
     $data = $response->getResponseData();
     if ($data != NULL) {
       try {
-        $output = $this->serializer()->serialize($data, $format);
+        $query = $this->request->query->all();
+        $output = $this->serializer()->serialize($data, $format, $query);
         $response->setContent($output);
       }
       catch (\Exception $e) {
