@@ -33,8 +33,13 @@ services:
   relaxed.revs_diff:
     class: Drupal\relaxed\RevisionDiff\RevisionDiff
     arguments: ['@entity.rev_index']
+  paramconverter.docid:
+    class: Drupal\relaxed\ParamConverter\DocIdConverter
+    arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
+    tags:
+      - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
+    arguments: ['@entity.manager', '@entity.uuid_index']
     tags:
       - { name: paramconverter, priority: 10 }

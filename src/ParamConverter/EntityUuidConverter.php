@@ -31,10 +31,9 @@ class EntityUuidConverter implements ParamConverterInterface {
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, RevisionIndex $rev_index) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
-    $this->revIndex = $rev_index;
   }
 
   /**
@@ -46,21 +45,9 @@ class EntityUuidConverter implements ParamConverterInterface {
   public function convert($uuid, $definition, $name, array $defaults) {
     $entity_type_id = substr($definition['type'], strlen($this->key . ':'));
     $entity_id = NULL;
-    $revision_id = NULL;
-    $request = \Drupal::request();
 
-    // Figure out if we should load a specific revision or not.
-    if (!$rev = $request->query->get('rev')) {
-      $rev = $request->headers->get('if-none-match');
-    }
-
-    // Use the indices to resolve the entity and revision ID.
-    if ($rev && $item = $this->revIndex->get("$uuid:$rev")) {
-      $entity_type_id = $item['entity_type'];
-      $entity_id = $item['entity_id'];
-      $revision_id = $item['revision_id'];
-    }
-    elseif ($item = $this->uuidIndex->get($uuid)) {
+    // Use the index to resolve the entity type and ID.
+    if ($item = $this->uuidIndex->get($uuid)) {
       $entity_type_id = $item['entity_type'];
       $entity_id = $item['entity_id'];
     }
@@ -70,13 +57,7 @@ class EntityUuidConverter implements ParamConverterInterface {
       return $uuid;
     }
 
-    $storage = $this->entityManager->getStorage($entity_type_id);
-    if ($revision_id) {
-      $entity = $storage->loadRevision($revision_id);
-    }
-    else {
-      $entity = $storage->load($entity_id);
-    }
+    $entity = $this->entityManager->getStorage($entity_type_id)->load($entity_id);
     return !empty($entity) ? $entity : $uuid;
   }
 

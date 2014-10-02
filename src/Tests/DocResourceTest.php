@@ -84,6 +84,17 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $rev = $data['_revisions']['start'] . '-' . $data['_revisions']['ids'][0];
       $this->assertEqual($rev, $entity->_revs_info->rev, 'GET request returned revision list.');
+
+      // Save an additional revision.
+      $entity->save();
+
+      $open_revs = array();
+      foreach ($entity->_revs_info as $item) {
+        $open_revs[] = $item->rev;
+      }
+      $open_revs_string = '[' . implode(',', $open_revs) . ']';
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('open_revs' => $open_revs_string));
+
     }
   }
 
