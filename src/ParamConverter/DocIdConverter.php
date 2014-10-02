@@ -21,11 +21,6 @@ class DocIdConverter implements ParamConverterInterface {
   protected $uuidIndex;
 
   /**
-   * @var string
-   */
-  protected $key = 'entity_uuid';
-
-  /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    */
   public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, RevisionIndex $rev_index) {
@@ -37,13 +32,15 @@ class DocIdConverter implements ParamConverterInterface {
   /**
    * Converts a UUID into an existing entity.
    *
-   * @return string | \Drupal\Core\Entity\EntityInterface
-   *   The entity if it exists in the database or else the original UUID string.
+   * @return string | \Drupal\Core\Entity\EntityInterface[]
+   *   An array of the entity or entity revisions that was requested, if
+   *   existing, or else the original UUID string.
    */
   public function convert($uuid, $definition, $name, array $defaults) {
-    $entity_type_id = substr($definition['type'], strlen($this->key . ':'));
+    $entity_type_id = NULL;
     $entity_id = NULL;
-    $revision_id = NULL;
+    $revision_ids = array();
+    $entities = array();
     $request = \Drupal::request();
 
     // Fetch parameters.
@@ -56,22 +53,21 @@ class DocIdConverter implements ParamConverterInterface {
     if ($rev_query && $item = $this->revIndex->get("$uuid:$rev_query")) {
       $entity_type_id = $item['entity_type'];
       $entity_id = $item['entity_id'];
-      $revision_id = $item['revision_id'];
+      $revision_ids[] = $item['revision_id'];
     }
     elseif ($item = $this->uuidIndex->get($uuid)) {
       $entity_type_id = $item['entity_type'];
       $entity_id = $item['entity_id'];
     }
-
     // Return the plain UUID if we're missing information.
     if (!$entity_id || !$entity_type_id) {
       return $uuid;
     }
-    $storage = $this->entityManager->getStorage($entity_type_id);
 
+    $storage = $this->entityManager->getStorage($entity_type_id);
     if ($open_revs_query) {
       $open_revs = array();
-      if ($open_revs_query === 'all') {
+      if ($open_revs_query == 'all') {
         $entity = $storage->load($entity_id);
         // @todo _revs_info doesn't actually denote only open revisions.
         foreach ($entity->_revs_info as $item) {
@@ -81,22 +77,19 @@ class DocIdConverter implements ParamConverterInterface {
       else {
         $open_revs = explode(',', $open_revs_query);
       }
-      $revision_ids = array();
       foreach ($open_revs as $open_rev) {
         if ($item = $this->revIndex->get("$uuid:$open_rev")) {
           $revision_ids[] = $item['revision_id'];
         }
       }
-      $revisions = array();
+    }
+    if ($revision_ids) {
       foreach ($revision_ids as $revision_id) {
-        $revisions[] = $storage->loadRevision($revision_id);
+        $entities[] = $storage->loadRevision($revision_id);
       }
-      return $revisions;
+      return $entities ?: $uuid;
     }
-    elseif ($revision_id) {
-      return $storage->loadRevision($revision_id) ?: $uuid;
-    }
-    return $storage->load($entity_id) ?: $uuid;
+    return $storage->loadMultiple(array($entity_id)) ?: $uuid;
   }
 
   /**

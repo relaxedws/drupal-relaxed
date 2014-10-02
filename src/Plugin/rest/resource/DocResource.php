@@ -39,6 +39,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class DocResource extends ResourceBase {
 
   /**
+   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    *
    * @return \Drupal\rest\ResourceResponse
@@ -53,25 +54,30 @@ class DocResource extends ResourceBase {
   }
 
   /**
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\Core\Entity\ContentEntityInterface[] $entities
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function get($workspace, $entity) {
-    if (!$entity instanceof ContentEntityInterface) {
+  public function get($workspace, $entities) {
+    if (empty($entities) || is_string($entities)) {
       throw new NotFoundHttpException();
     }
-    if (!$entity->access('view')) {
-      throw new AccessDeniedHttpException();
-    }
-    foreach ($entity as $field_name => $field) {
-      if (!$field->access('view')) {
-        unset($entity->{$field_name});
+    foreach ($entities as $entity) {
+      if (!$entity->access('view')) {
+        throw new AccessDeniedHttpException();
+      }
+      foreach ($entity as $field_name => $field) {
+        if (!$field->access('view')) {
+          unset($entity->{$field_name});
+        }
       }
     }
+    // Decide if to return a single entity or multiple revisions.
+    $data = \Drupal::request()->query->get('open_revs') ? $entities : reset($entities);
     // @todo Create a event handler and override the ETag that's set by core.
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse($entity, 200, array('X-Relaxed-ETag' => $entity->_revs_info->rev));
+    return new ResourceResponse($data, 200, array('X-Relaxed-ETag' => $entity->_revs_info->rev));
   }
 
   /**
