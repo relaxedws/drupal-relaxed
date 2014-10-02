@@ -38,8 +38,8 @@ services:
     arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
     tags:
       - { name: paramconverter, priority: 20 }
-  paramconverter.entity_uuid:
-    class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@entity.uuid_index']
+  paramconverter.db:
+    class: Drupal\relaxed\ParamConverter\DbConverter
+    arguments: ['@entity.manager']
     tags:
-      - { name: paramconverter, priority: 10 }
+      - { name: paramconverter, priority: 20 }

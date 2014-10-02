@@ -23,13 +23,6 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}",
- *   },
- *   uri_parameters = {
- *     "canonical" = {
- *       "db" = {
- *         "type" = "entity_uuid:workspace",
- *       }
- *     }
  *   }
  * )
  */
@@ -84,7 +77,7 @@ class DbResource extends ResourceBase {
       // @todo Consider using the container injected in parent::create()
       $entity = \Drupal::service('entity.manager')
         ->getStorage('workspace')
-        ->create(array('name' => $name, 'id' => drupal_strtolower($name), 'uuid' => $name))
+        ->create(array('id' => $name))
         ->save();
     }
     catch (EntityStorageException $e) {

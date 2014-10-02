@@ -19,17 +19,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/{docid}",
- *   },
- *   uri_parameters = {
- *     "canonical" = {
- *       "doc" = {
- *         "type" = "entity_uuid:workspace",
- *       },
- *       "docid" = {
- *         "type" = "entity_uuid",
- *         "rev" = TRUE,
- *       }
- *     }
  *   }
  * )
  *

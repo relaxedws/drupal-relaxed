@@ -22,13 +22,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_bulk_docs",
- *   },
- *   uri_parameters = {
- *     "canonical" = {
- *       "db" = {
- *         "type" = "entity_uuid:workspace",
- *       }
- *     }
  *   }
  * )
  */

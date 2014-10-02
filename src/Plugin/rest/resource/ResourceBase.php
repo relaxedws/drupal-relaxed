@@ -5,7 +5,6 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\relaxed\ResourceManagerInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -38,13 +37,6 @@ abstract class ResourceBase extends CoreResourceBase {
 
       if (isset($definition['uri_paths'][$method_lower])) {
         $route->setPath($definition['uri_paths'][$method_lower]);
-      }
-
-      if (isset($definition['uri_parameters'][$method_lower])) {
-        $route->addOptions(array('parameters' => $definition['uri_parameters'][$method_lower]));
-      }
-      elseif (isset($definition['uri_parameters']['canonical'])) {
-        $route->addOptions(array('parameters' => $definition['uri_parameters']['canonical']));
       }
 
       switch ($method) {

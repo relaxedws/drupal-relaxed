@@ -15,23 +15,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_local/{docid}",
- *   },
- *   uri_parameters = {
- *     "canonical" = {
- *       "doc" = {
- *         "type" = "entity_uuid:workspace",
- *       },
- *       "docid" = {
- *         "type" = "entity_uuid",
- *         "rev" = TRUE,
- *       }
- *     }
  *   }
  * )
  */
 class LocalDocResource extends DocResource {
 
   /**
+   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    *
    * @return \Drupal\rest\ResourceResponse
@@ -44,15 +34,18 @@ class LocalDocResource extends DocResource {
   }
 
   /**
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\Core\Entity\ContentEntityInterface[] $entities
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function get($workspace, $entity) {
-    if ($entity instanceof ContentEntityInterface && $entity->_local->value == FALSE) {
-      throw new NotFoundHttpException();
+  public function get($workspace, $entities) {
+    foreach ($entities as $entity) {
+      if ($entity instanceof ContentEntityInterface && $entity->_local->value == FALSE) {
+        throw new NotFoundHttpException();
+      }
     }
-    return parent::get($workspace, $entity);
+    return parent::get($workspace, $entities);
   }
 
   /**

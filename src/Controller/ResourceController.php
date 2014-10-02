@@ -26,11 +26,6 @@ class ResourceController implements ContainerAwareInterface {
   protected $serializer;
 
   /**
-   * @var \Drupal\relaxed\ResourceManagerInterface
-   */
-  protected $resourceManager;
-
-  /**
    * @var \Symfony\Component\HttpFoundation\Request $request
    */
   protected $request;

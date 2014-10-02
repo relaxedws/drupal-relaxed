@@ -21,7 +21,14 @@ class DocIdConverter implements ParamConverterInterface {
   protected $uuidIndex;
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @var \Drupal\multiversion\Entity\RevisionIndex
+   */
+  protected $revIndex;
+
+  /**
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\multiversion\Entity\UuidIndex $uuid_index
+   * @param \Drupal\multiversion\Entity\RevisionIndex $rev_index
    */
   public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, RevisionIndex $rev_index) {
     $this->entityManager = $entity_manager;

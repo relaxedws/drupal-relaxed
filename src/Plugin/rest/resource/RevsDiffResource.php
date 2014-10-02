@@ -25,13 +25,6 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_revs_diff",
- *   },
- *   uri_parameters = {
- *     "canonical" = {
- *       "db" = {
- *         "type" = "entity_uuid:workspace",
- *       }
- *     }
  *   }
  * )
  */
