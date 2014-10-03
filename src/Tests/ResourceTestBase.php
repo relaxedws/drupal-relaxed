@@ -170,10 +170,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    */
   protected function createWorkspace($name) {
     $entity = entity_create('workspace', array(
-      'id' => drupal_strtolower($name),
-      'name' => $name,
-      'label' => $name,
-      'uuid' => $name
+      'id' => $name,
     ));
     return $entity;
   }

@@ -16,8 +16,8 @@ class WorkspaceNormalizer extends EntityNormalizer {
     $data = parent::normalize($entity, $format, $context);
 
     if (isset($data['name'])) {
-      $data['db_name'] = $data['name'];
-      unset($data['name']);
+      $data['db_name'] = $data['id'];
+      unset($data['id']);
     }
     return $data;
   }
@@ -27,7 +27,7 @@ class WorkspaceNormalizer extends EntityNormalizer {
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     if (isset($data['db_name'])) {
-      $data['name'] = $data['db_name'];
+      $data['id'] = $data['db_name'];
       unset($data['db_name']);
     }
     return $this->entityManager->getStorage('workspace')->create($data);

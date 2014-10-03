@@ -21,7 +21,7 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest($this->workspace->name(), 'HEAD', NULL);
+    $response = $this->httpRequest($this->workspace->id(), 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertTrue(empty($response), 'HEAD request returned no body.');
@@ -36,13 +36,13 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest($this->workspace->name(), 'GET', NULL);
+    $response = $this->httpRequest($this->workspace->id(), 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
-    $this->assertEqual($data['db_name'], $this->workspace->name(), 'GET request returned correct db_name.');
+    $this->assertEqual($data['db_name'], $this->workspace->id(), 'GET request returned correct db_name.');
   }
 
   public function testPut() {

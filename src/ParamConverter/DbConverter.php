@@ -34,6 +34,6 @@ class DbConverter implements ParamConverterInterface {
    * {@inheritdoc}
    */
   public function applies($definition, $name, Route $route) {
-    return ($name == 'db');
+    return ($definition['type'] == 'relaxed:db');
   }
 }

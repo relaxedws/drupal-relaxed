@@ -39,6 +39,17 @@ abstract class ResourceBase extends CoreResourceBase {
         $route->setPath($definition['uri_paths'][$method_lower]);
       }
 
+      // @todo Consider converting this into something more generic.
+      $parameters = array();
+      foreach (array('db', 'docid') as $parameter) {
+        if (strpos($route->getPath(), '{' . $parameter . '}')) {
+          $parameters[$parameter] = array('type' => 'relaxed:' . $parameter);
+        }
+      }
+      if ($parameters) {
+        $route->addOptions(array('parameters' => $parameters));
+      }
+
       switch ($method) {
         case 'POST':
         case 'PUT':
