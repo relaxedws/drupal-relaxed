@@ -76,7 +76,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
 
       $response = $this->httpRequest(
-        $this->workspace->name() . '/_revs_diff', 'POST', $serialized
+        $this->workspace->id() . '/_revs_diff', 'POST', $serialized
       );
       $this->assertResponse('200', 'HTTP response code is correct.');
       $data = Json::decode($response);
@@ -168,7 +168,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
 
       $response = $this->httpRequest(
-        $this->workspace->name() . '/_revs_diff', 'POST', $serialized
+        $this->workspace->id() . '/_revs_diff', 'POST', $serialized
       );
       $this->assertResponse('200', 'HTTP response code is correct.');
       $response_data = Json::decode($response);

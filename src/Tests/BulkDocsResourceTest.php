@@ -16,7 +16,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
   }
 
   public function testPostCreate() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
     $this->enableService('relaxed:bulk_docs', 'POST');
     $serializer = $this->container->get('serializer');
 
@@ -44,7 +44,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
   }
 
   public function testPostUpdate() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
     $this->enableService('relaxed:bulk_docs', 'POST');
     $serializer = $this->container->get('serializer');
 
