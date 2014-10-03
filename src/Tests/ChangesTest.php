@@ -60,11 +60,31 @@ class ChangesTest extends ResourceTestBase {
     );
     $entity->save();
 
+    // Create a new entity.
+    $entity = entity_create('entity_test_rev');
+    $entity->save();
+
+    // Update the field_test_text field.
+    $entity->set(
+      'field_test_text',
+      array(
+        0 => array(
+          'value' => $this->randomString(),
+          'format' => 'plain_text',
+        ),
+      )
+    );
+    $entity->save();
+
     $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
+    $data = Json::decode($response);
+    $this->assertTrue(
+      is_array($data) && !empty($data),
+      'Data format is correct, the array is not empty.'
+    );
 
-    //$data = Json::decode($response);
   }
 }

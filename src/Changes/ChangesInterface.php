@@ -12,7 +12,7 @@ interface ChangesInterface {
   /**
    * Sets from what workspace to fetch changes.
    */
-  public function workspace($name);
+  public function useWorkspace($name);
 
   /**
    * Sets from what sequence number to check for changes.

@@ -12,7 +12,6 @@ use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\multiversion\Entity\Sequence\SequenceFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 
 /**
@@ -42,15 +41,8 @@ class ChangesResource extends ResourceBase {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
 
-    $settings = new Settings(array());
-    $container = new ContainerBuilder();
-    $sequence_factory = new SequenceFactory($container, $settings);
-    $changes = new Changes($sequence_factory);
-
-    //$changes = \Drupal::service('relaxed.changes');
-
-    $result = $changes->workspace($workspace->name())->getNormal();
-
+    $changes = \Drupal::service('relaxed.changes');
+    $result = $changes->useWorkspace($workspace->name())->getNormal();
 
     return new ResourceResponse($result, 200);
   }

@@ -43,3 +43,6 @@ services:
     arguments: ['@entity.manager']
     tags:
       - { name: paramconverter, priority: 20 }
+  relaxed.changes:
+    class: Drupal\relaxed\Changes\Changes
+    arguments: ['@entity.sequence_index']
