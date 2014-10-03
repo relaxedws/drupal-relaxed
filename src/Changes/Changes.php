@@ -55,7 +55,7 @@ class Changes implements ChangesInterface {
           'rev' => $change['rev'],
         ),
         'deleted' => $change['deleted'],
-        'id' => $change['entity_id'],
+        'id' => $change['entity_uuid'],
         'seq' => $change['local_seq'],
       );
     }

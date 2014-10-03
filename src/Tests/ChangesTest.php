@@ -21,8 +21,13 @@ class ChangesTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
+    $revs = array();
     $entity = entity_create('entity_test_rev');
     $entity->save();
+    $revs[] = array(
+      'id' => $entity->uuid(),
+      'rev' => $entity->_revs_info->rev,
+    );
 
     // Update the field_test_text field.
     $entity->set(
@@ -35,6 +40,10 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
+    $revs[] = array(
+      'id' => $entity->uuid(),
+      'rev' => $entity->_revs_info->rev,
+    );
 
     // Update the name filed.
     $entity->set(
@@ -47,6 +56,10 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
+    $revs[] = array(
+      'id' => $entity->uuid(),
+      'rev' => $entity->_revs_info->rev,
+    );
 
     // Update the name filed again.
     $entity->set(
@@ -59,10 +72,18 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
+    $revs[] = array(
+      'id' => $entity->uuid(),
+      'rev' => $entity->_revs_info->rev,
+    );
 
     // Create a new entity.
     $entity = entity_create('entity_test_rev');
     $entity->save();
+    $revs[] = array(
+      'id' => $entity->uuid(),
+      'rev' => $entity->_revs_info->rev,
+    );
 
     // Update the field_test_text field.
     $entity->set(
@@ -75,6 +96,10 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
+    $revs[] = array(
+      'id' => $entity->uuid(),
+      'rev' => $entity->_revs_info->rev,
+    );
 
     $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType);
     $this->assertResponse('200', 'HTTP response code is correct.');
@@ -82,9 +107,22 @@ class ChangesTest extends ResourceTestBase {
 
     $data = Json::decode($response);
     $this->assertTrue(
-      is_array($data) && !empty($data),
+      is_array($data) && !empty($data) && isset($data['results']),
       'Data format is correct, the array is not empty.'
     );
 
+    $results_count = count($data['results']);
+    $revs_count = count($revs);
+    $this->assertEqual($results_count, $revs_count, 'The number of changes is correct.');
+
+    $correct_data = TRUE;
+    foreach ($data['results'] as $key => $rev) {
+      if ($revs[$key]['id'] != $rev['id']
+        || $revs[$key]['rev'] != $rev['changes']['rev']) {
+        $correct_data = FALSE;
+      }
+    }
+    $this->assertTrue($correct_data, 'The returned information is correct.');
   }
+
 }
