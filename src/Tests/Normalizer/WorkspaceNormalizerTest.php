@@ -39,9 +39,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   public function testNormalize() {
     $expected = array(
-      'id' => drupal_strtolower($this->entity->name()),
-      'label' => $this->entity->name(),
-      'db_name' => $this->entity->name(),
+      'db_name' => $this->entity->id(),
     );
     $normalized = $this->serializer->normalize($this->entity);
 
@@ -71,10 +69,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
    */
   protected function createWorkspace($name) {
     $entity = entity_create('workspace', array(
-      'id' => drupal_strtolower($name),
-      'name' => $name,
-      'label' => $name,
-      'uuid' => $name
+      'id' => $name,
     ));
     return $entity;
   }

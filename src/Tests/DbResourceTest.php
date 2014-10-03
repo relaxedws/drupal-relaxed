@@ -54,21 +54,18 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $name = $this->randomMachineName();
-    $response = $this->httpRequest($name, 'PUT', NULL);
+    $id = $this->randomMachineName();
+    $response = $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
 
-    $entity = \Drupal::entityManager()->loadEntityByUuid('workspace', $name);
-    $this->assertTrue(!empty($entity), 'The entity being PUT was loaded.');
-
-    $name = $this->randomMachineName();
-    $entity = $this->createWorkspace($name);
+    $id = $this->randomMachineName();
+    $entity = $this->createWorkspace($id);
     $entity->save();
 
     // Test putting an existing workspace.
-    $response = $this->httpRequest($entity->name(), 'PUT', NULL);
+    $response = $this->httpRequest($entity->id(), 'PUT', NULL);
     $this->assertResponse('412', 'HTTP response code is correct for existing database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['error']), 'PUT request returned error.');
@@ -89,12 +86,12 @@ class DbResourceTest extends ResourceTestBase {
       $entity = entity_create($entity_type);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
-      $response = $this->httpRequest($this->workspace->name(), 'POST', $serialized);
+      $response = $this->httpRequest($this->workspace->id(), 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when posting new entity');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
 
-      $response = $this->httpRequest($this->workspace->name(), 'POST', $serialized);
+      $response = $this->httpRequest($this->workspace->id(), 'POST', $serialized);
       $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }
@@ -108,11 +105,11 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $name = $this->randomMachineName();
-    $entity = $this->createWorkspace($name);
+    $id = $this->randomMachineName();
+    $entity = $this->createWorkspace($id);
     $entity->save();
 
-    $response = $this->httpRequest($entity->name(), 'DELETE', NULL);
+    $response = $this->httpRequest($entity->id(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');

@@ -15,7 +15,7 @@ class WorkspaceNormalizer extends EntityNormalizer {
     $context['entity_type'] = 'workspace';
     $data = parent::normalize($entity, $format, $context);
 
-    if (isset($data['name'])) {
+    if (isset($data['id'])) {
       $data['db_name'] = $data['id'];
       unset($data['id']);
     }

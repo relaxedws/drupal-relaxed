@@ -22,15 +22,18 @@ class LocalDocResource extends DocResource {
 
   /**
    * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
-   * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param string | \Drupal\Core\Entity\ContentEntityInterface[] $entities
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function head($workspace, $entity) {
+  public function head($workspace, $entities) {
+    // We know there can only be one entity with HEAD requests.
+    $entity = reset($entities);
+
     if ($entity instanceof ContentEntityInterface && $entity->_local->value == FALSE) {
       throw new NotFoundHttpException();
     }
-    return parent::head($workspace, $entity);
+    return parent::head($workspace, $entities);
   }
 
   /**
