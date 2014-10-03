@@ -34,12 +34,12 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $entities) {
-    // We know there can only be one entity with HEAD requests.
-    $entity = reset($entities);
-
-    if (!$entity instanceof ContentEntityInterface) {
+    if (empty($entities) || is_string($entities)) {
       throw new NotFoundHttpException();
     }
+    // We know there can only be one entity with DELETE requests.
+    $entity = reset($entities);
+
     // @todo Create a event handler and override the ETag that's set by core.
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
     return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => $entity->_revs_info->rev));
@@ -106,11 +106,17 @@ class DocResource extends ResourceBase {
   }
 
   /**
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function delete($workspace, ContentEntityInterface $entity) {
+  public function delete($workspace, $entities) {
+    if (empty($entities) || is_string($entities)) {
+      throw new NotFoundHttpException();
+    }
+    // We know there can only be one entity with DELETE requests.
+    $entity = reset($entities);
+
     try {
       // @todo: Access check.
       $entity->delete();

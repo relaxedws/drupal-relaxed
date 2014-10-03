@@ -13,7 +13,7 @@ use Drupal\Component\Serialization\Json;
 class DocResourceTest extends ResourceTestBase {
 
   public function testHead() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
 
     // HEAD and GET is handled by the same resource.
     $this->enableService('relaxed:doc', 'GET');
@@ -53,7 +53,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testGet() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
 
     $this->enableService('relaxed:doc', 'GET');
     $entity_types = array('entity_test_rev');
@@ -99,7 +99,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
 
     $this->enableService('relaxed:doc', 'PUT');
     $serializer = $this->container->get('serializer');
@@ -122,7 +122,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testDelete() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
 
     $this->enableService('relaxed:doc', 'DELETE');
     $entity_types = array('entity_test_rev');
