@@ -164,6 +164,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
     }
+
+    if (isset($context['new_edits']) && ($context['new_edits'] === FALSE)) {
+      $entity->new_edits = FALSE;
+    }
+
     return $entity;
   }
 }
