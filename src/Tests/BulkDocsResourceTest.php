@@ -88,7 +88,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     foreach ($patched_entities['docs'] as $key => $patched_entity) {
       $entity_number = $key+1;
-      $entity = entity_load($entity_type, $patched_entity->id());
+      $entity = entity_load($entity_type, $patched_entity->id(), TRUE);
       if ($key == 1) {
         $this->assertEqual($entity, NULL, "Entity number $entity_number has been deleted.");
       }
