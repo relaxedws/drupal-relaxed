@@ -9,6 +9,11 @@ namespace Drupal\relaxed\RevisionDiff;
 
 use Drupal\multiversion\Entity\RevisionIndex;
 
+/**
+ * @todo Move this into the \Drupal\multiversion\Entity namespace
+ * @todo We probably should make UuidIndex and RevisionIndex key per workspace
+ *   so that we can use revision diff per workspace.
+ */
 class RevisionDiff implements RevisionDiffInterface {
 
   public $entityKeys = array();
