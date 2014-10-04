@@ -145,13 +145,29 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $this->entityManager->getStorage($entity_type_id)->create($data);
+    $storage = $this->entityManager->getStorage($entity_type_id);
+
+    if ($entity_id) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
+      foreach ($data as $name => $value) {
+        $entity->{$name} = $value;
+      }
+    }
+    else {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      $entity = $storage->create($data);
+    }
 
     if ($entity_id) {
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
     }
+
+    if (isset($context['new_edits']) && ($context['new_edits'] === FALSE)) {
+      $entity->new_edits = FALSE;
+    }
+
     return $entity;
   }
 }
