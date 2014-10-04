@@ -151,7 +151,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
       foreach ($data as $name => $value) {
-        $entity->$name = $value;
+        $entity->{$name} = $value;
       }
     }
     else {
