@@ -156,7 +156,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      $storage->create($data);
+      $entity = $storage->create($data);
     }
 
     if ($entity_id) {
