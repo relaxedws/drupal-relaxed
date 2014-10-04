@@ -12,7 +12,7 @@ use Drupal\Component\Serialization\Json;
 class ChangesTest extends ResourceTestBase {
 
   public function testGet() {
-    $db = $this->workspace->name();
+    $db = $this->workspace->id();
     $this->enableService('relaxed:changes', 'GET');
 
     // Create a user with the correct permissions.

@@ -139,12 +139,14 @@ class ResourceController implements ContainerAwareInterface {
     $resource = $this->getResource();
 
     $content = $this->request->getContent();
+    // @todo Check if it's safe to pass all query parameters like this.
+    $query = $this->request->query->all();
     $entity = NULL;
     if (!empty($content)) {
       try {
         $definition = $resource->getPluginDefinition();
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
-        $entity = $this->serializer()->deserialize($content, $class, $format);
+        $entity = $this->serializer()->deserialize($content, $class, $format, $query);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -162,7 +164,6 @@ class ResourceController implements ContainerAwareInterface {
     $data = $response->getResponseData();
     if ($data != NULL) {
       try {
-        $query = $this->request->query->all();
         $output = $this->serializer()->serialize($data, $format, $query);
         $response->setContent($output);
       }
