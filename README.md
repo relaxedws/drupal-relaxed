@@ -12,3 +12,4 @@ This module is part of [the content staging suite for D8](https://www.drupal.org
 ## Presentations
 
 - https://austin2014.drupal.org/session/content-staging-drupal-8
+- https://amsterdam2014.drupal.org/session/content-staging-drupal-8-continued
