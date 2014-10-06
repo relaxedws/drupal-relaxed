@@ -30,6 +30,10 @@ services:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     tags:
       - { name: normalizer, priority: 20 }
+  relaxed.normalizer.attachment_file_item:
+    class: Drupal\relaxed\Normalizer\FileItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
   relaxed.revs_diff:
     class: Drupal\relaxed\RevisionDiff\RevisionDiff
     arguments: ['@entity.rev_index']
