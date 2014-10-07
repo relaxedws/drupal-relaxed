@@ -43,7 +43,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
    *
    * @var \Drupal\file\Entity\File
    */
-  protected $file;
+  protected $file = array();
 
   protected function setUp() {
     parent::setUp();
@@ -73,11 +73,16 @@ class FileItemNormalizerTest extends NormalizerTestBase{
           'weight' => 0,
         ),
       ))->save();
-    file_put_contents('public://example.txt', $this->randomMachineName());
-    $this->file = entity_create('file', array(
-        'uri' => 'public://example.txt',
+    file_put_contents('public://example1.txt', $this->randomMachineName());
+    $this->files['1'] = entity_create('file', array(
+        'uri' => 'public://example1.txt',
       ));
-    $this->file->save();
+    $this->files['1']->save();
+    file_put_contents('public://example2.txt', $this->randomMachineName());
+    $this->files['2'] = entity_create('file', array(
+        'uri' => 'public://example2.txt',
+      ));
+    $this->files['2']->save();
 
     // Create a Image field for testing.
     entity_create('field_storage_config', array(
@@ -112,12 +117,19 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         'format' => 'full_html',
       ),
       'field_test_file' => array(
-        'target_id' => $this->file->id(),
-        'display' => 1,
-        'description' => $this->randomMachineName(),
+        array(
+          'target_id' => $this->files['1']->id(),
+          'display' => 1,
+          'description' => $this->randomMachineName(),
+        ),
+        array(
+          'target_id' => $this->files['2']->id(),
+          'display' => 1,
+          'description' => $this->randomMachineName(),
+        ),
       ),
       'field_test_image' => array(
-        'target_id' => $this->file->id(),
+        'target_id' => $this->image->id(),
         'display' => 1,
         'description' => $this->randomMachineName(),
         'alt' => $this->randomMachineName(),
@@ -160,28 +172,13 @@ class FileItemNormalizerTest extends NormalizerTestBase{
       'user_id' => array(
         array('target_id' => $this->values['user_id']),
       ),
+      '_attachments' => array(
+        // todo Add expected values for _attachments.
+      ),
       'field_test_text' => array(
         array(
           'value' => $this->values['field_test_text']['value'],
           'format' => $this->values['field_test_text']['format'],
-        ),
-      ),
-      'field_test_file' => array(
-        array(
-          'target_id' => $this->values['field_test_file']['target_id'],
-          'display' => $this->values['field_test_file']['display'],
-          'description' => $this->values['field_test_file']['description'],
-        ),
-      ),
-      'field_test_image' => array(
-        array(
-          'target_id' => $this->values['field_test_image']['target_id'],
-          'display' => $this->values['field_test_image']['display'],
-          'description' => $this->values['field_test_image']['description'],
-          'alt' => $this->values['field_test_image']['alt'],
-          'title' => $this->values['field_test_image']['title'],
-          'width' => $this->values['field_test_image']['width'],
-          'height' => $this->values['field_test_image']['height'],
         ),
       ),
       '_local' => array(
