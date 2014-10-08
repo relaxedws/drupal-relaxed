@@ -92,7 +92,7 @@ abstract class ResourceTestBase extends RESTTestBase {
         $curl_options = array(
           CURLOPT_HTTPGET => TRUE,
           CURLOPT_CUSTOMREQUEST => 'GET',
-          CURLOPT_URL => url($url, $options),
+          CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => array('Accept: ' . $mime_type),
         );
@@ -103,7 +103,7 @@ abstract class ResourceTestBase extends RESTTestBase {
           $curl_options = array(
             CURLOPT_HTTPGET => FALSE,
             CURLOPT_CUSTOMREQUEST => 'HEAD',
-            CURLOPT_URL => url($url, $options),
+            CURLOPT_URL => _url($url, $options),
             CURLOPT_NOBODY => TRUE,
             CURLOPT_HTTPHEADER => array('Accept: ' . $mime_type),
           );
@@ -114,7 +114,7 @@ abstract class ResourceTestBase extends RESTTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_POST => TRUE,
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => array(
             'Content-Type: ' . $mime_type,
@@ -128,7 +128,7 @@ abstract class ResourceTestBase extends RESTTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PUT',
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => array(
             'Content-Type: ' . $mime_type,
@@ -142,7 +142,7 @@ abstract class ResourceTestBase extends RESTTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PATCH',
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => array(
             'Content-Type: ' . $mime_type,
@@ -155,7 +155,7 @@ abstract class ResourceTestBase extends RESTTestBase {
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'DELETE',
-          CURLOPT_URL => url($url, array('absolute' => TRUE)),
+          CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => array('X-CSRF-Token: ' . $token),
         );
