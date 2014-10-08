@@ -26,18 +26,40 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class AttachmentResource extends ResourceBase {
 
-  public function head($workspace, $entities, $attachment) {
+  public function head($workspace, $entities, $field_name, $delta, $file_uuid, $scheme, $filename) {
     if (empty($entities) || is_string($entities)) {
       throw new NotFoundHttpException();
     }
 
-    return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => ''));
+    $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+    if (!$file) {
+      throw new NotFoundHttpException();
+    }
+
+    $file_contents = file_get_contents($file->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    return new ResourceResponse(
+      NULL,
+      200,
+      array(
+        'X-Relaxed-ETag' => $encoded_digest,
+        'Content-Length' => $file->getSize(),
+        'Content-MD5' => $encoded_digest,
+      )
+    );
   }
 
-  public function get($workspace, $entities, $attachment) {
+  public function get($workspace, $entities, $field_name, $delta, $file_uuid, $scheme, $filename) {
     if (empty($entities) || is_string($entities)) {
       throw new NotFoundHttpException();
     }
+
+    $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+    if (!$file) {
+      throw new NotFoundHttpException();
+    }
+
     foreach ($entities as $entity) {
       if (!$entity->access('view')) {
         throw new AccessDeniedHttpException();
@@ -49,6 +71,20 @@ class AttachmentResource extends ResourceBase {
       }
     }
 
-    return new ResourceResponse($attachment, 200, NULL);
+    $file_contents = file_get_contents($file->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    $resource = new ResourceResponse(
+      $file_contents,
+      200,
+      array(
+        'Content-Type' => $file->getMimeType(),
+        'X-Relaxed-ETag' => $encoded_digest,
+        'Content-Length' => $file->getSize(),
+        'Content-MD5' => $encoded_digest,
+      )
+    );
+
+    return $resource;
   }
 }

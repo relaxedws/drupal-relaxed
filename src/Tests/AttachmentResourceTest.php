@@ -19,15 +19,15 @@ class AttachmentResourceTest extends ResourceTestBase {
     // Create a File field for testing.
     entity_create('field_storage_config', array(
         'name' => 'field_test_file',
-        'entity_type' => 'entity_test_mulrev',
+        'entity_type' => 'entity_test_rev',
         'type' => 'file',
         'cardinality' => 2,
         'translatable' => FALSE,
       ))->save();
     entity_create('field_config', array(
-        'entity_type' => 'entity_test_mulrev',
+        'entity_type' => 'entity_test_rev',
         'field_name' => 'field_test_file',
-        'bundle' => 'entity_test_mulrev',
+        'bundle' => 'entity_test_rev',
         'label' => 'Test file-field',
         'widget' => array(
           'type' => 'file',
@@ -48,26 +48,26 @@ class AttachmentResourceTest extends ResourceTestBase {
     // Create a Image field for testing.
     entity_create('field_storage_config', array(
         'name' => 'field_test_image',
-        'entity_type' => 'entity_test_mulrev',
+        'entity_type' => 'entity_test_rev',
         'type' => 'image',
         'cardinality' => 3,
         'translatable' => FALSE,
       ))->save();
     entity_create('field_config', array(
-        'entity_type' => 'entity_test_mulrev',
+        'entity_type' => 'entity_test_rev',
         'field_name' => 'field_test_image',
-        'bundle' => 'entity_test_mulrev',
+        'bundle' => 'entity_test_rev',
         'label' => 'Test image-field',
         'widget' => array(
           'type' => 'image',
           'weight' => 0,
         ),
       ))->save();
-    file_unmanaged_copy(DRUPAL_ROOT . '/core/misc/druplicon.png', 'public://example.jpg');
-    $this->image = entity_create('file', array(
-        'uri' => 'public://example.jpg',
+    file_unmanaged_copy(DRUPAL_ROOT . '/core/misc/druplicon.png', 'public://example.png');
+    $this->files['3'] = entity_create('file', array(
+        'uri' => 'public://example.png',
       ));
-    $this->image->save();
+    $this->files['3']->save();
 
     $this->values = array(
       'name' => $this->randomMachineName(),
@@ -85,7 +85,7 @@ class AttachmentResourceTest extends ResourceTestBase {
         ),
       ),
       'field_test_image' => array(
-        'target_id' => $this->image->id(),
+        'target_id' => $this->files['3']->id(),
         'display' => 1,
         'description' => $this->randomMachineName(),
         'alt' => $this->randomMachineName(),
@@ -94,7 +94,7 @@ class AttachmentResourceTest extends ResourceTestBase {
         'height' => 100,
       ),
     );
-    $this->entity = entity_create('entity_test_mulrev', $this->values);
+    $this->entity = entity_create('entity_test_rev', $this->values);
     $this->entity->save();
 
   }
@@ -105,35 +105,83 @@ class AttachmentResourceTest extends ResourceTestBase {
     // HEAD and GET is handled by the same resource.
     $this->enableService('relaxed:attachment', 'GET');
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_mulrev', 'view');
+    $permissions = $this->entityPermissions('entity_test_rev', 'view');
     $permissions[] = 'restful get relaxed:attachment';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
+    $file_contents = file_get_contents($this->files['1']->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
 
+    $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-length', $this->files['1']->getSize());
+    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertHeader('content-md5', $encoded_digest);
 
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $file_contents = file_get_contents($this->files['2']->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-length', $this->files['2']->getSize());
+    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertHeader('content-md5', $encoded_digest);
+
+    $file_contents = file_get_contents($this->files['3']->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-length', $this->files['3']->getSize());
+    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertHeader('content-md5', $encoded_digest);
   }
 
   public function testGet() {
     $db = $this->workspace->id();
     $this->enableService('relaxed:attachment', 'GET');
-    $serializer = $this->container->get('serializer');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_mulrev', 'view');
+    $permissions = $this->entityPermissions('entity_test_rev', 'view');
     $permissions[] = 'restful get relaxed:attachment';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
+    $file_contents = file_get_contents($this->files['1']->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
 
+    $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->files['1']->getMimeType());
+    $this->assertHeader('content-length', $this->files['1']->getSize());
+    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertHeader('content-md5', $encoded_digest);
 
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $file_contents = file_get_contents($this->files['2']->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->files['2']->getMimeType());
+    $this->assertHeader('content-length', $this->files['2']->getSize());
+    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertHeader('content-md5', $encoded_digest);
+
+    $file_contents = file_get_contents($this->files['3']->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->files['3']->getMimeType());
+    $this->assertHeader('content-length', $this->files['3']->getSize());
+    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertHeader('content-md5', $encoded_digest);
   }
 }
