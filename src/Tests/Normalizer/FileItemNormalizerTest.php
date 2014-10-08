@@ -73,6 +73,8 @@ class FileItemNormalizerTest extends NormalizerTestBase{
           'weight' => 0,
         ),
       ))->save();
+
+    // Create two txt files.
     file_put_contents('public://example1.txt', $this->randomMachineName());
     $this->files['1'] = entity_create('file', array(
         'uri' => 'public://example1.txt',
@@ -102,11 +104,13 @@ class FileItemNormalizerTest extends NormalizerTestBase{
           'weight' => 0,
         ),
       ))->save();
+
+    // Create a jpg file.
     file_unmanaged_copy(DRUPAL_ROOT . '/core/misc/druplicon.png', 'public://example.jpg');
-    $this->image = entity_create('file', array(
+    $this->files['3'] = entity_create('file', array(
         'uri' => 'public://example.jpg',
       ));
-    $this->image->save();
+    $this->files['3']->save();
 
     // Create a test entity to serialize.
     $this->values = array(
@@ -129,7 +133,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         ),
       ),
       'field_test_image' => array(
-        'target_id' => $this->image->id(),
+        'target_id' => $this->files['3']->id(),
         'display' => 1,
         'description' => $this->randomMachineName(),
         'alt' => $this->randomMachineName(),
@@ -149,6 +153,26 @@ class FileItemNormalizerTest extends NormalizerTestBase{
    */
   public function testFileItemNormalize() {
     $entity = entity_load('entity_test_mulrev', $this->entity->id());
+
+    $attachments_keys['1'] = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
+    $attachments_keys['2'] = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
+    $attachments_keys['3'] = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
+    $expected_attachments = array();
+    $files_number = 1;
+    while ($files_number <= 3) {
+      $uri = $this->files[$files_number]->getFileUri();
+      $file_contents = file_get_contents($uri);
+      $attachments = array(
+        $attachments_keys[$files_number] => array(
+          'content_type' => $this->files[$files_number]->getMimeType(),
+          'digest' => 'md5-' . base64_encode(md5($file_contents)),
+          'length' => $this->files[$files_number]->getSize(),
+          'data' => base64_encode($file_contents),
+        ),
+      );
+      $expected_attachments = array_merge($expected_attachments, $attachments);
+      $files_number++;
+    }
 
     $expected = array(
       'id' => array(
@@ -172,15 +196,13 @@ class FileItemNormalizerTest extends NormalizerTestBase{
       'user_id' => array(
         array('target_id' => $this->values['user_id']),
       ),
-      '_attachments' => array(
-        // todo Add expected values for _attachments.
-      ),
       'field_test_text' => array(
         array(
           'value' => $this->values['field_test_text']['value'],
           'format' => $this->values['field_test_text']['format'],
         ),
       ),
+      '_attachments' => $expected_attachments,
       '_local' => array(
         array(
           'value' => $entity->_local->first()->get('value')->getCastedValue(),
@@ -200,5 +222,4 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     }
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
   }
-
 }

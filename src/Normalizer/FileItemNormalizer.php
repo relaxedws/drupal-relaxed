@@ -7,10 +7,8 @@
 
 namespace Drupal\relaxed\Normalizer;
 
-use Drupal\Core\Field\FieldItemInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Drupal\Component\Utility\Crypt;
 
 class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface {
 
@@ -23,20 +21,15 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {
-    static $deltas = array();
-
     $definition = $data->getFieldDefinition();
     $values = $data->getValue();
     $file = entity_load('file', $values['target_id']);
     $uri = $file->getFileUri();
     $scheme = file_uri_scheme($uri);
-
     $field_name = $definition->getName();
-    if (!isset($deltas[$field_name])) {
-      $deltas[$field_name] = 0;
-    }
-    $key = $field_name . '/' . $deltas[$field_name] . '/' . $file->uuid() . '/' . $scheme . '/' . $file->getFileName();
-    $deltas[$field_name]++;
+
+    // Create the attachment key, the format is: field_name/delta/uuid/scheme/filename.
+    $key = $field_name . '/' . $data->getName() . '/' . $file->uuid() . '/' . $scheme . '/' . $file->getFileName();
 
     $file_contents = file_get_contents($uri);
     if (in_array(file_uri_scheme($uri), array('public', 'private')) == FALSE) {
