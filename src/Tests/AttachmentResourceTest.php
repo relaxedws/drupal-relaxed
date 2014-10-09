@@ -18,7 +18,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     // Create a File field for testing.
     entity_create('field_storage_config', array(
-        'name' => 'field_test_file',
+        'field_name' => 'field_test_file',
         'entity_type' => 'entity_test_rev',
         'type' => 'file',
         'cardinality' => 2,
@@ -47,7 +47,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     // Create a Image field for testing.
     entity_create('field_storage_config', array(
-        'name' => 'field_test_image',
+        'field_name' => 'field_test_image',
         'entity_type' => 'entity_test_rev',
         'type' => 'image',
         'cardinality' => 3,
