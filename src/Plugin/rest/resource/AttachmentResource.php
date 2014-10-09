@@ -71,20 +71,24 @@ class AttachmentResource extends ResourceBase {
       }
     }
 
-    $file_contents = file_get_contents($file->getFileUri());
-    $encoded_digest = base64_encode(md5($file_contents));
+    if (in_array(file_uri_scheme($file->getFileUri()), array('public', 'private')) == FALSE) {
+      $response = new ResourceResponse('', 200, array('Content-Type' => $file->getMimeType()));
+    }
+    else {
+      $file_contents = file_get_contents($file->getFileUri());
+      $encoded_digest = base64_encode(md5($file_contents));
+      $response = new ResourceResponse(
+        $file_contents,
+        200,
+        array(
+          'Content-Type' => $file->getMimeType(),
+          'X-Relaxed-ETag' => $encoded_digest,
+          'Content-Length' => $file->getSize(),
+          'Content-MD5' => $encoded_digest,
+        )
+      );
+    }
 
-    $resource = new ResourceResponse(
-      $file_contents,
-      200,
-      array(
-        'Content-Type' => $file->getMimeType(),
-        'X-Relaxed-ETag' => $encoded_digest,
-        'Content-Length' => $file->getSize(),
-        'Content-MD5' => $encoded_digest,
-      )
-    );
-
-    return $resource;
+    return $response;
   }
 }
