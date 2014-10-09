@@ -21,33 +21,36 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {
+    $result = array();
     $definition = $data->getFieldDefinition();
     $values = $data->getValue();
     $file = entity_load('file', $values['target_id']);
-    $uri = $file->getFileUri();
-    $scheme = file_uri_scheme($uri);
-    $field_name = $definition->getName();
+    if ($file) {
+      $uri = $file->getFileUri();
+      $scheme = file_uri_scheme($uri);
+      $field_name = $definition->getName();
 
-    // Create the attachment key, the format is: field_name/delta/uuid/scheme/filename.
-    $key = $field_name . '/' . $data->getName() . '/' . $file->uuid() . '/' . $scheme . '/' . $file->getFileName();
+      // Create the attachment key, the format is: field_name/delta/uuid/scheme/filename.
+      $key = $field_name . '/' . $data->getName() . '/' . $file->uuid() . '/' . $scheme . '/' . $file->getFileName();
 
-    $file_contents = file_get_contents($uri);
-    if (in_array(file_uri_scheme($uri), array('public', 'private')) == FALSE) {
-      $file_data = '';
+      $file_contents = file_get_contents($uri);
+      if (in_array(file_uri_scheme($uri), array('public', 'private')) == FALSE) {
+        $file_data = '';
+      }
+      else {
+        $file_data = base64_encode($file_contents);
+      }
+
+      // @todo Add 'revpos' value to the result array.
+      $result = array(
+        $key => array(
+          'content_type' => $file->getMimeType(),
+          'digest' => 'md5-' . base64_encode(md5($file_contents)),
+          'length' => $file->getSize(),
+          'data' => $file_data,
+        ),
+      );
     }
-    else {
-      $file_data = base64_encode($file_contents);
-    }
-
-    // @todo Add 'revpos' value to the result array.
-    $result = array(
-      $key => array(
-        'content_type' => $file->getMimeType(),
-        'digest' => 'md5-' . base64_encode(md5($file_contents)),
-        'length' => $file->getSize(),
-        'data' => $file_data,
-      ),
-    );
 
     return $result;
   }

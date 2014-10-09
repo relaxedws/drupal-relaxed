@@ -184,4 +184,48 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
   }
+
+  public function testPut() {
+    $db = $this->workspace->id();
+    $this->enableService('relaxed:attachment', 'PUT');
+    $serializer = $this->container->get('serializer');
+
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('entity_test_rev', 'view');
+    $permissions[] = 'restful put relaxed:attachment';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    file_put_contents('public://new_example.txt', $this->randomMachineName());
+    $file = entity_create('file', array(
+        'uri' => 'public://new_example.txt',
+      ));
+    $serialized = $serializer->serialize($file, $this->defaultFormat);
+
+    $attachment_info = 'field_test_file/0/' . $file->uuid() . '/public/' . $file->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
+    $this->assertResponse('201', 'HTTP response code is correct');
+    $data = Json::decode($response);
+    $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
+  }
+
+  public function testDelete() {
+    $db = $this->workspace->id();
+    $this->enableService('relaxed:attachment', 'DELETE');
+
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('entity_test_rev', 'delete');
+    $permissions[] = 'restful delete relaxed:attachment';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct for new database');
+    $data = Json::decode($response);
+    $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
+
+    $entity = entity_load('file',  $this->files['2']->id());
+    $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
+  }
 }
