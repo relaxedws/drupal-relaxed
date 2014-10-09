@@ -57,7 +57,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
 
     // Create a File field for testing.
     entity_create('field_storage_config', array(
-        'name' => 'field_test_file',
+        'field_name' => 'field_test_file',
         'entity_type' => 'entity_test_mulrev',
         'type' => 'file',
         'cardinality' => 2,
@@ -88,7 +88,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
 
     // Create a Image field for testing.
     entity_create('field_storage_config', array(
-        'name' => 'field_test_image',
+        'field_name' => 'field_test_image',
         'entity_type' => 'entity_test_mulrev',
         'type' => 'image',
         'cardinality' => 3,
