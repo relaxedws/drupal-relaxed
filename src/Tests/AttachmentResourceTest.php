@@ -99,7 +99,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
   }
 
-/*  public function testHead() {
+  public function testHead() {
     $db = $this->workspace->id();
 
     // HEAD and GET is handled by the same resource.
@@ -183,7 +183,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertHeader('content-length', $this->files['3']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
-  }*/
+  }
 
   public function testPut() {
     $db = $this->workspace->id();
@@ -207,13 +207,9 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertResponse('200', 'HTTP response code is correct');
     $data = Json::decode($response);
     $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
-
-    $entity = entity_load('entity_test_rev',  $this->entity->id());
-
-    $this->assertTrue(empty($entity), 'test');
   }
 
-/*  public function testDelete() {
+  public function testDelete() {
     $db = $this->workspace->id();
     $this->enableService('relaxed:attachment', 'DELETE');
 
@@ -231,5 +227,5 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $entity = entity_load('file',  $this->files['2']->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
-  }*/
+  }
 }

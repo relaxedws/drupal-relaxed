@@ -85,7 +85,7 @@ class AttachmentResource extends ResourceBase {
         $file_contents,
         200,
         array(
-          'Content-Type' => array($file->getMimeType()),
+          'Content-Type' => $file->getMimeType(),
           'X-Relaxed-ETag' => $encoded_digest,
           'Content-Length' => $file->getSize(),
           'Content-MD5' => $encoded_digest,
