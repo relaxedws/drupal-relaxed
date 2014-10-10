@@ -30,7 +30,7 @@ services:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     tags:
       - { name: normalizer, priority: 20 }
-  relaxed.normalizer.attachment_file_item:
+  relaxed.normalizer.file_item:
     class: Drupal\relaxed\Normalizer\FileItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
