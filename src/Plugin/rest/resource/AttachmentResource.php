@@ -70,9 +70,9 @@ class AttachmentResource extends ResourceBase {
         }
       }
     }
-    $uri = $file->getFileUri();
-    $content_type = \Drupal::service('file.mime_type.guesser')->guess($uri);
 
+    $uri = $file->getFileUri();
+    $content_type = $file->getMimeType();
     if (in_array(file_uri_scheme($file->getFileUri()), array('public', 'private')) == FALSE) {
       $response = new ResourceResponse('', 200, array('Content-Type' => $content_type));
     }
