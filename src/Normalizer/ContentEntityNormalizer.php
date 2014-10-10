@@ -43,12 +43,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity as $name => $field) {
       $field_type = $field_definitions[$name]->getType();
+      $field_data = $this->serializer->normalize($field, $format, $context);
       // Add file and image field types into _attachments key.
       if ($field_type == 'file' || $field_type == 'image') {
         if (!isset($data['_attachments'])) {
           $data['_attachments'] = array();
         }
-        $field_data = $this->serializer->normalize($field, $format, $context);
         if ($field_data !== NULL) {
           foreach ($field_data as $field_info) {
             $data['_attachments'] = array_merge($data['_attachments'], $field_info);
@@ -56,7 +56,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         }
         continue;
       }
-      $field_data = $this->serializer->normalize($field, $format, $context);
       if ($field_data !== NULL) {
         $data[$name] = $field_data;
       }
