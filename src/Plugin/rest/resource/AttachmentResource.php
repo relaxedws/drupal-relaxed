@@ -9,6 +9,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\file\FileInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "relaxed:attachment",
  *   label = "Attachment",
  *   serialization_class = {
- *     "canonical" = "Drupal\Core\Field\FieldItemInterface",
+ *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/{docid}/{field_name}/{delta}/{uuid}/{scheme}/{filename}",
@@ -95,35 +96,47 @@ class AttachmentResource extends ResourceBase {
     return $response;
   }
 
-  public function put($workspace, $existing_entity, $field_name, $delta, $file_uuid, $scheme, $filename, ContentEntityInterface $received_entity = NULL) {
-    if (!$received_entity instanceof ContentEntityInterface) {
+  public function put($workspace, $existing_entity, $field_name, $delta, $file_uuid, $scheme, $filename, FileInterface $received_entity = NULL) {
+    if (!$received_entity instanceof FileInterface) {
       throw new BadRequestHttpException(t('No content received'));
     }
 
+    // We know there can only be one entity with PUT requests.
+    $existing_entity = reset($existing_entity);
+
     // Check entity and field level access.
-    if (!$received_entity->access('create')) {
+    if (!$existing_entity->access('create')) {
       throw new AccessDeniedHttpException();
     }
-    foreach ($received_entity as $field_name => $field) {
+    foreach ($existing_entity as $field_name => $field) {
       if (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
     }
 
     // Validate the received data before saving.
+    $this->validate($existing_entity);
     $this->validate($received_entity);
     try {
       $received_entity->save();
-      $rev = $received_entity->_revs_info->rev;
+
+      // todo: Attach the new file to the entity.
+
+      $existing_entity->save();
+      $rev = $existing_entity->_revs_info->rev;
+      $file_contents = file_get_contents($received_entity->getFileUri());
+      $encoded_digest = base64_encode(md5($file_contents));
+
       return new ResourceResponse(
         array(
           'ok' => TRUE,
-          'id' => $received_entity->uuid(),
-          'rev' => $rev),
-        201,
+          'id' => $existing_entity->uuid(),
+          'rev' => $rev,
+        ),
+        200,
         array(
-          'ETag' => $rev,
-          'Location' => $received_entity->getFileUri(),
+          'X-Relaxed-ETag' => $encoded_digest,
+          'Content-MD5' => $encoded_digest,
         )
       );
     }
