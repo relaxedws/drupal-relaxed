@@ -81,7 +81,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Override the normalization for a few special fields, just so that we
     // follow the API spec.
     foreach (array('_deleted', '_local_seq') as $field) {
-      $data[$field] = $entity->{$field}->value;
+      if (isset($entity->{$field}->value)) {
+        $data[$field] = $entity->{$field}->value;
+      }
     }
     return $data;
   }
@@ -153,8 +155,19 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // Denormalize File and Image field types.
+    if (isset($data['_attachments'])) {
+      foreach ($data['_attachments'] as $key => $value) {
+        list($field_name, $delta, $file_uuid,,) = explode('/', $key);
+        $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+        $data[$field_name][$delta] = array(
+          'target_id' => $file->id(),
+        );
+      }
+    }
+
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_entity_type', '_local_seq') as $key) {
+    foreach (array('_id', '_rev', '_entity_type', '_local_seq', '_attachments') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
