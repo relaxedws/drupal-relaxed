@@ -41,7 +41,7 @@ abstract class ResourceBase extends CoreResourceBase {
 
       // @todo Consider converting this into something more generic.
       $parameters = array();
-      foreach (array('db', 'docid') as $parameter) {
+      foreach (array('db', 'docid', 'attachment') as $parameter) {
         if (strpos($route->getPath(), '{' . $parameter . '}')) {
           $parameters[$parameter] = array('type' => 'relaxed:' . $parameter);
         }

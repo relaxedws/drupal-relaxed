@@ -24,21 +24,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   uri_paths = {
- *     "canonical" = "/{db}/{docid}/{field_name}/{delta}/{uuid}/{scheme}/{filename}",
+ *     "canonical" = "/{db}/{docid}/{field_name}/{delta}/{attachment}/{scheme}/{filename}",
  *   }
  * )
  */
 class AttachmentResource extends ResourceBase {
 
-  public function head($workspace, $entities, $field_name, $delta, $file_uuid, $scheme, $filename) {
-    if (empty($entities) || is_string($entities)) {
+  public function head($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
+    if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
       throw new NotFoundHttpException();
     }
 
-    $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
-    if (!$file) {
-      throw new NotFoundHttpException();
-    }
+    // There can be only one file.
+    $file = reset($file);
 
     $file_contents = file_get_contents($file->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
@@ -54,15 +52,13 @@ class AttachmentResource extends ResourceBase {
     );
   }
 
-  public function get($workspace, $entities, $field_name, $delta, $file_uuid, $scheme, $filename) {
-    if (empty($entities) || is_string($entities)) {
+  public function get($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
+    if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
       throw new NotFoundHttpException();
     }
 
-    $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
-    if (!$file) {
-      throw new NotFoundHttpException();
-    }
+    // There can be only one file.
+    $file = reset($file);
 
     foreach ($entities as $entity) {
       if (!$entity->access('view')) {
@@ -74,18 +70,20 @@ class AttachmentResource extends ResourceBase {
         }
       }
     }
+    $uri = $file->getFileUri();
+    $content_type = \Drupal::service('file.mime_type.guesser')->guess($uri);
 
     if (in_array(file_uri_scheme($file->getFileUri()), array('public', 'private')) == FALSE) {
-      $response = new ResourceResponse('', 200, array('Content-Type' => $file->getMimeType()));
+      $response = new ResourceResponse('', 200, array('Content-Type' => $content_type));
     }
     else {
-      $file_contents = file_get_contents($file->getFileUri());
+      $file_contents = file_get_contents($uri);
       $encoded_digest = base64_encode(md5($file_contents));
       $response = new ResourceResponse(
         $file_contents,
         200,
         array(
-          'Content-Type' => $file->getMimeType(),
+          'Content-Type' => $content_type,
           'X-Relaxed-ETag' => $encoded_digest,
           'Content-Length' => $file->getSize(),
           'Content-MD5' => $encoded_digest,
@@ -96,7 +94,7 @@ class AttachmentResource extends ResourceBase {
     return $response;
   }
 
-  public function put($workspace, $existing_entity, $field_name, $delta, $file_uuid, $scheme, $filename, FileInterface $received_entity = NULL) {
+  public function put($workspace, $existing_entity, $field_name, $delta, $file, $scheme, $filename, FileInterface $received_entity = NULL) {
     if (!$received_entity instanceof FileInterface) {
       throw new BadRequestHttpException(t('No content received'));
     }
@@ -145,13 +143,8 @@ class AttachmentResource extends ResourceBase {
     }
   }
 
-  public function delete($workspace, $entities, $field_name, $delta, $file_uuid, $scheme, $filename) {
-    if (empty($entities) || is_string($entities)) {
-      throw new NotFoundHttpException();
-    }
-
-    $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
-    if (!$file) {
+  public function delete($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
+    if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
       throw new NotFoundHttpException();
     }
 
