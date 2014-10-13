@@ -77,7 +77,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     // Keep in overridden method when removing the bulk of this method.
     $url = $this->apiRoot . '/' . $url;
 
-    if (!isset($mime_type)) {
+    if ($mime_type === NULL) {
       $mime_type = $this->defaultMimeType;
     }
     if (!in_array($method, array('GET', 'HEAD', 'OPTIONS', 'TRACE'))) {
@@ -94,20 +94,20 @@ abstract class ResourceTestBase extends RESTTestBase {
           CURLOPT_CUSTOMREQUEST => 'GET',
           CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => array('Accept: ' . $mime_type),
         );
+        $curl_options[CURLOPT_HTTPHEADER] = $mime_type ? array('Accept: ' . $mime_type) : array();
         break;
 
-        case 'HEAD':
-          $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
-          $curl_options = array(
-            CURLOPT_HTTPGET => FALSE,
-            CURLOPT_CUSTOMREQUEST => 'HEAD',
-            CURLOPT_URL => _url($url, $options),
-            CURLOPT_NOBODY => TRUE,
-            CURLOPT_HTTPHEADER => array('Accept: ' . $mime_type),
-          );
-          break;
+      case 'HEAD':
+        $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
+        $curl_options = array(
+          CURLOPT_HTTPGET => FALSE,
+          CURLOPT_CUSTOMREQUEST => 'HEAD',
+          CURLOPT_URL => _url($url, $options),
+          CURLOPT_NOBODY => TRUE,
+        );
+        $curl_options[CURLOPT_HTTPHEADER] = $mime_type ? array('Accept: ' . $mime_type) : array();
+        break;
 
       case 'POST':
         $curl_options = array(
@@ -182,5 +182,16 @@ abstract class ResourceTestBase extends RESTTestBase {
       'id' => $name,
     ));
     return $entity;
+  }
+
+  protected function assertHeader($header, $value, $message = '', $group = 'Browser') {
+    $header = strtolower($header);
+    $header_value = $this->drupalGetHeader($header);
+    // Strip attributes such as 'charset' from the content-type header for
+    // easier comparison.
+    if ($header == 'content-type') {
+      list($header_value) = explode(';', $header_value);
+    }
+    return $this->assertTrue($header_value == $value, $message ? $message : 'HTTP response header ' . $header . ' with value ' . $value . ' found.', $group);
   }
 }
