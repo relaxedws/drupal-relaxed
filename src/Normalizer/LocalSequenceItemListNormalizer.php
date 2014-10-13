@@ -7,7 +7,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class LocalSequenceItemListNormalizer extends NormalizerBase implements DenormalizerInterface {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array('Drupal\multiversion\Plugin\Field\FieldType\LocalSequenceItemList');
+
+  /**
+   * @var string[]
+   */
+  protected $format = array('json');
 
   /**
    * {@inheritdoc}

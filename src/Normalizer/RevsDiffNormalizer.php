@@ -9,7 +9,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array('Drupal\relaxed\RevisionDiff\RevisionDiffInterface');
+
+  /**
+   * @var string[]
+   */
+  protected $format = array('json');
 
   /**
    * {@inheritdoc}

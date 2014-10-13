@@ -39,11 +39,16 @@ abstract class ResourceBase extends CoreResourceBase {
         $route->setPath($definition['uri_paths'][$method_lower]);
       }
 
-      // @todo Consider converting this into something more generic.
+      // @todo Move the parameter logic to a generic route enhancer instead.
       $parameters = array();
-      foreach (array('db', 'docid', 'attachment') as $parameter) {
+      foreach (array('db', 'docid') as $parameter) {
         if (strpos($route->getPath(), '{' . $parameter . '}')) {
           $parameters[$parameter] = array('type' => 'relaxed:' . $parameter);
+        }
+      }
+      if (!empty($definition['uri_parameters']['canonical'])) {
+        foreach ($definition['uri_parameters']['canonical'] as $parameter => $type) {
+          $parameters[$parameter] = array('type' => $type);
         }
       }
       if ($parameters) {

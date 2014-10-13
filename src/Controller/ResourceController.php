@@ -2,14 +2,13 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\file\FileInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -141,12 +140,13 @@ class ResourceController implements ContainerAwareInterface {
     $content = $this->request->getContent();
     // @todo Check if it's safe to pass all query parameters like this.
     $query = $this->request->query->all();
+    $context = array('query' => $query);
     $entity = NULL;
     if (!empty($content)) {
       try {
         $definition = $resource->getPluginDefinition();
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
-        $entity = $this->serializer()->deserialize($content, $class, $format, $query);
+        $entity = $this->serializer()->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -164,7 +164,10 @@ class ResourceController implements ContainerAwareInterface {
     $data = $response->getResponseData();
     if ($data != NULL) {
       try {
-        $output = $this->serializer()->serialize($data, $format, $query);
+        if ($data instanceof FileInterface) {
+          $context['uri'] = $data->getFileUri();
+        }
+        $output = $this->serializer()->serialize($data, $format, $context);
         $response->setContent($output);
       }
       catch (\Exception $e) {

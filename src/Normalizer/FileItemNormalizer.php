@@ -12,10 +12,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array(
     'Drupal\file\Plugin\Field\FieldType\FileItem',
     'Drupal\image\Plugin\Field\FieldType\ImageItem',
   );
+
+  /**
+   * @var string
+   */
+  protected $format = array('json');
 
   /**
    * {@inheritdoc}
@@ -42,6 +50,7 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
       }
 
       // @todo Add 'revpos' value to the result array.
+      // @todo Utilize the FileNormalizer to normalize the 'data' field.
       $result = array(
         $key => array(
           'content_type' => $file->getMimeType(),

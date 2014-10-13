@@ -14,7 +14,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInterface {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
+
+  /**
+   * @var string[]
+   */
+  protected $format = array('json');
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -61,7 +69,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    if (!empty($context['revs'])) {
+    if (!empty($context['query']['revs'])) {
       $parts = explode('-', $entity->_revs_info->rev);
       $data['_revisions'] = array(
         'ids' => array(),
@@ -191,7 +199,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity->setNewRevision(FALSE);
     }
 
-    if (isset($context['new_edits']) && ($context['new_edits'] === FALSE)) {
+    if (isset($context['query']['new_edits']) && ($context['query']['new_edits'] === FALSE)) {
       $entity->new_edits = FALSE;
     }
 

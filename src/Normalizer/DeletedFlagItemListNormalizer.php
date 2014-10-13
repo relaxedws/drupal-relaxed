@@ -7,6 +7,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class DeletedFlagItemListNormalizer extends NormalizerBase implements DenormalizerInterface {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array('Drupal\multiversion\Plugin\Field\FieldType\DeletedFlagItemList');
 
   /**

@@ -8,7 +8,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\rest\ResourceResponse;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(

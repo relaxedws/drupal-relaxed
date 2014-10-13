@@ -15,6 +15,11 @@ class ChangesNormalizer extends NormalizerBase implements DenormalizerInterface 
   protected $supportedInterfaceOrClass = array('Drupal\relaxed\Changes\ChangesInterface');
 
   /**
+   * @var string
+   */
+  protected $format = array('json');
+
+  /**
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {
