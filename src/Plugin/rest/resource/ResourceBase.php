@@ -45,7 +45,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
       // @todo Move the parameter logic to a generic route enhancer instead.
       $parameters = array();
-      foreach (array('db', 'docid', 'attachment') as $parameter) {
+      foreach (array('db', 'docid') as $parameter) {
         if (strpos($route->getPath(), '{' . $parameter . '}')) {
           $parameters[$parameter] = array('type' => 'relaxed:' . $parameter);
         }
