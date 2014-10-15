@@ -1,16 +1,12 @@
 services:
-  relaxed.encoder.file:
-    abstract: true
-    class: Drupal\relaxed\Encoder\FileEncoder
-  # @todo Implement a container pass that dynamically adds file encoders.
-  relaxed.encoder.txt:
-    parent: relaxed.encoder.file
+  relaxed.encoder.stream:
+    class: Drupal\relaxed\Encoder\StreamEncoder
     tags:
-      - { name: encoder, format: txt}
-  relaxed.encoder.png:
-    parent: relaxed.encoder.file
+      - { name: encoder, format: stream }
+  relaxed.encoder.base64_stream:
+    class: Drupal\relaxed\Encoder\StreamEncoder
     tags:
-      - { name: encoder, format: png}
+      - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
     arguments: ['@entity.manager', '@entity.uuid_index']
@@ -42,11 +38,11 @@ services:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     tags:
       - { name: normalizer, priority: 20 }
-  relaxed.normalizer.file:
-    class: Drupal\relaxed\Normalizer\FileNormalizer
-    arguments: ['@entity.manager', '@entity.uuid_index']
+  relaxed.normalizer.attachment:
+    class: Drupal\relaxed\Normalizer\AttachmentNormalizer
+    arguments: ['@entity.manager']
     tags:
-      - { name: normalizer, priority: 5 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.file_item:
     class: Drupal\relaxed\Normalizer\FileItemNormalizer
     tags:

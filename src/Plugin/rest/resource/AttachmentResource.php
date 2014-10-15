@@ -7,8 +7,6 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
 use Drupal\rest\ResourceResponse;
@@ -36,28 +34,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class AttachmentResource extends ResourceBase {
 
+  /**
+   * @param $workspace
+   * @param string | \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param string $field_name
+   * @param integer $delta
+   * @param string | \Drupal\file\Entity\File $file
+   * @param string $scheme
+   * @param string $filename
+   * @return ResourceResponse
+   */
   public function head($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
     if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
       throw new NotFoundHttpException();
     }
     // There can only be one entity for this endpoint.
     $entity = reset($entities);
-    if (!$entity->access('view')) {
+    if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-
-    $file_contents = file_get_contents($file->getFileUri());
-    $encoded_digest = base64_encode(md5($file_contents));
-
-    return new ResourceResponse(
-      NULL,
-      200,
-      array(
-        'X-Relaxed-ETag' => $encoded_digest,
-        'Content-Length' => $file->getSize(),
-        'Content-MD5' => $encoded_digest,
-      )
-    );
+    return new ResourceResponse(NULL, 200, $this->attachmentHeaders($file));
   }
 
   /**
@@ -79,8 +75,7 @@ class AttachmentResource extends ResourceBase {
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    // @todo Set Content-Length, Content-MD5 and X-Relaxed-ETag headers.
-    return new ResourceResponse($file, 200);
+    return new ResourceResponse($file, 200, $this->attachmentHeaders($file));
   }
 
   public function put($workspace, $existing_entity, $field_name, $delta, $file, $scheme, $filename, FileInterface $received_entity = NULL) {
@@ -157,5 +152,23 @@ class AttachmentResource extends ResourceBase {
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
     }
+  }
+
+  /**
+   * Helper method that returns the response headers for an attachment.
+   *
+   * @param \Drupal\file\FileInterface $file
+   * @return array
+   */
+  protected function attachmentHeaders(FileInterface $file) {
+    $file_contents = file_get_contents($file->getFileUri());
+    $encoded_digest = base64_encode(md5($file_contents));
+
+    return array(
+      'X-Relaxed-ETag' => $encoded_digest,
+      'Content-Type' => $file->getMimeType(),
+      'Content-Length' => $file->getSize(),
+      'Content-MD5' => $encoded_digest,
+    );
   }
 }
