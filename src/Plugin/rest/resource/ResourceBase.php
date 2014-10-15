@@ -3,14 +3,18 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\relaxed\ResourceManagerInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class ResourceBase extends CoreResourceBase {
+abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceInterface {
 
+  /**
+   * {@inheritdoc}
+   * @todo Consider moving this rather complex/abstracted code to each plugin.
+   * Our API is rather static so this doesn't need to be dynamic.
+   */
   public function routes() {
     $collection = new RouteCollection();
     $definition = $this->getPluginDefinition();
@@ -58,17 +62,24 @@ abstract class ResourceBase extends CoreResourceBase {
       switch ($method) {
         case 'POST':
         case 'PUT':
-          // Restrict on the Content-Type header.
-          $route->addRequirements(array('_content_type_format' => implode('|', $this->serializerFormats)));
+          // Restrict on the Content-Type header if not an attachment resource.
+          if (!$this->isAttachment()) {
+            $route->addRequirements(array('_content_type_format' => implode('|', $this->serializerFormats)));
+          }
           $collection->add("$route_name.$method", $route);
           break;
 
         case 'GET':
-          // Restrict on the Accept header.
-          foreach ($this->serializerFormats as $format) {
-            $format_route = clone $route;
-            $format_route->addRequirements(array('_format' => $format));
-            $collection->add("$route_name.$method.$format", $format_route);
+          // Restrict on the Accept header if not an attachment resource.
+          if (!$this->isAttachment()) {
+            foreach ($this->serializerFormats as $format) {
+              $format_route = clone $route;
+              $format_route->addRequirements(array('_format' => $format));
+              $collection->add("$route_name.$method.$format", $format_route);
+            }
+          }
+          else {
+            $collection->add("$route_name.$method", $route);
           }
           break;
 
@@ -78,6 +89,10 @@ abstract class ResourceBase extends CoreResourceBase {
       }
     }
     return $collection;
+  }
+
+  public function isAttachment() {
+    return (substr($this->getPluginId(), -strlen('attachment')) == 'attachment');
   }
 
   protected function validate(ContentEntityInterface $entity) {

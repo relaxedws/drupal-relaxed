@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\file\FileInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -57,11 +56,14 @@ class ResourceController implements ContainerAwareInterface {
    * @return string
    */
   protected function getFormat() {
-    return $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format') ?: 'json';
+    if (!$format = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format')) {
+      return $this->getResource()->isAttachment() ? 'stream' : 'json';
+    }
+    return $format;
   }
 
   /**
-   * @return \Drupal\rest\Plugin\ResourceInterface
+   * @return \Drupal\relaxed\Plugin\rest\resource\RelaxedResourceInterface
    */
   protected function getResource() {
     $plugin_id = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getDefault('_plugin');
@@ -155,6 +157,7 @@ class ResourceController implements ContainerAwareInterface {
 
     try {
       $parameters = $this->getParameters();
+      /** @var \Drupal\rest\ResourceResponse $response */
       $response = call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $this->request)));
     }
     catch (\Exception $e) {
@@ -164,9 +167,6 @@ class ResourceController implements ContainerAwareInterface {
     $data = $response->getResponseData();
     if ($data != NULL) {
       try {
-        if ($data instanceof FileInterface) {
-          $context['uri'] = $data->getFileUri();
-        }
         $output = $this->serializer()->serialize($data, $format, $context);
         $response->setContent($output);
       }
@@ -174,7 +174,9 @@ class ResourceController implements ContainerAwareInterface {
         return $this->errorResponse($e);
       }
     }
-    $response->headers->set('Content-Type', $this->request->getMimeType($format));
+    if (!$response->headers->get('Content-Type')) {
+      $response->headers->set('Content-Type', $this->request->getMimeType($format));
+    }
     return $response;
   }
 

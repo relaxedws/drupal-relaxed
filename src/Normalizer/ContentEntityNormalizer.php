@@ -180,6 +180,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // @todo Move the below update logic to the resource plugin instead.
     $storage = $this->entityManager->getStorage($entity_type_id);
 
     if ($entity_id) {
@@ -191,6 +192,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      // @todo Use the passed $class to instantiate the entity.
       $entity = $storage->create($data);
     }
 
