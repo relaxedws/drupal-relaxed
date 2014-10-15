@@ -6,7 +6,15 @@ use Drupal\serialization\Normalizer\EntityNormalizer;
 
 class WorkspaceNormalizer extends EntityNormalizer {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array('Drupal\multiversion\Entity\WorkspaceInterface');
+
+  /**
+   * @var string[]
+   */
+  protected $format = array('json');
 
   /**
    * {@inheritdoc}
@@ -18,6 +26,9 @@ class WorkspaceNormalizer extends EntityNormalizer {
     if (isset($data['id'])) {
       $data['db_name'] = $data['id'];
       unset($data['id']);
+    }
+    if ($update_seq = $entity->getUpdateSeq()) {
+      $data['update_seq'] = $update_seq;
     }
     return $data;
   }
