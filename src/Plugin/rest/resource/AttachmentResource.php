@@ -122,27 +122,36 @@ class AttachmentResource extends ResourceBase {
     }
   }
 
-  public function delete($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
-    // There can only be one entity for this endpoint.
-    $entity = reset($entities);
-    // Check that we received valid entities.
-    if (!$entity instanceof ContentEntityInterface || !$file instanceof FileInterface) {
-      throw new BadRequestHttpException(t('No content received'));
+  /**
+   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\Core\Entity\EntityInterface $entity
+   * @param string $field_name
+   * @param integer $delta
+   * @param string | \Drupal\file\FileInterface $file
+   * @param string $scheme
+   * @param string $filename
+   */
+  public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
+    if (is_string($workspace) || is_string($entity) || is_string($file)) {
+      throw new NotFoundHttpException();
     }
 
+    // Check entity and field level access.
+    if (!$entity->access('update') || !$entity->{$field_name}->access('delete')) {
+      throw new AccessDeniedHttpException();
+    }
+
+    // Check that this file actually exists on $entity.
+    if ($entity->{$field_name}[$delta]->target_id != $file->id()) {
+      throw new BadRequestHttpException();
+    }
     try {
-      // @todo: Access check.
-      $entity->{$field_name}[$delta]->entity->delete();
+      $file->delete();
+      unset($entity->{$field_name}[$delta]);
       $entity->save();
       $rev = $entity->_revs_info->rev;
-      return new ResourceResponse(
-        array(
-          'ok' => TRUE,
-          'id' => $entity->uuid(),
-          'rev' => $rev
-        ),
-        200
-      );
+      $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev);
+      return new ResourceResponse($data, 200, array('X-Relaxed-ETag'), $rev);
     }
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
@@ -156,13 +165,13 @@ class AttachmentResource extends ResourceBase {
    * @param array $headers_to_include
    * @return array
    */
-  protected function responseHeaders(FileInterface $file, $headers_to_include = array()) {
+  protected function responseHeaders(FileInterface $file, $headers_to_include = array(), $rev = NULL) {
     $file_contents = file_get_contents($file->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
 
     $all_headers = array(
       'Content-Type' => $file->getMimeType(),
-      'X-Relaxed-ETag' => $encoded_digest,
+      'X-Relaxed-ETag' => $rev ?: $encoded_digest,
       'Content-Length' => $file->getSize(),
       'Content-MD5' => $encoded_digest,
     );

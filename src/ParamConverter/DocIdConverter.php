@@ -43,6 +43,7 @@ class DocIdConverter implements ParamConverterInterface {
    *   An array of the entity or entity revisions that was requested, if
    *   existing, or else the original UUID string.
    * @todo Add test to make sure empty arrays are never returned.
+   * @todo Fall back to a stub entity instead of UUID string when it doesn't exist.
    */
   public function convert($uuid, $definition, $name, array $defaults) {
     $request = \Drupal::request();

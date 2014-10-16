@@ -164,13 +164,13 @@ class ResourceController implements ContainerAwareInterface {
       return $this->errorResponse($e);
     }
 
-    // All requests containing content should always respond with JSON, e.g.
-    // when PUTing image attachments the response should still be a JSON object
-    // indicating the result etc.
-    $response_format = !empty($content) ? 'json' : $format;
+    // Default to plain text format in case there is no response data.
+    $response_format = 'text';
     $response_data = $response->getResponseData();
-
     if ($response_data != NULL) {
+      // It's only when doing GET on a stream we want to respond with the same.
+      // Fall back to JSON in all other cases.
+      $response_format = ($request->getMethod() == 'GET' && $format == 'stream') ? 'stream' : 'json';
       try {
         $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
         $response->setContent($response_output);
