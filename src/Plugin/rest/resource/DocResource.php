@@ -37,7 +37,7 @@ class DocResource extends ResourceBase {
     if (empty($entities) || is_string($entities)) {
       throw new NotFoundHttpException();
     }
-    // We know there can only be one entity with DELETE requests.
+    // We know there can only be one entity with HEAD requests.
     $entity = reset($entities);
 
     // @todo Create a event handler and override the ETag that's set by core.
