@@ -55,7 +55,7 @@ class LocalDocResource extends DocResource {
     if ($revisions[0] instanceof ContentEntityInterface && $revisions[0]->_local->value == FALSE) {
       throw new NotFoundHttpException();
     }
-    return parent::get($workspace, $entities);
+    return parent::get($workspace, $revisions);
   }
 
   /**
