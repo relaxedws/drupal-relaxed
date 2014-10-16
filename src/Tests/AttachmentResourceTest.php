@@ -125,7 +125,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', 'text/plain');
+    $this->assertHeader('content-type', $this->files['1']->getMimeType());
     $this->assertHeader('content-length', $this->files['1']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -136,7 +136,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', 'text/plain');
+    $this->assertHeader('content-type', $this->files['2']->getMimeType());
     $this->assertHeader('content-length', $this->files['2']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -147,7 +147,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', 'text/plain');
+    $this->assertHeader('content-type', $this->files['3']->getMimeType());
     $this->assertHeader('content-length', $this->files['3']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
