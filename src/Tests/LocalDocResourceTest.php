@@ -34,6 +34,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $entity->_local->value = TRUE;
       $entity->save();
       $this->httpRequest("$db/_local/" . $entity->uuid(), 'HEAD', NULL);
+      $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
   }

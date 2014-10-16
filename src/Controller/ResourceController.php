@@ -165,12 +165,14 @@ class ResourceController implements ContainerAwareInterface {
     }
 
     // Default to plain text format in case there is no response data.
-    $response_format = 'text';
+    // It's only when doing GET on a stream we want to respond with the same.
+    // Fall back to JSON in all other cases.
+    $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
+      ? 'stream'
+      : 'json';
+
     $response_data = $response->getResponseData();
     if ($response_data != NULL) {
-      // It's only when doing GET on a stream we want to respond with the same.
-      // Fall back to JSON in all other cases.
-      $response_format = ($request->getMethod() == 'GET' && $format == 'stream') ? 'stream' : 'json';
       try {
         $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
         $response->setContent($response_output);
