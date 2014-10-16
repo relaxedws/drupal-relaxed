@@ -23,7 +23,7 @@ class DbResourceTest extends ResourceTestBase {
 
     $response = $this->httpRequest($this->workspace->id(), 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertHeader('content-type', 'text/plain');
     $this->assertTrue(empty($response), 'HEAD request returned no body.');
   }
 
