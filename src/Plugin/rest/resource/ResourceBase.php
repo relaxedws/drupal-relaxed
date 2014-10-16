@@ -30,14 +30,14 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
       $method_lower = strtolower($method);
       $route = new Route($api_root . $definition['uri_paths']['canonical'], array(
-        '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
-        '_plugin' => $this->pluginId,
-      ), array(
-        '_method' => $method,
-        '_permission' => "restful " . $method_lower . " $this->pluginId",
-      ), array(
-        '_access_mode' => 'ANY',
-      ));
+          '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
+          '_plugin' => $this->pluginId,
+        ), array(
+          '_method' => $method,
+          '_permission' => "restful " . $method_lower . " $this->pluginId",
+        ), array(
+          '_access_mode' => 'ANY',
+        ));
 
       if (isset($definition['uri_paths'][$method_lower])) {
         $route->setPath($definition['uri_paths'][$method_lower]);

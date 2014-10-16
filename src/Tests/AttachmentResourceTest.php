@@ -46,37 +46,37 @@ class AttachmentResourceTest extends ResourceTestBase {
       ))->save();
     file_put_contents('public://example1.txt', $this->randomMachineName());
     $this->files['1'] = entity_create('file', array(
-      'uri' => 'public://example1.txt',
-    ));
+        'uri' => 'public://example1.txt',
+      ));
     $this->files['1']->save();
     file_put_contents('public://example2.txt', $this->randomMachineName());
     $this->files['2'] = entity_create('file', array(
-     'uri' => 'public://example2.txt',
-    ));
+        'uri' => 'public://example2.txt',
+      ));
     $this->files['2']->save();
 
     // Create a Image field for testing.
     entity_create('field_storage_config', array(
-      'field_name' => 'field_test_image',
-      'entity_type' => 'entity_test_rev',
-      'type' => 'image',
-      'cardinality' => 3,
-      'translatable' => FALSE,
-    ))->save();
-    entity_create('field_config', array(
-      'entity_type' => 'entity_test_rev',
-      'field_name' => 'field_test_image',
-      'bundle' => 'entity_test_rev',
-      'label' => 'Test image-field',
-      'widget' => array(
+        'field_name' => 'field_test_image',
+        'entity_type' => 'entity_test_rev',
         'type' => 'image',
-        'weight' => 0,
-      ),
-    ))->save();
+        'cardinality' => 3,
+        'translatable' => FALSE,
+      ))->save();
+    entity_create('field_config', array(
+        'entity_type' => 'entity_test_rev',
+        'field_name' => 'field_test_image',
+        'bundle' => 'entity_test_rev',
+        'label' => 'Test image-field',
+        'widget' => array(
+          'type' => 'image',
+          'weight' => 0,
+        ),
+      ))->save();
     file_unmanaged_copy(DRUPAL_ROOT . '/core/misc/druplicon.png', 'public://example.png');
     $this->files['3'] = entity_create('file', array(
-      'uri' => 'public://example.png',
-    ));
+        'uri' => 'public://example.png',
+      ));
     $this->files['3']->save();
 
     $values = array(
@@ -214,8 +214,8 @@ class AttachmentResourceTest extends ResourceTestBase {
     $file_uri = 'public://new_example.txt';
     file_put_contents($file_uri, $this->randomMachineName());
     $file_stub = entity_create('file', array(
-      'uri' => $file_uri,
-    ));
+        'uri' => $file_uri,
+      ));
     $serialized = $serializer->serialize($file_stub, 'stream');
 
     $field_name = 'field_test_file';
