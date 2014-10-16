@@ -41,7 +41,7 @@ class StreamEncoder implements EncoderInterface, DecoderInterface {
     if (!is_scalar($data)) {
       throw new \InvalidArgumentException(sprintf('Data argument is not a scalar.'));
     }
-    $uri = !empty($context['uri']) ? $context['uri'] : 'php://memory';
+    $uri = !empty($context['uri']) ? $context['uri'] : 'temporary://' . $this->random->name();
     $mode = !empty($context['mode']) ? $context['mode'] : 'w+b';
     $stream = fopen($uri, $mode);
     $data = ($format == 'base64_stream') ? base64_decode($data) : $data;

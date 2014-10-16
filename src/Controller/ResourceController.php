@@ -164,18 +164,23 @@ class ResourceController implements ContainerAwareInterface {
       return $this->errorResponse($e);
     }
 
-    $data = $response->getResponseData();
-    if ($data != NULL) {
+    // All requests containing content should always respond with JSON, e.g.
+    // when PUTing image attachments the response should still be a JSON object
+    // indicating the result etc.
+    $response_format = !empty($content) ? 'json' : $format;
+    $response_data = $response->getResponseData();
+
+    if ($response_data != NULL) {
       try {
-        $output = $this->serializer()->serialize($data, $format, $context);
-        $response->setContent($output);
+        $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
+        $response->setContent($response_output);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
       }
     }
     if (!$response->headers->get('Content-Type')) {
-      $response->headers->set('Content-Type', $this->request->getMimeType($format));
+      $response->headers->set('Content-Type', $this->request->getMimeType($response_format));
     }
     return $response;
   }

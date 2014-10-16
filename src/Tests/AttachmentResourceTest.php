@@ -2,6 +2,8 @@
 
 namespace Drupal\relaxed\Tests;
 
+use Drupal\Component\Serialization\Json;
+
 /**
  * Tests the /db/doc/attachment.
  *
@@ -9,7 +11,17 @@ namespace Drupal\relaxed\Tests;
  */
 class AttachmentResourceTest extends ResourceTestBase {
 
-  public static $modules = array('file', 'image');
+  public static $modules = array('rest', 'entity_test', 'file', 'image');
+
+  /**
+   * @var \Drupal\file\FileInterface[]
+   */
+  protected $files;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityInterface
+   */
+  protected $entity;
 
   protected function setUp() {
     parent::setUp();
@@ -34,40 +46,40 @@ class AttachmentResourceTest extends ResourceTestBase {
       ))->save();
     file_put_contents('public://example1.txt', $this->randomMachineName());
     $this->files['1'] = entity_create('file', array(
-        'uri' => 'public://example1.txt',
-      ));
+      'uri' => 'public://example1.txt',
+    ));
     $this->files['1']->save();
     file_put_contents('public://example2.txt', $this->randomMachineName());
     $this->files['2'] = entity_create('file', array(
-        'uri' => 'public://example2.txt',
-      ));
+     'uri' => 'public://example2.txt',
+    ));
     $this->files['2']->save();
 
     // Create a Image field for testing.
     entity_create('field_storage_config', array(
-        'field_name' => 'field_test_image',
-        'entity_type' => 'entity_test_rev',
-        'type' => 'image',
-        'cardinality' => 3,
-        'translatable' => FALSE,
-      ))->save();
+      'field_name' => 'field_test_image',
+      'entity_type' => 'entity_test_rev',
+      'type' => 'image',
+      'cardinality' => 3,
+      'translatable' => FALSE,
+    ))->save();
     entity_create('field_config', array(
-        'entity_type' => 'entity_test_rev',
-        'field_name' => 'field_test_image',
-        'bundle' => 'entity_test_rev',
-        'label' => 'Test image-field',
-        'widget' => array(
-          'type' => 'image',
-          'weight' => 0,
-        ),
-      ))->save();
+      'entity_type' => 'entity_test_rev',
+      'field_name' => 'field_test_image',
+      'bundle' => 'entity_test_rev',
+      'label' => 'Test image-field',
+      'widget' => array(
+        'type' => 'image',
+        'weight' => 0,
+      ),
+    ))->save();
     file_unmanaged_copy(DRUPAL_ROOT . '/core/misc/druplicon.png', 'public://example.png');
     $this->files['3'] = entity_create('file', array(
-        'uri' => 'public://example.png',
-      ));
+      'uri' => 'public://example.png',
+    ));
     $this->files['3']->save();
 
-    $this->values = array(
+    $values = array(
       'name' => $this->randomMachineName(),
       'user_id' => 0,
       'field_test_file' => array(
@@ -92,9 +104,8 @@ class AttachmentResourceTest extends ResourceTestBase {
         'height' => 100,
       ),
     );
-    $this->entity = entity_create('entity_test_rev', $this->values);
+    $this->entity = entity_create('entity_test_rev', $values);
     $this->entity->save();
-
   }
 
   public function testHead() {
@@ -186,29 +197,40 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertHeader('content-md5', $encoded_digest);
   }
 
-//  public function testPut() {
-//    $db = $this->workspace->id();
-//    $this->enableService('relaxed:attachment', 'PUT');
-//    $serializer = $this->container->get('serializer');
-//
-//    // Create a user with the correct permissions.
-//    $permissions = $this->entityPermissions('entity_test_rev', 'create');
-//    $permissions[] = 'restful put relaxed:attachment';
-//    $account = $this->drupalCreateUser($permissions);
-//    $this->drupalLogin($account);
-//
-//    file_put_contents('public://new_example.txt', $this->randomMachineName());
-//    $file = entity_create('file', array(
-//        'uri' => 'public://new_example.txt',
-//      ));
-//    $serialized = $serializer->serialize($file, $this->defaultFormat);
-//
-//    $attachment_info = 'field_test_file/0/' . $file->uuid() . '/public/' . $file->getFileName();
-//    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
-//    $this->assertResponse('200', 'HTTP response code is correct');
-//    $data = Json::decode($response);
-//    $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
-//  }
+  public function testPut() {
+    $db = $this->workspace->id();
+    $this->enableService('relaxed:attachment', 'PUT');
+    $serializer = $this->container->get('serializer');
+
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('entity_test_rev', 'create');
+    $permissions[] = 'restful put relaxed:attachment';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    $file_uri = 'public://new_example.txt';
+    file_put_contents($file_uri, $this->randomMachineName());
+    $file_stub = entity_create('file', array(
+      'uri' => $file_uri,
+    ));
+    $serialized = $serializer->serialize($file_stub, 'stream');
+
+    $field_name = 'field_test_file';
+    $attachment_info = $field_name . '/0/' . $file_stub->uuid() . '/public/' . $file_stub->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
+    $this->assertResponse('200', 'HTTP response code is correct');
+    $data = Json::decode($response);
+    $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
+
+    /** @var \Drupal\file\FileInterface $file */
+    $files = \Drupal::entityManager()->getStorage('file')->loadByProperties(array('uri' => $file_uri));
+    $file = reset($files);
+    $this->assertTrue(!empty($file), 'File was saved.');
+    $this->assertEqual($file->getFileUri(), $file_uri, 'File was saved with the correct URI.');
+
+    $entity = entity_load('entity_test_rev', $this->entity->id());
+    $this->assertEqual($entity->{$field_name}->get(0)->target_id, $file->id(), 'File was attached to the entity.');
+  }
 
 //  public function testDelete() {
 //    $db = $this->workspace->id();
