@@ -34,6 +34,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertResponse('200', 'HTTP response code is correct.');
+      $this->assertHeader('content-type', 'text/plain');
       // @todo Change when a proper event handler is implemented for ETag.
       $this->assertHeader('x-relaxed-etag', $first_rev);
       $this->assertTrue(empty($response), 'HEAD request returned no body.');
