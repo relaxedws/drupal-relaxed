@@ -83,8 +83,12 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           }
           break;
 
-        default:
-          $collection->add("$route_name.$method", $route);
+        case 'DELETE':
+          foreach ($this->serializerFormats as $format) {
+            $format_route = clone $route;
+            $format_route->addRequirements(array('_format' => $format));
+            $collection->add("$route_name.$method.$format", $format_route);
+          }
           break;
       }
     }

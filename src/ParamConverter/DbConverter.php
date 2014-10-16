@@ -25,6 +25,7 @@ class DbConverter implements ParamConverterInterface {
    *
    * @return string | \Drupal\Core\Entity\EntityInterface
    *   The entity if it exists in the database or else the original UUID string.
+   * @todo Fall back to a stub entity instead of UUID string when it doesn't exist.
    */
   public function convert($entity_id, $definition, $name, array $defaults) {
     return $this->entityManager->getStorage('workspace')->load($entity_id) ?: $entity_id;

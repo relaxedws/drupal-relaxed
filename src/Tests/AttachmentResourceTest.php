@@ -232,23 +232,26 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertEqual($entity->{$field_name}->get(0)->target_id, $file->id(), 'File was attached to the entity.');
   }
 
-//  public function testDelete() {
-//    $db = $this->workspace->id();
-//    $this->enableService('relaxed:attachment', 'DELETE');
-//
-//    // Create a user with the correct permissions.
-//    $permissions = $this->entityPermissions('entity_test_rev', 'delete');
-//    $permissions[] = 'restful delete relaxed:attachment';
-//    $account = $this->drupalCreateUser($permissions);
-//    $this->drupalLogin($account);
-//
-//    $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
-//    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
-//    $this->assertResponse('200', 'HTTP response code is correct for new database');
-//    $data = Json::decode($response);
-//    $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
-//
-//    $entity = entity_load('file',  $this->files['2']->id());
-//    $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
-//  }
+  public function testDelete() {
+    $db = $this->workspace->id();
+    $this->enableService('relaxed:attachment', 'DELETE');
+
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('entity_test_rev', 'delete');
+    $permissions[] = 'restful delete relaxed:attachment';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    $field_name = 'field_test_file';
+    $attachment_info = $field_name . '/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
+    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct for new database');
+    $data = Json::decode($response);
+    $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
+
+    $file = entity_load('file',  $this->files['2']->id());
+    $this->assertTrue(empty($file), 'The file was deleted.');
+    $entity = entity_load('entity_test_rev', $this->entity->id());
+    $this->assertEqual($entity->{$field_name}->count(), 1, 'The file does not exist on the entity any more.');
+  }
 }
