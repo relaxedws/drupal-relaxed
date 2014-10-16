@@ -6,15 +6,7 @@ use Drupal\serialization\Normalizer\EntityNormalizer;
 
 class WorkspaceNormalizer extends EntityNormalizer {
 
-  /**
-   * @var string[]
-   */
   protected $supportedInterfaceOrClass = array('Drupal\multiversion\Entity\WorkspaceInterface');
-
-  /**
-   * @var string[]
-   */
-  protected $format = array('json');
 
   /**
    * {@inheritdoc}
