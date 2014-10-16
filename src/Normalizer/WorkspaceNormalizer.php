@@ -27,6 +27,14 @@ class WorkspaceNormalizer extends EntityNormalizer {
       $data['db_name'] = $data['id'];
       unset($data['id']);
     }
+    if ($update_seq = $entity->getUpdateSeq()) {
+      $data['update_seq'] = $update_seq;
+    }
+    if (isset($data['created'])) {
+      $data['instance_start_time'] = $entity->getStartTime();
+      unset($data['created']);
+    }
+
     return $data;
   }
 
@@ -37,6 +45,10 @@ class WorkspaceNormalizer extends EntityNormalizer {
     if (isset($data['db_name'])) {
       $data['id'] = $data['db_name'];
       unset($data['db_name']);
+    }
+    if (isset($data['instance_start_time'])) {
+      $data['created'] = $data['instance_start_time'];
+      unset($data['instance_start_time']);
     }
     return $this->entityManager->getStorage('workspace')->create($data);
   }

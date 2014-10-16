@@ -64,7 +64,7 @@ class DocIdConverter implements ParamConverterInterface {
       $entity_id = $item['entity_id'];
       $revision_id = $item['revision_id'];
     }
-    elseif ($item = $this->uuidIndex->get($uuid)) {
+    elseif (!$rev_query && $item = $this->uuidIndex->get($uuid)) {
       $entity_type_id = $item['entity_type'];
       $entity_id = $item['entity_id'];
     }

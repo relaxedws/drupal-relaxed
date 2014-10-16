@@ -97,6 +97,9 @@ class DocResourceTest extends ResourceTestBase {
       $open_revs_string = '[' . implode(',', $open_revs) . ']';
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('open_revs' => $open_revs_string));
 
+      // Test the response for a fake revision.
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('rev' => '11112222333344445555'));
+      $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
 
