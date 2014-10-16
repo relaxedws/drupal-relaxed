@@ -62,7 +62,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       switch ($method) {
         case 'POST':
         case 'PUT':
-          // Restrict on the Content-Type header if not an attachment resource.
+          // Restrict on the Content-Type header.
           if (!$this->isAttachment()) {
             $route->addRequirements(array('_content_type_format' => implode('|', $this->serializerFormats)));
           }

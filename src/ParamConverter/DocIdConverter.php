@@ -42,12 +42,9 @@ class DocIdConverter implements ParamConverterInterface {
    * @return string | \Drupal\Core\Entity\EntityInterface[]
    *   An array of the entity or entity revisions that was requested, if
    *   existing, or else the original UUID string.
+   * @todo Add test to make sure empty arrays are never returned.
    */
   public function convert($uuid, $definition, $name, array $defaults) {
-    $entity_type_id = NULL;
-    $entity_id = NULL;
-    $revision_ids = array();
-    $entities = array();
     $request = \Drupal::request();
 
     // Fetch parameters.
@@ -56,11 +53,15 @@ class DocIdConverter implements ParamConverterInterface {
       $rev_query = $request->headers->get('if-none-match');
     }
 
+    $entity_type_id = NULL;
+    $entity_id = NULL;
+    $revision_id = NULL;
+
     // Use the indices to resolve the entity and revision ID.
     if ($rev_query && $item = $this->revIndex->get("$uuid:$rev_query")) {
       $entity_type_id = $item['entity_type'];
       $entity_id = $item['entity_id'];
-      $revision_ids[] = $item['revision_id'];
+      $revision_id = $item['revision_id'];
     }
     elseif (!$rev_query && $item = $this->uuidIndex->get($uuid)) {
       $entity_type_id = $item['entity_type'];
@@ -72,7 +73,7 @@ class DocIdConverter implements ParamConverterInterface {
     }
 
     $storage = $this->entityManager->getStorage($entity_type_id);
-    if ($open_revs_query) {
+    if ($open_revs_query && in_array($request->getMethod(), array('GET', 'HEAD'))) {
       $open_revs = array();
       if ($open_revs_query == 'all') {
         $entity = $storage->load($entity_id);
@@ -84,19 +85,23 @@ class DocIdConverter implements ParamConverterInterface {
       else {
         $open_revs = explode(',', $open_revs_query);
       }
+
+      $revision_ids = array();
       foreach ($open_revs as $open_rev) {
         if ($item = $this->revIndex->get("$uuid:$open_rev")) {
           $revision_ids[] = $item['revision_id'];
         }
       }
-    }
-    if ($revision_ids) {
+      $revisions = array();
       foreach ($revision_ids as $revision_id) {
-        $entities[] = $storage->loadRevision($revision_id);
+        $revisions[] = $storage->loadRevision($revision_id);
       }
-      return $entities ?: $uuid;
+      return $revisions ?: $uuid;
     }
-    return $storage->loadMultiple(array($entity_id)) ?: $uuid;
+    if ($revision_id) {
+      return $storage->loadRevision($revision_id) ?: $uuid;
+    }
+    return $storage->load($entity_id) ?: $uuid;
   }
 
   /**

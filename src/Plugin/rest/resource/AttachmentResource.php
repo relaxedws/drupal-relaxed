@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
 use Drupal\rest\ResourceResponse;
@@ -35,105 +36,99 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AttachmentResource extends ResourceBase {
 
   /**
-   * @param $workspace
-   * @param string | \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    * @param string $field_name
    * @param integer $delta
-   * @param string | \Drupal\file\Entity\File $file
+   * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
    * @return ResourceResponse
    */
-  public function head($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
-    if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
+  public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
+    if (is_string($workspace) || is_string($entity) || is_string($file)) {
       throw new NotFoundHttpException();
     }
-    // There can only be one entity for this endpoint.
-    $entity = reset($entities);
+
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    return new ResourceResponse(NULL, 200, $this->attachmentHeaders($file));
+    return new ResourceResponse(NULL, 200, $this->responseHeaders($file, array('Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag')));
   }
 
   /**
-   * @param $workspace
-   * @param string | \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
-   * @param string | \Drupal\file\Entity\File $file
+   * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
    * @return ResourceResponse
    */
-  public function get($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
-    if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
+  public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
+    if (is_string($workspace) || is_string($entity) || is_string($file)) {
       throw new NotFoundHttpException();
     }
-    // There can only be one entity for this endpoint.
-    $entity = reset($entities);
+
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    return new ResourceResponse($file, 200, $this->attachmentHeaders($file));
+    return new ResourceResponse($file, 200, $this->responseHeaders($file, array('Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag')));
   }
 
-  public function put($workspace, $existing_entity, $field_name, $delta, $file, $scheme, $filename, FileInterface $received_entity = NULL) {
-    if (!$received_entity instanceof FileInterface) {
-      throw new BadRequestHttpException(t('No content received'));
+  /**
+   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\Core\Entity\EntityInterface $entity
+   * @param string $field_name
+   * @param integer $delta
+   * @param string | \Drupal\file\FileInterface $existing_file
+   * @param string $scheme
+   * @param string $filename
+   * @param \Drupal\file\FileInterface $received_file
+   */
+  public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
+    if (is_string($workspace) || is_string($entity)) {
+      throw new NotFoundHttpException();
     }
-
-    // We know there can only be one entity with PUT requests.
-    $existing_entity = reset($existing_entity);
 
     // Check entity and field level access.
-    if (!$existing_entity->access('create')) {
+    if (!$entity->access('create') || !$entity->{$field_name}->access('create')) {
       throw new AccessDeniedHttpException();
     }
-    foreach ($existing_entity as $field_name => $field) {
-      if (!$field->access('create')) {
-        throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
-      }
-    }
+
+    // Start with the existing file and update values from the received file.
+    $file = ($existing_file instanceof FileInterface) ? $existing_file : $received_file;
 
     // Validate the received data before saving.
-    $this->validate($existing_entity);
-    $this->validate($received_entity);
+    $this->validate($file);
     try {
-      $received_entity->save();
+      // The serializer created a temporary file. Move it to the received URI.
+      $received_uri = "$scheme://$filename";
+      file_unmanaged_move($received_file->getFileUri(), $received_uri);
+      $file->setFileUri($received_uri);
+      $file->save();
 
-      // todo: Attach the new file to the entity.
+      // Update the entity with the new file.
+      $entity->{$field_name}->get($delta)->target_id = $file->id();
+      $entity->save();
 
-      $existing_entity->save();
-      $rev = $existing_entity->_revs_info->rev;
-      $file_contents = file_get_contents($received_entity->getFileUri());
-      $encoded_digest = base64_encode(md5($file_contents));
-
-      return new ResourceResponse(
-        array(
-          'ok' => TRUE,
-          'id' => $existing_entity->uuid(),
-          'rev' => $rev,
-        ),
-        200,
-        array(
-          'X-Relaxed-ETag' => $encoded_digest,
-          'Content-MD5' => $encoded_digest,
-        )
-      );
+      $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_revs_info->rev);
+      return new ResourceResponse($data, 200, $this->responseHeaders($file, array('Content-MD5', 'X-Relaxed-ETag')));
     }
+    // @todo We should probablt catch a more generic exception here and on other places.
     catch (EntityStorageException $e) {
       throw new HttpException(500, NULL, $e);
     }
   }
 
   public function delete($workspace, $entities, $field_name, $delta, $file, $scheme, $filename) {
-    if (empty($entities) || is_string($entities) || empty($file) || is_string($file)) {
-      throw new NotFoundHttpException();
-    }
-
-    // We know there can only be one entity with DELETE requests.
+    // There can only be one entity for this endpoint.
     $entity = reset($entities);
+    // Check that we received valid entities.
+    if (!$entity instanceof ContentEntityInterface || !$file instanceof FileInterface) {
+      throw new BadRequestHttpException(t('No content received'));
+    }
 
     try {
       // @todo: Access check.
@@ -155,20 +150,27 @@ class AttachmentResource extends ResourceBase {
   }
 
   /**
-   * Helper method that returns the response headers for an attachment.
+   * Helper method that returns the response headers.
    *
    * @param \Drupal\file\FileInterface $file
+   * @param array $headers_to_include
    * @return array
    */
-  protected function attachmentHeaders(FileInterface $file) {
+  protected function responseHeaders(FileInterface $file, $headers_to_include = array()) {
     $file_contents = file_get_contents($file->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
 
-    return array(
-      'X-Relaxed-ETag' => $encoded_digest,
+    $all_headers = array(
       'Content-Type' => $file->getMimeType(),
+      'X-Relaxed-ETag' => $encoded_digest,
       'Content-Length' => $file->getSize(),
       'Content-MD5' => $encoded_digest,
     );
+
+    $return = array();
+    foreach ($headers_to_include as $header) {
+      $return[$header] = $all_headers[$header];
+    }
+    return $return;
   }
 }
