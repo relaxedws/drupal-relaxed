@@ -2,14 +2,12 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Entity\EntityInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -58,11 +56,14 @@ class ResourceController implements ContainerAwareInterface {
    * @return string
    */
   protected function getFormat() {
-    return $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format') ?: 'json';
+    if (!$format = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format')) {
+      return $this->getResource()->isAttachment() ? 'stream' : 'json';
+    }
+    return $format;
   }
 
   /**
-   * @return \Drupal\rest\Plugin\ResourceInterface
+   * @return \Drupal\relaxed\Plugin\rest\resource\RelaxedResourceInterface
    */
   protected function getResource() {
     $plugin_id = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getDefault('_plugin');
@@ -141,12 +142,13 @@ class ResourceController implements ContainerAwareInterface {
     $content = $this->request->getContent();
     // @todo Check if it's safe to pass all query parameters like this.
     $query = $this->request->query->all();
+    $context = array('query' => $query);
     $entity = NULL;
     if (!empty($content)) {
       try {
         $definition = $resource->getPluginDefinition();
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
-        $entity = $this->serializer()->deserialize($content, $class, $format, $query);
+        $entity = $this->serializer()->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -155,23 +157,33 @@ class ResourceController implements ContainerAwareInterface {
 
     try {
       $parameters = $this->getParameters();
+      /** @var \Drupal\rest\ResourceResponse $response */
       $response = call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $this->request)));
     }
     catch (\Exception $e) {
       return $this->errorResponse($e);
     }
 
-    $data = $response->getResponseData();
-    if ($data != NULL) {
+    // Default to plain text format in case there is no response data.
+    // It's only when doing GET on a stream we want to respond with the same.
+    // Fall back to JSON in all other cases.
+    $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
+      ? 'stream'
+      : 'json';
+
+    $response_data = $response->getResponseData();
+    if ($response_data != NULL) {
       try {
-        $output = $this->serializer()->serialize($data, $format, $query);
-        $response->setContent($output);
+        $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
+        $response->setContent($response_output);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
       }
     }
-    $response->headers->set('Content-Type', $this->request->getMimeType($format));
+    if (!$response->headers->get('Content-Type')) {
+      $response->headers->set('Content-Type', $this->request->getMimeType($response_format));
+    }
     return $response;
   }
 

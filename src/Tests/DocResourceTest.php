@@ -33,8 +33,8 @@ class DocResourceTest extends ResourceTestBase {
       $first_rev = $entity->_revs_info->rev;
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
-      $this->assertResponse('200', 'HTTP response code is correct.');
       $this->assertHeader('content-type', $this->defaultMimeType);
+      $this->assertResponse('200', 'HTTP response code is correct.');
       // @todo Change when a proper event handler is implemented for ETag.
       $this->assertHeader('x-relaxed-etag', $first_rev);
       $this->assertTrue(empty($response), 'HEAD request returned no body.');
@@ -45,9 +45,11 @@ class DocResourceTest extends ResourceTestBase {
       $second_rev = $entity->_revs_info->rev;
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
+      $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertHeader('x-relaxed-etag', $second_rev);
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => $first_rev));
+      $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertHeader('x-relaxed-etag', $first_rev);
     }
   }

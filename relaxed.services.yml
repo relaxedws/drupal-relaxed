@@ -1,14 +1,22 @@
 services:
+  relaxed.encoder.stream:
+    class: Drupal\relaxed\Encoder\StreamEncoder
+    tags:
+      - { name: encoder, format: stream }
+  relaxed.encoder.base64_stream:
+    class: Drupal\relaxed\Encoder\StreamEncoder
+    tags:
+      - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
+    arguments: ['@entity.manager', '@entity.uuid_index']
     tags:
       - { name: normalizer, priority: 10 }
-    arguments: ['@entity.manager', '@entity.uuid_index']
   relaxed.normalizer.bulk_docs:
     class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
+    arguments: ['@entity.manager', '@entity.uuid_index']
     tags:
       - { name: normalizer, priority: 20 }
-    arguments: ['@entity.manager', '@entity.uuid_index']
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
@@ -30,19 +38,33 @@ services:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     tags:
       - { name: normalizer, priority: 20 }
+  relaxed.normalizer.attachment:
+    class: Drupal\relaxed\Normalizer\AttachmentNormalizer
+    arguments: ['@entity.manager']
+    tags:
+      - { name: normalizer, priority: 30 }
+  relaxed.normalizer.file_item:
+    class: Drupal\relaxed\Normalizer\FileItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
   relaxed.revs_diff:
     class: Drupal\relaxed\RevisionDiff\RevisionDiff
     arguments: ['@entity.rev_index']
+  relaxed.changes:
+    class: Drupal\relaxed\Changes\Changes
+    arguments: ['@entity.sequence_index']
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
     tags:
-      - { name: paramconverter, priority: 20 }
+      - { name: paramconverter, priority: 30 }
   paramconverter.db:
     class: Drupal\relaxed\ParamConverter\DbConverter
     arguments: ['@entity.manager']
     tags:
       - { name: paramconverter, priority: 20 }
-  relaxed.changes:
-    class: Drupal\relaxed\Changes\Changes
-    arguments: ['@entity.sequence_index']
+  paramconverter.entity_uuid:
+    class: Drupal\relaxed\ParamConverter\EntityUuidConverter
+    arguments: ['@entity.manager', '@entity.uuid_index']
+    tags:
+      - { name: paramconverter, priority: 20 }

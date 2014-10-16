@@ -14,7 +14,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInterface {
 
+  /**
+   * @var string[]
+   */
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
+
+  /**
+   * @var string[]
+   */
+  protected $format = array('json');
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -40,14 +48,28 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     $data['_entity_type'] = $context['entity_type'] = $entity->getEntityTypeId();
 
+    $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity as $name => $field) {
+      $field_type = $field_definitions[$name]->getType();
       $field_data = $this->serializer->normalize($field, $format, $context);
+      // Add file and image field types into _attachments key.
+      if ($field_type == 'file' || $field_type == 'image') {
+        if (!isset($data['_attachments'])) {
+          $data['_attachments'] = array();
+        }
+        if ($field_data !== NULL) {
+          foreach ($field_data as $field_info) {
+            $data['_attachments'] = array_merge($data['_attachments'], $field_info);
+          }
+        }
+        continue;
+      }
       if ($field_data !== NULL) {
         $data[$name] = $field_data;
       }
     }
 
-    if (!empty($context['revs'])) {
+    if (!empty($context['query']['revs'])) {
       $parts = explode('-', $entity->_revs_info->rev);
       $data['_revisions'] = array(
         'ids' => array(),
@@ -66,7 +88,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Override the normalization for a few special fields, just so that we
     // follow the API spec.
     foreach (array('_deleted', '_local_seq') as $field) {
-      $data[$field] = $entity->{$field}->value;
+      if (isset($entity->{$field}->value)) {
+        $data[$field] = $entity->{$field}->value;
+      }
     }
     return $data;
   }
@@ -138,13 +162,25 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // Denormalize File and Image field types.
+    if (isset($data['_attachments'])) {
+      foreach ($data['_attachments'] as $key => $value) {
+        list($field_name, $delta, $file_uuid,,) = explode('/', $key);
+        $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+        $data[$field_name][$delta] = array(
+          'target_id' => $file->id(),
+        );
+      }
+    }
+
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_entity_type', '_local_seq') as $key) {
+    foreach (array('_id', '_rev', '_entity_type', '_local_seq', '_attachments') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
     }
 
+    // @todo Move the below update logic to the resource plugin instead.
     $storage = $this->entityManager->getStorage($entity_type_id);
 
     if ($entity_id) {
@@ -156,6 +192,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      // @todo Use the passed $class to instantiate the entity.
       $entity = $storage->create($data);
     }
 
@@ -164,7 +201,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity->setNewRevision(FALSE);
     }
 
-    if (isset($context['new_edits']) && ($context['new_edits'] === FALSE)) {
+    if (isset($context['query']['new_edits']) && ($context['query']['new_edits'] === FALSE)) {
       $entity->new_edits = FALSE;
     }
 
