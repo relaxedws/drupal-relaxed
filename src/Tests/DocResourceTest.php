@@ -127,6 +127,22 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertResponse('201', 'HTTP response code is correct');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
+
+      $entity = entity_create($entity_type);
+      $entity->save();
+      $first_rev = $entity->_revs_info->rev;
+      $entity->name = $this->randomMachineName();
+      $entity->save();
+      $second_rev = $entity->_revs_info->rev;
+      $serialized = $serializer->serialize($entity, $this->defaultFormat);
+
+      $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, array('if-match' => $first_rev));
+      $this->assertResponse('409', 'HTTP response code is correct.');
+
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, array('if-match' => $second_rev));
+      $this->assertResponse('201', 'HTTP response code is correct.');
+      $data = Json::decode($response);
+      $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
     }
   }
 

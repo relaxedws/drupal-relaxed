@@ -108,6 +108,11 @@ class DocResource extends ResourceBase {
 
     // Validate the received data before saving.
     $this->validate($received_entity);
+
+    if (!is_string($existing_entity) && $received_entity->_revs_info->rev != $existing_entity->_revs_info->rev) {
+      throw new ConflictHttpException();
+    }
+
     try {
       $received_entity->save();
       $rev = $received_entity->_revs_info->rev;

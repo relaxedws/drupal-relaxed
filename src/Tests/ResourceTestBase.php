@@ -73,7 +73,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    *   has been committed. However, the prepending of self::apiRoot needs to be
    *   kept.
    */
-  protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL) {
+  protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL, $headers = NULL) {
     // Keep in overridden method when removing the bulk of this method.
     $url = $this->apiRoot . '/' . $url;
 
@@ -124,6 +124,7 @@ abstract class ResourceTestBase extends RESTTestBase {
         break;
 
       case 'PUT':
+        $if_match_header = isset($headers['if-match']) ? $headers['if-match'] : '';
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PUT',
@@ -133,6 +134,7 @@ abstract class ResourceTestBase extends RESTTestBase {
           CURLOPT_HTTPHEADER => array(
             'Content-Type: ' . $mime_type,
             'X-CSRF-Token: ' . $token,
+            'If-Match: ' . $if_match_header,
           ),
         );
         break;
