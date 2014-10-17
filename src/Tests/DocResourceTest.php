@@ -51,6 +51,10 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => $first_rev));
       $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertHeader('x-relaxed-etag', $first_rev);
+
+      // Test the response for a fake revision.
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => '11112222333344445555'));
+      $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
 
@@ -151,11 +155,22 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_create($entity_type);
       $entity->save();
+      $first_rev = $entity->_revs_info->rev;
+      $entity->name = $this->randomMachineName();
+      $entity->save();
+      $second_rev = $entity->_revs_info->rev;
+
+      $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', array('rev' => $first_rev));
+      $this->assertResponse('409', 'HTTP response code is correct.');
+
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', array('rev' => $second_rev));
+      $this->assertResponse('200', 'HTTP response code is correct.');
+      $data = Json::decode($response);
+      $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
       // Test the response for a fake revision.
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', array('rev' => '11112222333344445555'));
+      $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', array('rev' => '11112222333344445555'));
       $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
-
 }

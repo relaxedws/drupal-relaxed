@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -132,12 +133,20 @@ class DocResource extends ResourceBase {
     if (!$entity->access('delete')) {
       throw new AccessDeniedHttpException();
     }
+
+    $last_entity_revision = entity_load($entity->getEntityType()->id(), $entity->id());
+    $last_rev = $last_entity_revision->_revs_info->rev;
+    if ($last_rev != $entity->_revs_info->rev) {
+      throw new ConflictHttpException();
+    }
+
     try {
       $entity->delete();
     }
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
     }
+
     return new ResourceResponse(array('ok' => TRUE), 200);
   }
 }
