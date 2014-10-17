@@ -148,6 +148,13 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_load($entity_type, $entity->id());
       $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
+
+      $entity = entity_create($entity_type);
+      $entity->save();
+
+      // Test the response for a fake revision.
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', array('rev' => '11112222333344445555'));
+      $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
 
