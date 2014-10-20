@@ -155,12 +155,16 @@ abstract class ResourceTestBase extends RESTTestBase {
 
       case 'DELETE':
         $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
+        $if_match_header = isset($headers['if-match']) ? $headers['if-match'] : '';
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'DELETE',
           CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => array('X-CSRF-Token: ' . $token),
+          CURLOPT_HTTPHEADER => array(
+            'X-CSRF-Token: ' . $token,
+            'If-Match: ' . $if_match_header,
+          ),
         );
         break;
     }

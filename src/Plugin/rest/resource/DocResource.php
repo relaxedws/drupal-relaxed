@@ -139,8 +139,8 @@ class DocResource extends ResourceBase {
       throw new AccessDeniedHttpException();
     }
 
-    $last_entity_revision = entity_load($entity->getEntityType()->id(), $entity->id());
-    $last_rev = $last_entity_revision->_revs_info->rev;
+    $record = \Drupal::service('entity.uuid_index')->get($entity->uuid());
+    $last_rev = $record['rev'];
     if ($last_rev != $entity->_revs_info->rev) {
       throw new ConflictHttpException();
     }
