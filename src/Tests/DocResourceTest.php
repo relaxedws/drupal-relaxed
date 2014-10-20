@@ -44,16 +44,28 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
       $second_rev = $entity->_revs_info->rev;
 
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
+      $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertHeader('x-relaxed-etag', $second_rev);
 
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => $first_rev));
+      $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => $first_rev));
       $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertHeader('x-relaxed-etag', $first_rev);
 
       // Test the response for a fake revision.
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => '11112222333344445555'));
+      $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', array('rev' => '11112222333344445555'));
+      $this->assertResponse('404', 'HTTP response code is correct.');
+
+      $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL, NULL, array('if-none-match' => $first_rev));
+      $this->assertHeader('content-type', $this->defaultMimeType);
+      $this->assertHeader('x-relaxed-etag', $first_rev);
+
+      $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL, NULL, array('if-none-match' => $second_rev));
+      $this->assertHeader('content-type', $this->defaultMimeType);
+      $this->assertHeader('x-relaxed-etag', $second_rev);
+
+      // Test the response for a fake revision using if-none-match header.
+      $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL, NULL, array('if-none-match' => '11112222333344445555'));
       $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
@@ -99,10 +111,29 @@ class DocResourceTest extends ResourceTestBase {
         $open_revs[] = $item->rev;
       }
       $open_revs_string = '[' . implode(',', $open_revs) . ']';
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('open_revs' => $open_revs_string));
+      $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('open_revs' => $open_revs_string));
 
       // Test the response for a fake revision.
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('rev' => '11112222333344445555'));
+      $this->httpRequest("$db/" . $entity->uuid(), 'GET', array('rev' => '11112222333344445555'));
+      $this->assertResponse('404', 'HTTP response code is correct.');
+
+      $entity = entity_create($entity_type);
+      $entity->save();
+      $first_rev = $entity->_revs_info->rev;
+      $entity->name = $this->randomMachineName();
+      $entity->save();
+      $second_rev = $entity->_revs_info->rev;
+
+      $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, array('if-none-match' => $first_rev));
+      $this->assertHeader('content-type', $this->defaultMimeType);
+      $this->assertHeader('x-relaxed-etag', $first_rev);
+
+      $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, array('if-none-match' => $second_rev));
+      $this->assertHeader('content-type', $this->defaultMimeType);
+      $this->assertHeader('x-relaxed-etag', $second_rev);
+
+      // Test the response for a fake revision using if-none-match header.
+      $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, array('if-none-match' => '11112222333344445555'));
       $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
