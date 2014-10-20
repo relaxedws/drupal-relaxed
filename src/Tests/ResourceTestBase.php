@@ -84,87 +84,118 @@ abstract class ResourceTestBase extends RESTTestBase {
       // GET the CSRF token first for writing requests.
       $token = $this->drupalGet('rest/session/token');
     }
+    $additional_headers = array();
+    if (is_array($headers)) {
+      foreach ($headers as $name => $value) {
+        $name = mb_convert_case($name, MB_CASE_TITLE);
+        $additional_headers[] = "$name: $value";
+      }
+    }
     $curl_options = array();
     switch ($method) {
       case 'GET':
         // Set query if there are additional GET parameters.
         $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
+        $get_headers = array_merge(
+          array(
+            'Accept: ' . $mime_type,
+          ),
+          $additional_headers
+        );
         $curl_options = array(
           CURLOPT_HTTPGET => TRUE,
           CURLOPT_CUSTOMREQUEST => 'GET',
           CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => FALSE,
+          CURLOPT_HTTPHEADER => $get_headers,
         );
-        $curl_options[CURLOPT_HTTPHEADER] = $mime_type ? array('Accept: ' . $mime_type) : array();
         break;
 
       case 'HEAD':
         $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
+        $head_headers = array_merge(
+          array(
+            'Accept: ' . $mime_type,
+          ),
+          $additional_headers
+        );
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'HEAD',
           CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => TRUE,
+          CURLOPT_HTTPHEADER => $head_headers,
         );
-        $curl_options[CURLOPT_HTTPHEADER] = $mime_type ? array('Accept: ' . $mime_type) : array();
         break;
 
       case 'POST':
+        $post_headers = array_merge(
+          array(
+            'Content-Type: ' . $mime_type,
+            'X-CSRF-Token: ' . $token,
+          ),
+          $additional_headers
+        );
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_POST => TRUE,
           CURLOPT_POSTFIELDS => $body,
           CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => array(
-            'Content-Type: ' . $mime_type,
-            'X-CSRF-Token: ' . $token,
-          ),
+          CURLOPT_HTTPHEADER => $post_headers,
         );
         break;
 
       case 'PUT':
-        $if_match_header = isset($headers['if-match']) ? $headers['if-match'] : '';
+        $put_headers = array_merge(
+          array(
+            'Content-Type: ' . $mime_type,
+            'X-CSRF-Token: ' . $token,
+          ),
+          $additional_headers
+        );
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PUT',
           CURLOPT_POSTFIELDS => $body,
           CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => array(
-            'Content-Type: ' . $mime_type,
-            'X-CSRF-Token: ' . $token,
-            'If-Match: ' . $if_match_header,
-          ),
+          CURLOPT_HTTPHEADER => $put_headers,
         );
         break;
 
       case 'PATCH':
+        $patch_headers = array_merge(
+          array(
+            'Content-Type: ' . $mime_type,
+            'X-CSRF-Token: ' . $token,
+          ),
+          $additional_headers
+        );
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PATCH',
           CURLOPT_POSTFIELDS => $body,
           CURLOPT_URL => _url($url, array('absolute' => TRUE)),
           CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => array(
-            'Content-Type: ' . $mime_type,
-            'X-CSRF-Token: ' . $token,
-          ),
+          CURLOPT_HTTPHEADER => $patch_headers,
         );
         break;
 
       case 'DELETE':
         $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
-        $if_match_header = isset($headers['if-match']) ? $headers['if-match'] : '';
+        $delete_headers = array_merge(
+          array(
+            'X-CSRF-Token: ' . $token,
+          ),
+          $additional_headers
+        );
         $curl_options = array(
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'DELETE',
           CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => array(
-            'X-CSRF-Token: ' . $token,
-            'If-Match: ' . $if_match_header,
-          ),
+          CURLOPT_HTTPHEADER => $delete_headers,
         );
         break;
     }
