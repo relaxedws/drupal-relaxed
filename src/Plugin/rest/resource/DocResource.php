@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -107,6 +108,11 @@ class DocResource extends ResourceBase {
 
     // Validate the received data before saving.
     $this->validate($received_entity);
+
+    if (!is_string($existing_entity) && $received_entity->_revs_info->rev != $existing_entity->_revs_info->rev) {
+      throw new ConflictHttpException();
+    }
+
     try {
       $received_entity->save();
       $rev = $received_entity->_revs_info->rev;
@@ -132,12 +138,20 @@ class DocResource extends ResourceBase {
     if (!$entity->access('delete')) {
       throw new AccessDeniedHttpException();
     }
+
+    $record = \Drupal::service('entity.uuid_index')->get($entity->uuid());
+    $last_rev = $record['rev'];
+    if ($last_rev != $entity->_revs_info->rev) {
+      throw new ConflictHttpException();
+    }
+
     try {
       $entity->delete();
     }
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
     }
+
     return new ResourceResponse(array('ok' => TRUE), 200);
   }
 }

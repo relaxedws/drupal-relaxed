@@ -51,7 +51,9 @@ class DocIdConverter implements ParamConverterInterface {
     // Fetch parameters.
     $open_revs_query = trim($request->query->get('open_revs'), '[]');
     if (!$rev_query = $request->query->get('rev')) {
-      $rev_query = $request->headers->get('if-none-match');
+      if (!$rev_query = $request->headers->get('if-none-match')) {
+        $rev_query = $request->headers->get('if-match');
+      }
     }
 
     $entity_type_id = NULL;

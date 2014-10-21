@@ -98,7 +98,7 @@ class DbResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
 
-      $response = $this->httpRequest($this->workspace->id(), 'POST', $serialized);
+      $this->httpRequest($this->workspace->id(), 'POST', $serialized);
       $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }
