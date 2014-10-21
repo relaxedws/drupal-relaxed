@@ -73,7 +73,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    *   has been committed. However, the prepending of self::apiRoot needs to be
    *   kept.
    */
-  protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL, $headers = NULL) {
+  protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL, $headers = NULL, $query = NULL) {
     // Keep in overridden method when removing the bulk of this method.
     $url = $this->apiRoot . '/' . $url;
 
@@ -91,11 +91,11 @@ abstract class ResourceTestBase extends RESTTestBase {
         $additional_headers[] = "$name: $value";
       }
     }
+    // Set query if there are additional parameters.
+    $options = isset($query) ? array('absolute' => TRUE, 'query' => $query) : array('absolute' => TRUE);
     $curl_options = array();
     switch ($method) {
       case 'GET':
-        // Set query if there are additional GET parameters.
-        $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
         $get_headers = array_merge(
           array(
             'Accept: ' . $mime_type,
@@ -112,7 +112,6 @@ abstract class ResourceTestBase extends RESTTestBase {
         break;
 
       case 'HEAD':
-        $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
         $head_headers = array_merge(
           array(
             'Accept: ' . $mime_type,
@@ -158,7 +157,7 @@ abstract class ResourceTestBase extends RESTTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PUT',
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => _url($url, array('absolute' => TRUE)),
+          CURLOPT_URL => _url($url, $options),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $put_headers,
         );
@@ -183,7 +182,6 @@ abstract class ResourceTestBase extends RESTTestBase {
         break;
 
       case 'DELETE':
-        $options = isset($body) ? array('absolute' => TRUE, 'query' => $body) : array('absolute' => TRUE);
         $delete_headers = array_merge(
           array(
             'X-CSRF-Token: ' . $token,
