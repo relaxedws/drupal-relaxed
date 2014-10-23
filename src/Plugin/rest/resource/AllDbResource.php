@@ -32,6 +32,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class AllDbResource extends ResourceBase {
 
+  /**
+   * Retrieve list of all entity types.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   */
   public function get() {
     $entity_manager = \Drupal::entityManager();
     $entity_definitions = $entity_manager->getDefinitions();
