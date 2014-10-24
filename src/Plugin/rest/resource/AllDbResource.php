@@ -38,10 +38,9 @@ class AllDbResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get() {
-    $entity_manager = \Drupal::entityManager();
-    $entity_definitions = $entity_manager->getDefinitions();
-    $result = array_keys($entity_definitions);
+    $workspaces = entity_load_multiple('workspace');
+    $workspaces_names = array_keys($workspaces);
 
-    return new ResourceResponse($result, 200);
+    return new ResourceResponse($workspaces_names, 200);
   }
 }
