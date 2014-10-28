@@ -2,18 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\AllDbResource.
+ * Contains \Drupal\relaxed\Plugin\rest\resource\AllDbsResource.
  */
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\rest\ResourceResponse;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * @file
  * Implements http://docs.couchdb.org/en/latest/api/server/common.html#all-dbs
  */
 
