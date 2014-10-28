@@ -28,11 +28,12 @@ class AllDbResourceTest extends ResourceTestBase {
       $workspaces[] = $id;
     }
 
-    $response = $this->httpRequest('_all_dbs', 'GET', NULL);
+    $response = $this->httpRequest('_all_dbs', 'GET');
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
-
+    sort($data);
+    sort($workspaces);
     $this->assertEqual($data, $workspaces, 'All workspaces names received.');
   }
 }
