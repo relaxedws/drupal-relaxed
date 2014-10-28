@@ -68,3 +68,12 @@ services:
     arguments: ['@entity.manager', '@entity.uuid_index']
     tags:
       - { name: paramconverter, priority: 20 }
+  workspace.negotiator.relaxed:
+    class: Drupal\relaxed\Workspace\RelaxedWorkspaceNegotiator
+    arguments: ['@config.factory']
+    calls:
+      - [setContainer, ['@service_container']]
+      - [setCurrentUser, ['@current_user']]
+      - [setWorkspaceManager, ['@workspace.manager']]
+    tags:
+      - { name: workspace_negotiator, priority: 200 }
