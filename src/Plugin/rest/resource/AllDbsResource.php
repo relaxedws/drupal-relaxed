@@ -22,15 +22,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   id = "relaxed:all_dbs",
  *   label = "All Workspaces",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
- *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
+ *     "canonical" = "Drupal\multiversion\Entity\Workspace",
  *   },
  *   uri_paths = {
  *     "canonical" = "/_all_dbs",
  *   }
  * )
  */
-class AllDbResource extends ResourceBase {
+class AllDbsResource extends ResourceBase {
 
   /**
    * Retrieve list of all entity types.
