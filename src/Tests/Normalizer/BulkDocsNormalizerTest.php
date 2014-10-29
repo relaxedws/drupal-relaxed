@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\String;
-use Drupal\serialization\Tests\NormalizerTestBase;
 
 /**
  * Tests the content serialization format.
@@ -15,11 +14,6 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'relaxed');
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
-
-  /**
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
 
   /**
    * Array with test entities.
@@ -38,14 +32,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
 
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('key_value', array('key_value_sorted'));
-
-    $this->container
-      ->get('entity.definition_update_manager')
-      ->applyUpdates();
-
     $this->testEntities['docs'] = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
-    $this->serializer = $this->container->get('serializer');
   }
 
   public function testNormalize() {

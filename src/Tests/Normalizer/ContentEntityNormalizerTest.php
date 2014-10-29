@@ -2,9 +2,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
-use Drupal\serialization\Tests\NormalizerTestBase;
 
 /**
  * Tests the content serialization format.
@@ -17,18 +15,8 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
-  /**
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('key_value', array('key_value_sorted'));
-
-    $this->container
-      ->get('entity.definition_update_manager')
-      ->applyUpdates();
 
     // @todo: Attach a file field once multiversion supports attachments.
 
@@ -41,10 +29,9 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
         'format' => 'full_html',
       ),
     );
+
     $this->entity = entity_create('entity_test_mulrev', $this->values);
     $this->entity->save();
-
-    $this->serializer = $this->container->get('serializer');
   }
 
   public function testNormalize() {

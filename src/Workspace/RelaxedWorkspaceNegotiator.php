@@ -27,7 +27,7 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
     $api_root = trim($this->configFactory->get('relaxed.settings')->get('api_root'), '/');
     $path_info = trim($request->getPathInfo(), '/');
 
-    if (strpos($path_info, $api_root) === 0) {
+    if (!empty($api_root) && strpos($path_info, $api_root) === 0) {
       $paths = explode('/', $path_info);
       // If we have more than one part, and the second part is not an internal
       // resource, then it means the second part is the workspace ID.

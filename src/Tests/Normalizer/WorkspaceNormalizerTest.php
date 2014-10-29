@@ -2,9 +2,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
-use Drupal\serialization\Tests\NormalizerTestBase;
 
 /**
  * Tests the workspace serialization format.
@@ -17,24 +15,12 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   protected $entityClass = 'Drupal\multiversion\Entity\Workspace';
 
-  /**
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('key_value', array('key_value_sorted'));
-
-    $this->container
-      ->get('entity.definition_update_manager')
-      ->applyUpdates();
 
     $name = $this->randomMachineName();
     $this->entity = $this->createWorkspace($name);
     $this->entity->save();
-
-    $this->serializer = $this->container->get('serializer');
   }
 
   public function testNormalize() {

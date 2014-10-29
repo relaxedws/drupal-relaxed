@@ -2,9 +2,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
-use Drupal\serialization\Tests\NormalizerTestBase;
 
 /**
  * Tests the attachment serialization format.
@@ -50,8 +48,6 @@ class AttachmentNormalizerTest extends NormalizerTestBase {
 
     $meta = stream_get_meta_data($this->fileHandle);
     $this->fileEntity = entity_create('file', array('uri' => $meta['uri']));
-
-    $this->serializer = $this->container->get('serializer');
   }
 
   public function testNormalize() {

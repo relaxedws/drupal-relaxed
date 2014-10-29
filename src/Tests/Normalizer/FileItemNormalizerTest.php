@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\String;
-use Drupal\serialization\Tests\NormalizerTestBase;
 
 /**
  * Tests the file serialization format.
@@ -35,11 +34,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
   /**
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
-  /**
    * Created file entity.
    *
    * @var \Drupal\file\Entity\File
@@ -48,13 +42,8 @@ class FileItemNormalizerTest extends NormalizerTestBase{
 
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('key_value', array('key_value_sorted'));
     $this->installEntitySchema('file');
     $this->installSchema('file', array('file_usage'));
-
-    $this->container
-      ->get('entity.definition_update_manager')
-      ->applyUpdates();
 
     // Create a File field for testing.
     entity_create('field_storage_config', array(
@@ -145,8 +134,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     );
     $this->entity = entity_create('entity_test_mulrev', $this->values);
     $this->entity->save();
-
-    $this->serializer = $this->container->get('serializer');
   }
 
   /**

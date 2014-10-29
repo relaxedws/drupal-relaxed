@@ -1,13 +1,21 @@
 <?php
 
 use Drupal\Core\Entity\EntityInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * Implements hook_entity_insert().
  */
 function relaxed_entity_insert(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'workspace') {
-    \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+    // In some cases (mostly testing) the plugin manager is not yet initialized.
+    // @todo Fix this.
+    try {
+      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+    }
+    catch (InvalidArgumentException $e) {
+      watchdog_exception('relaxed', $e);
+    }
   }
 }
 
@@ -16,7 +24,14 @@ function relaxed_entity_insert(EntityInterface $entity) {
  */
 function relaxed_entity_update(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'workspace') {
-    \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+    // In some cases (mostly testing) the plugin manager is not yet initialized.
+    // @todo Fix this.
+    try {
+      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+    }
+    catch (InvalidArgumentException $e) {
+      watchdog_exception('relaxed', $e);
+    }
   }
 }
 
@@ -25,6 +40,13 @@ function relaxed_entity_update(EntityInterface $entity) {
  */
 function relaxed_entity_delete(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'workspace') {
-    \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+    // In some cases (mostly testing) the plugin manager is not yet initialized.
+    // @todo Fix this.
+    try {
+      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+    }
+    catch (InvalidArgumentException $e) {
+      watchdog_exception('relaxed', $e);
+    }
   }
 }
