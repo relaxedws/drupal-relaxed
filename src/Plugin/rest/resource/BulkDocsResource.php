@@ -34,6 +34,8 @@ class BulkDocsResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
+    // @todo Use \Drupal\multiversion\Entity\Transaction\AllOrNothingTransaction
+
     foreach ($entities['docs'] as $entity) {
       // Validate the received data before saving.
       $this->validate($entity);
