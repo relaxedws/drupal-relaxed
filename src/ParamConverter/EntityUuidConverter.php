@@ -4,7 +4,7 @@ namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
-use Drupal\multiversion\Entity\UuidIndex;
+use Drupal\multiversion\Entity\Index\UuidIndex;
 use Symfony\Component\Routing\Route;
 
 class EntityUuidConverter implements ParamConverterInterface {
@@ -15,7 +15,7 @@ class EntityUuidConverter implements ParamConverterInterface {
   protected $entityManager;
 
   /**
-   * @var \Drupal\multiversion\Entity\UuidIndex
+   * @var \Drupal\multiversion\Entity\Index\UuidIndex
    */
   protected $uuidIndex;
 

@@ -7,7 +7,7 @@
 
 namespace Drupal\relaxed\RevisionDiff;
 
-use Drupal\multiversion\Entity\RevisionIndex;
+use Drupal\multiversion\Entity\Index\RevisionIndex;
 
 /**
  * @todo Move this into the \Drupal\multiversion\Entity namespace

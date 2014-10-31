@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\multiversion\Entity\UuidIndex;
+use Drupal\multiversion\Entity\Index\UuidIndex;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 

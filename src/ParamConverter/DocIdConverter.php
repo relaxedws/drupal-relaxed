@@ -4,8 +4,8 @@ namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
-use Drupal\multiversion\Entity\UuidIndex;
-use Drupal\multiversion\Entity\RevisionIndex;
+use Drupal\multiversion\Entity\Index\UuidIndex;
+use Drupal\multiversion\Entity\Index\RevisionIndex;
 use Symfony\Component\Routing\Route;
 
 class DocIdConverter implements ParamConverterInterface {
@@ -16,19 +16,19 @@ class DocIdConverter implements ParamConverterInterface {
   protected $entityManager;
 
   /**
-   * @var \Drupal\multiversion\Entity\UuidIndex
+   * @var \Drupal\multiversion\Entity\Index\UuidIndex
    */
   protected $uuidIndex;
 
   /**
-   * @var \Drupal\multiversion\Entity\RevisionIndex
+   * @var \Drupal\multiversion\Entity\Index\RevisionIndex
    */
   protected $revIndex;
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   * @param \Drupal\multiversion\Entity\UuidIndex $uuid_index
-   * @param \Drupal\multiversion\Entity\RevisionIndex $rev_index
+   * @param \Drupal\multiversion\Entity\Index\UuidIndex $uuid_index
+   * @param \Drupal\multiversion\Entity\Index\RevisionIndex $rev_index
    */
   public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, RevisionIndex $rev_index) {
     $this->entityManager = $entity_manager;

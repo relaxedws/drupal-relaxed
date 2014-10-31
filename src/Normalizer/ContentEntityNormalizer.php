@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\multiversion\Entity\UuidIndex;
+use Drupal\multiversion\Entity\Index\UuidIndex;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -26,7 +26,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   * @param \Drupal\multiversion\Entity\UuidIndex $uuid_index
+   * @param \Drupal\multiversion\Entity\Index\UuidIndex $uuid_index
    */
   public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index) {
     $this->entityManager = $entity_manager;
