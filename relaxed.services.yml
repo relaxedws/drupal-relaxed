@@ -9,12 +9,12 @@ services:
       - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@entity.uuid_index']
+    arguments: ['@entity.manager', '@entity.index.uuid']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.bulk_docs:
     class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
-    arguments: ['@entity.manager', '@entity.uuid_index']
+    arguments: ['@entity.manager', '@entity.index.uuid']
     tags:
       - { name: normalizer, priority: 20 }
   relaxed.normalizer.workspace:
@@ -49,13 +49,13 @@ services:
       - { name: normalizer, priority: 10 }
   relaxed.revs_diff:
     class: Drupal\relaxed\RevisionDiff\RevisionDiff
-    arguments: ['@entity.rev_index']
+    arguments: ['@entity.index.rev']
   relaxed.changes:
     class: Drupal\relaxed\Changes\Changes
-    arguments: ['@entity.sequence_index']
+    arguments: ['@entity.index.sequence']
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@entity.uuid_index', '@entity.rev_index']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
@@ -65,7 +65,7 @@ services:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@entity.uuid_index']
+    arguments: ['@entity.manager', '@entity.index.uuid']
     tags:
       - { name: paramconverter, priority: 20 }
   workspace.negotiator.relaxed:
