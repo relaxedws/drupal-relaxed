@@ -7,7 +7,7 @@
 
 namespace Drupal\relaxed\Changes;
 
-use Drupal\multiversion\Entity\SequenceIndex;
+use Drupal\multiversion\Entity\Index\SequenceIndex;
 
 class Changes implements ChangesInterface {
 

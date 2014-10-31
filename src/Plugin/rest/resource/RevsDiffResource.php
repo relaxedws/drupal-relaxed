@@ -12,7 +12,7 @@ use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Drupal\multiversion\Entity\RevisionIndex;
+use Drupal\multiversion\Entity\Index\RevisionIndex;
 use Drupal\relaxed\RevisionDiff\RevisionDiff;
 
 /**
