@@ -40,7 +40,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->workspace = $this->createWorkspace($name);
     $this->workspace->save();
 
-    $this->multiversionManager->setActiveWorkspaceName($name);
+    $this->multiversionManager->setActiveWorkspaceId($name);
   }
 
   /**
