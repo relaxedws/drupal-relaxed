@@ -118,7 +118,7 @@ class ChangesTest extends ResourceTestBase {
     $correct_data = TRUE;
     foreach ($data['results'] as $key => $rev) {
       if ($revs[$key]['id'] != $rev['id']
-        || $revs[$key]['rev'] != $rev['changes']['rev']) {
+        || $revs[$key]['rev'] != $rev['changes'][0]['rev']) {
         $correct_data = FALSE;
       }
     }

@@ -49,7 +49,6 @@ class DbResourceTest extends ResourceTestBase {
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
     $this->assertEqual($data['db_name'], $this->workspace->id(), 'GET request returned correct db_name.');
-    $this->assertEqual($data['update_seq'], $entity->_local_seq->value, 'GET request returned correct update_seq.');
   }
 
   public function testPut() {
