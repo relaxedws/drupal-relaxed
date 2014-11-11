@@ -85,12 +85,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // @todo Remove fields that doesn't make sense to the API spec, such as
     // local entity and revision IDs.
 
-    // Override the normalization for a few special fields, just so that we
+    // Override the normalization for the _deleted special field, just so that we
     // follow the API spec.
-    foreach (array('_deleted', '_local_seq') as $field) {
-      if (isset($entity->{$field}->value)) {
-        $data[$field] = $entity->{$field}->value;
-      }
+    if (isset($entity->_deleted->value)) {
+      $data['_deleted'] = $entity->_deleted->value;
     }
     return $data;
   }
@@ -174,7 +172,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_entity_type', '_local_seq', '_attachments') as $key) {
+    foreach (array('_id', '_rev', '_entity_type', '_attachments') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }

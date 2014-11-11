@@ -41,23 +41,20 @@ class Changes implements ChangesInterface {
       ->useWorkspace($this->workspaceName)
       ->getRange($this->lastSeq, NULL);
 
-    $result = array();
-    $last_seq_number = count($changes);
-    if ($last_seq_number > 0) {
-      $last_seq_number = $last_seq_number - 1;
-      $result['last_seq'] = $changes[$last_seq_number]['local_seq'];
-    }
-
     // Format the result array.
-    foreach ($changes as $change) {
-      $result['results'][] = array(
+    $result = array();
+    foreach ($changes as $seq => $change) {
+      $change_result = array(
         'changes' => array(
-          'rev' => $change['rev'],
+          array('rev' => $change['rev']),
         ),
-        'deleted' => $change['deleted'],
         'id' => $change['entity_uuid'],
-        'seq' => $change['local_seq'],
+        'seq' => $seq,
       );
+      if ($change['deleted']) {
+        $change_result['deleted'] = TRUE;
+      }
+      $result['results'][] = $change_result;
     }
 
     return $result;

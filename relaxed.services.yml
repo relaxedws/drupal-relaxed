@@ -26,10 +26,6 @@ services:
     class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
     tags:
       - { name: normalizer, priority: 10 }
-  relaxed.normalizer.local_sequence_item_list:
-    class: Drupal\relaxed\Normalizer\LocalSequenceItemListNormalizer
-    tags:
-      - { name: normalizer, priority: 10 }
   relaxed.normalizer.revision_info_item_list:
     class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
     tags:
