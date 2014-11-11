@@ -42,7 +42,5 @@ class ReplicationLogTest extends MultiversionWebTestBase {
 
     $entity_id = $entity->id();
     $this->assertTrue(!empty($entity_id), 'Entity was saved.');
-
-    $this->assertTrue($entity->_local->value, 'Entity was saved as local.');
   }
 }

@@ -33,9 +33,6 @@ class LocalDocResource extends DocResource {
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : array($existing);
 
-    if ($revisions[0] instanceof ContentEntityInterface && $revisions[0]->_local->value == FALSE) {
-      throw new NotFoundHttpException();
-    }
     return parent::head($workspace, $revisions);
   }
 
@@ -52,9 +49,6 @@ class LocalDocResource extends DocResource {
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : array($existing);
 
-    if ($revisions[0] instanceof ContentEntityInterface && $revisions[0]->_local->value == FALSE) {
-      throw new NotFoundHttpException();
-    }
     return parent::get($workspace, $revisions);
   }
 
@@ -65,12 +59,6 @@ class LocalDocResource extends DocResource {
    * @return \Drupal\rest\ResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity) {
-    if (isset($received_entity->_local->value) && $received_entity->_local->value == FALSE) {
-      throw new BadRequestHttpException('The _local field value can not be set to FALSE when using this endpoint.');
-    }
-    else {
-      $received_entity->_local->value = TRUE;
-    }
     return parent::put($workspace, $existing_entity, $received_entity);
   }
 
