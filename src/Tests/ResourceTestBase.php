@@ -11,7 +11,7 @@ abstract class ResourceTestBase extends RESTTestBase {
   /**
    * @var string
    */
-  protected $api_root;
+  protected $apiRoot;
 
   /**
    * @var \Drupal\multiversion\Entity\WorkspaceInterface
