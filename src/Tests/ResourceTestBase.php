@@ -6,7 +6,7 @@ use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
 
-  public static $modules = array('rest', 'entity_test', 'relaxed');
+  public static $modules = array('rest', 'entity_test', 'relaxed', 'relaxed_test');
 
   /**
    * @var string

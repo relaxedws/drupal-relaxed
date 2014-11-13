@@ -31,6 +31,12 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
+
+    $entity = entity_create('entity_test_local');
+    $entity->save();
+    $this->httpRequest("$db/_local/" . $entity->uuid(), 'HEAD', NULL);
+    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertResponse('404', 'HTTP response code is correct.');
   }
 
   public function testGet() {
@@ -50,6 +56,11 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->httpRequest("$db/_local/" . $entity->uuid(), 'GET', NULL);
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
+
+    $entity = entity_create('entity_test_local');
+    $entity->save();
+    $this->httpRequest("$db/_local/" . $entity->uuid(), 'GET', NULL);
+    $this->assertResponse('404', 'HTTP response code is correct.');
   }
 
   public function testPut() {
@@ -70,6 +81,11 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->httpRequest("$db/_local/" . $entity->uuid(), 'PUT', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct');
     }
+
+    $entity = entity_create('entity_test_local');
+    $serialized = $serializer->serialize($entity, $this->defaultFormat);
+    $this->httpRequest("$db/_local/" . $entity->uuid(), 'PUT', $serialized);
+    $this->assertResponse('400', 'HTTP response code is correct.');
   }
 
 }
