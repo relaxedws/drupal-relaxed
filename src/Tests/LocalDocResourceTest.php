@@ -2,13 +2,10 @@
 
 namespace Drupal\relaxed\Tests;
 
-use Drupal\Component\Serialization\Json;
-
 /**
  * Tests the /db/doc resource.
  *
  * @group relaxed
- * @todo Test more entity types, at least node, taxonomy term, comment and user.
  */
 class LocalDocResourceTest extends ResourceTestBase {
 
@@ -17,7 +14,7 @@ class LocalDocResourceTest extends ResourceTestBase {
 
     // HEAD and GET is handled by the same resource.
     $this->enableService('relaxed:local:doc', 'GET');
-    $entity_types = array('entity_test_rev');
+    $entity_types = array('entity_test_local');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
@@ -32,18 +29,19 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
 
-    $entity = entity_create('entity_test_local');
+    // Test with an entity type that is not local.
+    $entity = entity_create('entity_test_rev');
     $entity->save();
     $this->httpRequest("$db/_local/" . $entity->uuid(), 'HEAD', NULL);
     $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertResponse('404', 'HTTP response code is correct.');
+    $this->assertResponse('400', 'HTTP response code is correct.');
   }
 
   public function testGet() {
     $db = $this->workspace->id();
 
     $this->enableService('relaxed:local:doc', 'GET');
-    $entity_types = array('entity_test_rev');
+    $entity_types = array('entity_test_local');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
@@ -57,10 +55,12 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
 
-    $entity = entity_create('entity_test_local');
+    // Test with an entity type that is not local.
+    $entity = entity_create('entity_test_rev');
     $entity->save();
     $this->httpRequest("$db/_local/" . $entity->uuid(), 'GET', NULL);
-    $this->assertResponse('404', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertResponse('400', 'HTTP response code is correct.');
   }
 
   public function testPut() {
@@ -68,7 +68,7 @@ class LocalDocResourceTest extends ResourceTestBase {
 
     $this->enableService('relaxed:local:doc', 'PUT');
     $serializer = $this->container->get('serializer');
-    $entity_types = array('entity_test_rev');
+    $entity_types = array('entity_test_local');
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
@@ -82,9 +82,11 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->assertResponse('201', 'HTTP response code is correct');
     }
 
-    $entity = entity_create('entity_test_local');
+    // Test with an entity type that is not local.
+    $entity = entity_create('entity_test_rev');
     $serialized = $serializer->serialize($entity, $this->defaultFormat);
     $this->httpRequest("$db/_local/" . $entity->uuid(), 'PUT', $serialized);
+    $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertResponse('400', 'HTTP response code is correct.');
   }
 
