@@ -51,16 +51,15 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     // Extending with further entity types.
     if (!$return) {
-      switch ($entity_type) {
-        case 'entity_test_rev':
-          switch ($operation) {
-            case 'view':
-              return array('view test entity');
-            case 'create':
-            case 'update':
-            case 'delete':
-              return array('administer entity_test content');
-          }
+      if (in_array($entity_type, array('entity_test_rev', 'entity_test_local'))) {
+        switch ($operation) {
+          case 'view':
+            return array('view test entity');
+          case 'create':
+          case 'update':
+          case 'delete':
+            return array('administer entity_test content');
+        }
       }
     }
     return $return;
