@@ -76,9 +76,6 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
         '_workspace' => array(
           array('target_id' => 'default')
         ),
-        '_trx' => array(
-          array('value' => 0)
-        ),
         '_id' => $entity->uuid(),
         '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
         '_deleted' => $entity->_deleted->first()->get('value')->getCastedValue(),
