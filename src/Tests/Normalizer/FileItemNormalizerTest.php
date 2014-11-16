@@ -191,11 +191,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         ),
       ),
       '_attachments' => $expected_attachments,
-      '_local' => array(
-        array(
-          'value' => $entity->_local->first()->get('value')->getCastedValue(),
-        )
-      ),
       '_workspace' => array(
         array('target_id' => 'default')
       ),

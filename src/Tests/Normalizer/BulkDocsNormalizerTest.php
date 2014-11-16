@@ -68,11 +68,6 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
             'format' => $this->testValues[$key]['field_test_text']['format'],
           ),
         ),
-        '_local' => array(
-          array(
-            'value' => $entity->_local->first()->get('value')->getCastedValue(),
-          )
-        ),
         '_workspace' => array(
           array('target_id' => 'default')
         ),

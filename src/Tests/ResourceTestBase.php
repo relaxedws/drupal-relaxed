@@ -6,12 +6,12 @@ use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
 
-  public static $modules = array('rest', 'entity_test', 'relaxed');
+  public static $modules = array('rest', 'entity_test', 'relaxed', 'relaxed_test');
 
   /**
    * @var string
    */
-  protected $api_root;
+  protected $apiRoot;
 
   /**
    * @var \Drupal\multiversion\Entity\WorkspaceInterface
@@ -51,16 +51,15 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     // Extending with further entity types.
     if (!$return) {
-      switch ($entity_type) {
-        case 'entity_test_rev':
-          switch ($operation) {
-            case 'view':
-              return array('view test entity');
-            case 'create':
-            case 'update':
-            case 'delete':
-              return array('administer entity_test content');
-          }
+      if (in_array($entity_type, array('entity_test_rev', 'entity_test_local'))) {
+        switch ($operation) {
+          case 'view':
+            return array('view test entity');
+          case 'create':
+          case 'update':
+          case 'delete':
+            return array('administer entity_test content');
+        }
       }
     }
     return $return;
