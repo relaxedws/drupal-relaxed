@@ -25,7 +25,7 @@ class RootResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
 
     $expected = array(
-      'drupal' => t('Welcome'),
+      'couchdb' => t('Welcome'),
       'uuid' => md5($GLOBALS['base_url']),
       'vendor' =>array(
         'name' => 'Drupal',

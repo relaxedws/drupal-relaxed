@@ -26,7 +26,7 @@ class RootResource extends ResourceBase {
   public function get() {
     return new ResourceResponse(
       array(
-        'drupal' => t('Welcome'),
+        'couchdb' => t('Welcome'),
         'uuid' => md5($GLOBALS['base_url']),
         'vendor' =>array(
           'name' => 'Drupal',
