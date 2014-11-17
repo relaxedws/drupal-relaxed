@@ -71,7 +71,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
         case 'GET':
           // Restrict on the Accept header if not an attachment resource.
-          if (!$this->isAttachment()) {
+          if (!$this->isAttachment() && $route_name != 'relaxed.root') {
             foreach ($this->serializerFormats as $format) {
               $format_route = clone $route;
               $format_route->addRequirements(array('_format' => $format));
