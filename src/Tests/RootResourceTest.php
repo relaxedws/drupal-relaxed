@@ -27,7 +27,7 @@ class RootResourceTest extends ResourceTestBase {
     $expected = array(
       'couchdb' => t('Welcome'),
       'uuid' => md5($GLOBALS['base_url']),
-      'vendor' =>array(
+      'vendor' => array(
         'name' => 'Drupal',
         'version' => \Drupal::VERSION,
       ),
