@@ -16,7 +16,7 @@ class SessionResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions and admin role.
     $permissions = array('restful get relaxed:session', 'administer permissions', 'administer users');
-    $account = $this->drupalCreateUser($permissions, 'test_user_admin');
+    $account = $this->drupalCreateUser($permissions, 'test_admin_user');
     $roles = $account->getRoles();
     $this->drupalLogin($account);
     \Drupal::config('user.settings')->set('admin_role', $roles[0])->save();
@@ -35,13 +35,13 @@ class SessionResourceTest extends ResourceTestBase {
       'info' => array(),
       'ok' => TRUE,
       'userCtx' => array(
-        'user' => 'test_user_admin',
+        'user' => 'test_admin_user',
         'roles' => $roles,
       ),
     );
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
 
-    // Logout the test_user user.
+    // Logout the test_admin_user user.
     $this->drupalLogout();
 
     // Create a simple user with the correct permissions (no admin role).
