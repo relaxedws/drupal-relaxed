@@ -59,8 +59,14 @@ resources:
       supported_auth:
         - cookie
   relaxed:root:
-      GET:
-        supported_formats:
-          - json
-        supported_auth:
-          - cookie
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+  relaxed:session:
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
