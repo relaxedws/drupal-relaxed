@@ -49,7 +49,7 @@ class DocIdConverter implements ParamConverterInterface {
     $request = \Drupal::request();
 
     // Fetch parameters.
-    $open_revs_query = trim($request->query->get('open_revs'), '[]');
+    $open_revs_query = json_decode(urldecode($request->query->get('open_revs')));
     if (!$rev_query = $request->query->get('rev')) {
       if (!$rev_query = $request->headers->get('if-none-match')) {
         $rev_query = $request->headers->get('if-match');
@@ -86,7 +86,7 @@ class DocIdConverter implements ParamConverterInterface {
         }
       }
       else {
-        $open_revs = explode(',', $open_revs_query);
+        $open_revs = $open_revs_query;
       }
 
       $revision_ids = array();

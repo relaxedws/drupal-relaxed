@@ -4,7 +4,9 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -75,11 +77,19 @@ class DocResource extends ResourceBase {
         }
       }
     }
-    // Decide if to return a single or multiple revisions.
-    $data = is_array($existing) ? $revisions : reset($revisions);
-    // @todo Create a event handler and override the ETag that's set by core.
-    // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse($data, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
+
+    $parts = array();
+    foreach ($revisions as $revision) {
+      $parts[] = new ResourceResponse($revision, 200);
+    }
+
+    return new ResourceMultipartResponse($parts, 200);
+//
+//    // Decide if to return a single or multiple revisions.
+//    $data = is_array($existing) ? $revisions : reset($revisions);
+//    // @todo Create a event handler and override the ETag that's set by core.
+//    // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
+//    return new ResourceResponse($data, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
   }
 
   /**
