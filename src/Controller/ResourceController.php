@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -164,22 +165,15 @@ class ResourceController implements ContainerAwareInterface {
       return $this->errorResponse($e);
     }
 
-    if (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream') {
-      $response_format = 'stream';
-    }
-    elseif ($request->getMethod() == 'GET' && $format == 'mixed') {
-      $response_format = 'mixed';
-    }
-    else {
-      $response_format = 'json';
-    }
+    $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
+      ? 'stream'
+      : 'json';
 
-    if ($response_format == 'mixed') {
-      $parts = array();
+    if ($response instanceof MultipartResponse) {
       foreach ($response->getParts() as $response_part) {
         try {
           $response_data = $response_part->getResponseData();
-          $response_output = $this->serializer()->serialize($response_data, 'json');
+          $response_output = $this->serializer()->serialize($response_data, $response_format);
           $response_part->setContent($response_output);
         }
         catch (\Exception $e) {
@@ -188,9 +182,7 @@ class ResourceController implements ContainerAwareInterface {
         if (!$response->headers->get('Content-Type')) {
           $response->headers->set('Content-Type', $this->request->getMimeType($response_format));
         }
-        $parts[] = $response_part;
       }
-      $response->sendContent();
     }
     else {
       $response_data = $response->getResponseData();
