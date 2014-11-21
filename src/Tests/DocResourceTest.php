@@ -154,7 +154,8 @@ class DocResourceTest extends ResourceTestBase {
       $entity = entity_create($entity_type);
       $entity->save();
       $entity->name = $this->randomMachineName();
-      // Save an additional revision.
+      // Save two additional revisions.
+      $entity->save();
       $entity->save();
 
       $open_revs = array();

@@ -94,7 +94,7 @@ class MultipartResponse extends Response
   public function sendContent()
   {
     foreach ($this->parts as $part) {
-      //echo "--{$this->boundary}\r\n";
+      echo "--{$this->boundary}\r\n";
       echo "{$part->headers}\r\n";
       $part->sendContent();
       echo "\r\n";
