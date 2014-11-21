@@ -4,7 +4,9 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\relaxed\HttpMultipart\Message\MultipartMessageFactory;
+use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use GuzzleHttp\Client;
+use GuzzleHttp\Stream\Stream;
 
 /**
  * Tests the /db/doc resource.
@@ -151,11 +153,12 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      $expected = array();
       $entity = entity_create($entity_type);
       $entity->save();
+
       $entity->name = $this->randomMachineName();
-      // Save two additional revisions.
-      $entity->save();
+      // Save an additional revision.
       $entity->save();
 
       $open_revs = array();
@@ -172,8 +175,22 @@ class DocResourceTest extends ResourceTestBase {
         array('open_revs' => $open_revs_string)
       );
 
+      $stream = Stream::factory($response);
+      $parts = MultipartResponse::parseMultipartBody($stream);
       $this->assertResponse('200', 'HTTP response code is correct.');
 
+      $data = array();
+      foreach ($parts as $part) {
+        $data[] = Json::decode($part['body']);
+      }
+
+      $correct_data = TRUE;
+      foreach ($open_revs as $key => $rev) {
+        if (isset($data[$key]['_rev']) && $data[$key]['_rev'] != $rev) {
+          $correct_data = FALSE;
+        }
+      }
+      $this->assertTrue($correct_data, 'Response contains correct revisions.');
     }
   }
 
