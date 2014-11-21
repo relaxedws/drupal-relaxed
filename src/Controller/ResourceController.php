@@ -179,9 +179,6 @@ class ResourceController implements ContainerAwareInterface {
         catch (\Exception $e) {
           return $this->errorResponse($e);
         }
-        if (!$response->headers->get('Content-Type')) {
-          $response->headers->set('Content-Type', $this->request->getMimeType($response_format));
-        }
       }
     }
     else {

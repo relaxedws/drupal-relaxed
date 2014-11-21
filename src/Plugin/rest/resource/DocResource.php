@@ -8,7 +8,6 @@ use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -80,10 +79,10 @@ class DocResource extends ResourceBase {
 
     $parts = array();
     foreach ($revisions as $revision) {
-      $parts[] = new ResourceResponse($revision, 200);
+      $parts[] = new ResourceResponse($revision, 200, array('Content-Type' => 'application/json'));
     }
 
-    return new ResourceMultipartResponse($parts, 200);
+    return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
 //
 //    // Decide if to return a single or multiple revisions.
 //    $data = is_array($existing) ? $revisions : reset($revisions);

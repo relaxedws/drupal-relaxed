@@ -142,8 +142,6 @@ class DocResourceTest extends ResourceTestBase {
 
   public function testGetMixed() {
     $db = $this->workspace->id();
-
-    $this->enableService('relaxed:doc', 'GET');
     $this->enableService('relaxed:doc', 'GET', 'mixed');
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
