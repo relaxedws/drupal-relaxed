@@ -65,13 +65,12 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           'format' => $this->values['field_test_text']['format'],
         ),
       ),
-      '_workspace' => array(
+      'workspace' => array(
         array('target_id' => 'default')
       ),
       '_id' => $entity->uuid(),
       '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
       '_deleted' => $entity->_deleted->first()->get('value')->getCastedValue(),
-      '_entity_type' => $entity->getEntityTypeId(),
     );
 
     $normalized = $this->serializer->normalize($this->entity);

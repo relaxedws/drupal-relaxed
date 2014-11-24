@@ -42,11 +42,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if ($entity->uuid()) {
       $data['_id'] = $entity->uuid();
     }
+    $entity_type = $context['entity_type'] = $entity->getEntityTypeId();
+    $data['_id'] = "$entity_type:" . $data['_id'];
+
     // New or mocked entities might not have a rev yet.
     if (!empty($entity->_revs_info->rev)) {
       $data['_rev'] = $entity->_revs_info->rev;
     }
-    $data['_entity_type'] = $context['entity_type'] = $entity->getEntityTypeId();
 
     $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity as $name => $field) {
@@ -82,13 +84,20 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    // @todo Remove fields that doesn't make sense to the API spec, such as
-    // local entity and revision IDs.
-
     // Override the normalization for the _deleted special field, just so that we
     // follow the API spec.
-    if (isset($entity->_deleted->value)) {
-      $data['_deleted'] = $entity->_deleted->value;
+    if (isset($entity->_deleted->value) && $entity->_deleted->value == TRUE) {
+      $data['_deleted'] = TRUE;
+    }
+    elseif (isset($data['_deleted'])) {
+      unset($data['_deleted']);
+    }
+
+    if (isset($data['_workspace'])) {
+      // Use the 'workspace' without underscore because the underscore is
+      // a reserved prefix in CouchDB.
+      $data['workspace'] = $data['_workspace'];
+      unset($data['_workspace']);
     }
     return $data;
   }
@@ -101,24 +110,29 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_uuid = NULL;
     $entity_id = NULL;
 
+    // Get the entity type and the entity id from $data['_id'] string.
+    if (!empty($data['_id'])) {
+      list($entity_type_from_data, $entity_id_from_data) = explode(':', $data['_id']);
+    }
+
     // Look for the entity type ID.
     if (!empty($context['entity_type'])) {
       $entity_type_id = $context['entity_type'];
     }
     elseif (!empty($data['_entity_type'])) {
-      $entity_type_id = $data['_entity_type'];
+      $entity_type_id = $entity_type_from_data;
     }
 
     // Resolve the UUID.
     // @todo Needs test
-    if (!empty($data['uuid'][0]['value']) && !empty($data['_id']) && ($data['uuid'][0]['value'] != $data['_id'])) {
+    if (!empty($data['uuid'][0]['value']) && !empty($entity_id_from_data) && ($data['uuid'][0]['value'] != $entity_id_from_data)) {
       throw new UnexpectedValueException('The uuid and _id values does not match.');
     }
     if (!empty($data['uuid'][0]['value'])) {
       $entity_uuid = $data['uuid'][0]['value'];
     }
-    elseif (!empty($data['_id'])) {
-      $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
+    elseif (isset($entity_id_info[0])) {
+      $entity_uuid = $data['uuid'][0]['value'] = $entity_id_from_data;
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.

@@ -83,12 +83,6 @@ class DocResource extends ResourceBase {
     }
 
     return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
-//
-//    // Decide if to return a single or multiple revisions.
-//    $data = is_array($existing) ? $revisions : reset($revisions);
-//    // @todo Create a event handler and override the ETag that's set by core.
-//    // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-//    return new ResourceResponse($data, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
   }
 
   /**

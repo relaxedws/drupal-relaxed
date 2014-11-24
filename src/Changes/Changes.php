@@ -43,6 +43,10 @@ class Changes implements ChangesInterface {
 
     // Format the result array.
     $result = array();
+    $last_seq_number = count($changes);
+    if ($last_seq_number > 0) {
+      $result['last_seq'] = $last_seq_number - 1;
+    }
     foreach ($changes as $seq => $change) {
       $change_result = array(
         'changes' => array(
