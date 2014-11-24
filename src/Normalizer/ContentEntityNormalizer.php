@@ -86,7 +86,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Override the normalization for the _deleted special field, just so that we
     // follow the API spec.
-    if (isset($entity->_deleted->value) && $entity->_deleted->value == TRUE) {
+    if (isset($entity->_deleted->value)) {
       $data['_deleted'] = TRUE;
     }
     elseif (isset($data['_deleted'])) {
@@ -119,7 +119,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if (!empty($context['entity_type'])) {
       $entity_type_id = $context['entity_type'];
     }
-    elseif (!empty($data['_entity_type'])) {
+    elseif (isset($entity_type_from_data)) {
       $entity_type_id = $entity_type_from_data;
     }
 
@@ -149,13 +149,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           $entity_type_id = $record['entity_type'];
         }
         elseif ($entity_type_id != $record['entity_type']) {
-          throw new UnexpectedValueException('The _entity_type value does not match the existing UUID record.');
+          throw new UnexpectedValueException('The entity_type value does not match the existing UUID record.');
         }
       }
     }
 
     if (empty($entity_type_id)) {
-      throw new UnexpectedValueException('The _entity_type value is missing.');
+      throw new UnexpectedValueException('The entity_type value is missing.');
     }
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
 
@@ -186,7 +186,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_entity_type', '_attachments') as $key) {
+    foreach (array('_id', '_rev', '_attachments') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
