@@ -3,9 +3,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\relaxed\HttpMultipart\Message\MultipartMessageFactory;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
-use GuzzleHttp\Client;
 use GuzzleHttp\Stream\Stream;
 
 /**
