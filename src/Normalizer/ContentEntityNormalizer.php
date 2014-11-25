@@ -86,7 +86,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Override the normalization for the _deleted special field, just so that we
     // follow the API spec.
-    if (isset($entity->_deleted->value)) {
+    if (isset($entity->_deleted->value) && $entity->_deleted->value == TRUE) {
       $data['_deleted'] = TRUE;
     }
     elseif (isset($data['_deleted'])) {

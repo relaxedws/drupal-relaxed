@@ -39,16 +39,22 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
     $expected = array();
     for ($key = 0; $key < $this->testValuesNumber; $key++) {
       $entity = entity_load('entity_test_mulrev', $key+1);
+      $uuid = $entity->uuid();
 
-      $expected[] = array(
+      if ($key == 0) {
+        $entity->delete();
+        $this->testEntities['docs'][$key] = $entity;
+      }
+
+      $expected[$key] = array(
         'id' => array(
           array('value' => $key+1),
         ),
         'revision_id' => array(
-          array('value' => $key+1),
+          array('value' => $entity->revision_id->value),
         ),
         'uuid' => array(
-          array('value' => $this->testEntities['docs'][$key]->uuid()),
+          array('value' => $uuid),
         ),
         'langcode' => array(
           array('value' => 'en'),
@@ -71,10 +77,13 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
         'workspace' => array(
           array('target_id' => 'default')
         ),
-        '_id' => $entity->uuid(),
+        '_id' => 'entity_test_mulrev:' . $uuid,
         '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
-        '_deleted' => $entity->_deleted->first()->get('value')->getCastedValue(),
       );
+
+      if ($key == 0) {
+        $expected[$key]['_deleted'] = TRUE;
+      }
     }
 
     $normalized = $this->serializer->normalize($this->testEntities);
