@@ -97,7 +97,7 @@ class DocIdConverter implements ParamConverterInterface {
       }
       $revisions = array();
       foreach ($revision_ids as $revision_id) {
-        $revisions[] = $storage->loadRevision($revision_id);
+        $revisions[] = $storage->loadRevision($revision_id) ?: $storage->loadDeleted($entity_id);
       }
       return $revisions ?: $uuid;
     }
