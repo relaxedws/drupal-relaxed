@@ -186,7 +186,7 @@ class ResourceController implements ContainerAwareInterface {
       }
     }
 
-    return $response;
+    return ($format == 'mixed') ? $response : $responses[0];
   }
 
   /**

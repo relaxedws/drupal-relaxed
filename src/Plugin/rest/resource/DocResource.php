@@ -79,7 +79,13 @@ class DocResource extends ResourceBase {
 
     $parts = array();
     foreach ($revisions as $revision) {
-      $parts[] = new ResourceResponse($revision, 200, array('Content-Type' => 'application/json'));
+      $parts[] = new ResourceResponse(
+        $revision,
+        200,
+        array(
+          'X-Relaxed-ETag' => $revision->_revs_info->rev,
+        )
+      );
     }
 
     return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
