@@ -169,31 +169,18 @@ class ResourceController implements ContainerAwareInterface {
       ? 'stream'
       : 'json';
 
-    if ($response instanceof MultipartResponse) {
-      foreach ($response->getParts() as $response_part) {
-        try {
-          $response_data = $response_part->getResponseData();
-          $response_output = $this->serializer()->serialize($response_data, $response_format);
-          $response_part->setContent($response_output);
-        }
-        catch (\Exception $e) {
-          return $this->errorResponse($e);
-        }
+    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
+    foreach ($responses as $response_part) {
+      try {
+        $response_data = $response_part->getResponseData();
+        $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
+        $response_part->setContent($response_output);
       }
-    }
-    else {
-      $response_data = $response->getResponseData();
-      if ($response_data != NULL) {
-        try {
-          $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
-          $response->setContent($response_output);
-        }
-        catch (\Exception $e) {
-          return $this->errorResponse($e);
-        }
+      catch (\Exception $e) {
+        return $this->errorResponse($e);
       }
-      if (!$response->headers->get('Content-Type')) {
-        $response->headers->set('Content-Type', $this->request->getMimeType($response_format));
+      if (!$response_part->headers->get('Content-Type')) {
+        $response_part->headers->set('Content-Type', $this->request->getMimeType($response_format));
       }
     }
 
