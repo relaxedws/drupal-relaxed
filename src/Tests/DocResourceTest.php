@@ -137,9 +137,9 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   /**
-   * Tests multipart GET requests.
+   * Tests GET requests with multiple parts.
    */
-  public function testGetMixed() {
+  public function testGetOpenRevs() {
     $db = $this->workspace->id();
     $this->enableService('relaxed:doc', 'GET', 'mixed');
     $entity_types = array('entity_test_rev');
@@ -150,13 +150,12 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $expected = array();
       $entity = entity_create($entity_type);
       $entity->save();
 
       $entity->name = $this->randomMachineName();
       // Save an additional revision.
-      $entity->save();
+      //$entity->save();
 
       $open_revs = array();
       foreach ($entity->_revs_info as $item) {

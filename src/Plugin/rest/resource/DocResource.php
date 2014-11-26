@@ -76,18 +76,18 @@ class DocResource extends ResourceBase {
       }
     }
 
-    $parts = array();
-    foreach ($revisions as $revision) {
-      $parts[] = new ResourceResponse(
-        $revision,
-        200,
-        array(
-          'X-Relaxed-ETag' => $revision->_revs_info->rev,
-        )
-      );
+    if (is_array($existing)) {
+      $parts = array();
+      foreach ($revisions as $revision) {
+        $parts[] = new ResourceResponse($revision, 200);
+      }
+
+      // Multipart response.
+      return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
     }
 
-    return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
+    // Normal response.
+    return new ResourceResponse($revisions[0], 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
   }
 
   /**
