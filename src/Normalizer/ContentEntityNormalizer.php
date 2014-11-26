@@ -125,13 +125,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Resolve the UUID.
     // @todo Needs test
-    if (!empty($data['uuid'][0]['value']) && !empty($entity_id_from_data) && ($data['uuid'][0]['value'] != $entity_id_from_data)) {
+    if (!empty($data['uuid'][0]['value']) && !isset($entity_id_from_data) && ($data['uuid'][0]['value'] != $entity_id_from_data)) {
       throw new UnexpectedValueException('The uuid and _id values does not match.');
     }
     if (!empty($data['uuid'][0]['value'])) {
       $entity_uuid = $data['uuid'][0]['value'];
     }
-    elseif (isset($entity_id_info[0])) {
+    elseif (isset($entity_id_from_data)) {
       $entity_uuid = $data['uuid'][0]['value'] = $entity_id_from_data;
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
