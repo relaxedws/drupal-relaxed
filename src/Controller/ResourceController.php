@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -164,26 +165,27 @@ class ResourceController implements ContainerAwareInterface {
       return $this->errorResponse($e);
     }
 
-    // Default to plain text format in case there is no response data.
-    // It's only when doing GET on a stream we want to respond with the same.
-    // Fall back to JSON in all other cases.
     $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
       ? 'stream'
       : 'json';
 
-    $response_data = $response->getResponseData();
-    if ($response_data != NULL) {
+    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
+    foreach ($responses as $response_part) {
       try {
-        $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
-        $response->setContent($response_output);
+        $response_data = $response_part->getResponseData();
+        if ($response_data != NULL) {
+          $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
+          $response_part->setContent($response_output);
+        }
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
       }
+      if (!$response_part->headers->get('Content-Type')) {
+        $response_part->headers->set('Content-Type', $this->request->getMimeType($response_format));
+      }
     }
-    if (!$response->headers->get('Content-Type')) {
-      $response->headers->set('Content-Type', $this->request->getMimeType($response_format));
-    }
+
     return $response;
   }
 

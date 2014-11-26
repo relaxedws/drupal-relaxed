@@ -4,9 +4,9 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -75,11 +75,19 @@ class DocResource extends ResourceBase {
         }
       }
     }
-    // Decide if to return a single or multiple revisions.
-    $data = is_array($existing) ? $revisions : reset($revisions);
-    // @todo Create a event handler and override the ETag that's set by core.
-    // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse($data, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
+
+    if (is_array($existing)) {
+      $parts = array();
+      foreach ($revisions as $revision) {
+        $parts[] = new ResourceResponse($revision, 200);
+      }
+
+      // Multipart response.
+      return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
+    }
+
+    // Normal response.
+    return new ResourceResponse($revisions[0], 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
   }
 
   /**

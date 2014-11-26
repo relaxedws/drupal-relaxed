@@ -3,6 +3,8 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
+use GuzzleHttp\Stream\Stream;
 
 /**
  * Tests the /db/doc resource.
@@ -70,6 +72,9 @@ class DocResourceTest extends ResourceTestBase {
     }
   }
 
+  /**
+   * Tests non-multipart GET requests.
+   */
   public function testGet() {
     $db = $this->workspace->id();
 
@@ -106,13 +111,6 @@ class DocResourceTest extends ResourceTestBase {
       // Save an additional revision.
       $entity->save();
 
-      $open_revs = array();
-      foreach ($entity->_revs_info as $item) {
-        $open_revs[] = $item->rev;
-      }
-      $open_revs_string = '[' . implode(',', $open_revs) . ']';
-      $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('open_revs' => $open_revs_string));
-
       // Test the response for a fake revision.
       $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('rev' => '11112222333344445555'));
       $this->assertResponse('404', 'HTTP response code is correct.');
@@ -135,6 +133,60 @@ class DocResourceTest extends ResourceTestBase {
       // Test the response for a fake revision using if-none-match header.
       $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, array('if-none-match' => '11112222333344445555'));
       $this->assertResponse('404', 'HTTP response code is correct.');
+    }
+  }
+
+  /**
+   * Tests GET requests with multiple parts.
+   */
+  public function testGetOpenRevs() {
+    $db = $this->workspace->id();
+    $this->enableService('relaxed:doc', 'GET', 'mixed');
+    $entity_types = array('entity_test_rev');
+    foreach ($entity_types as $entity_type) {
+      // Create a user with the correct permissions.
+      $permissions = $this->entityPermissions($entity_type, 'view');
+      $permissions[] = 'restful get relaxed:doc';
+      $account = $this->drupalCreateUser($permissions);
+      $this->drupalLogin($account);
+
+      $entity = entity_create($entity_type);
+      $entity->save();
+
+      $entity->name = $this->randomMachineName();
+      // Save an additional revision.
+      //$entity->save();
+
+      $open_revs = array();
+      foreach ($entity->_revs_info as $item) {
+        $open_revs[] = $item->rev;
+      }
+      $open_revs_string = json_encode($open_revs);
+      $response = $this->httpRequest(
+        "$db/" . $entity->uuid(),
+        'GET',
+        NULL,
+        'multipart/mixed',
+        NULL,
+        array('open_revs' => $open_revs_string)
+      );
+
+      $stream = Stream::factory($response);
+      $parts = MultipartResponse::parseMultipartBody($stream);
+      $this->assertResponse('200', 'HTTP response code is correct.');
+
+      $data = array();
+      foreach ($parts as $part) {
+        $data[] = Json::decode($part['body']);
+      }
+
+      $correct_data = TRUE;
+      foreach ($open_revs as $key => $rev) {
+        if (isset($data[$key]['_rev']) && $data[$key]['_rev'] != $rev) {
+          $correct_data = FALSE;
+        }
+      }
+      $this->assertTrue($correct_data, 'Response contains correct revisions.');
     }
   }
 

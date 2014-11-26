@@ -1,1 +1,125 @@
 api_root: "/relaxed"
+
+resources:
+  'relaxed:db':
+    HEAD:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    PUT:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    DELETE:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+  'relaxed:attachment':
+    HEAD:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    PUT:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    DELETE:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+  'relaxed:bulk_docs':
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+  'relaxed:changes':
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+  'relaxed:doc':
+    HEAD:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    GET:
+      supported_formats:
+        - json
+        - mixed
+      supported_auth:
+        - cookie
+        - basic_auth
+    PUT:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    DELETE:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+  'relaxed:revs_diff':
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+  'relaxed:local:doc':
+    HEAD:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    PUT:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth

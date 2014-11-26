@@ -16,6 +16,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
    * Our API is rather static so this doesn't need to be dynamic.
    */
   public function routes() {
+    $this->serializerFormats[] = 'mixed';
     $collection = new RouteCollection();
     $definition = $this->getPluginDefinition();
     $api_root = trim(\Drupal::config('relaxed.settings')->get('api_root'), '/');
