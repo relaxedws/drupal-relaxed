@@ -93,12 +93,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       unset($data['_deleted']);
     }
 
-    if (isset($data['_workspace'])) {
-      // Use the 'workspace' without underscore because the underscore is
-      // a reserved prefix in CouchDB.
-      $data['workspace'] = $data['_workspace'];
-      unset($data['_workspace']);
-    }
     return $data;
   }
 
