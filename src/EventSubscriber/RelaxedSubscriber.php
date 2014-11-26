@@ -12,7 +12,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Subscribes to the kernel request event to add the 'multipart/mixed' media type.
+ * Subscribes to the kernel request event to add the 'multipart/mixed' media type,
+ * otherwise the route with 'mixed' format will not be defined.
+ * @see Drupal\Core\Routing\AcceptHeaderMatcher::filter()
  *
  * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
  *   The event to process.
@@ -21,6 +23,8 @@ class RelaxedSubscriber implements EventSubscriberInterface {
 
   /**
    * Registers the 'mixed' format with the Request class.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    */
   public function onKernelRequest(GetResponseEvent $event) {
     $request = $event->getRequest();
