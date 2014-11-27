@@ -9,16 +9,23 @@ mysql:
   username: root
   encoding: utf8
 
-env:
-  - PATH=$PATH:/home/travis/.composer/vendor/bin
+services:
+  - couchdb
 
-before_install:
-  # Update Composer so that the Drush installation doesn't fail.
-  - composer selfupdate
+env:
+  matrix:
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb.sh'
+
+matrix:
+  allow_failures:
+    - env: SCRIPT='modules/relaxed/tests/bin/couchdb.sh'
+  fast_finish: true
 
 install:
   # Install Apache.
-  - sudo apt-get install apache2 libapache2-mod-fastcgi
+  - sudo apt-get install apache2 libapache2-mod-fastcgi apache2-utils
+  - sudo a2enmod log_forensic
 
   # Set up PHP-FPM.
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
@@ -32,6 +39,8 @@ install:
   - sudo service apache2 restart
 
   # Install Drush.
+  - export PATH=$PATH:/home/travis/.composer/vendor/bin
+  - composer selfupdate
   - composer global require drush/drush:7.0.0-alpha5
 
 before_script:
@@ -43,18 +52,8 @@ before_script:
 
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/drupal minimal
-
-  # Enable required modules and ignore any output to not break the test.
-  - drush --yes pm-enable key_value, multiversion, relaxed || true
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal minimal
 
 script:
-  # Enable Simpletest and run Simpletest tests.
-  - drush en --yes simpletest
-  - drush cr
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://localhost "relaxed" | tee /tmp/test.txt ; export TEST_EXIT=${PIPESTATUS[0]}
-  # Simpletest does not exit with code 0 on success, so we will need to analyze
-  # the output to ascertain whether the tests passed.
-  - TEST_SIMPLETEST=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
-  - if [ $TEST_EXIT -eq 0 ] && [ $TEST_SIMPLETEST -eq 0 ]; then exit 0; else exit 1; fi
+  - bash $SCRIPT
