@@ -7,8 +7,6 @@
 
 namespace Drupal\relaxed_test\Entity;
 
-use Drupal\entity_test\Entity\EntityTestRev;
-
 /**
  * Defines the test entity class.
  *
@@ -29,4 +27,4 @@ use Drupal\entity_test\Entity\EntityTestRev;
  *   local = TRUE,
  * )
  */
-class EntityTestLocal extends EntityTestRev { }
+class EntityTestLocal extends EntityTestRelaxed { }

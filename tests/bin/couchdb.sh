@@ -3,7 +3,7 @@
 set -ev
 
 # Enable dependencies.
-git clone --branch master https://github.com/dickolsson/drupal-relaxed_test.git $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
+mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
 drush en --yes relaxed_test || true
 
 # Create a target database and do the replication.

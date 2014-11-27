@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function relaxed_test_install() {
+  $entity_types = array('entity_test');
+  foreach ($entity_types as $entity_type) {
+    // Auto-create fields for testing.
+    entity_create('field_storage_config', array(
+        'entity_type' => $entity_type,
+        'field_name' => 'field_test_text',
+        'type' => 'text',
+        'cardinality' => 1,
+      ))->save();
+    entity_create('field_config', array(
+        'entity_type' => $entity_type,
+        'field_name' => 'field_test_text',
+        'bundle' => $entity_type,
+        'label' => 'Test text-field',
+        'translatable' => FALSE,
+      ))->save();
+  }
+
+  //Create content for testing.
+  foreach ($entity_types as $entity_type) {
+    $entities_number = 10;
+    while ($entities_number > 0) {
+      $entity = entity_create($entity_type);
+      $entity->save();
+      $entity->name = 'Entity name ' . $entity->id();
+      if ($entities_number % 2 == 0) {
+        $entity->delete();
+      }
+      $entity->save();
+      $entities_number--;
+    }
+  }
+
+  $permissions = \Drupal::service('user.permissions')->getPermissions();
+  if (!empty($permissions)) {
+    user_role_grant_permissions('authenticated', array_keys($permissions));
+  }
+}
+
