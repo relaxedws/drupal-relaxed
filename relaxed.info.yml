@@ -8,3 +8,4 @@ dependencies:
   - rest
   - serialization
   - multiversion
+  - basic_auth
