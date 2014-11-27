@@ -3,7 +3,7 @@
 set -ev
 
 # Enable dependencies.
-mv $TRAVIS_BUILD_DIR/../drupal/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
+mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
 mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
 drush en --yes entity_test, relaxed_test || true
 
