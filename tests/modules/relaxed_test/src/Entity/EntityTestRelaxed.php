@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\entity_test\Entity\EntityTest.
+ * Contains \Drupal\relaxed_test\Entity\EntityTest.
  */
 
 namespace Drupal\relaxed_test\Entity;
@@ -22,6 +22,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Test entity"),
  *   handlers = {
  *     "storage" = "Drupal\multiversion\Entity\Storage\Sql\ContentEntityStorage",
+ *     "access" = "Drupal\relaxed_test\RelaxedTestAccessControlHandler",
  *   },
  *   base_table = "entity_test_relaxed",
  *   persistent_cache = FALSE,

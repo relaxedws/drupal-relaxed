@@ -65,7 +65,7 @@ class DocResource extends ResourceBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : array($existing);
 
-    /*foreach ($revisions as $revision) {
+    foreach ($revisions as $revision) {
       if (!$revision->access('view')) {
         throw new AccessDeniedHttpException();
       }
@@ -74,7 +74,7 @@ class DocResource extends ResourceBase {
           unset($revision->{$field_name});
         }
       }
-    }*/
+    }
 
     if (is_array($existing)) {
       $parts = array();

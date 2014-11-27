@@ -39,7 +39,9 @@ function relaxed_test_install() {
 
   $permissions = \Drupal::service('user.permissions')->getPermissions();
   if (!empty($permissions)) {
-    user_role_grant_permissions('authenticated', array_keys($permissions));
+    $permissions = array_keys($permissions);
   }
+  $permissions[] = 'view entity_test_relaxed entity';
+  user_role_grant_permissions('authenticated', $permissions);
 }
 
