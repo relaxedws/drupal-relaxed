@@ -13,6 +13,9 @@ namespace Drupal\relaxed_test\Entity;
  * @ContentEntityType(
  *   id = "entity_test_local",
  *   label = @Translation("Test entity - local"),
+ *   handlers = {
+ *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",
+ *   },
  *   base_table = "entity_test_local",
  *   persistent_cache = FALSE,
  *   entity_keys = {
