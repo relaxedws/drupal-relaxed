@@ -4,7 +4,7 @@
  * Implements hook_install().
  */
 function relaxed_test_install() {
-  $entity_types = array('entity_test_relaxed');
+  $entity_types = array('entity_test_rev');
   foreach ($entity_types as $entity_type) {
     // Auto-create fields for testing.
     entity_create('field_storage_config', array(
@@ -41,7 +41,7 @@ function relaxed_test_install() {
   if (!empty($permissions)) {
     $permissions = array_keys($permissions);
   }
-  $permissions[] = 'view entity_test_relaxed entity';
+  $permissions[] = 'view test entity';
   user_role_grant_permissions('authenticated', $permissions);
 }
 
