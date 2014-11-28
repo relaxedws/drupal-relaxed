@@ -43,7 +43,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $data['_id'] = $entity->uuid();
     }
     $entity_type = $context['entity_type'] = $entity->getEntityTypeId();
-    $data['_id'] = "$entity_type:" . $data['_id'];
+    $data['_id'] = "$entity_type." . $data['_id'];
 
     // New or mocked entities might not have a rev yet.
     if (!empty($entity->_revs_info->rev)) {
@@ -106,7 +106,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Get the entity type and the entity id from $data['_id'] string.
     if (!empty($data['_id'])) {
-      list($entity_type_from_data, $entity_id_from_data) = explode(':', $data['_id']);
+      list($entity_type_from_data, $entity_id_from_data) = explode('.', $data['_id']);
     }
 
     // Look for the entity type ID.
