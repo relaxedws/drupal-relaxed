@@ -194,7 +194,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
       'workspace' => array(
         array('target_id' => 'default')
       ),
-      '_id' => 'entity_test_mulrev:' . $entity->uuid(),
+      '_id' => 'entity_test_mulrev.' . $entity->uuid(),
       '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
     );
 
