@@ -189,7 +189,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if (isset($data['_rev']) && isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
       $parts = explode('-', $data['_rev']);
       if ($parts[0] == $data['_revisions']['start'] && in_array($parts[1], $data['_revisions']['ids'])) {
-        $data['_revs_info'][0]['rev'] = $parts[1];
+        $data['_revs_info'][0]['rev'] = $data['_rev'];
       }
     }
 
