@@ -34,12 +34,12 @@ curl -X GET http://admin:admin@localhost/relaxed/default
 nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://admin:admin@localhost/relaxed/default"}' http://localhost:5984/_replicate &
 sleep 300
 
+curl -X GET http://admin:admin@localhost/relaxed/default/1111b3b1-6d76-4813-9e12-18d4e91e1111
+curl -X GET http://admin:admin@localhost/relaxed/default/2222b3b1-6d76-4813-9e12-18d4e91e2222
+curl -X GET http://admin:admin@localhost/relaxed/default/3333b3b1-6d76-4813-9e12-18d4e91e3333
+
 # Output information from couch.log.
 sudo cat /var/log/couchdb/couch.log
 
 # Output information from forensic.log.
 sudo cat /var/log/apache2/forensic.log
-
-curl -X GET http://admin:admin@localhost/relaxed/default/1111b3b1-6d76-4813-9e12-18d4e91e1111
-curl -X GET http://admin:admin@localhost/relaxed/default/2222b3b1-6d76-4813-9e12-18d4e91e2222
-curl -X GET http://admin:admin@localhost/relaxed/default/3333b3b1-6d76-4813-9e12-18d4e91e3333
