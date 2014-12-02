@@ -58,6 +58,6 @@ function relaxed_entity_delete(EntityInterface $entity) {
  */
 function relaxed_entity_create_access(AccountInterface $account, array $context, $entity_bundle) {
   if ($entity_bundle == 'replication_log') {
-    return AccessResult::allowedIfHasPermission($account, 'restful get relaxed:local:doc');
+    return AccessResult::allowedIfHasPermission($account, 'restful put relaxed:local:doc');
   }
 }
