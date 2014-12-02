@@ -40,6 +40,6 @@ sudo cat /var/log/couchdb/couch.log
 # Output information from forensic.log.
 sudo cat /var/log/apache2/forensic.log
 
-curl -X GET http://admin:admin@localhost/relaxed/default/1c74b3b1-6d76-4813-9e12-18d4e91e1111
-curl -X GET http://admin:admin@localhost/relaxed/default/1c74b3b1-6d76-4813-9e12-18d4e91e2222
-curl -X GET http://admin:admin@localhost/relaxed/default/1c74b3b1-6d76-4813-9e12-18d4e91e3333
+curl -X GET http://admin:admin@localhost/relaxed/default/1111b3b1-6d76-4813-9e12-18d4e91e1111
+curl -X GET http://admin:admin@localhost/relaxed/default/2222b3b1-6d76-4813-9e12-18d4e91e2222
+curl -X GET http://admin:admin@localhost/relaxed/default/3333b3b1-6d76-4813-9e12-18d4e91e3333
