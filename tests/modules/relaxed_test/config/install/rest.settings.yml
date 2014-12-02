@@ -127,9 +127,18 @@ resources:
         - json
       supported_auth:
         - cookie
+        - basic_auth
   'relaxed:session':
     GET:
       supported_formats:
         - json
       supported_auth:
         - cookie
+        - basic_auth
+  'relaxed:ensure_full_commit':
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth

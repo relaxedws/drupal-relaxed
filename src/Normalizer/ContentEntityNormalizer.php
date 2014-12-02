@@ -105,8 +105,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_id = NULL;
 
     // Get the entity type and the entity id from $data['_id'] string.
-    if (!empty($data['_id'])) {
+    if (!empty($data['_id']) && strpos($data['_id'], '.') !== false) {
       list($entity_type_from_data, $entity_id_from_data) = explode('.', $data['_id']);
+    }
+    elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== false) {
+      list($entity_type_from_data, $entity_id_from_data) = explode('/', $data['_id']);
+      if ($entity_type_from_data == '_local' && $entity_id_from_data) {
+        $entity_type_from_data = 'replication_log';
+      }
     }
 
     // Look for the entity type ID.
@@ -180,7 +186,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_attachments') as $key) {
+    foreach (array('_id', '_rev', '_attachments', '_revisions') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
@@ -192,8 +198,16 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if ($entity_id) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
-      foreach ($data as $name => $value) {
-        $entity->{$name} = $value;
+      if ($entity) {
+        foreach ($data as $name => $value) {
+          $entity->{$name} = $value;
+        }
+      }
+      elseif (isset($data['id'])) {
+        unset($data['id']);
+        $entity_id = NULL;
+        /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+        $entity = $storage->save($data);
       }
     }
     else {
