@@ -52,12 +52,3 @@ function relaxed_entity_delete(EntityInterface $entity) {
     }
   }
 }
-
-/**
- *  Implements hook_entity_create_access().
- */
-function relaxed_entity_create_access(AccountInterface $account, array $context, $entity_bundle) {
-  if ($entity_bundle == 'replication_log') {
-    return AccessResult::allowedIfHasPermission($account, 'restful put relaxed:local:doc');
-  }
-}

@@ -16,6 +16,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  *   label = @Translation("Replication log"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\SqlContentEntityStorage",
+ *     "access" = "Drupal\relaxed\Entity\ReplicationLogAccessControlHandler",
  *   },
  *   base_table = "replication_log",
  *   revision_table = "replication_log_revision",
