@@ -103,14 +103,14 @@ class DocResource extends ResourceBase {
     }
 
     // Check entity and field level access.
-    /*if (!$received_entity->access('create')) {
+    if (!$received_entity->access('create')) {
       throw new AccessDeniedHttpException();
     }
     foreach ($received_entity as $field_name => $field) {
       if (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
-    }*/
+    }
 
     // @todo Ensure that $received_entity is being saved with the UUID from $existing_entity
 

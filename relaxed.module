@@ -1,6 +1,8 @@
 <?php
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -48,5 +50,14 @@ function relaxed_entity_delete(EntityInterface $entity) {
     catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
     }
+  }
+}
+
+/**
+ *  Implements hook_entity_create_access().
+ */
+function relaxed_entity_create_access(AccountInterface $account, array $context, $entity_bundle) {
+  if ($entity_bundle == 'replication_log') {
+    return AccessResult::allowedIfHasPermission($account, 'restful get relaxed:local:doc');
   }
 }
