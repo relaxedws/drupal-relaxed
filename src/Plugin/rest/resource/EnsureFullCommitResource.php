@@ -11,6 +11,10 @@ use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
+ * This resource does not do anything since Drupal does not (yet) have a concept
+ * of transactions across multiple requests. This resource only exists to comply
+ * with the replication protocol.
+ *
  * @RestResource(
  *   id = "relaxed:ensure_full_commit",
  *   label = "Ensure Full Commit",
