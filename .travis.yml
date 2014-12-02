@@ -15,13 +15,13 @@ services:
 env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/drupal_to_couchdb.sh'
-    - SCRIPT='modules/relaxed/tests/bin/couchdb_to_drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
 
 matrix:
   allow_failures:
-    - env: SCRIPT='modules/relaxed/tests/bin/drupal_to_couchdb.sh'
-    - env: SCRIPT='modules/relaxed/tests/bin/couchdb_to_drupal.sh'
+    - env: SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - env: SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
   fast_finish: true
 
 install:
