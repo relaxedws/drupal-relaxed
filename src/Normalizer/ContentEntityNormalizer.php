@@ -185,6 +185,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // Add _rev_info field info to the $data array.
+    if (isset($data['_rev']) && isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
+      $parts = explode('-', $data['_rev']);
+      if ($parts[0] == $data['_revisions']['start'] && in_array($parts[1], $data['_revisions']['ids'])) {
+        $data['_revs_info'][0]['rev'] = $parts[1];
+      }
+    }
+
     // Clean-up attributes we don't needs anymore.
     foreach (array('_id', '_rev', '_attachments', '_revisions') as $key) {
       if (isset($data[$key])) {
