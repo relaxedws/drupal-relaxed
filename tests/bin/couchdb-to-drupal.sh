@@ -34,12 +34,8 @@ curl -X GET http://admin:admin@localhost/relaxed/default
 nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://admin:admin@localhost/relaxed/default"}' http://localhost:5984/_replicate &
 sleep 300
 
-curl -X GET http://admin:admin@localhost/relaxed/default/1111b3b1-6d76-4813-9e12-18d4e91e1111
-curl -X GET http://admin:admin@localhost/relaxed/default/2222b3b1-6d76-4813-9e12-18d4e91e2222
-curl -X GET http://admin:admin@localhost/relaxed/default/3333b3b1-6d76-4813-9e12-18d4e91e3333
+curl -X GET http://admin:admin@localhost/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
-# Output information from couch.log.
-sudo cat /var/log/couchdb/couch.log
-
-# Output information from forensic.log.
-sudo cat /var/log/apache2/forensic.log
+# Analyze the output to ascertain the right revisions got replicated.
+ALL_DOCS=$(egrep -c "(2-53af89597b78f87defb3fd9c6845072a)|(3-a751de6677a6196258905cb60851ce0f)|(4-d3b3807b37e52224a8833feab50d8af6)" /tmp/all_docs.txt > /dev/null)$?
+if [ $ALL_DOCS -eq 3 ]; then exit 0; else exit 1; fi
