@@ -16,5 +16,5 @@ sleep 300
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
 # Analyze the output to ascertain the right revisions got replicated.
-ALL_DOCS=$(egrep -c "(\"total_rows\"\:10)|(2-)|(1-)" /tmp/all_docs.txt)
-if [ $ALL_DOCS -eq 11 ]; then exit 0; else exit 1; fi
+ALL_DOCS=$(egrep -c "(\"total_rows\"\:10)" /tmp/all_docs.txt)
+if [ $ALL_DOCS -eq 10 ]; then exit 0; else exit 1; fi

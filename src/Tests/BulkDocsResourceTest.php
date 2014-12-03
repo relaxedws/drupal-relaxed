@@ -5,7 +5,7 @@ namespace Drupal\relaxed\Tests;
 use Drupal\Component\Serialization\Json;
 
 /**
- * Tests the /db/all-docs resource.
+ * Tests the /db/_bulk_docs resource.
  *
  * @group relaxed
  */

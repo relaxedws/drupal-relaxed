@@ -143,7 +143,7 @@ class ResourceController implements ContainerAwareInterface {
     $content = $this->request->getContent();
     // @todo Check if it's safe to pass all query parameters like this.
     $query = $this->request->query->all();
-    $context = array('query' => $query);
+    $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
     $entity = NULL;
     if (!empty($content)) {
       try {

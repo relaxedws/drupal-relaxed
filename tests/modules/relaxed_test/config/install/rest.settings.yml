@@ -142,3 +142,10 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+  'relaxed:all_docs':
+    GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth

@@ -37,5 +37,5 @@ sleep 300
 curl -X GET http://admin:admin@localhost/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
 # Analyze the output to ascertain the right revisions got replicated.
-ALL_DOCS=$(egrep -c "(2-53af89597b78f87defb3fd9c6845072a)|(3-a751de6677a6196258905cb60851ce0f)|(4-d3b3807b37e52224a8833feab50d8af6)" /tmp/all_docs.txt)
+ALL_DOCS=$(egrep -c "(\"total_rows\"\:3)" /tmp/all_docs.txt)
 if [ $ALL_DOCS -eq 3 ]; then exit 0; else exit 1; fi

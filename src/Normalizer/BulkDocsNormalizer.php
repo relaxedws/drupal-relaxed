@@ -21,6 +21,9 @@ class BulkDocsNormalizer extends ContentEntityNormalizer {
         $result['docs'][] = parent::normalize($field, $format, $context);
       }
     }
+    elseif (isset($context['resource_id']) && $context['resource_id'] == 'relaxed:all_docs') {
+      return \Drupal::service('relaxed.normalizer.all_docs')->normalize($data, $format, $context);
+    }
     else {
       return parent::normalize($data, $format, $context);
     }
