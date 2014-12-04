@@ -42,4 +42,4 @@ curl -X GET http://admin:admin@localhost/relaxed/target/_all_docs | tee /tmp/all
 # Analyze the output to ascertain the right revisions got replicated.
 # Should be 4 entities: 3 - entity_test and 1 - replication_log.
 ALL_DOCS=$(egrep -c "(\"total_rows\"\:4)" /tmp/all_docs.txt)
-if [ $ALL_DOCS -eq 4 ]; then exit 0; else exit 1; fi
+if [ $ALL_DOCS -eq 1 ]; then exit 0; else exit 1; fi
