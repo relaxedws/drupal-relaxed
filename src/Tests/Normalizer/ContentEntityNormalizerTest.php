@@ -92,6 +92,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
       $this->assertEqual($expected[$key], $normalized[$key], "Field $key is normalized correctly.");
       $this->assertTrue($expected[$key] === $normalized[$key], "Correct data type for the $key field.");
     }
+    $this->assertTrue($expected['_revisions']['start'] === $normalized['_revisions']['start'], "Correct data type for the start field.");
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
 
     // @todo Test context switches.
