@@ -15,4 +15,3 @@ function relaxed_test_install() {
   $permissions[] = 'view test entity';
   user_role_grant_permissions('authenticated', $permissions);
 }
-

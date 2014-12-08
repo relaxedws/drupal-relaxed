@@ -33,25 +33,23 @@ class AllDocsResourceTest extends ResourceTestBase {
       $entities[1] = entity_create($entity_type);
       $entities[1]->save();
 
+      $rows = array();
+      foreach ($entities as $entity) {
+        $uuid = $entity->uuid();
+        $entity_type_id = $entity->getEntityTypeId();
+        $rows[] = array(
+          'id' => "$entity_type_id.$uuid",
+          'key' => "$entity_type_id.$uuid",
+          'value' => array(
+            'rev' => $entity->_revs_info->rev,
+          ),
+        );
+      }
+
       $expected = array(
         'total_rows' => 2,
         'offset' => 0,
-        'rows' => array(
-          array(
-            'id' => $entities[0]->uuid(),
-            'key' => $entities[0]->uuid(),
-            'value' => array(
-              'rev' => $entities[0]->_revs_info->rev,
-            ),
-          ),
-          array(
-            'id' => $entities[1]->uuid(),
-            'key' => $entities[1]->uuid(),
-            'value' => array(
-              'rev' => $entities[1]->_revs_info->rev,
-            ),
-          ),
-        ),
+        'rows' => $rows,
       );
 
       $db = $this->workspace->id();
