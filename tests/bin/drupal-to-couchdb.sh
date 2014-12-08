@@ -12,7 +12,7 @@ while read document
 do
   curl -X POST \
        -H "Content-Type: application/json" \
-       -d $document \
+       -d "$document" \
        admin:admin@localhost/relaxed/default
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 

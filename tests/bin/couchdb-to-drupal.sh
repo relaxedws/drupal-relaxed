@@ -15,7 +15,7 @@ while read document
 do
   curl -X POST \
        -H "Content-Type: application/json" \
-       -d $document \
+       -d "$document" \
        localhost:5984/source
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 

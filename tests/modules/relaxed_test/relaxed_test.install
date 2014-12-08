@@ -7,22 +7,7 @@ function relaxed_test_install() {
   // Apply updates.
   \Drupal::service('entity.definition_update_manager')->applyUpdates();
 
-  $entity_types = array('entity_test_rev');
-  //Create content for testing.
-  foreach ($entity_types as $entity_type) {
-    $entities_number = 10;
-    while ($entities_number > 0) {
-      $entity = entity_create($entity_type);
-      $entity->save();
-      $entity->name = 'Entity name ' . $entity->id();
-      if ($entities_number % 2 == 0) {
-        $entity->delete();
-      }
-      $entity->save();
-      $entities_number--;
-    }
-  }
-
+  // Set permissions.
   $permissions = \Drupal::service('user.permissions')->getPermissions();
   if (!empty($permissions)) {
     $permissions = array_keys($permissions);
