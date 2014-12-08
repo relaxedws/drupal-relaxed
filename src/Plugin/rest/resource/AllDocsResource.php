@@ -34,7 +34,7 @@ class AllDocsResource extends ResourceBase {
     $multiversion_manager = \Drupal::service('multiversion.manager');
     $entity_types = \Drupal::service('entity.manager')->getDefinitions();
     foreach ($entity_types as $entity_type) {
-      if ($multiversion_manager->isSupportedEntityType($entity_type)) {
+      if ($multiversion_manager->isSupportedEntityType($entity_type) && !$entity_type->get('local')) {
         $entities = entity_load_multiple_by_properties($entity_type->id(), array('workspace' => $db));
         $docs = array_merge($docs, $entities);
       }

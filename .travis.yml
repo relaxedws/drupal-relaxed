@@ -18,12 +18,6 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
 
-matrix:
-  allow_failures:
-    - env: SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
-    - env: SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
-  fast_finish: true
-
 install:
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi apache2-utils
