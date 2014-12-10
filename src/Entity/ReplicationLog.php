@@ -51,7 +51,6 @@ class ReplicationLog extends ContentEntityBase implements ReplicationLogInterfac
       ->setLabel(t('Replication log history'))
       ->setDescription(t('The version id of the test entity.'))
       ->setReadOnly(TRUE)
-      ->setRequired(TRUE)
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     $fields['session_id'] = BaseFieldDefinition::create('uuid')
@@ -62,7 +61,6 @@ class ReplicationLog extends ContentEntityBase implements ReplicationLogInterfac
     $fields['source_last_seq'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Last processed checkpoint'))
       ->setDescription(t('The last processed checkpoint. Shortcut to the source_last_seq in the last history item.'))
-      ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
     return $fields;
