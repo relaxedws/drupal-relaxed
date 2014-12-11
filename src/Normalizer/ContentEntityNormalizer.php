@@ -105,7 +105,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_id = NULL;
 
     // Get the entity type and the entity id from $data['_id'] string.
-    if (!empty($data['_id']) && strpos($data['_id'], '.') !== FALSE) {
+    if (!empty($data['_id']) && strpos($data['_id'], '_local') !== FALSE) {
       list($entity_type_from_data, $entity_id_from_data) = explode('.', $data['_id']);
     }
     elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
