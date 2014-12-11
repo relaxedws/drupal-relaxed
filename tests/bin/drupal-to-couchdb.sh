@@ -13,8 +13,8 @@ do
   curl -X POST \
        -H "Content-Type: application/json" \
        -d "$document" \
-       admin:andre1@drupal8dev.loc/relaxed/default
-done < tests/fixtures/documents.txt
+       admin:admin@localhost/relaxed/default
+done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 
 # Create a target database and do the replication.
 curl -X PUT localhost:5984/target
