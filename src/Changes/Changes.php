@@ -43,11 +43,11 @@ class Changes implements ChangesInterface {
 
     // Format the result array.
     $result = array();
-    $last_seq_number = count($changes);
-    if ($last_seq_number > 0) {
-      $result['last_seq'] = $last_seq_number - 1;
-    }
-    foreach ($changes as $seq => $change) {
+    $seq = 0;
+    foreach ($changes as $change) {
+      if (isset($change['local']) && $change['local'] == TRUE) {
+        continue;
+      }
       $change_result = array(
         'changes' => array(
           array('rev' => $change['rev']),
@@ -55,10 +55,15 @@ class Changes implements ChangesInterface {
         'id' => $change['entity_uuid'],
         'seq' => $seq,
       );
+      $seq++;
       if ($change['deleted']) {
         $change_result['deleted'] = TRUE;
       }
       $result['results'][] = $change_result;
+    }
+    $last_seq_number = count($result['results']);
+    if ($last_seq_number > 0) {
+      $result['last_seq'] = $last_seq_number - 1;
     }
 
     return $result;
