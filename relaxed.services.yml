@@ -7,6 +7,10 @@ services:
     class: Drupal\relaxed\Encoder\StreamEncoder
     tags:
       - { name: encoder, format: base64_stream }
+  relaxed.normalizer.stdclass:
+    class: Drupal\relaxed\Normalizer\StdClassNormalizer
+    tags:
+        - { name: normalizer, priority: 10 }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
     arguments: ['@entity.manager', '@entity.index.uuid']

@@ -41,12 +41,11 @@ class BulkDocsResource extends ResourceBase {
       $this->validate($entity);
       try {
         $entity->save();
-        $rev = $entity->_revs_info->rev;
-        $result[] = array(
-          'ok' => TRUE,
-          'id' => $entity->uuid(),
-          'rev' => $rev
-        );
+        $object = new \stdClass();
+        $object->ok = TRUE;
+        $object->id = $entity->uuid();
+        $object->rev = $entity->_revs_info->rev;
+        $result[] = $object;
       }
       catch (EntityStorageException $e) {
         throw new HttpException(500, NULL, $e);
