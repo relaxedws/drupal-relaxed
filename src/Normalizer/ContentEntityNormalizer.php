@@ -106,11 +106,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Get the entity type and the entity id from $data['_id'] string.
     if (!empty($data['_id']) && strpos($data['_id'], '.') !== FALSE && substr($data['_id'], 0, 6) != '_local') {
-      list($entity_type_from_data, $entity_id_from_data) = explode('.', $data['_id']);
+      list($entity_type_from_data, $entity_uuid_from_data) = explode('.', $data['_id']);
     }
     elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
-      list($entity_type_from_data, $entity_id_from_data) = explode('/', $data['_id']);
-      if ($entity_type_from_data == '_local' && $entity_id_from_data) {
+      list($entity_type_from_data, $entity_uuid_from_data) = explode('/', $data['_id']);
+      if ($entity_type_from_data == '_local' && $entity_uuid_from_data) {
         $entity_type_from_data = 'replication_log';
       }
     }
@@ -125,14 +125,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Resolve the UUID.
     // @todo Needs test
-    if (!empty($data['uuid'][0]['value']) && !isset($entity_id_from_data) && ($data['uuid'][0]['value'] != $entity_id_from_data)) {
+    if (!empty($data['uuid'][0]['value']) && !isset($entity_uuid_from_data) && ($data['uuid'][0]['value'] != $entity_uuid_from_data)) {
       throw new UnexpectedValueException('The uuid and _id values does not match.');
     }
     if (!empty($data['uuid'][0]['value'])) {
       $entity_uuid = $data['uuid'][0]['value'];
     }
-    elseif (isset($entity_id_from_data)) {
-      $entity_uuid = $data['uuid'][0]['value'] = $entity_id_from_data;
+    elseif (isset($entity_uuid_from_data)) {
+      $entity_uuid = $data['uuid'][0]['value'] = $entity_uuid_from_data;
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
@@ -193,7 +193,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
     elseif (isset($data['_rev']) && !isset($data['_revisions'])) {
-      $data['_revs_info'][0]['rev'] = $data['_rev'];
+      // This revision will be used when the entity does not have an id,
+      // but it has a revision.
+      $data_rev = $data['_rev'];
     }
 
     // Clean-up attributes we don't needs anymore.
@@ -222,6 +224,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
     else {
+      if (isset($data_rev)) {
+        $data['_revs_info'][0]['rev'] = $data_rev;
+      }
+
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       // @todo Use the passed $class to instantiate the entity.
       $entity = $storage->create($data);
