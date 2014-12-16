@@ -24,11 +24,6 @@ class ChangesTest extends ResourceTestBase {
     $revs = array();
     $entity = entity_create('entity_test_rev');
     $entity->save();
-    $revs[] = array(
-      'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
-    );
-
     // Update the field_test_text field.
     $entity->set(
       'field_test_text',
@@ -40,10 +35,6 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
-    $revs[] = array(
-      'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
-    );
 
     // Update the name filed.
     $entity->set(
@@ -56,10 +47,6 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
-    $revs[] = array(
-      'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
-    );
 
     // Update the name filed again.
     $entity->set(
@@ -80,10 +67,6 @@ class ChangesTest extends ResourceTestBase {
     // Create a new entity.
     $entity = entity_create('entity_test_rev');
     $entity->save();
-    $revs[] = array(
-      'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
-    );
 
     // Update the field_test_text field.
     $entity->set(
@@ -96,10 +79,6 @@ class ChangesTest extends ResourceTestBase {
       )
     );
     $entity->save();
-    $revs[] = array(
-      'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
-    );
 
     // Delete the entity.
     $entity->delete();
