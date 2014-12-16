@@ -133,7 +133,7 @@ class DbResource extends ResourceBase {
       return new ResourceResponse(array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev), 201, array('ETag' => $rev));
     }
     catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e->getMessage());
+      throw new HttpException(500, NULL, $e);
     }
   }
 
