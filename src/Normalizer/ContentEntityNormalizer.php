@@ -186,7 +186,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Add _rev_info field info to the $data array.
-    if (isset($data['_rev']) && isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
+    if (isset($data['_rev']) && isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])
+      && (isset($context['query']['revs_info']) || isset($context['query']['open_revs']))) {
       $parts = explode('-', $data['_rev']);
       if ($parts[0] == $data['_revisions']['start'] && in_array($parts[1], $data['_revisions']['ids'])) {
         $data['_revs_info'][0]['rev'] = $data['_rev'];
