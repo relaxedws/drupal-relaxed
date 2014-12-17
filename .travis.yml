@@ -21,7 +21,7 @@ env:
 
 matrix:
   allow_failures:
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
   fast_finish: true
 
 install:
