@@ -19,6 +19,11 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
 
+matrix:
+  allow_failures:
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+  fast_finish: true
+
 install:
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi apache2-utils
@@ -41,6 +46,7 @@ install:
   - composer global require drush/drush:7.0.0-alpha5
 
   # Install mocha-phantomjs, pouchdb and other dependences.
+  - cd $TRAVIS_BUILD_DIR/../drupal
   - npm install -g mocha-phantomjs
   - npm install chai
   - npm install es5-shim
