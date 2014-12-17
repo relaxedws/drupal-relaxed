@@ -2,6 +2,13 @@
 
 set -ev
 
+# Install mocha-phantomjs, pouchdb and other dependences.
+npm install -g mocha-phantomjs
+npm install chai
+npm install es5-shim
+npm install mocha
+npm install pouchdb
+
 mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
 mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
 mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/pouchdb/test.html $TRAVIS_BUILD_DIR/../drupal/test.html
