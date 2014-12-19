@@ -37,7 +37,7 @@ describe('Test replication', function () {
   it('Test basic pull replication', function (done) {
     var db = new PouchDB('drupal_to_pouch');
     var remote = new PouchDB('http://admin:admin@localhost/relaxed/default');
-    remote.bulkDocs({ docs: docs }, {}, function (err, results) {
+    //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
       db.replicate.from(remote, function (err, result) {
         result.ok.should.equal(true);
         result.docs_written.should.equal(docs.length);
@@ -48,6 +48,6 @@ describe('Test replication', function () {
           done();
         });
       });
-    });
+    //});
   });
 });
