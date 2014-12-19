@@ -193,9 +193,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         $data['_revs_info'][0]['rev'] = $data['_rev'];
       }
     }
-    elseif (isset($data['_rev']) && !isset($data['_revisions'])) {
-      // This revision will be used when the entity does not have an id,
-      // but it has a revision.
+
+    // This revision will be used when the entity does not have an id,
+    // it has a revision and it is new for the actual database.
+    if (isset($data['_rev'])) {
       $data_rev = $data['_rev'];
     }
 
@@ -218,6 +219,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         }
       }
       elseif (isset($data['id'])) {
+        if (isset($data_rev)) {
+          $data['_revs_info'][0]['rev'] = $data_rev;
+        }
+
         unset($data['id']);
         $entity_id = NULL;
         /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
