@@ -26,6 +26,10 @@ services:
     arguments: ['@entity.manager', '@entity.index.uuid']
     tags:
       - { name: normalizer, priority: 10 }
+  relaxed.normalizer.changes:
+    class: Drupal\relaxed\Normalizer\ChangesNormalizer
+    tags:
+      - { name: normalizer }
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
@@ -55,9 +59,6 @@ services:
   relaxed.revs_diff:
     class: Drupal\relaxed\RevisionDiff\RevisionDiff
     arguments: ['@entity.index.rev']
-  relaxed.changes:
-    class: Drupal\relaxed\Changes\Changes
-    arguments: ['@entity.index.sequence']
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev']
