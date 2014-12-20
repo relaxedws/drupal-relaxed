@@ -9,7 +9,7 @@ use Drupal\Component\Serialization\Json;
  *
  * @group relaxed
  */
-class ChangesTest extends ResourceTestBase {
+class ChangesResourceTest extends ResourceTestBase {
 
   public function testGet() {
     $db = $this->workspace->id();
