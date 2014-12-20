@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\relaxed\AllDocs\AllDocs;
 use Drupal\rest\ResourceResponse;
 
 /**
@@ -14,7 +15,7 @@ use Drupal\rest\ResourceResponse;
  *   id = "relaxed:all_docs",
  *   label = "All Docs",
  *   serialization_class = {
- *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
+ *     "canonical" = "Drupal\relaxed\AllDocs\AllDocs",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_all_docs",
@@ -29,22 +30,14 @@ class AllDocsResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace) {
-    $db = $workspace->id();
-    $docs = array();
-    $multiversion_manager = \Drupal::service('multiversion.manager');
-    $entity_types = \Drupal::service('entity.manager')->getDefinitions();
-    foreach ($entity_types as $entity_type) {
-      if ($multiversion_manager->isSupportedEntityType($entity_type) && !$entity_type->get('local')) {
-        $entities = entity_load_multiple_by_properties($entity_type->id(), array('workspace' => $db));
-        $docs = array_merge($docs, $entities);
-      }
-    }
-    $result = array(
-      'total_rows' => count($docs),
-      'offset' => 0,
-      'rows' => $docs,
+    // @todo: Inject the container without using deprecated method call.
+    $all_docs = AllDocs::createInstance(
+      \Drupal::getContainer(),
+      \Drupal::service('entity.manager'),
+      \Drupal::service('multiversion.manager'),
+      $workspace
     );
 
-    return new ResourceResponse($result, 200);
+    return new ResourceResponse($all_docs, 200);
   }
 }

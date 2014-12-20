@@ -7,6 +7,10 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\MultiversionManagerInterface;
+use Drupal\relaxed\AllDocs\AllDocs;
+
 /**
  * Tests the serialization format for AllDocsNormalizer.
  *
@@ -18,39 +22,52 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
+  /**
+   * @var \Drupal\Core\Entity\ContentEntityInterface[]
+   */
+  protected $entities = array();
+
   protected function setUp() {
     parent::setUp();
 
-    // Create a test entity to serialize.
-    $this->values = array(
-      'name' => $this->randomMachineName(),
-      'user_id' => 0,
-      'field_test_text' => array(
-        'value' => $this->randomMachineName(),
-        'format' => 'full_html',
-      ),
-    );
-
-    $this->entity = entity_create('entity_test_mulrev', $this->values);
-    $this->entity->save();
+    $this->entities = array();
+    for ($i = 0; $i < 3; $i++) {
+      $this->entities[$i] = entity_create('entity_test_mulrev');
+      $this->entities[$i]->save();
+    }
   }
 
   public function testNormalize() {
-    $uuid = $this->entity->uuid();
-    $entity_type_id = $this->entity->getEntityTypeId();
     $expected = array(
-      'id' => "$entity_type_id.$uuid",
-      'key' => "$entity_type_id.$uuid",
-      'value' => array(
-        'rev' => $this->entity->_revs_info->rev,
-      ),
+      'total_rows' => 3,
+      'offset' => 0,
+      'rows' => array()
     );
 
-    $normalized = \Drupal::service('relaxed.normalizer.all_docs')->normalize($this->entity);
+    foreach ($this->entities as $entity) {
+      $expected['rows'][] = array(
+        'id' => $entity->uuid(),
+        'key' => $entity->uuid(),
+        'value' => array(
+          'rev' => $entity->_revs_info->rev,
+        ),
+      );
+    }
+
+    /** @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager */
+    $workspace_manager = \Drupal::service('workspace.manager');
+
+    $all_docs = AllDocs::createInstance(
+      $this->container,
+      \Drupal::service('entity.manager'),
+      \Drupal::service('multiversion.manager'),
+      $workspace_manager->getActiveWorkspace()
+    );
+
+    $normalized = \Drupal::service('relaxed.normalizer.all_docs')->normalize($all_docs);
 
     foreach (array_keys($expected) as $key) {
       $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key.");
     }
-    $this->assertEqual($expected['value']['rev'], $normalized['value']['rev'], "Correct revision.");
   }
 }

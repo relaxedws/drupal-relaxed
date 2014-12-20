@@ -35,11 +35,9 @@ class AllDocsResourceTest extends ResourceTestBase {
 
       $rows = array();
       foreach ($entities as $entity) {
-        $uuid = $entity->uuid();
-        $entity_type_id = $entity->getEntityTypeId();
         $rows[] = array(
-          'id' => "$entity_type_id.$uuid",
-          'key' => "$entity_type_id.$uuid",
+          'id' => $entity->uuid(),
+          'key' => $entity->uuid(),
           'value' => array(
             'rev' => $entity->_revs_info->rev,
           ),
@@ -60,12 +58,6 @@ class AllDocsResourceTest extends ResourceTestBase {
 
       foreach (array_keys($data) as $key) {
         $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key.");
-      }
-
-      foreach ($expected['rows'] as $row_number => $row) {
-        foreach (array_keys($row) as $key) {
-          $this->assertEqual($expected['rows'][$row_number][$key], $data['rows'][$row_number][$key], "Correct value for $key key.");
-        }
       }
     }
   }

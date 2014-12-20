@@ -6,20 +6,29 @@ use Drupal\serialization\Normalizer\NormalizerBase;
 
 class AllDocsNormalizer extends NormalizerBase {
 
-  protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
+  protected $supportedInterfaceOrClass = array('Drupal\relaxed\AllDocs\AllDocsInterface');
 
   /**
    * {@inheritdoc}
    */
-  public function normalize($data, $format = NULL, array $context = array()) {
-    $uuid = $data->uuid();
-    $entity_type_id = $data->getEntityTypeId();
-    return array(
-      'id' => "$entity_type_id.$uuid",
-      'key' => "$entity_type_id.$uuid",
-      'value' => array(
-        'rev' => $data->_revs_info->rev,
-      ),
+  public function normalize($all_docs, $format = NULL, array $context = array()) {
+    $data = array(
+      'offset' => 0,
+      'rows' => array(),
     );
+
+    /** @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs */
+    $rows = $all_docs->execute();
+
+    foreach ($rows as $key => $value) {
+      $data['rows'][] = array(
+        'id' => $key,
+        'key' => $key,
+        'value' => $value
+      );
+    }
+
+    $data['total_rows'] = count($rows);
+    return $data;
   }
 }
