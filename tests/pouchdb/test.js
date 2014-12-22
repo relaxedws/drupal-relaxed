@@ -25,7 +25,6 @@ describe('Test replication', function () {
         result.ok.should.equal(true);
         result.docs_written.should.equal(docs.length);
         db.info(function (err, info) {
-          console.log(info);
           info.update_seq.should.equal(9);
           info.doc_count.should.equal(9);
           done();
@@ -40,9 +39,7 @@ describe('Test replication', function () {
     //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
       db.replicate.from(remote, function (err, result) {
         result.ok.should.equal(true);
-        result.docs_written.should.equal(docs.length);
         db.info(function (err, info) {
-          console.log(info);
           info.update_seq.should.equal(9, 'update_seq');
           info.doc_count.should.equal(9, 'doc_count');
           done();
