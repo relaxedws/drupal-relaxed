@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 interface AllDocsInterface {
 
   /**
+   * Factory method.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    * @param \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager

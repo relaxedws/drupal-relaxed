@@ -141,6 +141,9 @@ class AllDocs implements AllDocsInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Move any logic around 'includeDocs' and the serialization format into
+   *   the serializer to better separate concerns.
    */
   public function execute() {
     $rows = array();

@@ -14,6 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 interface ChangesInterface {
 
   /**
+   * Factory method.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @param \Drupal\multiversion\Entity\Index\SequenceIndexInterface $sequence_index
    * @return \Drupal\relaxed\Changes\ChangesInterface

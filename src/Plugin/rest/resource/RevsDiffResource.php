@@ -20,8 +20,7 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
  *   id = "relaxed:revs_diff",
  *   label = "Revisions diff",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
- *     "post" = "Drupal\relaxed\RevisionDiff\RevisionDiffInterface",
+ *     "canonical" = "Drupal\relaxed\RevisionDiff\RevisionDiff",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_revs_diff",
@@ -30,18 +29,15 @@ use Drupal\relaxed\RevisionDiff\RevisionDiff;
  */
 class RevsDiffResource extends ResourceBase {
 
-  public function post($workspace, $data) {
+  public function post($workspace, $revs_diff) {
     if (is_string($workspace)) {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
-    if (empty($data)) {
+    if (empty($revs_diff)) {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
-    $revs_diff = \Drupal::service('relaxed.revs_diff');
-    $missing = $revs_diff->setEntityKeys($data)->getMissing();
-
-    return new ResourceResponse($missing, 200);
+    return new ResourceResponse($revs_diff, 200);
   }
 
 }
