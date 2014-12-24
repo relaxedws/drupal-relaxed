@@ -7,13 +7,8 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Drupal\multiversion\Entity\Index\RevisionIndex;
-use Drupal\relaxed\RevisionDiff\RevisionDiff;
 
 /**
  * @RestResource(
@@ -37,6 +32,7 @@ class RevsDiffResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
+    /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $revs_diff */
     return new ResourceResponse($revs_diff, 200);
   }
 
