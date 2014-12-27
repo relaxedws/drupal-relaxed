@@ -14,7 +14,6 @@ services:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.bulk_docs:
     class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid']
     tags:
       - { name: normalizer, priority: 20 }
   relaxed.normalizer.all_docs:

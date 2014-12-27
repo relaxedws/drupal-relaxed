@@ -30,17 +30,18 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+    if (!isset($context['workspace'])) {
+      throw new LogicException('A \'workspace\' context is required to denormalize revision diff data.');
+    }
+
+    // @todo Use injected container.
     /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
-    if (isset($context['workspace'])) {
-      $revs_diff = $class::createInstance(
-        \Drupal::getContainer(),
-        \Drupal::service('entity.index.rev'),
-        $context['workspace']
-      );
-    }
-    else {
-      throw new LogicException('A \'workspace\' context is required for denormalizing revision diff data.');
-    }
+    $revs_diff = $class::createInstance(
+      \Drupal::getContainer(),
+      \Drupal::service('entity.index.rev'),
+      $context['workspace']
+    );
+
     $revs_diff->setRevisionIds($data);
     return $revs_diff;
   }

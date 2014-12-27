@@ -30,6 +30,9 @@ class AllDocsResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace) {
+    if (is_string($workspace)) {
+      throw new NotFoundHttpException();
+    }
     // @todo: Inject the container without using deprecated method call.
     $all_docs = AllDocs::createInstance(
       \Drupal::getContainer(),

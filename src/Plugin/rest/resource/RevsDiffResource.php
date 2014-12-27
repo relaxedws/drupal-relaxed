@@ -24,6 +24,11 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class RevsDiffResource extends ResourceBase {
 
+  /**
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param \Drupal\replication\Entity\RevisionDiff\RevisionDiffInterface $revs_diff
+   * @return \Drupal\rest\ResourceResponse
+   */
   public function post($workspace, $revs_diff) {
     if (is_string($workspace)) {
       throw new BadRequestHttpException(t('Database does not exist'));
@@ -32,7 +37,6 @@ class RevsDiffResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
-    /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $revs_diff */
     return new ResourceResponse($revs_diff, 200);
   }
 

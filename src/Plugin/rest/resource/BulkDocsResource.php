@@ -8,17 +8,19 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\relaxed\BulkDocs\BulkDocsInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
  *   id = "relaxed:bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
- *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
+ *     "canonical" = "Drupal\relaxed\BulkDocs\BulkDocs",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_bulk_docs",
@@ -27,31 +29,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class BulkDocsResource extends ResourceBase {
 
-  public function post($workspace, array $entities = array()) {
-    $result = array();
-
-    if  (empty($entities)) {
-      throw new BadRequestHttpException(t('No content info received'));
+  /**
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs
+   * @return \Drupal\rest\ResourceResponse
+   */
+  public function post($workspace, $bulk_docs) {
+    if (is_string($workspace)) {
+      throw new NotFoundHttpException();
     }
 
-    // @todo Use \Drupal\multiversion\Entity\Transaction\AllOrNothingTransaction
-
-    foreach ($entities['docs'] as $entity) {
-      // Validate the received data before saving.
-      $this->validate($entity);
-      try {
-        $entity->save();
-        $object = new \stdClass();
-        $object->ok = TRUE;
-        $object->id = $entity->uuid();
-        $object->rev = $entity->_revs_info->rev;
-        $result[] = $object;
-      }
-      catch (EntityStorageException $e) {
-        throw new HttpException(500, NULL, $e);
-      }
-    }
-
-    return new ResourceResponse($result, 201);
+    $bulk_docs->save();
+    return new ResourceResponse($bulk_docs, 201);
   }
 }

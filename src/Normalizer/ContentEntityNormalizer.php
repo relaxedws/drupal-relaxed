@@ -37,13 +37,16 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    $data = array();
-    // New or mocked entities might not have a UUID yet.
-    if ($entity->uuid()) {
-      $data['_id'] = $entity->uuid();
-    }
     $entity_type = $context['entity_type'] = $entity->getEntityTypeId();
-    $data['_id'] = "$entity_type." . $data['_id'];
+
+    $data = array(
+      '@context' => array(
+        $entity_type => '', // @todo Use link manager to generate entity type URL
+      ),
+      '@id' => '', // @todo Use link manager to generate entity URL
+      '@type' => $entity_type,
+      '_id' => "$entity_type." . $entity->uuid()
+    );
 
     // New or mocked entities might not have a rev yet.
     if (!empty($entity->_revs_info->rev)) {
@@ -121,6 +124,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     elseif (isset($entity_type_from_data)) {
       $entity_type_id = $entity_type_from_data;
+    }
+    elseif (isset($data['@type'])) {
+      $entity_type_id = $data['@type'];
     }
 
     // Resolve the UUID.
@@ -201,7 +207,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_attachments', '_revisions') as $key) {
+    foreach (array('@context', '@id', '@type', '_id', '_rev', '_attachments', '_revisions') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
@@ -242,10 +248,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if ($entity_id) {
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
-    }
-
-    if (isset($context['query']['new_edits']) && ($context['query']['new_edits'] === FALSE)) {
-      $entity->new_edits = FALSE;
     }
 
     return $entity;
