@@ -7,50 +7,66 @@
 
 namespace Drupal\relaxed\RevisionDiff;
 
-use Drupal\multiversion\Entity\Index\RevisionIndex;
+use Drupal\multiversion\Entity\Index\RevisionIndexInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * @todo Move this into the \Drupal\multiversion\Entity namespace
- * @todo We probably should make UuidIndex and RevisionIndex key per workspace
- *   so that we can use revision diff per workspace.
- */
 class RevisionDiff implements RevisionDiffInterface {
 
-  public $entityKeys = array();
+  /**
+   * @var array
+   */
+  protected $revisionIds = array();
 
-  public function __construct(RevisionIndex $rev_index) {
+  /**
+   * {@inheritdoc}
+   */
+  static public function createInstance(ContainerInterface $container, RevisionIndexInterface $rev_index, WorkspaceInterface $workspace) {
+    return new static(
+      $rev_index,
+      $workspace
+    );
+  }
+
+  /**
+   * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   */
+  public function __construct(RevisionIndexInterface $rev_index, WorkspaceInterface $workspace) {
     $this->revisionIndex = $rev_index;
+    $this->workspaceId = $workspace->id();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setEntityKeys(array $entity_keys) {
-    $this->entityKeys = $entity_keys;
+  public function setRevisionIds(array $revision_ids) {
+    $this->revisionIds = $revision_ids;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getEntityKeys() {
-    return $this->entityKeys;
+  public function getRevisionIds() {
+    return $this->revisionIds;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Move any assumptions about the serialization format into the
+   *   serializer to better separate concerns.
    */
   public function getMissing() {
     $keys = array();
-    $entity_keys = $this->getEntityKeys();
-    foreach ($entity_keys as $entity_uuid => $revision_ids) {
+    foreach ($this->getRevisionIds() as $entity_uuid => $revision_ids) {
       foreach ($revision_ids as $revision_id) {
         $keys[] = $entity_uuid . ':' . $revision_id;
       }
     }
     $existing_revision_ids = $this->revisionIndex->getMultiple($keys);
 
-    // Do diff.
     $missing_revision_ids = array();
     foreach ($keys as $key) {
       if (!isset($existing_revision_ids[$key])) {

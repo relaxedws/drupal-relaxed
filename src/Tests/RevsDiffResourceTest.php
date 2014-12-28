@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\relaxed\RevisionDiff\RevisionDiff;
 
 /**
  * Tests the /db/_revs_diff resource.
@@ -14,7 +13,6 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
   public function testPostNoMissingRevisions() {
     $this->enableService('relaxed:revs_diff', 'POST');
-    $serializer = $this->container->get('serializer');
 
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
@@ -71,12 +69,8 @@ class RevsDiffResourceTest extends ResourceTestBase {
         }
       }
 
-      $revs_diff = \Drupal::service('relaxed.revs_diff');
-      $revs_diff->setEntityKeys($data);
-      $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
-
       $response = $this->httpRequest(
-        $this->workspace->id() . '/_revs_diff', 'POST', $serialized
+        $this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data)
       );
       $this->assertResponse('200', 'HTTP response code is correct.');
       $data = Json::decode($response);
@@ -86,7 +80,6 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
   public function testPostMissingRevisions() {
     $this->enableService('relaxed:revs_diff', 'POST');
-    $serializer = $this->container->get('serializer');
 
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
@@ -162,13 +155,8 @@ class RevsDiffResourceTest extends ResourceTestBase {
         '33-1214293f06b11ea6da4c9da0593333zz',
         '44-1214293f06b11ea6da4c9da0594444zz',
       );
-
-      $revs_diff = \Drupal::service('relaxed.revs_diff');
-      $revs_diff->setEntityKeys($data);
-      $serialized = $serializer->serialize($revs_diff, $this->defaultFormat);
-
       $response = $this->httpRequest(
-        $this->workspace->id() . '/_revs_diff', 'POST', $serialized
+        $this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data)
       );
       $this->assertResponse('200', 'HTTP response code is correct.');
       $response_data = Json::decode($response);

@@ -68,7 +68,7 @@ class ReplicationHistoryItem extends FieldItemBase {
       ->setDescription(t('Recorded intermediate sequence.'))
       ->setRequired(TRUE);
 
-    $properties['session_id'] = DataDefinition::create('integer')
+    $properties['session_id'] = DataDefinition::create('string')
       ->setLabel(t('Session ID'))
       ->setDescription(t('Unique session ID for the replication.'))
       ->setRequired(TRUE);
@@ -114,7 +114,7 @@ class ReplicationHistoryItem extends FieldItemBase {
         ),
         'end_time' => array(
           'type' => 'varchar',
-          'length' => 20,
+          'length' => 50,
           'not null' => FALSE,
         ),
         'missing_checked' => array(
@@ -145,7 +145,7 @@ class ReplicationHistoryItem extends FieldItemBase {
         ),
         'start_time' => array(
           'type' => 'varchar',
-          'length' => 20,
+          'length' => 50,
           'not null' => FALSE,
         ),
       ),

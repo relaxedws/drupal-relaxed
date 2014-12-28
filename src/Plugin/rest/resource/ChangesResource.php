@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\relaxed\Changes\Changes;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -15,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "relaxed:changes",
  *   label = "Changes",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\Changes\ChangesInterface",
+ *     "canonical" = "Drupal\relaxed\Changes\Changes",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_changes",
@@ -29,10 +30,14 @@ class ChangesResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
 
-    $changes = \Drupal::service('relaxed.changes');
-    $result = $changes->useWorkspace($workspace->id())->getNormal();
+    // @todo: Inject the container without using deprecated method call.
+    $changes = Changes::createInstance(
+      \Drupal::getContainer(),
+      \Drupal::service('entity.index.sequence'),
+      $workspace
+    );
 
-    return new ResourceResponse($result, 200);
+    return new ResourceResponse($changes, 200);
   }
 
 }

@@ -6,6 +6,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -76,18 +77,29 @@ class DocResource extends ResourceBase {
       }
     }
 
+    $result = $revisions[0];
+    $request = Request::createFromGlobals();
     if (is_array($existing)) {
       $parts = array();
-      foreach ($revisions as $revision) {
-        $parts[] = new ResourceResponse($revision, 200);
-      }
+      if (strpos($request->headers->get('Accept'), 'application/json') === FALSE
+        && strpos($request->headers->get('Content-Type'), 'application/json') === FALSE) {
+        foreach ($revisions as $revision) {
+          $parts[] = new ResourceResponse($revision, 200);
+        }
 
-      // Multipart response.
-      return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
+        // Multipart response.
+        return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
+      }
+      else {
+        $result = array();
+        foreach ($revisions as $revision) {
+          $result[] = array('ok' => $revision);
+        }
+      }
     }
 
     // Normal response.
-    return new ResourceResponse($revisions[0], 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
+    return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
   }
 
   /**

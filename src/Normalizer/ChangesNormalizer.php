@@ -8,9 +8,8 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\serialization\Normalizer\NormalizerBase;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class ChangesNormalizer extends NormalizerBase implements DenormalizerInterface {
+class ChangesNormalizer extends NormalizerBase {
 
   protected $supportedInterfaceOrClass = array('Drupal\relaxed\Changes\ChangesInterface');
 
@@ -22,15 +21,16 @@ class ChangesNormalizer extends NormalizerBase implements DenormalizerInterface 
   /**
    * {@inheritdoc}
    */
-  public function normalize($data, $format = NULL, array $context = array()) {
-    return $data;
-  }
+  public function normalize($changes, $format = NULL, array $context = array()) {
+    /** @var \Drupal\relaxed\Changes\ChangesInterface $changes */
+    $results = $changes->getNormal();
+    $last_result = end($results);
+    $last_seq = isset($last_result['seq']) ? $last_result['seq'] : 0;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = NULL, array $context = array()) {
-    return $data;
+    return array(
+      'last_seq' => $last_seq,
+      'results' => $results,
+    );
   }
 
 }

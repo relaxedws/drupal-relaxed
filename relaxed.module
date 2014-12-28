@@ -1,6 +1,8 @@
 <?php
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**

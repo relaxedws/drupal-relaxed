@@ -38,6 +38,11 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $entity = entity_load('entity_test_mulrev', 1);
 
     $expected = array(
+      '@context' => array(
+        'entity_test_mulrev' => '',
+      ),
+      '@id' => '',
+      '@type' => 'entity_test_mulrev',
       'id' => array(
         array('value' => 1),
       ),
@@ -68,7 +73,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
       'workspace' => array(
         array('target_id' => 'default')
       ),
-      '_id' => 'entity_test_mulrev:' . $entity->uuid(),
+      '_id' => 'entity_test_mulrev.' . $entity->uuid(),
       '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
     );
 
@@ -77,6 +82,21 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     foreach (array_keys($expected) as $key) {
       $this->assertEqual($expected[$key], $normalized[$key], "Field $key is normalized correctly.");
     }
+    $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
+
+    // Test normalization when is set the revs query parameter.
+    $parts = explode('-', $entity->_revs_info->rev);
+    $expected['_revisions'] = array(
+      'ids' => array($parts[1]),
+      'start' => (int) $parts[0],
+    );
+
+    $normalized = $this->serializer->normalize($this->entity, NULL, array('query' => array('revs' => TRUE)));
+
+    foreach (array_keys($expected) as $key) {
+      $this->assertEqual($expected[$key], $normalized[$key], "Field $key is normalized correctly.");
+    }
+    $this->assertTrue($expected['_revisions']['start'] === $normalized['_revisions']['start'], "Correct data type for the start field.");
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
 
     // @todo Test context switches.

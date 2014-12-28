@@ -37,13 +37,16 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    $data = array();
-    // New or mocked entities might not have a UUID yet.
-    if ($entity->uuid()) {
-      $data['_id'] = $entity->uuid();
-    }
     $entity_type = $context['entity_type'] = $entity->getEntityTypeId();
-    $data['_id'] = "$entity_type:" . $data['_id'];
+
+    $data = array(
+      '@context' => array(
+        $entity_type => '', // @todo Use link manager to generate entity type URL
+      ),
+      '@id' => '', // @todo Use link manager to generate entity URL
+      '@type' => $entity_type,
+      '_id' => "$entity_type." . $entity->uuid()
+    );
 
     // New or mocked entities might not have a rev yet.
     if (!empty($entity->_revs_info->rev)) {
@@ -75,7 +78,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $parts = explode('-', $entity->_revs_info->rev);
       $data['_revisions'] = array(
         'ids' => array(),
-        'start' => $parts[0],
+        'start' => (int) $parts[0],
       );
       foreach ($entity->_revs_info as $item) {
         $parts = explode('-', $item->rev);
@@ -105,8 +108,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_id = NULL;
 
     // Get the entity type and the entity id from $data['_id'] string.
-    if (!empty($data['_id'])) {
-      list($entity_type_from_data, $entity_id_from_data) = explode(':', $data['_id']);
+    if (!empty($data['_id']) && strpos($data['_id'], '.') !== FALSE && substr($data['_id'], 0, 6) != '_local') {
+      list($entity_type_from_data, $entity_uuid_from_data) = explode('.', $data['_id']);
+    }
+    elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
+      list($entity_type_from_data, $entity_uuid_from_data) = explode('/', $data['_id']);
+      if ($entity_type_from_data == '_local' && $entity_uuid_from_data) {
+        $entity_type_from_data = 'replication_log';
+      }
     }
 
     // Look for the entity type ID.
@@ -116,17 +125,20 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     elseif (isset($entity_type_from_data)) {
       $entity_type_id = $entity_type_from_data;
     }
+    elseif (isset($data['@type'])) {
+      $entity_type_id = $data['@type'];
+    }
 
     // Resolve the UUID.
     // @todo Needs test
-    if (!empty($data['uuid'][0]['value']) && !isset($entity_id_from_data) && ($data['uuid'][0]['value'] != $entity_id_from_data)) {
+    if (!empty($data['uuid'][0]['value']) && !isset($entity_uuid_from_data) && ($data['uuid'][0]['value'] != $entity_uuid_from_data)) {
       throw new UnexpectedValueException('The uuid and _id values does not match.');
     }
     if (!empty($data['uuid'][0]['value'])) {
       $entity_uuid = $data['uuid'][0]['value'];
     }
-    elseif (isset($entity_id_from_data)) {
-      $entity_uuid = $data['uuid'][0]['value'] = $entity_id_from_data;
+    elseif (isset($entity_uuid_from_data)) {
+      $entity_uuid = $data['uuid'][0]['value'] = $entity_uuid_from_data;
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
@@ -179,8 +191,23 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // Add _rev_info field info to the $data array.
+    if (isset($data['_rev']) && isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])
+      && (isset($context['query']['revs_info']) || isset($context['query']['open_revs']))) {
+      $parts = explode('-', $data['_rev']);
+      if ($parts[0] == $data['_revisions']['start'] && in_array($parts[1], $data['_revisions']['ids'])) {
+        $data['_revs_info'][0]['rev'] = $data['_rev'];
+      }
+    }
+
+    // This revision will be used when the entity does not have an id,
+    // it has a revision and it is new for the actual database.
+    if (isset($data['_rev'])) {
+      $data_rev = $data['_rev'];
+    }
+
     // Clean-up attributes we don't needs anymore.
-    foreach (array('_id', '_rev', '_attachments') as $key) {
+    foreach (array('@context', '@id', '@type', '_id', '_rev', '_attachments', '_revisions') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
@@ -192,11 +219,27 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if ($entity_id) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
-      foreach ($data as $name => $value) {
-        $entity->{$name} = $value;
+      if ($entity) {
+        foreach ($data as $name => $value) {
+          $entity->{$name} = $value;
+        }
+      }
+      elseif (isset($data['id'])) {
+        if (isset($data_rev)) {
+          $data['_revs_info'][0]['rev'] = $data_rev;
+        }
+
+        unset($data['id']);
+        $entity_id = NULL;
+        /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+        $entity = $storage->create($data);
       }
     }
     else {
+      if (isset($data_rev)) {
+        $data['_revs_info'][0]['rev'] = $data_rev;
+      }
+
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       // @todo Use the passed $class to instantiate the entity.
       $entity = $storage->create($data);
@@ -205,10 +248,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if ($entity_id) {
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
-    }
-
-    if (isset($context['query']['new_edits']) && ($context['query']['new_edits'] === FALSE)) {
-      $entity->new_edits = FALSE;
     }
 
     return $entity;

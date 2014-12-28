@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -141,14 +142,24 @@ class ResourceController implements ContainerAwareInterface {
     $resource = $this->getResource();
 
     $content = $this->request->getContent();
+    $parameters = $this->getParameters();
     // @todo Check if it's safe to pass all query parameters like this.
     $query = $this->request->query->all();
-    $context = array('query' => $query);
+    $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
     $entity = NULL;
     if (!empty($content)) {
       try {
         $definition = $resource->getPluginDefinition();
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
+
+        // If we have a workspace parameter, pass it to the deserializer.
+        foreach ($parameters as $parameter) {
+          if ($parameter instanceof WorkspaceInterface) {
+            $context['workspace'] = $parameter;
+            break;
+          }
+        }
+
         $entity = $this->serializer()->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
@@ -157,7 +168,6 @@ class ResourceController implements ContainerAwareInterface {
     }
 
     try {
-      $parameters = $this->getParameters();
       /** @var \Drupal\rest\ResourceResponse $response */
       $response = call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $this->request)));
     }

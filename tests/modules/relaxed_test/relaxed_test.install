@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function relaxed_test_install() {
+  // Apply updates.
+  \Drupal::service('entity.definition_update_manager')->applyUpdates();
+
+  // Set permissions.
+  $permissions = \Drupal::service('user.permissions')->getPermissions();
+  if (!empty($permissions)) {
+    $permissions = array_keys($permissions);
+  }
+  $permissions[] = 'view test entity';
+  user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, $permissions);
+}

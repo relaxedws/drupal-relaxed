@@ -14,9 +14,17 @@ services:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.bulk_docs:
     class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid']
     tags:
       - { name: normalizer, priority: 20 }
+  relaxed.normalizer.all_docs:
+    class: Drupal\relaxed\Normalizer\AllDocsNormalizer
+    arguments: ['@entity.manager', '@entity.index.uuid']
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.changes:
+    class: Drupal\relaxed\Normalizer\ChangesNormalizer
+    tags:
+      - { name: normalizer }
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
@@ -30,7 +38,7 @@ services:
     class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
     tags:
       - { name: normalizer, priority: 10 }
-  relaxed.normalizer.revs_diff_normalizer:
+  relaxed.normalizer.revs_diff:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     tags:
       - { name: normalizer, priority: 20 }
@@ -43,12 +51,6 @@ services:
     class: Drupal\relaxed\Normalizer\FileItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
-  relaxed.revs_diff:
-    class: Drupal\relaxed\RevisionDiff\RevisionDiff
-    arguments: ['@entity.index.rev']
-  relaxed.changes:
-    class: Drupal\relaxed\Changes\Changes
-    arguments: ['@entity.index.sequence']
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev']

@@ -154,8 +154,6 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
 
       $entity->name = $this->randomMachineName();
-      // Save an additional revision.
-      //$entity->save();
 
       $open_revs = array();
       foreach ($entity->_revs_info as $item) {
@@ -183,6 +181,24 @@ class DocResourceTest extends ResourceTestBase {
       $correct_data = TRUE;
       foreach ($open_revs as $key => $rev) {
         if (isset($data[$key]['_rev']) && $data[$key]['_rev'] != $rev) {
+          $correct_data = FALSE;
+        }
+      }
+      $this->assertTrue($correct_data, 'Multipart response contains correct revisions.');
+
+      // Test a non-multipart request with open_revs.
+      $response = $this->httpRequest(
+        "$db/" . $entity->uuid(),
+        'GET',
+        NULL,
+        'application/json',
+        NULL,
+        array('open_revs' => $open_revs_string)
+      );
+      $data = Json::decode($response);
+      $correct_data = TRUE;
+      foreach ($open_revs as $key => $rev) {
+        if (isset($data[$key]['ok']['_rev']) && $data[$key]['ok']['_rev'] != $rev) {
           $correct_data = FALSE;
         }
       }

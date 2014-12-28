@@ -8,21 +8,39 @@
 namespace Drupal\relaxed\Changes;
 
 use Drupal\multiversion\Entity\Index\SequenceIndex;
+use Drupal\multiversion\Entity\Index\SequenceIndexInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Changes implements ChangesInterface {
 
-  protected $lastSeq = 0;
+  /**
+   * @var string
+   */
+  protected $workspaceId;
 
-  function __construct(SequenceIndex $sequenceIndex) {
-    $this->sequenceIndex = $sequenceIndex;
-  }
+  /**
+   * @var int
+   */
+  protected $lastSeq = 0;
 
   /**
    * {@inheritdoc}
    */
-  public function useWorkspace($name) {
-    $this->workspaceName = $name;
-    return $this;
+  static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace) {
+    return new static(
+      $sequence_index,
+      $workspace
+    );
+  }
+
+  /**
+   * @param \Drupal\multiversion\Entity\Index\SequenceIndex $sequenceIndex
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   */
+  public function __construct(SequenceIndex $sequenceIndex, WorkspaceInterface $workspace) {
+    $this->sequenceIndex = $sequenceIndex;
+    $this->workspaceId = $workspace->id();
   }
 
   /**
@@ -37,31 +55,30 @@ class Changes implements ChangesInterface {
    * {@inheritdoc}
    */
   public function getNormal() {
-    $changes = $this->sequenceIndex
-      ->useWorkspace($this->workspaceName)
+    $sequences = $this->sequenceIndex
+      ->useWorkspace($this->workspaceId)
       ->getRange($this->lastSeq, NULL);
 
     // Format the result array.
-    $result = array();
-    $last_seq_number = count($changes);
-    if ($last_seq_number > 0) {
-      $result['last_seq'] = $last_seq_number - 1;
-    }
-    foreach ($changes as $seq => $change) {
-      $change_result = array(
+    $changes = array();
+    foreach ($sequences as $seq => $sequence) {
+      if (!empty($sequence['local'])) {
+        continue;
+      }
+
+      $uuid = $sequence['entity_uuid'];
+      $changes[$uuid] = array(
         'changes' => array(
-          array('rev' => $change['rev']),
+          array('rev' => $sequence['rev']),
         ),
-        'id' => $change['entity_uuid'],
+        'id' => $uuid,
         'seq' => $seq,
       );
-      if ($change['deleted']) {
-        $change_result['deleted'] = TRUE;
+      if ($sequence['deleted']) {
+        $changes[$uuid]['deleted'] = TRUE;
       }
-      $result['results'][] = $change_result;
     }
-
-    return $result;
+    return array_values($changes);
   }
 
   /**
@@ -72,7 +89,7 @@ class Changes implements ChangesInterface {
     do {
       // @todo Implement exponential wait time.
       $change = $this->sequenceIndex
-        ->useWorkspace($this->workspaceName)
+        ->useWorkspace($this->workspaceId)
         ->getRange($this->lastSeq, NULL);
       $no_change = empty($change) ? TRUE : FALSE;
     } while ($no_change);

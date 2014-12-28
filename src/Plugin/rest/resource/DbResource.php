@@ -99,7 +99,7 @@ class DbResource extends ResourceBase {
    */
   public function post($workspace, ContentEntityInterface $entity = NULL) {
     // If the workspace parameter is a string it means it could not be upcasted
-    // to an entity because none exiisted.
+    // to an entity because none existed.
     if (is_string($workspace)) {
       throw new NotFoundHttpException(t('Database does not exist')); 
     }
