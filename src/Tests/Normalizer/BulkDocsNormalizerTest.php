@@ -3,6 +3,9 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\String;
+use Drupal\multiversion\Entity\Transaction\MockTransaction;
+use Drupal\relaxed\BulkDocs\BulkDocs;
+use Drupal\relaxed\BulkDocs\BulkDocsInterface;
 
 /**
  * Tests the content serialization format.
@@ -21,6 +24,16 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   protected $testEntities = array();
 
   /**
+   * @var \Drupal\relaxed\BulkDocs\BulkDocsInterface
+   */
+  protected $bulkDocs;
+
+  /**
+   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
+   */
+  protected $workspaceManager;
+
+  /**
    * Array with test values for test entities.
    */
   protected $testValues = array();
@@ -32,90 +45,66 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
 
   protected function setUp() {
     parent::setUp();
-    $this->testEntities['docs'] = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
+    $this->testEntities = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
+
+    $this->workspaceManager = $this->container->get('workspace.manager');
+
+    $this->bulkDocs = BulkDocs::createInstance(
+      $this->container,
+      new MockTransaction(),
+      $this->workspaceManager,
+      $this->workspaceManager->getActiveWorkspace()
+    );
+
+    $this->bulkDocs->setEntities($this->testEntities);
+    $this->bulkDocs->save();
   }
 
   public function testNormalize() {
     $expected = array();
     for ($key = 0; $key < $this->testValuesNumber; $key++) {
       $entity = entity_load('entity_test_mulrev', $key+1);
-      $uuid = $entity->uuid();
-
-      if ($key == 0) {
-        $entity->delete();
-        $this->testEntities['docs'][$key] = $entity;
-      }
-
       $expected[$key] = array(
-        'id' => array(
-          array('value' => $key+1),
-        ),
-        'revision_id' => array(
-          array('value' => $entity->revision_id->value),
-        ),
-        'uuid' => array(
-          array('value' => $uuid),
-        ),
-        'langcode' => array(
-          array('value' => 'en'),
-        ),
-        'name' => array(
-          array('value' => $this->testValues[$key]['name']),
-        ),
-        'type' => array(
-          array('value' => 'entity_test_mulrev'),
-        ),
-        'user_id' => array(
-          array('target_id' => $this->testValues[$key]['user_id']),
-        ),
-        'field_test_text' => array(
-          array(
-            'value' => $this->testValues[$key]['field_test_text']['value'],
-            'format' => $this->testValues[$key]['field_test_text']['format'],
-          ),
-        ),
-        'workspace' => array(
-          array('target_id' => 'default')
-        ),
-        '_id' => 'entity_test_mulrev.' . $uuid,
-        '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
+        'ok' => TRUE,
+        'id' => $entity->uuid(),
+        'rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
       );
-
-      if ($key == 0) {
-        $expected[$key]['_deleted'] = TRUE;
-      }
     }
 
-    $normalized = $this->serializer->normalize($this->testEntities);
+    $normalized = $this->serializer->normalize($this->bulkDocs);
 
     $entity_number = 1;
-    foreach ($expected as $key => $expected_entity) {
-      foreach (array_keys($expected_entity) as $entity_key) {
-        $this->assertEqual($expected_entity[$entity_key], $normalized['docs'][$key][$entity_key], "Field $entity_key is normalized correctly for entity number $entity_number.");
+    foreach ($expected as $key => $value) {
+      foreach (array_keys($value) as $value_key) {
+        $this->assertEqual($value[$value_key], $normalized[$key][$value_key], "Field $value_key is normalized correctly for entity number $entity_number.");
       }
-      $this->assertEqual(array_diff_key($normalized['docs'][$key], $expected[$key]), array(), 'No unexpected data is added to the normalized array.');
+      $this->assertEqual(array_diff_key($normalized[$key], $expected[$key]), array(), 'No unexpected data is added to the normalized array.');
       $entity_number++;
     }
   }
 
   public function testSerialize() {
-    $normalized = $this->serializer->normalize($this->testEntities);
+    $normalized = $this->serializer->normalize($this->bulkDocs);
     $expected = json_encode($normalized);
     // Paranoid test because JSON serialization is tested elsewhere.
-    $actual = $this->serializer->serialize($this->testEntities, 'json');
+    $actual = $this->serializer->serialize($this->bulkDocs, 'json');
     $this->assertIdentical($actual, $expected, 'Entity serializes correctly to JSON.');
   }
 
   public function testDenormalize() {
-    $normalized = $this->serializer->normalize($this->testEntities);
-    $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
-    $this->assertTrue(is_array($denormalized) && isset($denormalized['docs']), 'Denormalized data is an array.');
-    foreach ($denormalized['docs'] as $key => $entity) {
+    $data = array('docs' => array());
+    foreach ($this->testEntities as $entity) {
+      $data['docs'][] = $this->serializer->normalize($entity);
+    }
+    $context = array('workspace' => $this->workspaceManager->getActiveWorkspace());
+    $bulk_docs = $this->serializer->denormalize($data, 'Drupal\relaxed\BulkDocs\BulkDocs', 'json', $context);
+    $this->assertTrue($bulk_docs instanceof BulkDocsInterface, 'Denormalized data is an instance of the correct interface.');
+    foreach ($bulk_docs->getEntities() as $key => $entity) {
       $entity_number = $key+1;
       $this->assertTrue($entity instanceof $this->entityClass, String::format("Denormalized entity number $entity_number is an instance of @class", array('@class' => $this->entityClass)));
-      $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities['docs'][$key]->getEntityTypeId(), "Expected entity type foundfor entity number $entity_number.");
-      $this->assertIdentical($entity->bundle(), $this->testEntities['docs'][$key]->bundle(), "Expected entity bundle found for entity number $entity_number.");
-      $this->assertIdentical($entity->uuid(), $this->testEntities['docs'][$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");
+      $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities[$key]->getEntityTypeId(), "Expected entity type foundfor entity number $entity_number.");
+      $this->assertIdentical($entity->bundle(), $this->testEntities[$key]->bundle(), "Expected entity bundle found for entity number $entity_number.");
+      $this->assertIdentical($entity->uuid(), $this->testEntities[$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");
     }
 
     // @todo Test context switches.

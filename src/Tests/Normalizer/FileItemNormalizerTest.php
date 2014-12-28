@@ -163,6 +163,11 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     }
 
     $expected = array(
+      '@context' => array(
+        'entity_test_mulrev' => '',
+      ),
+      '@id' => '',
+      '@type' => 'entity_test_mulrev',
       'id' => array(
         array('value' => 1),
       ),

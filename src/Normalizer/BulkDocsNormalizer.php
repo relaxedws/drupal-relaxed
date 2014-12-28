@@ -4,6 +4,7 @@ namespace Drupal\relaxed\Normalizer;
 
 use Drupal\multiversion\Entity\Transaction\MockTransaction;
 use Drupal\serialization\Normalizer\NormalizerBase;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface {

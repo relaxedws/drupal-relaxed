@@ -27,7 +27,7 @@ class BulkDocs implements BulkDocsInterface {
   /**
    * @var \Drupal\Core\Entity\ContentEntityInterface[]
    */
-  protected $entities;
+  protected $entities = array();
 
   /**
    * @var bool
@@ -81,7 +81,7 @@ class BulkDocs implements BulkDocsInterface {
    * {@inheritdoc}
    */
   public function getEntities() {
-    $this->entities;
+    return $this->entities;
   }
 
   /**

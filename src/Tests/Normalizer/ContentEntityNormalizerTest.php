@@ -38,6 +38,11 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $entity = entity_load('entity_test_mulrev', 1);
 
     $expected = array(
+      '@context' => array(
+        'entity_test_mulrev' => '',
+      ),
+      '@id' => '',
+      '@type' => 'entity_test_mulrev',
       'id' => array(
         array('value' => 1),
       ),
