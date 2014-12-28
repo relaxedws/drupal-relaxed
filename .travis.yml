@@ -19,11 +19,6 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
 
-matrix:
-  allow_failures:
-    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
-  fast_finish: true
-
 install:
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi apache2-utils
