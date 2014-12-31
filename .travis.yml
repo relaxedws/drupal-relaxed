@@ -38,7 +38,7 @@ install:
   # Install Drush.
   - export PATH=$PATH:/home/travis/.composer/vendor/bin
 #  - composer selfupdate
-  - composer global require drush/drush:7.0.0-alpha5
+  - composer global require drush/drush:dev-master
 
 before_script:
   # Checkout a directory structure with all dependencies.
