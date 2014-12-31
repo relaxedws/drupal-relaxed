@@ -27,7 +27,7 @@ class RootResource extends ResourceBase {
     return new ResourceResponse(
       array(
         'couchdb' => t('Welcome'),
-        'uuid' => md5($GLOBALS['base_url']),
+        'uuid' => \Drupal::config('system.site')->get('uuid'),
         'vendor' => array(
           'name' => 'Drupal',
           'version' => \Drupal::VERSION,
