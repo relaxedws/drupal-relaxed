@@ -42,7 +42,7 @@ install:
 
 before_script:
   # Checkout a directory structure with all dependencies.
-  - git clone --depth 1 --branch 2335879-2342543-1869548 https://github.com/dickolsson/drupal-core.git $TRAVIS_BUILD_DIR/../drupal
+  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
