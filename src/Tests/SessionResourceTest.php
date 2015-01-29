@@ -19,7 +19,7 @@ class SessionResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions, 'test_admin_user');
     $roles = $account->getRoles();
     $this->drupalLogin($account);
-    \Drupal::configFactory()->getEditable('user.settings')->set('admin_role', $roles[0])->save();
+    \Drupal::configFactory()->getEditable('user.settings')->set('admin_role', $roles[1])->save();
 
     $response = $this->httpRequest('_session', 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
@@ -28,7 +28,7 @@ class SessionResourceTest extends ResourceTestBase {
 
     $roles = array(
       'authenticated',
-      $roles[0],
+      $roles[1],
       '_admin',
     );
     $expected = array(
@@ -57,7 +57,7 @@ class SessionResourceTest extends ResourceTestBase {
 
     $roles = array(
       'authenticated',
-      $roles[0],
+      $roles[1],
     );
     $expected = array(
       'info' => array(),
