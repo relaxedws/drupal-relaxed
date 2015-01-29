@@ -8,6 +8,8 @@ abstract class ResourceTestBase extends RESTTestBase {
 
   public static $modules = array('rest', 'entity_test', 'relaxed', 'relaxed_test');
 
+  protected $strictConfigSchema = FALSE;
+
   /**
    * @var string
    */
