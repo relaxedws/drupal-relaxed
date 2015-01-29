@@ -19,7 +19,7 @@ class SessionResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions, 'test_admin_user');
     $roles = $account->getRoles();
     $this->drupalLogin($account);
-    \Drupal::config('user.settings')->set('admin_role', $roles[0])->save();
+    \Drupal::configFactory()->getEditable('user.settings')->set('admin_role', $roles[0])->save();
 
     $response = $this->httpRequest('_session', 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
