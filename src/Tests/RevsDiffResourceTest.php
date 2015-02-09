@@ -56,16 +56,15 @@ class RevsDiffResourceTest extends ResourceTestBase {
       );
       $entity->save();
 
+      $entity = entity_load($entity_type, $entity->id(), TRUE);
       $data = array();
       $revs_count = $entity->_revs_info->count();
       if ($revs_count > 0) {
-        $rev_number = 1;
         $id = $entity->uuid();
-        while ($rev_number <= $revs_count) {
-          if ($rev = $entity->_revs_info->get($rev_number)->rev) {
+        for ($i = 0; $i < $revs_count; $i++) {
+          if ($rev = $entity->_revs_info->get($i)->rev) {
             $data[$id][] = $rev;
           }
-          $rev_number++;
         }
       }
 
@@ -130,7 +129,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       if ($revs_count > 0) {
         $rev_number = 1;
         while ($rev_number <= $revs_count) {
-          if ($rev = $entity->_revs_info->get($rev_number)->rev) {
+          if ($rev = $entity->_revs_info->rev[$rev_number]) {
             $data[$id][] = $rev;
           }
           $rev_number++;
