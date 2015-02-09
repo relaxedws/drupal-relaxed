@@ -7,7 +7,7 @@ npm install -g mocha-phantomjs
 npm install chai
 npm install es5-shim
 npm install mocha
-npm install pouchdb
+npm install pouchdb@3.2.1
 
 mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
 mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
