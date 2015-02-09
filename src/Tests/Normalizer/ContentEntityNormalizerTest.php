@@ -61,6 +61,9 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
       'type' => array(
         array('value' => 'entity_test_mulrev'),
       ),
+      'created' => array(
+        array('value' => $this->entity->created->value),
+      ),
       'user_id' => array(
         array('target_id' => $this->values['user_id']),
       ),
