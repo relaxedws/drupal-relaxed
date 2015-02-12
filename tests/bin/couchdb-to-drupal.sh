@@ -23,6 +23,8 @@ done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 # Get all docs from couchdb db.
 curl -X GET http://localhost:5984/source/_all_docs
 
+drush cr
+
 # Run the replication.
 nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://admin:admin@drupal.loc/relaxed/default"}' http://localhost:5984/_replicate &
 sleep 200
