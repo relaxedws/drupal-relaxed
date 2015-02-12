@@ -35,15 +35,16 @@ install:
   - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
 
   # Set up the Apache vhost for the first Drupal instance.
-  - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost-default.conf /etc/apache2/sites-available/default
+  - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/default
   - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal?g" --in-place /etc/apache2/sites-available/default
-  - sudo sed -i -e "/DocumentRoot/i\ServerName drupal.loc" /etc/apache2/sites-available/default
+  - sudo sed -e "s?%TRAVIS_BUILD_SERVERNAME%?drupal.loc?g" --in-place /etc/apache2/sites-available/default
   - echo "127.0.0.1 drupal.loc" | sudo tee -a /etc/hosts
 
   # Set up the Apache vhost for the second Drupal instance.
   - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/drupal2
   - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal2?g" --in-place /etc/apache2/sites-available/drupal2
-  - sudo sed -i -e "/DocumentRoot/i\ServerName drupal2.loc" /etc/apache2/sites-available/drupal2
+  - sudo sed -e "s?%TRAVIS_BUILD_SERVERNAME%?drupal2.loc?g" --in-place /etc/apache2/sites-available/drupal2
+  - sudo sed -i "/FastCgiExternalServer/d" --in-place /etc/apache2/sites-available/drupal2
   - echo "127.0.0.1 drupal2.loc" | sudo tee -a /etc/hosts
 
   - sudo a2ensite drupal2
