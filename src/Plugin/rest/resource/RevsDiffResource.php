@@ -26,7 +26,7 @@ class RevsDiffResource extends ResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\replication\Entity\RevisionDiff\RevisionDiffInterface $revs_diff
+   * @param \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $revs_diff
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $revs_diff) {

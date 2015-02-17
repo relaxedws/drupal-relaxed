@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Implements hook_install().
  */
@@ -8,7 +7,7 @@ function relaxed_install() {
   // these settings are not loaded if added to /config/install/rest.settings.yml.
   // @todo Figure out a better way to do this.
   $relaxed_resource_config = \Drupal::config('relaxed.settings')->get('resources');
-  $rest_config = \Drupal::config('rest.settings');
+  $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
   $rest_resource_config = $rest_config->get('resources');
   $rest_config->set('resources', array_merge($rest_resource_config, $relaxed_resource_config))->save();
 }

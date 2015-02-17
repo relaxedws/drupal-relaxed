@@ -14,6 +14,8 @@ use Drupal\multiversion\Tests\MultiversionWebTestBase;
  */
 class ReplicationLogTest extends MultiversionWebTestBase {
 
+  protected $strictConfigSchema = FALSE;
+
   // @todo 'node' needs to be enabled because relaxed depends on rest that seems
   // to assumes certain things incorrectly. Revisit this.
   public static $modules = array('entity_test', 'node', 'relaxed');

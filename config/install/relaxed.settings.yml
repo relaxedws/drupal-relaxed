@@ -1,7 +1,7 @@
 api_root: "/relaxed"
 
 resources:
-  'relaxed:db':
+  relaxed:db:
     HEAD:
       supported_formats:
         - json
@@ -32,7 +32,7 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:attachment':
+  relaxed:attachment:
     HEAD:
       supported_formats:
         - json
@@ -57,21 +57,21 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:bulk_docs':
+  relaxed:bulk_docs:
     POST:
       supported_formats:
         - json
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:changes':
+  relaxed:changes:
     GET:
       supported_formats:
         - json
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:doc':
+  relaxed:doc:
     HEAD:
       supported_formats:
         - json
@@ -97,14 +97,14 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:revs_diff':
+  relaxed:revs_diff:
     POST:
       supported_formats:
         - json
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:local:doc':
+  relaxed:local:doc:
     HEAD:
       supported_formats:
         - json
@@ -123,28 +123,28 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:root':
+  relaxed:root:
     GET:
       supported_formats:
         - json
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:session':
+  relaxed:session:
     GET:
       supported_formats:
         - json
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:ensure_full_commit':
+  relaxed:ensure_full_commit:
     POST:
       supported_formats:
         - json
       supported_auth:
         - cookie
         - basic_auth
-  'relaxed:all_docs':
+  relaxed:all_docs:
     GET:
       supported_formats:
         - json
