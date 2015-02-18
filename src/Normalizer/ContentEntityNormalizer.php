@@ -59,10 +59,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $field_data = $this->serializer->normalize($field, $format, $context);
       // Add file and image field types into _attachments key.
       if ($field_type == 'file' || $field_type == 'image') {
-        if (!isset($data['_attachments'])) {
-          $data['_attachments'] = array();
-        }
         if ($field_data !== NULL) {
+          if (!isset($data['_attachments']) && !empty($field_data)) {
+            $data['_attachments'] = array();
+          }
           foreach ($field_data as $field_info) {
             $data['_attachments'] = array_merge($data['_attachments'], $field_info);
           }
