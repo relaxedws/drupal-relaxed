@@ -13,14 +13,15 @@ do
   curl -X POST \
        -H "Content-Type: application/json" \
        -d "$document" \
-       admin:admin@localhost/relaxed/default
+       admin:admin@drupal.loc/relaxed/default;
+  sleep 2;
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 
 # Create a target database and do the replication.
 curl -X PUT localhost:5984/target
 
 # Run the replication.
-nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@localhost/relaxed/default", "target": "http://localhost:5984/target"}' http://localhost:5984/_replicate &
+nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@drupal.loc/relaxed/default", "target": "http://localhost:5984/target"}' http://localhost:5984/_replicate &
 sleep 120
 
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
