@@ -38,12 +38,22 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
   }
 
   public function testNormalize() {
+    /** @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager */
+    $workspace_manager = \Drupal::service('workspace.manager');
+    $serializer = \Drupal::service('serializer');
+    $normalizer = \Drupal::service('relaxed.normalizer.all_docs');
+
+    $all_docs = AllDocs::createInstance(
+      $this->container,
+      $workspace_manager->getActiveWorkspace()
+    );
+
+    // Test without including docs.
     $expected = array(
       'total_rows' => 3,
       'offset' => 0,
       'rows' => array()
     );
-
     foreach ($this->entities as $entity) {
       $expected['rows'][] = array(
         'id' => $entity->uuid(),
@@ -54,20 +64,32 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
       );
     }
 
-    /** @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager */
-    $workspace_manager = \Drupal::service('workspace.manager');
-
-    $all_docs = AllDocs::createInstance(
-      $this->container,
-      \Drupal::service('entity.manager'),
-      \Drupal::service('multiversion.manager'),
-      $workspace_manager->getActiveWorkspace()
-    );
-
-    $normalized = \Drupal::service('relaxed.normalizer.all_docs')->normalize($all_docs);
-
+    $normalized = $normalizer->normalize($all_docs);
     foreach (array_keys($expected) as $key) {
-      $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key.");
+      $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key when not including docs.");
+    }
+
+    // Test with including docs.
+    $expected = array(
+      'total_rows' => 3,
+      'offset' => 0,
+      'rows' => array()
+    );
+    foreach ($this->entities as $entity) {
+      $expected['rows'][] = array(
+        'id' => $entity->uuid(),
+        'key' => $entity->uuid(),
+        'value' => array(
+          'rev' => $entity->_revs_info->rev,
+          'doc' => $serializer->normalize($entity),
+        ),
+      );
+    }
+
+    $all_docs->includeDocs(TRUE);
+    $normalized = $normalizer->normalize($all_docs);
+    foreach (array_keys($expected) as $key) {
+      $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key when including docs.");
     }
   }
 }

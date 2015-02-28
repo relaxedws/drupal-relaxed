@@ -13,6 +13,7 @@ class ChangesResourceTest extends ResourceTestBase {
 
   public function testGet() {
     $db = $this->workspace->id();
+    $serializer = \Drupal::service('serializer');
     $this->enableService('relaxed:changes', 'GET');
 
     // Create a user with the correct permissions.
@@ -21,7 +22,8 @@ class ChangesResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $revs = array();
+    $expected_with_docs = $expected_without_docs = array('last_seq' => 6, 'results' => array());
+
     $entity = entity_create('entity_test_rev');
     $entity->save();
     // Update the field_test_text field.
@@ -59,9 +61,16 @@ class ChangesResourceTest extends ResourceTestBase {
       )
     );
     $entity->save();
-    $revs[] = array(
+    $expected_without_docs['results'][] = array(
+      'changes' => array(array('rev' => $entity->_revs_info->rev)),
       'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
+      'seq' => 3,
+    );
+    $expected_with_docs['results'][] = array(
+      'changes' => array(array('rev' => $entity->_revs_info->rev)),
+      'id' => $entity->uuid(),
+      'seq' => 3,
+      'doc' => $serializer->normalize($entity)
     );
 
     // Create a new entity.

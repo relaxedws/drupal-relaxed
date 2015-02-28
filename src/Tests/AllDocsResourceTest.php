@@ -18,6 +18,8 @@ class AllDocsResourceTest extends ResourceTestBase {
 
   public function testGet() {
     $this->enableService('relaxed:all_docs', 'GET');
+    $serializer = \Drupal::service('serializer');
+    $db = $this->workspace->id();
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('workspace', 'view');
@@ -32,33 +34,57 @@ class AllDocsResourceTest extends ResourceTestBase {
       $entities[0]->save();
       $entities[1] = entity_create($entity_type);
       $entities[1]->save();
+    }
 
-      $rows = array();
-      foreach ($entities as $entity) {
-        $rows[] = array(
-          'id' => $entity->uuid(),
-          'key' => $entity->uuid(),
-          'value' => array(
-            'rev' => $entity->_revs_info->rev,
-          ),
-        );
-      }
-
-      $expected = array(
-        'total_rows' => 2,
-        'offset' => 0,
-        'rows' => $rows,
+    // Test without including docs.
+    $rows = array();
+    foreach ($entities as $entity) {
+      $rows[] = array(
+        'id' => $entity->uuid(),
+        'key' => $entity->uuid(),
+        'value' => array(
+          'rev' => $entity->_revs_info->rev,
+        ),
       );
+    }
+    $expected = array(
+      'total_rows' => 2,
+      'offset' => 0,
+      'rows' => $rows,
+    );
 
-      $db = $this->workspace->id();
-      $response = $this->httpRequest("$db/_all_docs", 'GET');
-      $this->assertResponse('200', 'HTTP response code is correct.');
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $data = Json::decode($response);
+    $response = $this->httpRequest("$db/_all_docs", 'GET');
+    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+    $data = Json::decode($response);
+    foreach (array_keys($data) as $key) {
+      $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key when not including docs.");
+    }
 
-      foreach (array_keys($data) as $key) {
-        $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key.");
-      }
+    // Test with including docs.
+    $rows = array();
+    foreach ($entities as $entity) {
+      $rows[] = array(
+        'id' => $entity->uuid(),
+        'key' => $entity->uuid(),
+        'value' => array(
+          'rev' => $entity->_revs_info->rev,
+          'doc' => $serializer->normalize($entity),
+        ),
+      );
+    }
+    $expected = array(
+      'total_rows' => 2,
+      'offset' => 0,
+      'rows' => $rows,
+    );
+
+    $response = $this->httpRequest("$db/_all_docs", 'GET', NULL, NULL, NULL, array('include_docs' => 'true'));
+    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+    $data = Json::decode($response);
+    foreach (array_keys($data) as $key) {
+      $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key when including docs.");
     }
   }
 }

@@ -23,6 +23,12 @@ interface ChangesInterface {
   static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace);
 
   /**
+   * @param boolean $include_docs
+   * @return \Drupal\relaxed\Changes\ChangesInterface
+   */
+  public function includeDocs($include_docs);
+
+  /**
    * Sets from what sequence number to check for changes.
    *
    * @param int $seq

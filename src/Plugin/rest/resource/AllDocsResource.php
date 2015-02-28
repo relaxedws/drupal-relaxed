@@ -9,6 +9,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\relaxed\AllDocs\AllDocs;
 use Drupal\rest\ResourceResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @RestResource(
@@ -36,11 +37,13 @@ class AllDocsResource extends ResourceBase {
     // @todo: Inject the container without using deprecated method call.
     $all_docs = AllDocs::createInstance(
       \Drupal::getContainer(),
-      \Drupal::service('entity.manager'),
-      \Drupal::service('multiversion.manager'),
       $workspace
     );
 
+    $request = Request::createFromGlobals();
+    if ($request->query->get('include_docs') == 'true') {
+      $all_docs->includeDocs(TRUE);
+    }
     return new ResourceResponse($all_docs, 200);
   }
 }

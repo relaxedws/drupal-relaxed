@@ -7,6 +7,7 @@ use Drupal\multiversion\Entity\Index\EntityIndexInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\MultiversionManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class AllDocs implements AllDocsInterface {
 
@@ -29,6 +30,11 @@ class AllDocs implements AllDocsInterface {
    * @var \Drupal\multiversion\Entity\Index\EntityIndexInterface
    */
   protected $entityIndex;
+
+  /**
+   * @var \Symfony\Component\Serializer\SerializerInterface
+   */
+  protected $serializer;
 
   /**
    * @var boolean
@@ -68,12 +74,13 @@ class AllDocs implements AllDocsInterface {
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace) {
+  public static function createInstance(ContainerInterface $container, WorkspaceInterface $workspace) {
     return new static(
-      $entity_manager,
-      $multiversion_manager,
+      $container->get('entity.manager'),
+      $container->get('multiversion.manager'),
       $workspace,
-      $container->get('entity.index.id')
+      $container->get('entity.index.id'),
+      $container->get('serializer')
     );
   }
 
@@ -83,11 +90,12 @@ class AllDocs implements AllDocsInterface {
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\multiversion\Entity\Index\EntityIndexInterface $entity_index
    */
-  public function __construct(EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace, EntityIndexInterface $entity_index) {
+  public function __construct(EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace, EntityIndexInterface $entity_index, SerializerInterface $serializer) {
     $this->entityManager = $entity_manager;
     $this->multiversionManager = $multiversion_manager;
     $this->workspace = $workspace;
     $this->entityIndex = $entity_index;
+    $this->serializer = $serializer;
   }
 
   /**
@@ -163,20 +171,19 @@ class AllDocs implements AllDocsInterface {
           continue;
         }
 
+        $keys = array();
+        foreach ($ids as $id) {
+          $keys[] = $entity_type_id . ':' . $id;
+        }
+        $items = $this->entityIndex->getMultiple($keys);
+        foreach ($items as $item) {
+          $rows[$item['uuid']] = array('rev' => $item['rev']);
+        }
+
         if ($this->includeDocs) {
           $entities = $this->entityManager->getStorage($entity_type_id)->loadMultiple($ids);
           foreach ($entities as $entity) {
-            $rows[$entity->uuid()] = $entity;
-          }
-        }
-        else {
-          $keys = array();
-          foreach ($ids as $id) {
-            $keys[] = $entity_type_id . ':' . $id;
-          }
-          $items = $this->entityIndex->getMultiple($keys);
-          foreach ($items as $item) {
-            $rows[$item['uuid']] = array('rev' => $item['rev']);
+            $rows[$entity->uuid()]['doc'] = $this->serializer->normalize($entity, 'json');
           }
         }
       }

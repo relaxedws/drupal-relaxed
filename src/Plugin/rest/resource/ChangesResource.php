@@ -9,6 +9,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\relaxed\Changes\Changes;
 use Drupal\rest\ResourceResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -36,6 +37,11 @@ class ChangesResource extends ResourceBase {
       \Drupal::service('entity.index.sequence'),
       $workspace
     );
+
+    $request = Request::createFromGlobals();
+    if ($request->query->get('include_docs') == 'true') {
+      $changes->includeDocs(TRUE);
+    }
 
     return new ResourceResponse($changes, 200);
   }

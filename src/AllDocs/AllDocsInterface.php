@@ -13,12 +13,10 @@ interface AllDocsInterface {
    * Factory method.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   * @param \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @return \Drupal\relaxed\AllDocs\AllDocsInterface
    */
-  public static function createInstance(ContainerInterface $container, EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace);
+  public static function createInstance(ContainerInterface $container, WorkspaceInterface $workspace);
 
   /**
    * @param boolean $include_docs

@@ -7,10 +7,13 @@
 
 namespace Drupal\relaxed\Changes;
 
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\SequenceIndex;
 use Drupal\multiversion\Entity\Index\SequenceIndexInterface;
+use Drupal\multiversion\Entity\Storage\ContentEntityStorageInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class Changes implements ChangesInterface {
 
@@ -18,6 +21,21 @@ class Changes implements ChangesInterface {
    * @var string
    */
   protected $workspaceId;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * @var \Symfony\Component\Serializer\SerializerInterface
+   */
+  protected $serializer;
+
+  /**
+   * @var boolean
+   */
+  protected $includeDocs = FALSE;
 
   /**
    * @var int
@@ -30,17 +48,30 @@ class Changes implements ChangesInterface {
   static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace) {
     return new static(
       $sequence_index,
-      $workspace
+      $workspace,
+      $container->get('entity.manager'),
+      $container->get('serializer')
     );
   }
 
   /**
    * @param \Drupal\multiversion\Entity\Index\SequenceIndex $sequenceIndex
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    */
-  public function __construct(SequenceIndex $sequenceIndex, WorkspaceInterface $workspace) {
+  public function __construct(SequenceIndex $sequenceIndex, WorkspaceInterface $workspace, EntityManagerInterface $entity_manager, SerializerInterface $serializer) {
     $this->sequenceIndex = $sequenceIndex;
     $this->workspaceId = $workspace->id();
+    $this->entityManager = $entity_manager;
+    $this->serializer = $serializer;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function includeDocs($include_docs) {
+    $this->includeDocs = $include_docs;
   }
 
   /**
@@ -76,6 +107,12 @@ class Changes implements ChangesInterface {
       );
       if ($sequence['deleted']) {
         $changes[$uuid]['deleted'] = TRUE;
+      }
+      if ($this->includeDocs == TRUE) {
+        /** @var \Drupal\multiversion\Entity\Storage\ContentEntityStorageInterface $storage */
+        $storage = $this->entityManager->getStorage($sequence['entity_type']);
+        $revision = $storage->loadRevision($sequence['revision_id']);
+        $changes[$uuid]['doc'] = $this->serializer->normalize($revision);
       }
     }
     return array_values($changes);
