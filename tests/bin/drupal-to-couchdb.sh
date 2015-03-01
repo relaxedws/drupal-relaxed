@@ -22,7 +22,7 @@ curl -X PUT localhost:5984/target
 
 # Run the replication.
 nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@drupal.loc/relaxed/default", "target": "http://localhost:5984/target"}' http://localhost:5984/_replicate &
-sleep 120
+sleep 200
 
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
