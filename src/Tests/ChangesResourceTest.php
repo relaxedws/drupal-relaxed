@@ -27,39 +27,15 @@ class ChangesResourceTest extends ResourceTestBase {
     $entity = entity_create('entity_test_rev');
     $entity->save();
     // Update the field_test_text field.
-    $entity->set(
-      'field_test_text',
-      array(
-        0 => array(
-          'value' => $this->randomString(),
-          'format' => 'plain_text',
-        ),
-      )
-    );
+    $entity->set('field_test_text', array(array('value' => $this->randomString(), 'format' => 'plain_text')));
     $entity->save();
 
     // Update the name filed.
-    $entity->set(
-      'name',
-      array(
-        0 => array(
-          'value' => $this->randomString(12),
-          'format' => 'plain_text',
-        ),
-      )
-    );
+    $entity->set('name', array(array('value' => $this->randomString(12), 'format' => 'plain_text')));
     $entity->save();
 
     // Update the name filed again.
-    $entity->set(
-      'name',
-      array(
-        0 => array(
-          'value' => $this->randomString(25),
-          'format' => 'plain_text',
-        ),
-      )
-    );
+    $entity->set('name', array(array('value' => $this->randomString(25), 'format' => 'plain_text')));
     $entity->save();
     $expected_without_docs['results'][] = array(
       'changes' => array(array('rev' => $entity->_revs_info->rev)),
@@ -78,51 +54,38 @@ class ChangesResourceTest extends ResourceTestBase {
     $entity->save();
 
     // Update the field_test_text field.
-    $entity->set(
-      'field_test_text',
-      array(
-        0 => array(
-          'value' => $this->randomString(),
-          'format' => 'plain_text',
-        ),
-      )
-    );
+    $entity->set('field_test_text', array(array('value' => $this->randomString(), 'format' => 'plain_text')));
     $entity->save();
 
     // Delete the entity.
     $entity->delete();
-    $revs[] = array(
+    $expected_without_docs['results'][] = array(
+      'changes' => array(array('rev' => $entity->_revs_info->rev)),
       'id' => $entity->uuid(),
-      'rev' => $entity->_revs_info->rev,
-      'deleted' => TRUE,
+      'seq' => 6,
+      'deleted' => true,
+    );
+    $expected_with_docs['results'][] = array(
+      'changes' => array(array('rev' => $entity->_revs_info->rev)),
+      'id' => $entity->uuid(),
+      'seq' => 6,
+      'doc' => $serializer->normalize($entity),
+      'deleted' => true,
     );
 
     $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
-    $this->assertTrue(
-      is_array($data) && !empty($data) && isset($data['results']),
-      'Data format is correct, the array is not empty.'
-    );
+    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $results_count = count($data['results']);
-    $revs_count = count($revs);
-    $this->assertEqual($results_count, $revs_count, 'The number of changes is correct.');
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('include_docs' => 'true'));
+    $this->assertResponse('200', 'HTTP response code is correct when including docs.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
 
-    $correct_data = TRUE;
-    foreach ($data['results'] as $key => $rev) {
-      if ($revs[$key]['id'] != $rev['id']
-        || $revs[$key]['rev'] != $rev['changes'][0]['rev']) {
-        $correct_data = FALSE;
-      }
-      if (isset($revs[$key]['deleted']) && !isset($rev['deleted'])
-        || isset($rev['deleted']) && !isset($revs[$key]['deleted'])) {
-          $correct_data = FALSE;
-      }
-    }
-    $this->assertTrue($correct_data, 'The returned information is correct.');
+    $data = Json::decode($response);
+    $this->assertEqual($data, $expected_with_docs, 'The result is correct when including docs.');
   }
 
 }
