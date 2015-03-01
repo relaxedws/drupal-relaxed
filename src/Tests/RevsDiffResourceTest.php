@@ -14,6 +14,12 @@ class RevsDiffResourceTest extends ResourceTestBase {
   public function testPostNoMissingRevisions() {
     $this->enableService('relaxed:revs_diff', 'POST');
 
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('workspace', 'view');
+    $permissions[] = 'restful post relaxed:revs_diff';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
       // Create a new test entity.
@@ -21,39 +27,15 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $entity->save();
 
       // Update the field_test_text field.
-      $entity->set(
-        'field_test_text',
-        array(
-          0 => array(
-            'value' => $this->randomString(),
-            'format' => 'plain_text',
-          ),
-        )
-      );
+      $entity->set('field_test_text', array(array('value' => $this->randomString(), 'format' => 'plain_text')));
       $entity->save();
 
       // Update the name filed.
-      $entity->set(
-        'name',
-        array(
-          0 => array(
-            'value' => $this->randomString(12),
-            'format' => 'plain_text',
-          ),
-        )
-      );
+      $entity->set('name', array(array('value' => $this->randomString(12), 'format' => 'plain_text')));
       $entity->save();
 
       // Update the name filed again.
-      $entity->set(
-        'name',
-        array(
-          0 => array(
-            'value' => $this->randomString(25),
-            'format' => 'plain_text',
-          ),
-        )
-      );
+      $entity->set('name', array(array('value' => $this->randomString(25), 'format' => 'plain_text')));
       $entity->save();
 
       $entity = entity_load($entity_type, $entity->id(), TRUE);
@@ -66,9 +48,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
         }
       }
 
-      $response = $this->httpRequest(
-        $this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data)
-      );
+      $response = $this->httpRequest($this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data));
       $this->assertResponse('200', 'HTTP response code is correct.');
       $data = Json::decode($response);
       $this->assertTrue(empty($data), 'Data format is correct.');
@@ -78,6 +58,12 @@ class RevsDiffResourceTest extends ResourceTestBase {
   public function testPostMissingRevisions() {
     $this->enableService('relaxed:revs_diff', 'POST');
 
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('workspace', 'view');
+    $permissions[] = 'restful post relaxed:revs_diff';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
     $entity_types = array('entity_test_rev');
     foreach ($entity_types as $entity_type) {
 
@@ -86,39 +72,15 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $entity->save();
 
       // Update the field_test_text field.
-      $entity->set(
-        'field_test_text',
-        array(
-          0 => array(
-            'value' => $this->randomString(),
-            'format' => 'plain_text',
-          ),
-        )
-      );
+      $entity->set('field_test_text', array(array('value' => $this->randomString(), 'format' => 'plain_text')));
       $entity->save();
 
       // Update the name filed.
-      $entity->set(
-        'name',
-        array(
-          0 => array(
-            'value' => $this->randomString(12),
-            'format' => 'plain_text',
-          ),
-        )
-      );
+      $entity->set('name', array(array('value' => $this->randomString(12), 'format' => 'plain_text')));
       $entity->save();
 
       // Update the name filed again.
-      $entity->set(
-        'name',
-        array(
-          0 => array(
-            'value' => $this->randomString(25),
-            'format' => 'plain_text',
-          ),
-        )
-      );
+      $entity->set('name', array(array('value' => $this->randomString(25), 'format' => 'plain_text')));
       $entity->save();
 
       $data = array();
@@ -148,9 +110,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
         '33-1214293f06b11ea6da4c9da0593333zz',
         '44-1214293f06b11ea6da4c9da0594444zz',
       );
-      $response = $this->httpRequest(
-        $this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data)
-      );
+      $response = $this->httpRequest($this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data));
       $this->assertResponse('200', 'HTTP response code is correct.');
       $response_data = Json::decode($response);
       $this->assertTrue(
