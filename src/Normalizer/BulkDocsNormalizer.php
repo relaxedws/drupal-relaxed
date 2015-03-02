@@ -54,7 +54,10 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
         if (!empty($doc)) {
           // @todo Find a more generic way to denormalize this w/o calling a
           // specific normalization service.
-          $entities[] = \Drupal::service('relaxed.normalizer.content_entity')->denormalize($doc, 'Drupal\Core\Entity\ContentEntityInterface', $format, $context);
+          $entity = \Drupal::service('relaxed.normalizer.content_entity')->denormalize($doc, 'Drupal\Core\Entity\ContentEntityInterface', $format, $context);
+          if ($entity) {
+            $entities[] = $entity;
+          }
         }
       }
     }

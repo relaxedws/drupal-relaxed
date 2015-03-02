@@ -239,13 +239,16 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
     else {
+      $entity = NULL;
       if (isset($data_rev)) {
         $data['_revs_info'][0]['rev'] = $data_rev;
       }
 
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       // @todo Use the passed $class to instantiate the entity.
-      $entity = $storage->create($data);
+      if (!empty($bundle_key) && !empty($data[$bundle_key]) || $entity_type_id == 'replication_log') {
+        $entity = $storage->create($data);
+      }
     }
 
     if ($entity_id) {
