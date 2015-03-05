@@ -103,7 +103,7 @@ class Changes implements ChangesInterface {
           array('rev' => $sequence['rev']),
         ),
         'id' => $uuid,
-        'seq' => $seq + 1,
+        'seq' => $seq,
       );
       if ($sequence['deleted']) {
         $changes[$uuid]['deleted'] = TRUE;

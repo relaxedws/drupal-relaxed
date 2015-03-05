@@ -25,15 +25,21 @@ class ChangesNormalizer extends NormalizerBase {
     /** @var \Drupal\relaxed\Changes\ChangesInterface $changes */
     $results = $changes->getNormal();
     $last_result = end($results);
-    // 'since' parameter is important for PouchDB replication.
-    if ($since = $context['query']['since']) {
-      $results = array_slice($results, $since);
-    }
     $last_seq = isset($last_result['seq']) ? $last_result['seq'] : 0;
+
+    // 'since' parameter is important for PouchDB replication.
+    $since = (isset($context['query']['since']) && is_numeric($context['query']['since'])) ? $context['query']['since'] : 0;
+
+    $filtered_results = array();
+    foreach ($results as $result) {
+      if ($result['seq'] > $since) {
+        $filtered_results[] = $result;
+      }
+    }
 
     return array(
       'last_seq' => $last_seq,
-      'results' => $results,
+      'results' => ($since == 0) ? $results : $filtered_results,
     );
   }
 
