@@ -25,6 +25,10 @@ class ChangesNormalizer extends NormalizerBase {
     /** @var \Drupal\relaxed\Changes\ChangesInterface $changes */
     $results = $changes->getNormal();
     $last_result = end($results);
+    // 'since' parameter is important for PouchDB replication.
+    if ($since = $context['query']['since']) {
+      $results = array_slice($results, $since);
+    }
     $last_seq = isset($last_result['seq']) ? $last_result['seq'] : 0;
 
     return array(

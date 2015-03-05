@@ -25,8 +25,11 @@ describe('Test replication', function () {
         result.ok.should.equal(true);
         result.docs_written.should.equal(docs.length);
         db.info(function (err, info) {
-          info.update_seq.should.equal(9);
-          info.doc_count.should.equal(9);
+          console.log(err);
+          verifyInfo(info, {
+            update_seq: 9,
+            doc_count: 9
+          });
           done();
         });
       });
@@ -37,14 +40,24 @@ describe('Test replication', function () {
     var db = new PouchDB('drupal_to_pouch');
     var remote = new PouchDB('http://admin:admin@drupal.loc/relaxed/default');
     //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
-      db.replicate.from(remote, function (err, result) {
+      db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
+        result.docs_written.should.equal(docs.length);
         db.info(function (err, info) {
-          info.update_seq.should.equal(9, 'update_seq');
-          info.doc_count.should.equal(9, 'doc_count');
+          verifyInfo(info, {
+            update_seq: 9,
+            doc_count: 9
+          });
           done();
         });
       });
     //});
   });
 });
+
+function verifyInfo(info, expected) {
+  if (!testUtils.isCouchMaster()) {
+    info.update_seq.should.equal(expected.update_seq, 'update_seq');
+  }
+  info.doc_count.should.equal(expected.doc_count, 'doc_count');
+}
