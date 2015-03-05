@@ -34,9 +34,11 @@ class ChangesNormalizer extends NormalizerBase {
     if ($since == 0) {
       $filtered_results = $results;
     }
-    foreach ($results as $result) {
-      if ($result['seq'] > $since) {
-        $filtered_results[] = $result;
+    else {
+      foreach ($results as $result) {
+        if ($result['seq'] > $since) {
+          $filtered_results[] = $result;
+        }
       }
     }
 
