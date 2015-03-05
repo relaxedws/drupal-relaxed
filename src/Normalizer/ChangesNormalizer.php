@@ -31,6 +31,9 @@ class ChangesNormalizer extends NormalizerBase {
     $since = (isset($context['query']['since']) && is_numeric($context['query']['since'])) ? $context['query']['since'] : 0;
 
     $filtered_results = array();
+    if ($since == 0) {
+      $filtered_results = $results;
+    }
     foreach ($results as $result) {
       if ($result['seq'] > $since) {
         $filtered_results[] = $result;
@@ -39,7 +42,7 @@ class ChangesNormalizer extends NormalizerBase {
 
     return array(
       'last_seq' => $last_seq,
-      'results' => ($since == 0) ? $results : $filtered_results,
+      'results' => $filtered_results,
     );
   }
 
