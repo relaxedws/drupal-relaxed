@@ -24,6 +24,7 @@ before_install:
   - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
 
 install:
+  - sudo apt-get update
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi apache2-utils
   - sudo a2enmod log_forensic
