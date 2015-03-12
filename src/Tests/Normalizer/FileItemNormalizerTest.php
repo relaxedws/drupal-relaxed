@@ -189,6 +189,9 @@ class FileItemNormalizerTest extends NormalizerTestBase{
       'created' => array(
         array('value' => $this->entity->created->value),
       ),
+      'default_langcode' => array(
+        array('value' => TRUE),
+      ),
       'user_id' => array(
         array('target_id' => $this->values['user_id']),
       ),
