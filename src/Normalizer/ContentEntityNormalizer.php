@@ -221,6 +221,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
       if ($entity) {
         foreach ($data as $name => $value) {
+          if ($name == 'default_langcode') {
+            continue;
+          }
           $entity->{$name} = $value;
         }
       }
