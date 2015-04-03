@@ -17,6 +17,6 @@ mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/pouchdb/test.js $TRAVIS_BUI
 # Enable dependencies.
 drush en --yes entity_test, relaxed_test || true
 
-mocha-phantomjs -R dot -s localToRemoteUrlAccessEnabled=true http://admin:admin@drupal.loc/test.html | tee /tmp/output.txt
+mocha-phantomjs -s localToRemoteUrlAccessEnabled=true -s webSecurityEnabled=false test.html | tee /tmp/output.txt
 
 test 1 -eq $(egrep -c "(2 passing)" /tmp/output.txt)
