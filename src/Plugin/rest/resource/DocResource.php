@@ -67,7 +67,10 @@ class DocResource extends ResourceBase {
     $revisions = is_array($existing) ? $existing : array($existing);
 
     foreach ($revisions as $revision) {
-      if (!$revision->access('view')) {
+      $entity_type_id = $revision->getEntityTypeId();
+      $current_user = \Drupal::currentUser();
+      if (($entity_type_id == 'user' && !$current_user->hasPermission('administer users'))
+        || ($entity_type_id != 'user' && !$revision->access('view'))) {
         throw new AccessDeniedHttpException();
       }
       foreach ($revision as $field_name => $field) {

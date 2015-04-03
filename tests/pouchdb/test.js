@@ -42,11 +42,13 @@ describe('Test replication', function () {
     //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
       db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
-        result.docs_written.should.equal(docs.length);
+        // We expect to have 11 docs: 9 - entity_test entity type
+        // and 2 - user entity type.
+        result.docs_written.should.equal(11);
         db.info(function (err, info) {
           verifyInfo(info, {
-            update_seq: 9,
-            doc_count: 9
+            update_seq: 11,
+            doc_count: 11
           });
           done();
         });

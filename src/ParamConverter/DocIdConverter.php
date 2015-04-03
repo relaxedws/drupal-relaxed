@@ -71,7 +71,7 @@ class DocIdConverter implements ParamConverterInterface {
       $entity_id = $item['entity_id'];
     }
     // Return the plain UUID if we're missing information.
-    if (!$entity_id || !$entity_type_id) {
+    if (!isset($entity_id) || !$entity_type_id) {
       return $uuid;
     }
 
