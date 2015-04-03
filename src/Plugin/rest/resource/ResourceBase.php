@@ -36,8 +36,6 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       ), array(
         '_method' => $method,
         '_permission' => "restful " . $method_lower . " $this->pluginId",
-      ), array(
-        '_access_mode' => 'ANY',
       ));
 
       if (isset($definition['uri_paths'][$method_lower])) {

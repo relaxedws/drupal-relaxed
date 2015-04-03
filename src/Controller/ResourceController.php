@@ -200,9 +200,12 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Generates a CSRF protecting session token.
+   *
    * @return \Symfony\Component\HttpFoundation\Response
+   *   The response object.
    */
   public function csrfToken() {
-    return new Response(drupal_get_token('rest'), 200, array('Content-Type' => 'text/plain'));
+    return new Response(\Drupal::csrfToken()->get('rest'), 200, array('Content-Type' => 'text/plain'));
   }
 }
