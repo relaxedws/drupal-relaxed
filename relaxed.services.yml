@@ -75,7 +75,3 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
-  relaxed.relaxed_subscriber:
-    class: Drupal\relaxed\EventSubscriber\RelaxedSubscriber
-    tags:
-      - { name: event_subscriber }
