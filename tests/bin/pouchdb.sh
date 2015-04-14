@@ -7,7 +7,7 @@ npm install -g mocha-phantomjs
 npm install chai
 npm install es5-shim
 npm install mocha
-npm install pouchdb@3.2.1
+npm install pouchdb
 
 mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
 mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
@@ -17,6 +17,6 @@ mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/pouchdb/test.js $TRAVIS_BUI
 # Enable dependencies.
 drush en --yes entity_test, relaxed_test || true
 
-mocha-phantomjs -R dot -s localToRemoteUrlAccessEnabled=true http://admin:admin@drupal.loc/test.html | tee /tmp/output.txt
+mocha-phantomjs -s localToRemoteUrlAccessEnabled=true -s webSecurityEnabled=false test.html | tee /tmp/output.txt
 
 test 1 -eq $(egrep -c "(2 passing)" /tmp/output.txt)

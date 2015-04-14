@@ -86,6 +86,34 @@ class ChangesResourceTest extends ResourceTestBase {
 
     $data = Json::decode($response);
     $this->assertEqual($data, $expected_with_docs, 'The result is correct when including docs.');
+
+    // Test when using 'since' query parameter.
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => 1));
+    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+
+    $data = Json::decode($response);
+    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => 3));
+    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+
+    $data = Json::decode($response);
+    // Unset first value from results, it shouldn't be returned when since == 3.
+    unset($expected_without_docs['results'][0]);
+    // Reset the keys of the results array.
+    $expected_without_docs['results'] = array_values($expected_without_docs['results']);
+    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => 6));
+    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+
+    $data = Json::decode($response);
+    // The result array should be empty in this case.
+    $expected_without_docs['results'] = array();
+    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
   }
 
 }
