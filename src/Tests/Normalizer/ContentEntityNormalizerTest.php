@@ -39,9 +39,12 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
 
     $expected = array(
       '@context' => array(
-        'entity_test_mulrev' => '',
+        'entity_test_mulrev' => \Drupal::service('rest.link_manager')->getTypeUri(
+          'entity_test_mulrev',
+          $entity->bundle()
+        ),
       ),
-      '@id' => '',
+      '@id' => $this->getEntityUri($entity),
       '@type' => 'entity_test_mulrev',
       'id' => array(
         array('value' => 1),
@@ -79,7 +82,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
       'workspace' => array(
         array('target_id' => 'default')
       ),
-      '_id' => 'entity_test_mulrev.' . $entity->uuid(),
+      '_id' => $entity->uuid(),
       '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
     );
 
@@ -126,4 +129,5 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
 
     // @todo Test context switches.
   }
+
 }

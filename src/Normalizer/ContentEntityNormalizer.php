@@ -4,6 +4,7 @@ namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\UuidIndex;
+use Drupal\rest\LinkManager\LinkManager;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -28,9 +29,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    * @param \Drupal\multiversion\Entity\Index\UuidIndex $uuid_index
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, LinkManager $link_manager) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
+    $this->linkManager = $link_manager;
   }
 
   /**
@@ -41,11 +43,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     $data = array(
       '@context' => array(
-        $entity_type => '', // @todo Use link manager to generate entity type URL
+        $entity_type => $this->linkManager->getTypeUri(
+          $entity_type,
+          $entity->bundle()
+        ),
       ),
-      '@id' => '', // @todo Use link manager to generate entity URL
+      '@id' => $this->getEntityUri($entity),
       '@type' => $entity_type,
-      '_id' => "$entity_type." . $entity->uuid()
+      '_id' => $entity->uuid()
     );
 
     // New or mocked entities might not have a rev yet.
@@ -107,11 +112,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_uuid = NULL;
     $entity_id = NULL;
 
-    // Get the entity type and the entity id from $data['_id'] string.
-    if (!empty($data['_id']) && strpos($data['_id'], '.') !== FALSE && substr($data['_id'], 0, 6) != '_local') {
-      list($entity_type_from_data, $entity_uuid_from_data) = explode('.', $data['_id']);
-    }
-    elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
+    if (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
       list($entity_type_from_data, $entity_uuid_from_data) = explode('/', $data['_id']);
       if ($entity_type_from_data == '_local' && $entity_uuid_from_data) {
         $entity_type_from_data = 'replication_log';
@@ -131,14 +132,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Resolve the UUID.
     // @todo Needs test
-    if (!empty($data['uuid'][0]['value']) && !isset($entity_uuid_from_data) && ($data['uuid'][0]['value'] != $entity_uuid_from_data)) {
+    if (!empty($data['uuid'][0]['value']) && !empty($data['_id']) && ($data['uuid'][0]['value'] != $data['_id'])) {
       throw new UnexpectedValueException('The uuid and _id values does not match.');
     }
     if (!empty($data['uuid'][0]['value'])) {
       $entity_uuid = $data['uuid'][0]['value'];
     }
     elseif (isset($entity_uuid_from_data)) {
-      $entity_uuid = $data['uuid'][0]['value'] = $entity_uuid_from_data;
+      $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
@@ -258,4 +259,18 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     return $entity;
   }
+
+  /**
+   * Constructs the entity URI.
+   *
+   * @param $entity
+   *   The entity.
+   *
+   * @return string
+   *   The entity URI.
+   */
+  protected function getEntityUri($entity) {
+    return $entity->url('canonical', array('absolute' => TRUE));
+  }
+
 }

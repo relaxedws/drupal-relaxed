@@ -11,7 +11,7 @@ use Drupal\Component\Utility\String;
  */
 class AttachmentNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'file', 'relaxed', 'key_value', 'multiversion');
+  public static $modules = array('serialization', 'system', 'entity', 'field', 'file', 'relaxed', 'key_value', 'multiversion', 'rest');
 
   /**
    * @var \Symfony\Component\Serializer\SerializerInterface

@@ -9,7 +9,7 @@ services:
       - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@rest.link_manager']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.bulk_docs:
