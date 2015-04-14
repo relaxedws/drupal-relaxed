@@ -12,7 +12,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Defines a service profiler for the multiversion module.
+ * Defines a service profiler for the relaxed module.
  */
 class RelaxedServiceProvider extends ServiceProviderBase {
 
