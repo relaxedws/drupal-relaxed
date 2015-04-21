@@ -16,9 +16,12 @@ env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
 
 before_install:
   - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
