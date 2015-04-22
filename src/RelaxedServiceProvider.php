@@ -17,10 +17,6 @@ use \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class RelaxedServiceProvider extends ServiceProviderBase {
 
   public function alter(ContainerBuilder $container) {
-    // Override the access_check.permission class with a new class.
-    $definition = $container->getDefinition('access_check.permission');
-    $definition->setClass('Drupal\relaxed\Access\PermissionAccessCheck');
-
     // Override the access_check.rest.csrf class with a new class.
     // @todo Revisit this before beta release: https://www.drupal.org/node/2470691
     try {
