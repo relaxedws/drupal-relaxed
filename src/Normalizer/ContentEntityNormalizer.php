@@ -170,13 +170,17 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       // @todo Needs test.
       $data[$entity_type->getKey('id')] = $entity_id;
     }
-    // The bundle property behaves differently from other entity properties.
-    // i.e. the nested structure with a 'value' key does not work.
-    // @todo Does this still apply?
+
     if ($entity_type->hasKey('bundle')) {
       $bundle_key = $entity_type->getKey('bundle');
       if (!empty($data[$bundle_key][0]['value'])) {
+        // Add bundle info when entity is not new.
         $type = $data[$bundle_key][0]['value'];
+        $data[$bundle_key] = $type;
+      }
+      elseif (!empty($data[$bundle_key][0]['target_id'])) {
+        // Add bundle info when entity is new.
+        $type = $data[$bundle_key][0]['target_id'];
         $data[$bundle_key] = $type;
       }
     }

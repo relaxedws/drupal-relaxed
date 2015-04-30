@@ -1,0 +1,4 @@
+perform content replication:
+  title: 'Perform content replication'
+  description: 'Perform content replication regardless of permission restrictions.'
+  restrict access: true

@@ -16,9 +16,12 @@ env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
 
 before_install:
   - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
@@ -65,7 +68,7 @@ before_script:
 
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal minimal
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
 
   # Checkout second directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
@@ -75,7 +78,7 @@ before_script:
 
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal2
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal2 minimal
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal2 standard
 
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal
