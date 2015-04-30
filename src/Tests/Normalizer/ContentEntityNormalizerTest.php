@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Tests the content serialization format.
@@ -122,7 +122,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
   public function testDenormalize() {
     $normalized = $this->serializer->normalize($this->entity);
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
-    $this->assertTrue($denormalized instanceof $this->entityClass, String::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
+    $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
     $this->assertIdentical($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');
     $this->assertIdentical($denormalized->bundle(), $this->entity->bundle(), 'Expected entity bundle found.');
     $this->assertIdentical($denormalized->uuid(), $this->entity->uuid(), 'Expected entity UUID found.');

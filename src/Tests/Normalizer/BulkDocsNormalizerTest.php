@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\multiversion\Entity\Transaction\MockTransaction;
 use Drupal\relaxed\BulkDocs\BulkDocs;
 use Drupal\relaxed\BulkDocs\BulkDocsInterface;
@@ -101,7 +101,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
     $this->assertTrue($bulk_docs instanceof BulkDocsInterface, 'Denormalized data is an instance of the correct interface.');
     foreach ($bulk_docs->getEntities() as $key => $entity) {
       $entity_number = $key+1;
-      $this->assertTrue($entity instanceof $this->entityClass, String::format("Denormalized entity number $entity_number is an instance of @class", array('@class' => $this->entityClass)));
+      $this->assertTrue($entity instanceof $this->entityClass, SafeMarkup::format("Denormalized entity number $entity_number is an instance of @class", array('@class' => $this->entityClass)));
       $this->assertIdentical($entity->getEntityTypeId(), $this->testEntities[$key]->getEntityTypeId(), "Expected entity type foundfor entity number $entity_number.");
       $this->assertIdentical($entity->bundle(), $this->testEntities[$key]->bundle(), "Expected entity bundle found for entity number $entity_number.");
       $this->assertIdentical($entity->uuid(), $this->testEntities[$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");

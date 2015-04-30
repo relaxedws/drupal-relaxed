@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Tests the attachment serialization format.
@@ -62,7 +62,7 @@ class AttachmentNormalizerTest extends NormalizerTestBase {
 
   public function testDenormalize() {
     $denormalized = $this->serializer->denormalize($this->fileHandle, $this->entityClass, 'stream');
-    $this->assertTrue($denormalized instanceof $this->entityClass, String::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
+    $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
     $this->assertIdentical($denormalized->getEntityTypeId(), $this->fileEntity->getEntityTypeId(), 'Expected entity type found.');
   }
 
