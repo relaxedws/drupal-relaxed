@@ -22,7 +22,7 @@ class ChangesResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $expected_with_docs = $expected_without_docs = array('last_seq' => 6, 'results' => array());
+    $expected_with_docs = $expected_without_docs = array('last_seq' => NULL, 'results' => array());
 
     $entity = entity_create('entity_test_rev');
     $entity->save();
@@ -37,15 +37,16 @@ class ChangesResourceTest extends ResourceTestBase {
     // Update the name filed again.
     $entity->set('name', array(array('value' => $this->randomString(25), 'format' => 'plain_text')));
     $entity->save();
+    $first_seq = $this->multiversionManager->lastSequenceId();
     $expected_without_docs['results'][] = array(
       'changes' => array(array('rev' => $entity->_revs_info->rev)),
       'id' => $entity->uuid(),
-      'seq' => 3,
+      'seq' => $first_seq,
     );
     $expected_with_docs['results'][] = array(
       'changes' => array(array('rev' => $entity->_revs_info->rev)),
       'id' => $entity->uuid(),
-      'seq' => 3,
+      'seq' => $first_seq,
       'doc' => $serializer->normalize($entity)
     );
 
@@ -59,19 +60,22 @@ class ChangesResourceTest extends ResourceTestBase {
 
     // Delete the entity.
     $entity->delete();
+    $second_seq = $this->multiversionManager->lastSequenceId();
     $expected_without_docs['results'][] = array(
       'changes' => array(array('rev' => $entity->_revs_info->rev)),
       'id' => $entity->uuid(),
-      'seq' => 6,
+      'seq' => $second_seq,
       'deleted' => true,
     );
     $expected_with_docs['results'][] = array(
       'changes' => array(array('rev' => $entity->_revs_info->rev)),
       'id' => $entity->uuid(),
-      'seq' => 6,
+      'seq' => $second_seq,
       'doc' => $serializer->normalize($entity),
       'deleted' => true,
     );
+
+    $expected_with_docs['last_seq'] = $expected_without_docs['last_seq'] = $this->multiversionManager->lastSequenceId();
 
     $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
@@ -95,7 +99,7 @@ class ChangesResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => 3));
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => $first_seq));
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
@@ -106,7 +110,7 @@ class ChangesResourceTest extends ResourceTestBase {
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => 6));
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => $second_seq));
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
@@ -114,6 +118,8 @@ class ChangesResourceTest extends ResourceTestBase {
     // The result array should be empty in this case.
     $expected_without_docs['results'] = array();
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+
+    // @todo: Assert the sort order of all results.
   }
 
 }

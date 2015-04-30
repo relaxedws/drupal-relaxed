@@ -92,7 +92,7 @@ class Changes implements ChangesInterface {
 
     // Format the result array.
     $changes = array();
-    foreach ($sequences as $seq => $sequence) {
+    foreach ($sequences as $sequence) {
       if (!empty($sequence['local'])) {
         continue;
       }
@@ -103,7 +103,7 @@ class Changes implements ChangesInterface {
           array('rev' => $sequence['rev']),
         ),
         'id' => $uuid,
-        'seq' => $seq,
+        'seq' => $sequence['seq'],
       );
       if ($sequence['deleted']) {
         $changes[$uuid]['deleted'] = TRUE;
@@ -115,7 +115,15 @@ class Changes implements ChangesInterface {
         $changes[$uuid]['doc'] = $this->serializer->normalize($revision);
       }
     }
-    return array_values($changes);
+
+    // Now when we have rebuilt the result array we need to ensure that the
+    // results array is still sorted on the sequence key, as in the index.
+    $return = array_values($changes);
+    usort($return, function($a, $b) {
+      return $a['seq'] - $b['seq'];
+    });
+
+    return $return;
   }
 
   /**
