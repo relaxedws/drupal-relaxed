@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Normalizer;
 
-use Drupal\multiversion\Entity\Transaction\MockTransaction;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -32,11 +31,9 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
     }
 
     // @todo Use injected container.
-    // @todo Use transactions when they can handle multiple entity types.
     /** @var \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs */
     $bulk_docs = $class::createInstance(
       \Drupal::getContainer(),
-      new MockTransaction(),
       \Drupal::service('workspace.manager'),
       $context['workspace']
     );

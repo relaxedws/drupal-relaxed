@@ -2,17 +2,11 @@
 
 namespace Drupal\relaxed\BulkDocs;
 
-use Drupal\multiversion\Entity\Transaction\TransactionInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class BulkDocs implements BulkDocsInterface {
-
-  /**
-   * @var \Drupal\multiversion\Entity\Transaction\TransactionInterface
-   */
-  protected $trx;
 
   /**
    * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
@@ -42,21 +36,18 @@ class BulkDocs implements BulkDocsInterface {
   /**
    * {@inheritdoc}
    */
-  static public function createInstance(ContainerInterface $container, TransactionInterface $trx, WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace) {
+  static public function createInstance(ContainerInterface $container, WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace) {
     return new static(
-      $trx,
       $workspace_manager,
       $workspace
     );
   }
 
   /**
-   * @param \Drupal\multiversion\Entity\Transaction\TransactionInterface $trx
    * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    */
-  public function __construct(TransactionInterface $trx, WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace) {
-    $this->trx = $trx;
+  public function __construct(WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace) {
     $this->workspaceManager = $workspace_manager;
     $this->workspace = $workspace;
   }
@@ -86,8 +77,6 @@ class BulkDocs implements BulkDocsInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Use self::$trx when transactions can handle multiple entity types.
    */
   public function save() {
     $inital_workspace = $this->workspaceManager->getActiveWorkspace();
@@ -95,7 +84,7 @@ class BulkDocs implements BulkDocsInterface {
 
     foreach ($this->entities as $entity) {
       try {
-        $entity->new_edits = $this->newEdits;
+        $entity->_rev->new_edit = $this->newEdits;
         if (!$entity->isNew()) {
           // Ensure that deleted entities will be saved just once.
           $id = $entity->id();
