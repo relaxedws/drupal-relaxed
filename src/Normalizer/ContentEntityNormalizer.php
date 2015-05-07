@@ -153,9 +153,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       if ($record = $this->uuidIndex->get($entity_uuid)) {
         $entity_id = $record['entity_id'];
         if (empty($entity_type_id)) {
-          $entity_type_id = $record['entity_type'];
+          $entity_type_id = $record['entity_type_id'];
         }
-        elseif ($entity_type_id != $record['entity_type']) {
+        elseif ($entity_type_id != $record['entity_type_id']) {
           throw new UnexpectedValueException('The entity_type value does not match the existing UUID record.');
         }
       }

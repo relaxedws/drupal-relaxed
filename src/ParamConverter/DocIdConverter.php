@@ -61,13 +61,13 @@ class DocIdConverter implements ParamConverterInterface {
     $revision_id = NULL;
 
     // Use the indices to resolve the entity and revision ID.
-    if ($rev_query && $item = $this->revIndex->get("$uuid:$rev_query")) {
-      $entity_type_id = $item['entity_type'];
+    if ($rev_query && $item = $this->revIndex->get($rev_query)) {
+      $entity_type_id = $item['entity_type_id'];
       $entity_id = $item['entity_id'];
       $revision_id = $item['revision_id'];
     }
     elseif (!$rev_query && $item = $this->uuidIndex->get($uuid)) {
-      $entity_type_id = $item['entity_type'];
+      $entity_type_id = $item['entity_type_id'];
       $entity_id = $item['entity_id'];
     }
     // Return the plain UUID if we're missing information.
@@ -91,7 +91,7 @@ class DocIdConverter implements ParamConverterInterface {
 
       $revision_ids = array();
       foreach ($open_revs as $open_rev) {
-        if ($item = $this->revIndex->get("$uuid:$open_rev")) {
+        if ($item = $this->revIndex->get($open_rev)) {
           $revision_ids[] = $item['revision_id'];
         }
       }

@@ -39,7 +39,7 @@ class EntityUuidConverter implements ParamConverterInterface {
     if (!$entity_type_id) {
       // If entity type ID is not provided, try to look it up the UUID index.
       if ($item = $this->uuidIndex->get($uuid)) {
-        $entity_type_id = $item['entity_type'];
+        $entity_type_id = $item['entity_type_id'];
         $entity_id = $item['entity_id'];
         return $this->entityManager->getStorage($entity_type_id)->load($entity_id);
       }
