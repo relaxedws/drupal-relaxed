@@ -59,12 +59,7 @@ class RevisionDiff implements RevisionDiffInterface {
    *   serializer to better separate concerns.
    */
   public function getMissing() {
-    $keys = array();
-    foreach ($this->getRevisionIds() as $entity_uuid => $revision_ids) {
-      foreach ($revision_ids as $revision_id) {
-        $keys[] = $entity_uuid . ':' . $revision_id;
-      }
-    }
+    $keys = $this->getRevisionIds();
     $existing_revision_ids = $this->revisionIndex->getMultiple($keys);
 
     $missing_revision_ids = array();
