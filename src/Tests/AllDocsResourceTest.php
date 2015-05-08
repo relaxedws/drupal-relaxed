@@ -43,7 +43,7 @@ class AllDocsResourceTest extends ResourceTestBase {
         'id' => $entity->uuid(),
         'key' => $entity->uuid(),
         'value' => array(
-          'rev' => $entity->_revs_info->rev,
+          'rev' => $entity->_rev->value,
         ),
       );
     }
@@ -68,7 +68,7 @@ class AllDocsResourceTest extends ResourceTestBase {
         'id' => $entity->uuid(),
         'key' => $entity->uuid(),
         'value' => array(
-          'rev' => $entity->_revs_info->rev,
+          'rev' => $entity->_rev->value,
           'doc' => $serializer->normalize($entity),
         ),
       );

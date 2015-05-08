@@ -67,7 +67,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
       $expected[$key] = array(
         'ok' => TRUE,
         'id' => $entity->uuid(),
-        'rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
+        'rev' => $entity->_rev->value,
       );
     }
 

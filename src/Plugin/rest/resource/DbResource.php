@@ -129,7 +129,7 @@ class DbResource extends ResourceBase {
     $this->validate($entity);
     try {
       $entity->save();
-      $rev = $entity->_revs_info->rev;
+      $rev = $entity->_rev->value;
       return new ResourceResponse(array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev), 201, array('ETag' => $rev));
     }
     catch (EntityStorageException $e) {

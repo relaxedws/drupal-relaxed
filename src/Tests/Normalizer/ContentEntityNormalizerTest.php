@@ -39,12 +39,12 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
 
     $expected = array(
       '@context' => array(
+        '_id' => '@id',
         'entity_test_mulrev' => \Drupal::service('rest.link_manager')->getTypeUri(
           'entity_test_mulrev',
           $entity->bundle()
         ),
       ),
-      '@id' => $this->getEntityUri($entity),
       '@type' => 'entity_test_mulrev',
       'id' => array(
         array('value' => 1),
@@ -83,7 +83,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
         array('target_id' => 'default')
       ),
       '_id' => $entity->uuid(),
-      '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
+      '_rev' => $entity->_rev->value,
     );
 
     $normalized = $this->serializer->normalize($this->entity);
@@ -94,7 +94,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
 
     // Test normalization when is set the revs query parameter.
-    $parts = explode('-', $entity->_revs_info->rev);
+    $parts = explode('-', $entity->_rev->value);
     $expected['_revisions'] = array(
       'ids' => array($parts[1]),
       'start' => (int) $parts[0],

@@ -43,19 +43,16 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     $data = array(
       '@context' => array(
-        $entity_type => $this->linkManager->getTypeUri(
-          $entity_type,
-          $entity->bundle()
-        ),
+        '_id' => '@id',
+        $entity_type => $this->linkManager->getTypeUri($entity_type, $entity->bundle()),
       ),
-      '@id' => $this->getEntityUri($entity),
       '@type' => $entity_type,
       '_id' => $entity->uuid()
     );
 
     // New or mocked entities might not have a rev yet.
-    if (!empty($entity->_revs_info->rev)) {
-      $data['_rev'] = $entity->_revs_info->rev;
+    if (!empty($entity->_rev->value)) {
+      $data['_rev'] = $entity->_rev->value;
     }
 
     $field_definitions = $entity->getFieldDefinitions();
@@ -80,16 +77,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     if (!empty($context['query']['revs'])) {
-      $parts = explode('-', $entity->_revs_info->rev);
+      $parts = explode('-', $entity->_rev->value);
       $data['_revisions'] = array(
-        'ids' => array(),
+        'ids' => array($parts[1]),
         'start' => (int) $parts[0],
       );
-      foreach ($entity->_revs_info as $item) {
-        $parts = explode('-', $item->rev);
-        array_shift($parts);
-        $data['_revisions']['ids'][] = implode('-', $parts);
-      }
+      // @todo: Use \Drupal\multiversion\Entity\Index\RevisionTreeIndex::getDefaultBranch()
     }
 
     // Override the normalization for the _deleted special field, just so that we
@@ -196,19 +189,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    // Add _rev_info field info to the $data array.
-    if (isset($data['_rev']) && isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])
-      && (isset($context['query']['revs_info']) || isset($context['query']['open_revs']))) {
-      $parts = explode('-', $data['_rev']);
-      if ($parts[0] == $data['_revisions']['start'] && in_array($parts[1], $data['_revisions']['ids'])) {
-        $data['_revs_info'][0]['rev'] = $data['_rev'];
-      }
-    }
-
-    // This revision will be used when the entity does not have an id,
-    // it has a revision and it is new for the actual database.
+    // Add the _rev field to the $data array.
     if (isset($data['_rev'])) {
-      $data_rev = $data['_rev'];
+      $data['_rev'][0]['value'] = $data['_rev'];
+    }
+    if (isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
+      $data['_rev'][0]['revisions'] = $data['_revisions']['ids'];
     }
 
     // Clean-up attributes we don't needs anymore.
@@ -233,10 +219,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         }
       }
       elseif (isset($data['id'])) {
-        if (isset($data_rev)) {
-          $data['_revs_info'][0]['rev'] = $data_rev;
-        }
-
         unset($data['id']);
         $entity_id = NULL;
         /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
@@ -245,10 +227,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       $entity = NULL;
-      if (isset($data_rev)) {
-        $data['_revs_info'][0]['rev'] = $data_rev;
-      }
-
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       // @todo Use the passed $class to instantiate the entity.
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || $entity_type_id == 'replication_log') {

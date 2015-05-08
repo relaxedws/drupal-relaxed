@@ -80,10 +80,8 @@ class DocIdConverter implements ParamConverterInterface {
       $open_revs = array();
       if ($open_revs_query == 'all') {
         $entity = $storage->load($entity_id);
-        // @todo _revs_info doesn't actually denote only open revisions.
-        foreach ($entity->_revs_info as $item) {
-          $open_revs[] = $item->rev;
-        }
+        // @todo: Use \Drupal\multiversion\Entity\Index\RevisionTreeIndex::getOpenRevisions()
+        $open_revs[] = $entity->_rev->value;
       }
       else {
         $open_revs = $open_revs_query;

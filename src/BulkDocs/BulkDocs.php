@@ -99,7 +99,7 @@ class BulkDocs implements BulkDocsInterface {
         $this->result[] = array(
           'ok' => TRUE,
           'id' => $entity->uuid(),
-          'rev' => $entity->_revs_info->rev,
+          'rev' => $entity->_rev->value,
         );
       }
       catch (\Exception $e) {
@@ -107,7 +107,7 @@ class BulkDocs implements BulkDocsInterface {
           'error' => $e->getMessage(),
           'reason' => 'exception',
           'id' => $entity->uuid(),
-          'rev' => $entity->_revs_info->rev,
+          'rev' => $entity->_rev->value,
         );
         // @todo Inject logger or use \Drupal::logger().
         watchdog_exception('relaxed', $e);

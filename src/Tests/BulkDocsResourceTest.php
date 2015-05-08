@@ -131,7 +131,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $entity_number = $key+1;
       $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
       $new_rev = $entity_info['rev'];
-      $old_rev = $patched_entities['docs'][$key]->_revs_info->get(0)->rev;
+      $old_rev = $patched_entities['docs'][$key]->_rev->value;
       $this->assertEqual($new_rev, $old_rev, "POST request returned unchanged revision ID for entity number $entity_number.");
     }
 

@@ -209,7 +209,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         array('target_id' => 'default')
       ),
       '_id' => $entity->uuid(),
-      '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
+      '_rev' => $entity->_rev->value,
     );
 
     $normalized = $this->serializer->normalize($this->entity);
