@@ -164,12 +164,12 @@ class FileItemNormalizerTest extends NormalizerTestBase{
 
     $expected = array(
       '@context' => array(
+        '_id' => '@id',
         'entity_test_mulrev' => \Drupal::service('rest.link_manager')->getTypeUri(
           'entity_test_mulrev',
           $entity->bundle()
         ),
       ),
-      '@id' => $this->getEntityUri($entity),
       '@type' => 'entity_test_mulrev',
       'id' => array(
         array('value' => 1),
