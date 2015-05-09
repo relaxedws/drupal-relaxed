@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
-use Drupal\multiversion\Entity\Transaction\MockTransaction;
 use Drupal\relaxed\BulkDocs\BulkDocs;
 use Drupal\relaxed\BulkDocs\BulkDocsInterface;
 
@@ -51,7 +50,6 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
 
     $this->bulkDocs = BulkDocs::createInstance(
       $this->container,
-      new MockTransaction(),
       $this->workspaceManager,
       $this->workspaceManager->getActiveWorkspace()
     );
