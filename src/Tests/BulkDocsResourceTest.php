@@ -97,7 +97,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
           $input['docs'][$key]['field_test_text'][0]['value'],
           "Correct value for 'field_test_text' for entity number $entity_number."
         );
-        $count = $this->revTree->countRevs($entity->uuid());
+        list($count) = explode('-', $entity->_rev->value);
         $this->assertEqual($count, 2, "Entity number $entity_number has two revisions.");
       }
     }
