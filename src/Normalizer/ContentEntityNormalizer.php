@@ -50,11 +50,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       '_id' => $entity->uuid()
     );
 
-    // New or mocked entities might not have a rev yet.
-    if (!empty($entity->_rev->value)) {
-      $data['_rev'] = $entity->_rev->value;
-    }
-
     $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity as $name => $field) {
       $field_type = $field_definitions[$name]->getType();
@@ -74,6 +69,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       if ($field_data !== NULL) {
         $data[$name] = $field_data;
       }
+    }
+
+    // New or mocked entities might not have a rev yet.
+    if (!empty($entity->_rev->value)) {
+      $data['_rev'] = $entity->_rev->value;
     }
 
     if (!empty($context['query']['revs'])) {
@@ -191,7 +191,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Add the _rev field to the $data array.
     if (isset($data['_rev'])) {
-      $data['_rev'][0]['value'] = $data['_rev'];
+      $data['_rev'] = array(array('value' => $data['_rev']));
     }
     if (isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
       $data['_rev'][0]['revisions'] = $data['_revisions']['ids'];
