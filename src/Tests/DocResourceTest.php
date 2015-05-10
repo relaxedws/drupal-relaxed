@@ -106,10 +106,15 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('revs' => TRUE));
       $data = Json::decode($response);
       $rev = $data['_revisions']['start'] . '-' . $data['_revisions']['ids'][0];
-      $this->assertEqual($rev, $entity->_rev->value, 'GET request returned revision list.');
+      $this->assertEqual($rev, $entity->_rev->value, 'GET request returned correct revision list after first revision.');
 
       // Save an additional revision.
       $entity->save();
+
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('revs' => TRUE));
+      $data = Json::decode($response);
+      $count = count($data['_revisions']['ids']);
+      $this->assertEqual($count, 2, 'GET request returned correct revision list after second revision.');
 
       // Test the response for a fake revision.
       $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('rev' => '11112222333344445555'));
@@ -242,7 +247,8 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = entity_load($entity_type, $entity->id());
+      $entity = entity_load($entity_type, $entity->id(), TRUE);
+      $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, array('rev' => $first_rev));
       $this->assertResponse('409', 'HTTP response code is correct.');

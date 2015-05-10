@@ -87,8 +87,7 @@ class BulkDocs implements BulkDocsInterface {
         $entity->_rev->new_edit = $this->newEdits;
         if (!$entity->isNew()) {
           // Ensure that deleted entities will be saved just once.
-          $id = $entity->id();
-          if ($id) {
+          if ($id = $entity->id()) {
             $deleted_entity = entity_load_deleted($entity->getEntityTypeId(), $id, TRUE);
           }
         }

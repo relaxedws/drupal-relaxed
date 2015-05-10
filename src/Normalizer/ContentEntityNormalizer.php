@@ -3,8 +3,9 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\multiversion\Entity\Index\UuidIndex;
-use Drupal\rest\LinkManager\LinkManager;
+use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
+use Drupal\multiversion\Entity\Index\UuidIndexInterface;
+use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -21,17 +22,35 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
 
   /**
+   * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
+   */
+  protected $uuidIndex;
+
+  /**
+   * @var \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface
+   */
+  protected $revTree;
+
+  /**
+   * @var \Drupal\rest\LinkManager\LinkManagerInterface
+   */
+  protected $linkManager;
+
+  /**
    * @var string[]
    */
   protected $format = array('json');
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   * @param \Drupal\multiversion\Entity\Index\UuidIndex $uuid_index
+   * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
+   * @param \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface $rev_tree
+   * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, LinkManager $link_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionTreeIndexInterface $rev_tree, LinkManagerInterface $link_manager) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
+    $this->revTree = $rev_tree;
     $this->linkManager = $link_manager;
   }
 
@@ -76,13 +95,28 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $data['_rev'] = $entity->_rev->value;
     }
 
+    // @todo: Needs test.
     if (!empty($context['query']['revs'])) {
-      $parts = explode('-', $entity->_rev->value);
+      $entity_uuid = isset($data['uuid'][0]['value']) ? $data['uuid'][0]['value'] : NULL;
+
+      // Build the default branch.
+      $default_branch = array($entity->_rev->value => 'available');
+      if ($entity_uuid) {
+        $default_branch = $this->revTree->getDefaultBranch($entity_uuid);
+      }
+
+      // Build the revisions key.
+      $ids = array();
+      $start = 0;
+      foreach ($default_branch as $rev => $status) {
+        list($i, $hash) = explode('-', $rev);
+        $ids[] = $hash;
+        $start = (int) $i;
+      }
       $data['_revisions'] = array(
-        'ids' => array($parts[1]),
-        'start' => (int) $parts[0],
+        'ids' => array_reverse($ids),
+        'start' => $start,
       );
-      // @todo: Use \Drupal\multiversion\Entity\Index\RevisionTreeIndex::getDefaultBranch()
     }
 
     // Override the normalization for the _deleted special field, just so that we
@@ -158,14 +192,16 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       throw new UnexpectedValueException('The entity_type value is missing.');
     }
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
+    $id_key = $entity_type->getKey('id');
+    $revision_key = $entity_type->getKey('revision');
+    $bundle_key = $entity_type->getKey('bundle');
 
     if ($entity_id) {
       // @todo Needs test.
-      $data[$entity_type->getKey('id')] = $entity_id;
+      $data[$id_key] = $entity_id;
     }
 
     if ($entity_type->hasKey('bundle')) {
-      $bundle_key = $entity_type->getKey('bundle');
       if (!empty($data[$bundle_key][0]['value'])) {
         // Add bundle info when entity is not new.
         $type = $data[$bundle_key][0]['value'];
@@ -198,7 +234,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('@context', '@id', '@type', '_id', '_rev', '_attachments', '_revisions') as $key) {
+    foreach (array('@context', '@type', '_id', '_attachments', '_revisions') as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
@@ -218,8 +254,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           $entity->{$name} = $value;
         }
       }
-      elseif (isset($data['id'])) {
-        unset($data['id']);
+      elseif (isset($data[$id_key])) {
+        unset($data[$id_key], $data[$revision_key]);
         $entity_id = NULL;
         /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
         $entity = $storage->create($data);
@@ -227,9 +263,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       $entity = NULL;
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       // @todo Use the passed $class to instantiate the entity.
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || $entity_type_id == 'replication_log') {
+        unset($data[$id_key], $data[$revision_key]);
+        /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
         $entity = $storage->create($data);
       }
     }
