@@ -4,8 +4,9 @@ namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
-use Drupal\multiversion\Entity\Index\UuidIndex;
-use Drupal\multiversion\Entity\Index\RevisionIndex;
+use Drupal\multiversion\Entity\Index\RevisionIndexInterface;
+use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
+use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Symfony\Component\Routing\Route;
 
 class DocIdConverter implements ParamConverterInterface {
@@ -16,24 +17,31 @@ class DocIdConverter implements ParamConverterInterface {
   protected $entityManager;
 
   /**
-   * @var \Drupal\multiversion\Entity\Index\UuidIndex
+   * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
    */
   protected $uuidIndex;
 
   /**
-   * @var \Drupal\multiversion\Entity\Index\RevisionIndex
+   * @var \Drupal\multiversion\Entity\Index\RevisionIndexInterface
    */
   protected $revIndex;
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   * @param \Drupal\multiversion\Entity\Index\UuidIndex $uuid_index
-   * @param \Drupal\multiversion\Entity\Index\RevisionIndex $rev_index
+   * @var \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index, RevisionIndex $rev_index) {
+  protected $revTree;
+
+  /**
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
+   * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
+   * @param \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface $rev_tree
+   */
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, RevisionTreeIndexInterface $rev_tree) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
     $this->revIndex = $rev_index;
+    $this->revTree = $rev_tree;
   }
 
   /**
@@ -75,13 +83,12 @@ class DocIdConverter implements ParamConverterInterface {
       return $uuid;
     }
 
+    // @todo: We need to load regardless of deleted status below.
     $storage = $this->entityManager->getStorage($entity_type_id);
     if ($open_revs_query && in_array($request->getMethod(), array('GET', 'HEAD'))) {
       $open_revs = array();
       if ($open_revs_query == 'all') {
-        $entity = $storage->load($entity_id);
-        // @todo: Use \Drupal\multiversion\Entity\Index\RevisionTreeIndex::getOpenRevisions()
-        $open_revs[] = $entity->_rev->value;
+        $open_revs[] = array_keys($this->revTree->getOpenRevisions($uuid));
       }
       else {
         $open_revs = $open_revs_query;
@@ -95,14 +102,17 @@ class DocIdConverter implements ParamConverterInterface {
       }
       $revisions = array();
       foreach ($revision_ids as $revision_id) {
-        $revisions[] = $storage->loadRevision($revision_id) ?: $storage->loadDeleted($entity_id);
+        if ($revision = $storage->loadRevision($revision_id)) {
+          $revisions[] = $revision;
+        }
       }
       return $revisions ?: $uuid;
     }
     if ($revision_id) {
       return $storage->loadRevision($revision_id) ?: $uuid;
     }
-    return $storage->load($entity_id) ?: $uuid;
+    $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
+    return $entity ?: $uuid;
   }
 
   /**

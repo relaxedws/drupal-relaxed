@@ -170,9 +170,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
-    if (isset($data['_deleted'])) {
-      $data['_deleted'] = array(array('value' => $data['_deleted']));
-    }
+    // @todo Needs test for situation when a replication overwrites a delete.
+    $deleted = isset($data['_deleted']) ? $data['_deleted'] : FALSE;
+    $data['_deleted'] = array(array('value' => $deleted));
 
     // Map data from the UUID index.
     // @todo Needs test.
@@ -244,9 +244,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $storage = $this->entityManager->getStorage($entity_type_id);
 
     if ($entity_id) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
-      if ($entity) {
+      if ($entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id)) {
         foreach ($data as $name => $value) {
           if ($name == 'default_langcode') {
             continue;
@@ -257,7 +255,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       elseif (isset($data[$id_key])) {
         unset($data[$id_key], $data[$revision_key]);
         $entity_id = NULL;
-        /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
         $entity = $storage->create($data);
       }
     }
@@ -266,7 +263,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       // @todo Use the passed $class to instantiate the entity.
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || $entity_type_id == 'replication_log') {
         unset($data[$id_key], $data[$revision_key]);
-        /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
         $entity = $storage->create($data);
       }
     }
