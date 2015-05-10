@@ -23,7 +23,8 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
    */
   public function normalize($rev_diff, $format = NULL, array $context = array()) {
     /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
-    return $rev_diff->getMissing();
+    $missing = $rev_diff->getMissing();
+    return $missing ?: new \stdClass();
   }
 
   /**
