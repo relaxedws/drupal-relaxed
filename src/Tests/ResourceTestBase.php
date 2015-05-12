@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Tests;
 
-use Drupal\multiversion\Entity\Index\RevisionIndexInterface;
 use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
@@ -27,6 +26,11 @@ abstract class ResourceTestBase extends RESTTestBase {
   protected $multiversionManager;
 
   /**
+   * @var \Drupal\Core\Entity\EntityManager
+   */
+  protected $entityManager;
+
+  /**
    * @var \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface
    */
   protected $revTree;
@@ -49,6 +53,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->workspace->save();
 
     $this->multiversionManager->setActiveWorkspaceId($name);
+    $this->entityManager = $this->container->get('entity.manager');
     $this->revTree = $this->container->get('entity.index.rev.tree');
   }
 

@@ -171,15 +171,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         ),
       ),
       '@type' => 'entity_test_mulrev',
-      'id' => array(
-        array('value' => 1),
-      ),
-      'revision_id' => array(
-        array('value' => 1),
-      ),
-      'uuid' => array(
-        array('value' => $this->entity->uuid()),
-      ),
       'langcode' => array(
         array('value' => 'en'),
       ),
@@ -205,9 +196,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         ),
       ),
       '_attachments' => $expected_attachments,
-      'workspace' => array(
-        array('target_id' => 'default')
-      ),
       '_id' => $entity->uuid(),
       '_rev' => $entity->_rev->value,
     );

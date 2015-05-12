@@ -58,7 +58,8 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     $input = array('docs' => array());
-    foreach ($this->createTestEntities($entity_type, TRUE) as $key => $entity) {
+    $entities = $this->createTestEntities($entity_type, TRUE);
+    foreach ($entities as $key => $entity) {
       $entity->set(
         'field_test_text',
         array(
@@ -82,12 +83,12 @@ class BulkDocsResourceTest extends ResourceTestBase {
     foreach ($output as $key => $value) {
       $entity_number = $key+1;
       $this->assertTrue(isset($value['rev']), "POST request returned a revision hash for entity number $entity_number.");
-      $this->assertEqual($value['id'], $input['docs'][$key]['uuid'][0]['value'], "POST request returned correct ID for entity number $entity_number.");
+      $this->assertEqual($value['id'], $entities[$key]->uuid->value, "POST request returned correct ID for entity number $entity_number.");
     }
 
     foreach ($input['docs'] as $key => $value) {
       $entity_number = $key+1;
-      $entity = entity_load($entity_type, $value['id'][0]['value'], TRUE);
+      $entity = $this->entityManager->loadEntityByUuid($entity_type, $value['_id']);
       if ($key == 1) {
         $this->assertEqual($entity, NULL, "Entity number $entity_number has been deleted.");
       }
