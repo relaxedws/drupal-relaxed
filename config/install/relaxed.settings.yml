@@ -88,6 +88,7 @@ resources:
     PUT:
       supported_formats:
         - json
+        - related
       supported_auth:
         - cookie
         - basic_auth
