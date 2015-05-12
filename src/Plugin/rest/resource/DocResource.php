@@ -130,7 +130,7 @@ class DocResource extends ResourceBase {
     // @todo Ensure that $received_entity is being saved with the UUID from $existing_entity
 
     // Validate the received data before saving.
-    $this->validate($received_entity);
+    //$this->validate($received_entity);
 
     if (!is_string($existing_entity) && $received_entity->_rev->value != $existing_entity->_rev->value) {
       throw new ConflictHttpException();
