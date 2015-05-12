@@ -58,36 +58,43 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    $entity_type = $context['entity_type'] = $entity->getEntityTypeId();
+    $entity_type_id = $context['entity_type'] = $entity->getEntityTypeId();
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
+
+    $id_key = $entity_type->getKey('id');
+    $revision_key = $entity_type->getKey('revision');
+    $uuid_key = $entity_type->getKey('uuid');
+
     $entity_uuid = $entity->uuid();
+    $entity_rev = $entity->_rev->value;
 
     $data = array(
       '@context' => array(
         '_id' => '@id',
-        $entity_type => $this->linkManager->getTypeUri($entity_type, $entity->bundle()),
+        $entity_type_id => $this->linkManager->getTypeUri($entity_type_id, $entity->bundle()),
       ),
-      '@type' => $entity_type,
-      '_id' => $entity->uuid()
+      '@type' => $entity_type_id,
+      '_id' => $entity_uuid,
     );
 
     $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity as $name => $field) {
       $field_type = $field_definitions[$name]->getType();
-      $field_data = $this->serializer->normalize($field, $format, $context);
+      $items = $this->serializer->normalize($field, $format, $context);
       // Add file and image field types into _attachments key.
       if ($field_type == 'file' || $field_type == 'image') {
-        if ($field_data !== NULL) {
-          if (!isset($data['_attachments']) && !empty($field_data)) {
+        if ($items !== NULL) {
+          if (!isset($data['_attachments']) && !empty($items)) {
             $data['_attachments'] = array();
           }
-          foreach ($field_data as $field_info) {
-            $data['_attachments'] = array_merge($data['_attachments'], $field_info);
+          foreach ($items as $item) {
+            $data['_attachments'] = array_merge($data['_attachments'], $item);
           }
         }
         continue;
       }
-      if ($field_data !== NULL) {
-        $data[$name] = $field_data;
+      if ($items !== NULL) {
+        $data[$name] = $items;
       }
     }
 
@@ -137,6 +144,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       unset($data['_deleted']);
     }
 
+    // Finally we remove certain fields that are "local" to this host.
+    unset($data['workspace'], $data[$id_key], $data[$revision_key], $data[$uuid_key]);
+
     return $data;
   }
 
@@ -148,35 +158,33 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_uuid = NULL;
     $entity_id = NULL;
 
-    if (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
-      list($entity_type_from_data, $entity_uuid_from_data) = explode('/', $data['_id']);
-      if ($entity_type_from_data == '_local' && $entity_uuid_from_data) {
-        $entity_type_from_data = 'replication_log';
-      }
-    }
-
-    // Look for the entity type ID.
+    // Resolve the entity type ID.
     if (!empty($context['entity_type'])) {
       $entity_type_id = $context['entity_type'];
-    }
-    elseif (isset($entity_type_from_data)) {
-      $entity_type_id = $entity_type_from_data;
     }
     elseif (isset($data['@type'])) {
       $entity_type_id = $data['@type'];
     }
+    elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
+      list($prefix, $entity_uuid) = explode('/', $data['_id']);
+      if ($prefix == '_local' && $entity_uuid) {
+        $entity_type_id = 'replication_log';
+      }
+    }
 
     // Resolve the UUID.
-    // @todo Needs test
-    if (!empty($data['uuid'][0]['value']) && !empty($data['_id']) && ($data['uuid'][0]['value'] != $data['_id'])) {
-      throw new UnexpectedValueException('The uuid and _id values does not match.');
+    if (empty($entity_uuid)) {
+      if (!empty($data['_id'])) {
+        $entity_uuid = $data['_id'];
+      }
+      elseif (!empty($data['uuid'][0]['value'])) {
+        $entity_uuid = $data['uuid'][0]['value'];
+      }
+      elseif (isset($entity_uuid_from_data)) {
+        $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
+      }
     }
-    if (!empty($data['uuid'][0]['value'])) {
-      $entity_uuid = $data['uuid'][0]['value'];
-    }
-    elseif (isset($entity_uuid_from_data)) {
-      $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
-    }
+
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
     // @todo Needs test for situation when a replication overwrites a delete.
@@ -200,6 +208,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if (empty($entity_type_id)) {
       throw new UnexpectedValueException('The entity_type value is missing.');
     }
+    if (empty($entity_uuid)) {
+      throw new UnexpectedValueException('The uuid value is missing.');
+    }
+
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
     $id_key = $entity_type->getKey('id');
     $revision_key = $entity_type->getKey('revision');
@@ -227,7 +239,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if (isset($data['_attachments'])) {
       foreach ($data['_attachments'] as $key => $value) {
         list($field_name, $delta, $file_uuid,,) = explode('/', $key);
-        $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+        $file = $this->entityManager->loadEntityByUuid('file', $file_uuid);
         $data[$field_name][$delta] = array(
           'target_id' => $file->id(),
         );

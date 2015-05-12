@@ -36,6 +36,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
 
   public function testNormalize() {
     $entity = entity_load('entity_test_mulrev', 1);
+    $entity_rev = $entity->_rev->value;
 
     $expected = array(
       '@context' => array(
@@ -46,15 +47,6 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
         ),
       ),
       '@type' => 'entity_test_mulrev',
-      'id' => array(
-        array('value' => 1),
-      ),
-      'revision_id' => array(
-        array('value' => 1),
-      ),
-      'uuid' => array(
-        array('value' => $this->entity->uuid()),
-      ),
       'langcode' => array(
         array('value' => 'en'),
       ),
@@ -79,11 +71,8 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           'format' => $this->values['field_test_text']['format'],
         ),
       ),
-      'workspace' => array(
-        array('target_id' => 'default')
-      ),
       '_id' => $entity->uuid(),
-      '_rev' => $entity->_rev->value,
+      '_rev' => $entity_rev ?: NULL,
     );
 
     $normalized = $this->serializer->normalize($this->entity);
