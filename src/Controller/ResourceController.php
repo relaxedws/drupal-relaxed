@@ -183,6 +183,10 @@ class ResourceController implements ContainerAwareInterface {
                     'uuid' => $file_uuid,
                     'status' => FILE_STATUS_PERMANENT,
                   );
+                  $uid_info_found = preg_match('/(?<=\"uid\"\:\[\{\"target\_id\"\:\")(.*?)(?=\"\}\])/', $content, $uid_info);
+                  if ($uid_info_found && is_numeric($uid_info[1])) {
+                    $file_context['uid'] = $uid_info[1];
+                  }
                   $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
                   if ($file instanceof FileInterface) {
                     $file->save();
