@@ -106,10 +106,12 @@ class DbResource extends ResourceBase {
     elseif (empty($entity)) {
       throw new BadRequestHttpException(t('No content received'));
     }
+    $uuid = $entity->uuid();
+    $rev = $entity->_rev->value;
 
     // Check for conflicts.
-    if ($entity->uuid()) {
-      $entry = \Drupal::service('entity.index.uuid')->get($entity->uuid());
+    if ($uuid) {
+      $entry = \Drupal::service('entity.index.uuid')->get($uuid);
       if (!empty($entry)) {
         throw new ConflictHttpException();
       }
@@ -129,8 +131,7 @@ class DbResource extends ResourceBase {
     $this->validate($entity);
     try {
       $entity->save();
-      $rev = $entity->_rev->value;
-      return new ResourceResponse(array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev), 201, array('ETag' => $rev));
+      return new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, NULL, $e);

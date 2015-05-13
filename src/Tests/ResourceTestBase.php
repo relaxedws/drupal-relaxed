@@ -26,6 +26,11 @@ abstract class ResourceTestBase extends RESTTestBase {
   protected $multiversionManager;
 
   /**
+   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
+   */
+  protected $workspaceManager;
+
+  /**
    * @var \Drupal\Core\Entity\EntityManager
    */
   protected $entityManager;
@@ -47,6 +52,7 @@ abstract class ResourceTestBase extends RESTTestBase {
       ->applyUpdates();
 
     $this->multiversionManager = $this->container->get('multiversion.manager');
+    $this->workspaceManager = $this->container->get('workspace.manager');
 
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);
