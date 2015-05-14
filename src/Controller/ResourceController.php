@@ -176,6 +176,10 @@ class ResourceController implements ContainerAwareInterface {
               if ($file_info_found) {
                 list(, , $file_uuid, $scheme, $filename) = explode('/', $file_info[1]);
                 if ($file_uuid && $scheme && $filename) {
+                  $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+                  if ($file) {
+                    continue;
+                  }
                   $file_context = array(
                     'uri' => "$scheme://$filename",
                     'uuid' => $file_uuid,
