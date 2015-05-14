@@ -159,11 +159,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_id = NULL;
 
     // Resolve the entity type ID.
-    if (!empty($context['entity_type'])) {
-      $entity_type_id = $context['entity_type'];
-    }
-    elseif (isset($data['@type'])) {
+    if (isset($data['@type'])) {
       $entity_type_id = $data['@type'];
+    }
+    elseif (!empty($context['entity_type'])) {
+      $entity_type_id = $context['entity_type'];
     }
     elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
       list($prefix, $entity_uuid) = explode('/', $data['_id']);
@@ -173,16 +173,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Resolve the UUID.
-    if (empty($entity_uuid)) {
-      if (!empty($data['_id'])) {
-        $entity_uuid = $data['_id'];
-      }
-      elseif (!empty($data['uuid'][0]['value'])) {
-        $entity_uuid = $data['uuid'][0]['value'];
-      }
-      elseif (isset($entity_uuid_from_data)) {
-        $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
-      }
+    if (empty($entity_uuid) && !empty($data['_id'])) {
+      $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
     }
 
     // We need to nest the data for the _deleted field in its Drupal-specific
