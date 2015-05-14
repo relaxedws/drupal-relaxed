@@ -107,21 +107,21 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if (!empty($context['query']['revs']) || !empty($context['query']['revs_info'])) {
       $default_branch = $this->revTree->getDefaultBranch($entity_uuid);
 
+      $i = 0;
       foreach ($default_branch as $rev => $status) {
         // Build data for _revs_info.
         if (!empty($context['query']['revs_info'])) {
           $data['_revs_info'][] = array('rev' => $rev, 'status' => $status);
         }
+        if (!empty($context['query']['revs'])) {
+          list($start, $hash) = explode('-', $rev);
+          $data['_revisions']['ids'][] = $hash;
+          if ($i == 0) {
+            $data['_revisions']['start'] = (int) $start;
+          }
+        }
+        $i++;
       }
-    }
-
-    // @todo: Needs test.
-    if (!empty($context['query']['revs'])) {
-      $parts = explode('-', $entity->_rev->value);
-      $data['_revisions'] = array(
-        'ids' => array($parts[1]),
-        'start' => (int) $parts[0],
-      );
     }
 
     if (!empty($context['query']['conflicts'])) {
