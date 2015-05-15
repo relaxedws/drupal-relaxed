@@ -45,7 +45,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
       (isset($data['new_edits']) && ($data['new_edits']) === FALSE) ||
       (isset($context['query']['new_edits']) && ($context['query']['new_edits']) === FALSE)
     ) {
-      $bulk_docs->newEdits(FALSE);
+      $bulk_docs->setNewEdits(FALSE);
     }
 
     $entities = array();

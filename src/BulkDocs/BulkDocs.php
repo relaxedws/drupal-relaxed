@@ -51,9 +51,14 @@ class BulkDocs implements BulkDocsInterface {
   }
 
   /**
+   * Construcs a BuldDocs object
+   *
    * @param \Drupal\multiversion\Entity\Transaction\TransactionInterface $trx
+   *   The transaction instance.
    * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
+   *   The workspace manager instance.
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   *   The workspace instance
    */
   public function __construct(TransactionInterface $trx, WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace) {
     $this->trx = $trx;
@@ -64,7 +69,7 @@ class BulkDocs implements BulkDocsInterface {
   /**
    * {@inheritdoc}
    */
-  public function newEdits($new_edits) {
+  public function setNewEdits($new_edits) {
     $this->newEdits = (bool) $new_edits;
     return $this;
   }
