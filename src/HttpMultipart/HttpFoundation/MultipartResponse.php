@@ -5,8 +5,7 @@ namespace Drupal\relaxed\HttpMultipart\HttpFoundation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MultipartResponse extends Response
-{
+class MultipartResponse extends Response {
   /**
    * @var string
    */
@@ -24,15 +23,23 @@ class MultipartResponse extends Response
 
   /**
    * Constructor.
+   *
+   * @param array|NULL $parts
+   *   The multiparts for the response.
+   * @param int $status
+   *   The HTML status code.
+   * @param array $headers
+   *   The response headers.
+   * @param string $subtype
+   *   The subtype.
    */
-  public function __construct(array $parts = null, $status = 200, $headers = array(), $subtype = null)
-  {
-    parent::__construct(null, $status, $headers);
+  public function __construct(array $parts = NULL, $status = 200, $headers = array(), $subtype = NULL) {
+    parent::__construct(NULL, $status, $headers);
 
     $this->subtype = $subtype ?: 'mixed';
     $this->boundary = md5(microtime());
 
-    if (null !== $parts) {
+    if ($parts !== NULL) {
       $this->setParts($parts);
     }
   }
@@ -40,8 +47,7 @@ class MultipartResponse extends Response
   /**
    * {@inheritdoc}
    */
-  public function prepare(Request $request)
-  {
+  public function prepare(Request $request) {
     $this->headers->set('Content-Type', "multipart/{$this->subtype}; boundary=\"{$this->boundary}\"");
     $this->headers->set('Transfer-Encoding', 'chunked');
 
@@ -51,12 +57,12 @@ class MultipartResponse extends Response
   /**
    * Sets a part of the multipart response.
    *
-   * @param Response $part A response object to be part of the multipart response.
+   * @param \Symfony\Component\HttpFoundation\Response $part
+   *   A response object to be part of the multipart response.
    *
-   * @return MultipartResponse
+   * @return $this
    */
-  public function setPart(Response $part)
-  {
+  public function setPart(Response $part) {
     $this->parts[] = $part;
 
     return $this;
@@ -65,12 +71,12 @@ class MultipartResponse extends Response
   /**
    * Sets multiple parts of the multipart response.
    *
-   * @param Response[] $parts Response objects to be part of the multipart response.
+   * @param \Symfony\Component\HttpFoundation\Response[] $parts
+   *   Response objects to be part of the multipart response.
    *
-   * @return MultipartResponse
+   * @return $this
    */
-  public function setParts(array $parts)
-  {
+  public function setParts(array $parts) {
     foreach ($parts as $part) {
       $this->setPart($part);
     }
@@ -78,9 +84,10 @@ class MultipartResponse extends Response
   }
 
   /**
-   * Returns the parts.
+   * Get the repsonse parts.
    *
-   * @return Response[]
+   * @return \Symfony\Component\HttpFoundation\Response[]
+   *  List of response parts.
    */
   public function getParts() {
     return $this->parts;
@@ -89,10 +96,10 @@ class MultipartResponse extends Response
   /**
    * Sends content for the current web response.
    *
-   * @return Response
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The repsonse object.
    */
-  public function sendContent()
-  {
+  public function sendContent() {
     $content = '';
     foreach ($this->parts as $part) {
       $content .= "--{$this->boundary}\r\n";
@@ -111,9 +118,8 @@ class MultipartResponse extends Response
    *
    * @throws \LogicException when the content is not null
    */
-  public function setContent($content)
-  {
-    if (null !== $content) {
+  public function setContent($content) {
+    if ($content !== NULL) {
       throw new \LogicException('The content cannot be set on a MultipartResponse instance.');
     }
   }
@@ -121,10 +127,9 @@ class MultipartResponse extends Response
   /**
    * {@inheritdoc}
    *
-   * @return false
+   * @return FALSE
    */
-  public function getContent()
-  {
-    return false;
+  public function getContent() {
+    return FALSE;
   }
 }

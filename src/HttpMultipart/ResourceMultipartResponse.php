@@ -19,8 +19,7 @@ class ResourceMultipartResponse extends MultipartResponse {
   /**
    * {@inheritdoc}
    */
-  public function prepare(Request $request)
-  {
+  public function prepare(Request $request) {
     // Fix the timeout error on replication.
     $this->headers->set('Connection', 'close');
 

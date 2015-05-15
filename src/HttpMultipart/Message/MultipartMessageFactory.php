@@ -10,9 +10,8 @@ class MultipartMessageFactory extends MessageFactory {
   /**
    * {@inheritdoc}
    */
-  public function createResponse($statusCode, array $headers = [], $body = null, array $options = [])
-  {
-    if (null !== $body) {
+  public function createResponse($statusCode, array $headers = [], $body = NULL, array $options = []) {
+    if ($body !== NULL) {
       $body = Stream::factory($body);
     }
 

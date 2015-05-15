@@ -9,17 +9,18 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @todo Patch Response and AbstractMessage to declare their properties as protected rather than private.
  */
-class MultipartResponse extends Response
-{
-  /** @var StreamInterface[] */
+class MultipartResponse extends Response {
+
+  /**
+   * @var StreamInterface[]
+   */
   private $bodies = array();
 
   /**
    * {@inheritdoc}
    */
-  public function setBody(StreamInterface $body = null)
-  {
-    if (null === $body) {
+  public function setBody(StreamInterface $body = NULL) {
+    if ($body === NULL) {
       $this->removeHeader('Content-Length');
       $this->removeHeader('Transfer-Encoding');
     } else {
@@ -32,8 +33,7 @@ class MultipartResponse extends Response
   /**
    * {@inheritdoc}
    */
-  public function getBody()
-  {
+  public function getBody() {
     return array_shift($this->bodies);
   }
 
@@ -43,9 +43,9 @@ class MultipartResponse extends Response
    * @param StreamInterface $stream
    *
    * @return array
+   *   The multipart pats.
    */
-  public static function parseMultipartBody(StreamInterface $stream)
-  {
+  public static function parseMultipartBody(StreamInterface $stream) {
     $parts = [];
     preg_match('/--(.*)\b/', $stream, $boundary);
 
@@ -71,4 +71,5 @@ class MultipartResponse extends Response
 
     return $parts;
   }
+
 }
