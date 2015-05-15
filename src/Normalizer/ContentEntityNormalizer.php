@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
+use Drupal\file\FileInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -236,7 +237,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           );
           $file_context['uid'] = isset($data['uid'][0]['target_id']) ?: $data['uid'][0]['target_id'];
           $file = \Drupal::service('relaxed.normalizer.attachment')->denormalize($value, '\Drupal\file\FileInterface', 'stream', $file_context);
-          $file->save();
+          if ($file instanceof FileInterface) {
+            $file->save();
+          }
         }
         $data[$field_name][$delta] = array(
           'target_id' => $file->id(),
