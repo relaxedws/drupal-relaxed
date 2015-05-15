@@ -103,6 +103,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function includeDocs($include_docs) {
     $this->includeDocs = $include_docs;
+    return $this;
   }
 
   /**
@@ -110,6 +111,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function limit($limit) {
     $this->limit = $limit;
+    return $this;
   }
 
   /**
@@ -117,6 +119,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function skip($skip) {
     $this->skip = $skip;
+    return $this;
   }
 
   /**
@@ -124,6 +127,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function descending($descending) {
     $this->descending = $descending;
+    return $this;
   }
 
   /**
@@ -131,6 +135,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function startKey($key) {
     $this->startKey = $key;
+    return $this;
   }
 
   /**
@@ -138,6 +143,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function endKey($key) {
     $this->endKey = $key;
+    return $this;
   }
 
   /**
@@ -145,6 +151,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function inclusiveEnd($inclusive_end) {
     $this->inclusiveEnd = $inclusive_end;
+    return $this;
   }
 
   /**
