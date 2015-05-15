@@ -226,8 +226,18 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Denormalize File and Image field types.
     if (isset($data['_attachments'])) {
       foreach ($data['_attachments'] as $key => $value) {
-        list($field_name, $delta, $file_uuid,,) = explode('/', $key);
-        $file = $this->entityManager->loadEntityByUuid('file', $file_uuid);
+        list($field_name, $delta, $file_uuid, $scheme, $filename) = explode('/', $key);
+        $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+        if (!$file) {
+          $file_context = array(
+            'uri' => "$scheme://$filename",
+            'uuid' => $file_uuid,
+            'status' => FILE_STATUS_PERMANENT,
+          );
+          $file_context['uid'] = isset($data['uid'][0]['target_id']) ?: $data['uid'][0]['target_id'];
+          $file = \Drupal::service('relaxed.normalizer.attachment')->denormalize($value, '\Drupal\file\FileInterface', 'stream', $file_context);
+          $file->save();
+        }
         $data[$field_name][$delta] = array(
           'target_id' => $file->id(),
         );
