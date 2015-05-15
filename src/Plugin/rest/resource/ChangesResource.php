@@ -50,7 +50,7 @@ class ChangesResource extends ResourceBase {
 
     $request = Request::createFromGlobals();
     if ($request->query->get('include_docs') == 'true') {
-      $changes->includeDocs(TRUE);
+      $changes->setIncludeDocs(TRUE);
     }
 
     return new ResourceResponse($changes, 200);

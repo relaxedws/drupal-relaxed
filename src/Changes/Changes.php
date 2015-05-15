@@ -55,10 +55,16 @@ class Changes implements ChangesInterface {
   }
 
   /**
+   * Construcs a BuldDocs object.
+   *
    * @param \Drupal\multiversion\Entity\Index\SequenceIndex $sequenceIndex
+   *   The sequence index.
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   *  The workspace instance
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *  The entity manager.
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   *   The serializer service.
    */
   public function __construct(SequenceIndex $sequenceIndex, WorkspaceInterface $workspace, EntityManagerInterface $entity_manager, SerializerInterface $serializer) {
     $this->sequenceIndex = $sequenceIndex;
@@ -70,14 +76,15 @@ class Changes implements ChangesInterface {
   /**
    * {@inheritdoc}
    */
-  public function includeDocs($include_docs) {
+  public function setIncludeDocs($include_docs) {
     $this->includeDocs = $include_docs;
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function lastSeq($seq) {
+  public function setLastSeq($seq) {
     $this->lastSeq = $seq;
     return $this;
   }

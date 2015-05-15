@@ -51,7 +51,7 @@ class BulkDocs implements BulkDocsInterface {
   }
 
   /**
-   * Construcs a BuldDocs object
+   * Construcs a BuldDocs object.
    *
    * @param \Drupal\multiversion\Entity\Transaction\TransactionInterface $trx
    *   The transaction instance.
