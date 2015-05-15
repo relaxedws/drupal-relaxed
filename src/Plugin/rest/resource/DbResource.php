@@ -31,8 +31,9 @@ class DbResource extends ResourceBase {
   /**
    * @param $entity
    *
-   * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *
+   * @return ResourceResponse
    */
   public function head($entity) {
     if (!$entity instanceof WorkspaceInterface) {
@@ -44,8 +45,9 @@ class DbResource extends ResourceBase {
   /**
    * @param $entity
    *
-   * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function get($entity) {
     if (!$entity instanceof WorkspaceInterface) {
@@ -58,10 +60,11 @@ class DbResource extends ResourceBase {
   /**
    * @param $name
    *
-   * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function put($name) {
     // If the name parameter was upcasted to an entity it means it an entity
@@ -90,12 +93,13 @@ class DbResource extends ResourceBase {
    * @param $workspace
    * @param ContentEntityInterface $entity
    *
-   * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, ContentEntityInterface $entity = NULL) {
     // If the workspace parameter is a string it means it could not be upcasted
@@ -140,8 +144,9 @@ class DbResource extends ResourceBase {
   /**
    * @param WorkspaceInterface $entity
    *
-   * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function delete(WorkspaceInterface $entity) {
     try {

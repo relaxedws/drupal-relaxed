@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Plugin\Field\FieldType\ReplicationHistoryItem.
+ */
+
 namespace Drupal\relaxed\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;

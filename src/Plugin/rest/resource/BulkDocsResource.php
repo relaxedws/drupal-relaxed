@@ -32,6 +32,10 @@ class BulkDocsResource extends ResourceBase {
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Exception thrown if $workspace is not a loaded entity.
+   *
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $bulk_docs) {
