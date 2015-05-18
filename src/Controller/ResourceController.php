@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
@@ -177,19 +178,18 @@ class ResourceController implements ContainerAwareInterface {
                 list(, , $file_uuid, $scheme, $filename) = explode('/', $file_info[1]);
                 if ($file_uuid && $scheme && $filename) {
                   $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
-                  if ($file) {
-                    continue;
+                  if (!$file) {
+                    $file_context = array(
+                      'uri' => "$scheme://$filename",
+                      'uuid' => $file_uuid,
+                      'status' => FILE_STATUS_PERMANENT,
+                    );
+                    $uid_info_found = preg_match('/(?<=\"uid\"\:\[\{\"target\_id\"\:\")(.*?)(?=\"\}\])/', $content, $uid_info);
+                    if ($uid_info_found && is_numeric($uid_info[1])) {
+                      $file_context['uid'] = $uid_info[1];
+                    }
+                    $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
                   }
-                  $file_context = array(
-                    'uri' => "$scheme://$filename",
-                    'uuid' => $file_uuid,
-                    'status' => FILE_STATUS_PERMANENT,
-                  );
-                  $uid_info_found = preg_match('/(?<=\"uid\"\:\[\{\"target\_id\"\:\")(.*?)(?=\"\}\])/', $content, $uid_info);
-                  if ($uid_info_found && is_numeric($uid_info[1])) {
-                    $file_context['uid'] = $uid_info[1];
-                  }
-                  $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
                   if ($file instanceof FileInterface) {
                     $file->save();
                   }
