@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
@@ -347,6 +348,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
     }
+
+    Cache::invalidateTags(array($entity_type_id . '_list'));
 
     return $entity;
   }
