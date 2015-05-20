@@ -179,10 +179,20 @@ class ResourceController implements ContainerAwareInterface {
               if ($file_info_found) {
                 list(, , $file_uuid, $scheme, $filename) = explode('/', $file_info[1]);
                 if ($file_uuid && $scheme && $filename) {
+                  $uri = "$scheme://$filename";
+                  // Check if exists a file with this uuid.
                   $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
                   if (!$file) {
+                    // Check if exists a file with this $uri, if it exists then
+                    // change the URI and save the new file.
+                    $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
+                    if (count($existing_files)) {
+                      $uri = file_destination($uri, FILE_EXISTS_RENAME);
+                    }
+                  }
+                  if (!$file) {
                     $file_context = array(
-                      'uri' => "$scheme://$filename",
+                      'uri' => $uri,
                       'uuid' => $file_uuid,
                       'status' => FILE_STATUS_PERMANENT,
                     );
