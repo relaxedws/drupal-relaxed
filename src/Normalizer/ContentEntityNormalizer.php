@@ -297,6 +297,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // Remove changed info, otherwise we can get validation errors.
+    if (isset($data['changed'])) {
+      unset($data['changed']);
+    }
+
     // @todo Move the below update logic to the resource plugin instead.
     $storage = $this->entityManager->getStorage($entity_type_id);
 
