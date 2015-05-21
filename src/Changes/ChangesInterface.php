@@ -17,32 +17,43 @@ interface ChangesInterface {
    * Factory method.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
    * @param \Drupal\multiversion\Entity\Index\SequenceIndexInterface $sequence_index
-   * @return \Drupal\relaxed\Changes\ChangesInterface
+   *   The sequence index.
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   *  The workspace instance
+   *
+   * @return static
    */
   static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace);
 
   /**
+   * Sets the include_docs flag.
+   *
    * @param boolean $include_docs
-   * @return \Drupal\relaxed\Changes\ChangesInterface
+   *  The include docs flag to set.
+   *
+   * @return $this
    */
-  public function includeDocs($include_docs);
+  public function setIncludeDocs($include_docs);
 
   /**
    * Sets from what sequence number to check for changes.
    *
    * @param int $seq
-   * @return \Drupal\relaxed\Changes\ChangesInterface
+   *   The sequence to set.
+   *
+   * @return $this
    */
-  public function lastSeq($seq);
+  public function setLastSeq($seq);
 
   /**
-   * Return the changes in a 'normal' way.
+   * Get the changes in a 'normal' way.
    */
   public function getNormal();
 
   /**
-   * Return the changes with a 'longpoll'.
+   * Get the changes with a 'longpoll'.
    *
    * We can implement this method later.
    *

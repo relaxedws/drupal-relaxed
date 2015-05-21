@@ -85,10 +85,16 @@ class AllDocs implements AllDocsInterface {
   }
 
   /**
+   * Construcs an AllDocs object.
+   *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
    * @param \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager
+   *   The multiversion manager.
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   *  The workspace instance
    * @param \Drupal\multiversion\Entity\Index\EntityIndexInterface $entity_index
+   *  The entity index.
    */
   public function __construct(EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace, EntityIndexInterface $entity_index, SerializerInterface $serializer) {
     $this->entityManager = $entity_manager;
@@ -103,6 +109,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function includeDocs($include_docs) {
     $this->includeDocs = $include_docs;
+    return $this;
   }
 
   /**
@@ -110,6 +117,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function limit($limit) {
     $this->limit = $limit;
+    return $this;
   }
 
   /**
@@ -117,6 +125,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function skip($skip) {
     $this->skip = $skip;
+    return $this;
   }
 
   /**
@@ -124,6 +133,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function descending($descending) {
     $this->descending = $descending;
+    return $this;
   }
 
   /**
@@ -131,6 +141,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function startKey($key) {
     $this->startKey = $key;
+    return $this;
   }
 
   /**
@@ -138,6 +149,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function endKey($key) {
     $this->endKey = $key;
+    return $this;
   }
 
   /**
@@ -145,6 +157,7 @@ class AllDocs implements AllDocsInterface {
    */
   public function inclusiveEnd($inclusive_end) {
     $this->inclusiveEnd = $inclusive_end;
+    return $this;
   }
 
   /**

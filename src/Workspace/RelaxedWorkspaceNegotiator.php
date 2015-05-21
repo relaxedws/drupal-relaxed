@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Workspace\RelaxedWorkspaceNegotiator.
+ */
+
 namespace Drupal\relaxed\Workspace;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

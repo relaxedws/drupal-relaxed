@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Entity\ReplicationLogAccessControlHandler.
+ * Contains \Drupal\relaxed\ReplicationLogAccessControlHandler.
  */
 
-namespace Drupal\relaxed\Entity;
+namespace Drupal\relaxed;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;

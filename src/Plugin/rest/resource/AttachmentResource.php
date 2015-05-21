@@ -43,7 +43,13 @@ class AttachmentResource extends ResourceBase {
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ResourceResponse
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Exception thrown if user doesn't have required access.
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Exception thrown if $workspace or $entity is not loaded entities.
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     if (is_string($workspace) || is_string($entity) || is_string($file)) {
@@ -64,7 +70,8 @@ class AttachmentResource extends ResourceBase {
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ResourceResponse
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     if (is_string($workspace) || is_string($entity) || is_string($file)) {
@@ -86,8 +93,18 @@ class AttachmentResource extends ResourceBase {
    * @param string $scheme
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Exception thrown if user doesn't have required access.
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   *   Exception thrown file could not be saved.
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Exception thrown if $workspace or $entity is not loaded entities.
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
+    // @todo Why allow string in function scope only to throw an exception?
     if (is_string($workspace) || is_string($entity)) {
       throw new NotFoundHttpException();
     }
@@ -130,6 +147,17 @@ class AttachmentResource extends ResourceBase {
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Exception thrown if user doesn't have required access.
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   *   Exception thrown if entity reference field points to the wrong file.
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   *   Exception thrown if file fails to be deleted.
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Exception thrown if $workspace or $entity is not loaded entities.
+   *
+   * @return \Drupal\rest\ResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     if (is_string($workspace) || is_string($entity) || is_string($file)) {
@@ -163,7 +191,9 @@ class AttachmentResource extends ResourceBase {
    *
    * @param \Drupal\file\FileInterface $file
    * @param array $headers_to_include
+   *
    * @return array
+   *  The repsonse headers.
    */
   protected function responseHeaders(FileInterface $file, $headers_to_include = array(), $rev = NULL) {
     $file_contents = file_get_contents($file->getFileUri());

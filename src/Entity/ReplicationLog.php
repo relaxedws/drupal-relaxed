@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Entity\ReplicationLog.
+ */
+
 namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Entity\Entity;
@@ -7,6 +12,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\relaxed\ReplicationLogInterface;
 
 /**
  * The content workspace entity class.
@@ -16,7 +22,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  *   label = @Translation("Replication log"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\SqlContentEntityStorage",
- *     "access" = "Drupal\relaxed\Entity\ReplicationLogAccessControlHandler",
+ *     "access" = "Drupal\relaxed\ReplicationLogAccessControlHandler",
  *   },
  *   base_table = "replication_log",
  *   revision_table = "replication_log_revision",

@@ -26,6 +26,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ChangesResource extends ResourceBase {
 
+  /**
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   *  The workspace.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Exception thrown if $workspace is not a loaded entity.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *  The resource response.
+   */
   public function get($workspace) {
     if (is_string($workspace)) {
       throw new NotFoundHttpException();
@@ -40,7 +50,7 @@ class ChangesResource extends ResourceBase {
 
     $request = Request::createFromGlobals();
     if ($request->query->get('include_docs') == 'true') {
-      $changes->includeDocs(TRUE);
+      $changes->setIncludeDocs(TRUE);
     }
 
     return new ResourceResponse($changes, 200);

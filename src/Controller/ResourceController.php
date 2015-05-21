@@ -38,6 +38,8 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Gets the serializer.
+   *
    * @return \Symfony\Component\Serializer\SerializerInterface
    */
   protected function serializer() {
@@ -48,6 +50,8 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Gets the request method.
+   *
    * @return string
    */
   protected function getMethod() {
@@ -55,6 +59,8 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Get the request format.
+   *
    * @return string
    */
   protected function getFormat() {
@@ -65,6 +71,8 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Get the request resource.
+   *
    * @return \Drupal\relaxed\Plugin\rest\resource\RelaxedResourceInterface
    */
   protected function getResource() {
@@ -75,6 +83,8 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Get the request parameters.
+   *
    * @return array
    */
   protected function getParameters() {
@@ -93,6 +103,9 @@ class ResourceController implements ContainerAwareInterface {
    *
    * @todo Consider providing a better API where throwing an exception can
    *   provide both error and reason message.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *  The error repsonse.
    */
   public function errorResponse(\Exception $e) {
     // Default to 400 Bad Request.
@@ -130,9 +143,13 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * Handle a request.
+   *
    * @param \Symfony\Component\HttpFoundation\Request $request
+   *  The request to handle.
    *
    * @return \Symfony\Component\HttpFoundation\Response
+   *  A response for the request.
    */
   public function handle(Request $request) {
     $this->request = $request;
