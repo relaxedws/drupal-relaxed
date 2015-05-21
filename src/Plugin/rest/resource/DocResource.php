@@ -119,7 +119,7 @@ class DocResource extends ResourceBase {
 
     // Check entity and field level access.
     if (!$received_entity->access('create')) {
-      throw new AccessDeniedHttpException();
+      throw new AccessDeniedHttpException(t('Access denied when creating the entity.'));
     }
     foreach ($received_entity as $field_name => $field) {
       if (!$field->access('create')) {
