@@ -19,6 +19,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
   public static $modules = array(
     'serialization',
     'system',
+    'entity',
     'field',
     'entity_test',
     'text',
@@ -27,6 +28,7 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     'key_value',
     'multiversion',
     'rest',
+    'uuid',
     'relaxed',
     'file',
     'image'
