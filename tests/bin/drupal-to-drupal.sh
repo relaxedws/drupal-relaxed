@@ -36,6 +36,11 @@ curl -X GET http://admin:admin@drupal2.loc/relaxed/default/_all_docs | tee /tmp/
 #-----------------------------------
 sudo cat /var/log/couchdb/couch.log
 #-----------------------------------
+sudo cat /var/log/apache2/error.log
+#-----------------------------------
+sudo cat /var/log/apache2/forensic.log
+#-----------------------------------
+
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=4

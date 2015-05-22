@@ -39,7 +39,17 @@ sleep 120
 
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
+
 COUNT=$(wc -l < $DRUPAL_ROOT/modules/relaxed/tests/fixtures/documents.txt)
+
+#-----------------------------------
+sudo cat /var/log/couchdb/couch.log
+#-----------------------------------
+sudo cat /var/log/apache2/error.log
+#-----------------------------------
+sudo cat /var/log/apache2/forensic.log
+#-----------------------------------
+
 USERS=3
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
