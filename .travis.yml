@@ -62,6 +62,7 @@ install:
 before_script:
   # Add always_populate_raw_post_data=-1 to php.ini.
   - echo "always_populate_raw_post_data=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - phpenv config-add ./.travis.ini
 
   # Checkout a directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
