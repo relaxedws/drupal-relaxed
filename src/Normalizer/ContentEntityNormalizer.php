@@ -249,6 +249,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           $file_context['uid'] = isset($data['uid'][0]['target_id']) ?: $data['uid'][0]['target_id'];
           $file = \Drupal::service('relaxed.normalizer.attachment')->denormalize($value, '\Drupal\file\FileInterface', 'stream', $file_context);
           if ($file instanceof FileInterface) {
+            Cache::invalidateTags(array('file_list'));
             $file->save();
           }
         }
