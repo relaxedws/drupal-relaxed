@@ -1,4 +1,4 @@
-name: 'Relaxed Web Services'
+name: 'RELAXed Web Services'
 type: module
 description: 'Provides a RESTful API that exposes all content entities over UUID endpoints. Utility endpoints are also provided subscribing to changes and handling content replication.'
 package: Web services

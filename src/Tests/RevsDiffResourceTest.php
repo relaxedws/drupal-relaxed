@@ -40,18 +40,15 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
       $entity = entity_load($entity_type, $entity->id(), TRUE);
       $data = array();
-      $revs_count = $entity->_revs_info->count();
-      $id = $entity->uuid();
-      for ($i = 0; $i < $revs_count; $i++) {
-        if ($rev = $entity->_revs_info->get($i)->rev) {
-          $data[$id][] = $rev;
-        }
+      $uuid = $entity->uuid();
+      $revs = $this->revTree->getDefaultBranch($uuid);
+      foreach ($revs as $rev => $status) {
+        $data[$uuid][] = $rev;
       }
 
       $response = $this->httpRequest($this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data));
       $this->assertResponse('200', 'HTTP response code is correct.');
-      $data = Json::decode($response);
-      $this->assertTrue(empty($data), 'Data format is correct.');
+      $this->assertEqual($response, '{}', 'Data format is correct.');
     }
   }
 
@@ -84,12 +81,10 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $entity->save();
 
       $data = array();
-      $revs_count = $entity->_revs_info->count();
       $id = $entity->uuid();
-      for ($i = 0; $i < $revs_count; $i++) {
-        if ($rev = $entity->_revs_info->get($i)->rev) {
-          $data[$id][] = $rev;
-        }
+      $revs = $this->revTree->getDefaultBranch($id);
+      foreach ($revs as $rev => $status) {
+        $data[$id][] = $rev;
       }
 
       // Add invalid revision to test missing

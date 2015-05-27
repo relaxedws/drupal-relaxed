@@ -164,22 +164,13 @@ class FileItemNormalizerTest extends NormalizerTestBase{
 
     $expected = array(
       '@context' => array(
+        '_id' => '@id',
         'entity_test_mulrev' => \Drupal::service('rest.link_manager')->getTypeUri(
           'entity_test_mulrev',
           $entity->bundle()
         ),
       ),
-      '@id' => $this->getEntityUri($entity),
       '@type' => 'entity_test_mulrev',
-      'id' => array(
-        array('value' => 1),
-      ),
-      'revision_id' => array(
-        array('value' => 1),
-      ),
-      'uuid' => array(
-        array('value' => $this->entity->uuid()),
-      ),
       'langcode' => array(
         array('value' => 'en'),
       ),
@@ -205,11 +196,8 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         ),
       ),
       '_attachments' => $expected_attachments,
-      'workspace' => array(
-        array('target_id' => 'default')
-      ),
       '_id' => $entity->uuid(),
-      '_rev' => $entity->_revs_info->first()->get('rev')->getCastedValue(),
+      '_rev' => $entity->_rev->value,
     );
 
     $normalized = $this->serializer->normalize($this->entity);

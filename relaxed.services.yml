@@ -9,7 +9,7 @@ services:
       - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid', '@rest.link_manager']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.bulk_docs:
@@ -53,7 +53,7 @@ services:
       - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:

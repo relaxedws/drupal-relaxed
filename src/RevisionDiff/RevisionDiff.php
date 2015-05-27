@@ -55,27 +55,19 @@ class RevisionDiff implements RevisionDiffInterface {
   /**
    * {@inheritdoc}
    *
-   * @todo Move any assumptions about the serialization format into the
-   *   serializer to better separate concerns.
+   * @todo Implement the possible_ancestors key.
    */
   public function getMissing() {
-    $keys = array();
-    foreach ($this->getRevisionIds() as $entity_uuid => $revision_ids) {
+    $missing = array();
+    foreach ($this->getRevisionIds() as $uuid => $revision_ids) {
+      $existing = $this->revisionIndex->getMultiple($revision_ids);
       foreach ($revision_ids as $revision_id) {
-        $keys[] = $entity_uuid . ':' . $revision_id;
+        if (!isset($existing[$revision_id])) {
+          $missing[$uuid]['missing'][] = $revision_id;
+        }
       }
     }
-    $existing_revision_ids = $this->revisionIndex->getMultiple($keys);
-
-    $missing_revision_ids = array();
-    foreach ($keys as $key) {
-      if (!isset($existing_revision_ids[$key])) {
-        $uuid = substr($key, 0, strpos($key, ':'));
-        $missing_revision_ids[$uuid]['missing'][] = substr($key, strpos($key, ':') + 1);
-      }
-    }
-
-    return $missing_revision_ids;
+    return $missing;
   }
 
 }

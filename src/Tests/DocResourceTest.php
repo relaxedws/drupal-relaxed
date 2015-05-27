@@ -32,7 +32,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_create($entity_type);
       $entity->save();
-      $first_rev = $entity->_revs_info->rev;
+      $first_rev = $entity->_rev->value;
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertHeader('content-type', $this->defaultMimeType);
@@ -44,7 +44,7 @@ class DocResourceTest extends ResourceTestBase {
       $new_name = $this->randomMachineName();
       $entity->name = $new_name;
       $entity->save();
-      $second_rev = $entity->_revs_info->rev;
+      $second_rev = $entity->_rev->value;
 
       $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertHeader('content-type', $this->defaultMimeType);
@@ -97,19 +97,24 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertResponse('200', 'HTTP response code is correct.');
       $this->assertHeader('content-type', $this->defaultMimeType);
       // @todo Change when a proper event handler is implemented for ETag.
-      $this->assertHeader('x-relaxed-etag', $entity->_revs_info->rev);
+      $this->assertHeader('x-relaxed-etag', $entity->_rev->value);
       $data = Json::decode($response);
       // Only assert one example property here, other properties should be
       // checked in serialization tests.
-      $this->assertEqual($data['_rev'], $entity->_revs_info->rev, 'GET request returned correct revision hash.');
+      $this->assertEqual($data['_rev'], $entity->_rev->value, 'GET request returned correct revision hash.');
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('revs' => TRUE));
       $data = Json::decode($response);
       $rev = $data['_revisions']['start'] . '-' . $data['_revisions']['ids'][0];
-      $this->assertEqual($rev, $entity->_revs_info->rev, 'GET request returned revision list.');
+      $this->assertEqual($rev, $entity->_rev->value, 'GET request returned correct revision list after first revision.');
 
       // Save an additional revision.
       $entity->save();
+
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('revs' => TRUE));
+      $data = Json::decode($response);
+      $count = count($data['_revisions']['ids']);
+      $this->assertEqual($count, 2, 'GET request returned correct revision list after second revision.');
 
       // Test the response for a fake revision.
       $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, NULL, array('rev' => '11112222333344445555'));
@@ -117,10 +122,10 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_create($entity_type);
       $entity->save();
-      $first_rev = $entity->_revs_info->rev;
+      $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
-      $second_rev = $entity->_revs_info->rev;
+      $second_rev = $entity->_rev->value;
 
       $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL, NULL, array('if-none-match' => $first_rev));
       $this->assertHeader('content-type', $this->defaultMimeType);
@@ -156,9 +161,8 @@ class DocResourceTest extends ResourceTestBase {
       $entity->name = $this->randomMachineName();
 
       $open_revs = array();
-      foreach ($entity->_revs_info as $item) {
-        $open_revs[] = $item->rev;
-      }
+      $open_revs[] = $entity->_rev->value;
+
       $open_revs_string = json_encode($open_revs);
       $response = $this->httpRequest(
         "$db/" . $entity->uuid(),
@@ -229,10 +233,10 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_create($entity_type);
       $entity->save();
-      $first_rev = $entity->_revs_info->rev;
+      $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
-      $second_rev = $entity->_revs_info->rev;
+      $second_rev = $entity->_rev->value;
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, array('if-match' => $first_rev));
@@ -243,12 +247,13 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = entity_load($entity_type, $entity->id());
+      $entity = entity_load($entity_type, $entity->id(), TRUE);
+      $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, array('rev' => $first_rev));
       $this->assertResponse('409', 'HTTP response code is correct.');
 
-      $response = $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, array('rev' => $entity->_revs_info->rev));
+      $response = $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, array('rev' => $entity->_rev->value));
       $this->assertResponse('201', 'HTTP response code is correct.');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
@@ -280,10 +285,10 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_create($entity_type);
       $entity->save();
-      $first_rev = $entity->_revs_info->rev;
+      $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
-      $second_rev = $entity->_revs_info->rev;
+      $second_rev = $entity->_rev->value;
 
       $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, array('rev' => $first_rev));
       $this->assertResponse('409', 'HTTP response code is correct.');
@@ -299,10 +304,10 @@ class DocResourceTest extends ResourceTestBase {
 
       $entity = entity_create($entity_type);
       $entity->save();
-      $first_rev = $entity->_revs_info->rev;
+      $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
-      $second_rev = $entity->_revs_info->rev;
+      $second_rev = $entity->_rev->value;
 
       $this->httpRequest("$db/" . $entity->uuid(), 'DELETE', NULL, NULL, array('if-match' => $first_rev));
       $this->assertResponse('409', 'HTTP response code is correct.');

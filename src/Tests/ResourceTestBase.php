@@ -25,6 +25,21 @@ abstract class ResourceTestBase extends RESTTestBase {
    */
   protected $multiversionManager;
 
+  /**
+   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
+   */
+  protected $workspaceManager;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityManager
+   */
+  protected $entityManager;
+
+  /**
+   * @var \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface
+   */
+  protected $revTree;
+
   protected function setUp() {
     parent::setUp();
     $this->defaultFormat = 'json';
@@ -37,12 +52,15 @@ abstract class ResourceTestBase extends RESTTestBase {
       ->applyUpdates();
 
     $this->multiversionManager = $this->container->get('multiversion.manager');
+    $this->workspaceManager = $this->container->get('workspace.manager');
 
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);
     $this->workspace->save();
 
     $this->multiversionManager->setActiveWorkspaceId($name);
+    $this->entityManager = $this->container->get('entity.manager');
+    $this->revTree = $this->container->get('entity.index.rev.tree');
   }
 
   /**

@@ -50,7 +50,7 @@ class DocResource extends ResourceBase {
 
     // @todo Create a event handler and override the ETag that's set by core.
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
+    return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
   }
 
   /**
@@ -102,7 +102,7 @@ class DocResource extends ResourceBase {
     }
 
     // Normal response.
-    return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_revs_info->rev));
+    return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
   }
 
   /**
@@ -132,13 +132,13 @@ class DocResource extends ResourceBase {
     // Validate the received data before saving.
     $this->validate($received_entity);
 
-    if (!is_string($existing_entity) && $received_entity->_revs_info->rev != $existing_entity->_revs_info->rev) {
+    if (!is_string($existing_entity) && $received_entity->_rev->value != $existing_entity->_rev->value) {
       throw new ConflictHttpException();
     }
 
     try {
       $received_entity->save();
-      $rev = $received_entity->_revs_info->rev;
+      $rev = $received_entity->_rev->value;
       $data = array('ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev);
       return new ResourceResponse($data, 201, array('X-Relaxed-ETag' => $rev));
     }
@@ -164,7 +164,7 @@ class DocResource extends ResourceBase {
 
     $record = \Drupal::service('entity.index.uuid')->get($entity->uuid());
     $last_rev = $record['rev'];
-    if ($last_rev != $entity->_revs_info->rev) {
+    if ($last_rev != $entity->_rev->value) {
       throw new ConflictHttpException();
     }
 

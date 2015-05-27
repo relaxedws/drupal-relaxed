@@ -39,12 +39,12 @@ class ChangesResourceTest extends ResourceTestBase {
     $entity->save();
     $first_seq = $this->multiversionManager->lastSequenceId();
     $expected_without_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_revs_info->rev)),
+      'changes' => array(array('rev' => $entity->_rev->value)),
       'id' => $entity->uuid(),
       'seq' => $first_seq,
     );
     $expected_with_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_revs_info->rev)),
+      'changes' => array(array('rev' => $entity->_rev->value)),
       'id' => $entity->uuid(),
       'seq' => $first_seq,
       'doc' => $serializer->normalize($entity)
@@ -62,13 +62,13 @@ class ChangesResourceTest extends ResourceTestBase {
     $entity->delete();
     $second_seq = $this->multiversionManager->lastSequenceId();
     $expected_without_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_revs_info->rev)),
+      'changes' => array(array('rev' => $entity->_rev->value)),
       'id' => $entity->uuid(),
       'seq' => $second_seq,
       'deleted' => true,
     );
     $expected_with_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_revs_info->rev)),
+      'changes' => array(array('rev' => $entity->_rev->value)),
       'id' => $entity->uuid(),
       'seq' => $second_seq,
       'doc' => $serializer->normalize($entity),

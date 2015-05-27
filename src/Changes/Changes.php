@@ -110,7 +110,7 @@ class Changes implements ChangesInterface {
       }
       if ($this->includeDocs == TRUE) {
         /** @var \Drupal\multiversion\Entity\Storage\ContentEntityStorageInterface $storage */
-        $storage = $this->entityManager->getStorage($sequence['entity_type']);
+        $storage = $this->entityManager->getStorage($sequence['entity_type_id']);
         $revision = $storage->loadRevision($sequence['revision_id']);
         $changes[$uuid]['doc'] = $this->serializer->normalize($revision);
       }

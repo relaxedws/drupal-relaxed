@@ -113,7 +113,7 @@ class AttachmentResource extends ResourceBase {
       $entity->{$field_name}->get($delta)->target_id = $file->id();
       $entity->save();
 
-      $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_revs_info->rev);
+      $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value);
       return new ResourceResponse($data, 200, $this->responseHeaders($file, array('Content-MD5', 'X-Relaxed-ETag')));
     }
     // @todo We should probablt catch a more generic exception here and on other places.
@@ -149,7 +149,7 @@ class AttachmentResource extends ResourceBase {
       $file->delete();
       unset($entity->{$field_name}[$delta]);
       $entity->save();
-      $rev = $entity->_revs_info->rev;
+      $rev = $entity->_rev->value;
       $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev);
       return new ResourceResponse($data, 200, array('X-Relaxed-ETag'), $rev);
     }
