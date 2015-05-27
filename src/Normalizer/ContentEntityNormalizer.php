@@ -256,6 +256,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         }
         $data[$field_name][$delta] = array(
           'target_id' => $file->id(),
+          'alt' => $file->getFilename(),
         );
       }
     }
