@@ -231,7 +231,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         list($field_name, $delta, $file_uuid, $scheme, $filename) = explode('/', $key);
         $uri = "$scheme://$filename";
         // Check if exists a file with this uuid.
-        $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+        $file = $this->entityManager->loadEntityByUuid('file', $file_uuid);
         if (!$file) {
           // Check if exists a file with this $uri, if it exists then
           // change the URI and save the new file.
@@ -245,9 +245,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
             'uri' => $uri,
             'uuid' => $file_uuid,
             'status' => FILE_STATUS_PERMANENT,
+            'uid' => \Drupal::currentUser()->id(),
           );
-          $file_context['uid'] = isset($data['uid'][0]['target_id']) ?: $data['uid'][0]['target_id'];
-          $file = \Drupal::service('relaxed.normalizer.attachment')->denormalize($value, '\Drupal\file\FileInterface', 'stream', $file_context);
+          $file = \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
           \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
           if ($file instanceof FileInterface) {
             Cache::invalidateTags(array('file_list'));

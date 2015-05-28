@@ -26,7 +26,7 @@ curl -X GET http://localhost:5984/source/_all_docs
 drush cr
 
 # Run the replication.
-nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://admin:admin@drupal.loc/relaxed/default"}' http://localhost:5984/_replicate &
+nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://admin:admin@drupal.loc/relaxed/default", "worker_processes": 1}' http://localhost:5984/_replicate &
 sleep 120
 
 curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/all_docs.txt
