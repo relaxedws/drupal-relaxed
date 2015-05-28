@@ -40,8 +40,6 @@ sudo cat /var/log/apache2/error.log
 #-----------------------------------
 sudo cat /var/log/apache2/forensic.log
 #-----------------------------------
-php -i
-#-----------------------------------
 
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
