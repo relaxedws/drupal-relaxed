@@ -239,8 +239,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           if (count($existing_files)) {
             $uri = file_destination($uri, FILE_EXISTS_RENAME);
           }
-        }
-        if (!$file) {
           $file_context = array(
             'uri' => $uri,
             'uuid' => $file_uuid,
@@ -248,15 +246,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
             'uid' => \Drupal::currentUser()->id(),
           );
           $file = \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
-          \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
           if ($file instanceof FileInterface) {
-            Cache::invalidateTags(array('file_list'));
-            $file->save();
+            $data[$field_name][$delta] = array('entity_to_save' => $file);
           }
+          continue;
         }
         $data[$field_name][$delta] = array(
           'target_id' => $file->id(),
-          'alt' => $file->getFilename(),
         );
       }
     }

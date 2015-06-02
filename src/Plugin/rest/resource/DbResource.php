@@ -4,6 +4,8 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
@@ -132,6 +134,27 @@ class DbResource extends ResourceBase {
       }
       elseif (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+      }
+
+      // Save the files for file and image fields.
+      if ($field instanceof FileFieldItemList) {
+        foreach ($field as $delta => $item) {
+          if (isset($item->entity_to_save)) {
+            $file = $item->entity_to_save;
+            $file->save();
+            $file_info = array('target_id' => $file->id());
+
+            $field_definitions = $entity->getFieldDefinitions();
+            $field_type = $field_definitions[$field_name]->getType();
+            // Add alternative text for image type fields.
+            if ($field_type == 'image') {
+              $file_info['alt'] = $file->getFilename();
+            }
+            $entity->{$field_name}[$delta] = $file_info;
+
+            unset($entity->{$field_name}[$delta]->entity_to_save);
+          }
+        }
       }
     }
 
