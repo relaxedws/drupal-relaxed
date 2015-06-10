@@ -7,6 +7,8 @@ use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
+use Drupal\taxonomy\Plugin\views\argument\Taxonomy;
+use Drupal\taxonomy\TermStorageInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -251,6 +253,37 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // @todo Move the below update logic to the resource plugin instead.
     $storage = $this->entityManager->getStorage($entity_type_id);
+
+    // Denormalize entity reference fields.
+    foreach ($data as $field_name => $field_info) {
+      if (!is_array($field_info)) {
+        continue;
+      }
+      foreach ($field_info as $delta => $item) {
+        if (isset($item['entity_type_id']) && isset($item['target_uuid'])) {
+          $target_storage = $this->entityManager->getStorage($item['entity_type_id']);
+          $target_entity = $target_storage->loadByProperties(array('uuid' => $item['target_uuid']));
+          $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
+          if ($target_entity) {
+            $data[$field_name][$delta] = array(
+              'target_id' => $target_entity->id(),
+            );
+            continue;
+          }
+          $target_entity_values = array('uuid' => $item['target_uuid']);
+
+          if ($target_storage instanceof TermStorageInterface) {
+            $target_entity_values['vid'] = 'tags';
+            $target_entity_values['name'] = 'Stub name for taxonomy term';
+          }
+
+          $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
+          $data[$field_name][$delta] = array(
+            'entity_to_save' => $target_entity,
+          );
+        }
+      }
+    }
 
     if ($entity_id) {
       if ($entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id)) {

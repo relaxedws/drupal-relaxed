@@ -51,6 +51,10 @@ services:
     class: Drupal\relaxed\Normalizer\FileItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
+  relaxed.normalizer.entity_reference_item:
+    class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
