@@ -55,6 +55,8 @@ services:
     class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
+  relaxed.stub_entity_processor:
+      class: Drupal\relaxed\StubEntityProcessor\StubEntityProcessor
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
