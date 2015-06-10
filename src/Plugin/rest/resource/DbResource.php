@@ -108,7 +108,6 @@ class DbResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content received'));
     }
     $uuid = $entity->uuid();
-    $rev = $entity->_rev->value;
 
     // Check for conflicts.
     /*if ($uuid) {
@@ -137,6 +136,7 @@ class DbResource extends ResourceBase {
     $this->validate($entity);
     try {
       $entity->save();
+      $rev = $entity->_rev->value;
       return new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
     }
     catch (EntityStorageException $e) {
