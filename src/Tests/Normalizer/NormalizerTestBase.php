@@ -18,7 +18,6 @@ abstract class NormalizerTestBase extends CoreNormalizerTestBase {
 
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', array('router'));
     \Drupal::service('router.builder')->rebuild();
     $this->installSchema('key_value', array('key_value_sorted'));
 
