@@ -11,7 +11,7 @@ use Drupal\Component\Utility\SafeMarkup;
  */
 class ContentEntityNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'relaxed');
+  public static $modules = array('serialization', 'system', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'relaxed');
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 

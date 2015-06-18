@@ -34,9 +34,14 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
         '_plugin' => $this->pluginId,
       ), array(
-        '_method' => $method,
         '_permission' => "restful " . $method_lower . " $this->pluginId" . "+perform content replication",
-      ));
+      ),
+        array(),
+        '',
+        array(),
+        // The HTTP method is a requirement for this route.
+        array($method)
+      );
 
       if (isset($definition['uri_paths'][$method_lower])) {
         $route->setPath($definition['uri_paths'][$method_lower]);
@@ -70,16 +75,16 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
         case 'GET':
           // Restrict on the Accept header if not an attachment resource.
-          if (!$this->isAttachment()) {
-            foreach ($this->serializerFormats as $format) {
-              $format_route = clone $route;
-              $format_route->addRequirements(array('_format' => $format));
-              $collection->add("$route_name.$method.$format", $format_route);
-            }
-          }
-          else {
+//          if (!$this->isAttachment()) {
+//            foreach ($this->serializerFormats as $format) {
+//              $format_route = clone $route;
+//              $format_route->addRequirements(array('_format' => $format));
+//              $collection->add("$route_name.$method.$format", $format_route);
+//            }
+//          }
+//          else {
             $collection->add("$route_name.$method", $route);
-          }
+//          }
           break;
 
         case 'DELETE':
@@ -100,6 +105,11 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
   protected function validate(ContentEntityInterface $entity) {
     $violations = $entity->validate();
+
+    // Remove violations of inaccessible fields as they cannot stem from our
+    // changes.
+    $violations->filterByFieldAccess();
+
     if (count($violations) > 0) {
       $messages = array();
       foreach ($violations as $violation) {
