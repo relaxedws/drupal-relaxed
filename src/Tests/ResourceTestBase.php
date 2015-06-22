@@ -98,6 +98,10 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     if ($mime_type === NULL) {
       $mime_type = $this->defaultMimeType;
+
+      if (!isset($query['_format'])) {
+        $query[] = ['_format' => $this->defaultFormat];
+      }
     }
     if (!in_array($method, array('GET', 'HEAD', 'OPTIONS', 'TRACE'))) {
       // GET the CSRF token first for writing requests.
@@ -242,7 +246,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     return $entity;
   }
 
-  protected function assertHeader($header, $value, $message = '', $group = 'Browser') {
+  /*protected function assertHeader($header, $value, $message = '', $group = 'Browser') {
     $header = strtolower($header);
     $header_value = $this->drupalGetHeader($header);
     // Strip attributes such as 'charset' from the content-type header for
@@ -251,5 +255,5 @@ abstract class ResourceTestBase extends RESTTestBase {
       list($header_value) = explode(';', $header_value);
     }
     return $this->assertTrue($header_value == $value, $message ? $message : 'HTTP response header ' . $header . ' with value ' . $value . ' found.', $group);
-  }
+  }*/
 }
