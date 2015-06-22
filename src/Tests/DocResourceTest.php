@@ -170,7 +170,7 @@ class DocResourceTest extends ResourceTestBase {
         NULL,
         'multipart/mixed',
         NULL,
-        array('open_revs' => $open_revs_string)
+        array('open_revs' => $open_revs_string, '_format' => 'mixed')
       );
 
       $stream = Stream::factory($response);
@@ -195,7 +195,7 @@ class DocResourceTest extends ResourceTestBase {
         "$db/" . $entity->uuid(),
         'GET',
         NULL,
-        'application/json',
+        $this->defaultMimeType,
         NULL,
         array('open_revs' => $open_revs_string)
       );

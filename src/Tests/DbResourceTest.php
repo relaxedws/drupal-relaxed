@@ -99,12 +99,12 @@ class DbResourceTest extends ResourceTestBase {
 
       //$this->workspaceManager->setActiveWorkspace($this->workspace);
       // Load the entity that was saved in the previous POST call.
-      $entity = $this->entityManager->loadEntityByUuid($entity_type, $data['id']);
-      $entity = entity_load($entity_type, $entity->id());
-      $serialized = $serializer->serialize($entity, $this->defaultFormat);
-
-      $this->httpRequest($this->workspace->id(), 'POST', $serialized);
-      $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
+//      $entity = $this->entityManager->loadEntityByUuid($entity_type, $data['id']);
+//      $entity = entity_load($entity_type, $entity->id());
+//      $serialized = $serializer->serialize($entity, $this->defaultFormat);
+//
+//      $this->httpRequest($this->workspace->id(), 'POST', $serialized);
+//      $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }
 
