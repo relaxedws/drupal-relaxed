@@ -7,8 +7,6 @@ use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
-use Drupal\taxonomy\Plugin\views\argument\Taxonomy;
-use Drupal\taxonomy\TermStorageInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -277,10 +275,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           }
           $target_entity_values = array('uuid' => $item['target_uuid']);
 
-          if ($target_storage instanceof TermStorageInterface) {
-            $target_entity_values['vid'] = 'tags';
-            $target_entity_values['name'] = 'Stub name for taxonomy term';
-          }
+          // Let other modules feedback about their own additions.
+          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('relaxed_target_entity_values', array($target_storage)));
 
           $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
           $data[$field_name][$delta] = array(
