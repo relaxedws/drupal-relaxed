@@ -276,7 +276,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           $target_entity_values = array('uuid' => $item['target_uuid']);
 
           // Let other modules feedback about their own additions.
-          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('relaxed_target_entity_values', array($target_storage)));
+          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', array($target_storage)));
 
           $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
           $data[$field_name][$delta] = array(

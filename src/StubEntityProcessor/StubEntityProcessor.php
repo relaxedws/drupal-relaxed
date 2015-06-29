@@ -16,13 +16,18 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
    * {@inheritdoc}
    */
   public function processEntity(ContentEntityInterface $entity) {
-    $this->saveStubEntities($entity);
+    // Check if the entity is a stub entity and exists, if it already exists,
+    // update it if needed.
     $existing_entities = entity_load_multiple_by_properties($entity->getEntityTypeId(), array('uuid' => $entity->uuid()));
     $existing_entity = reset($existing_entities);
-    // Update a stub entity with the correct values.
+    // Update the stub entity with the correct values.
     if ($existing_entity && !$entity->id()) {
-      $this->updateStubEntity($entity,$existing_entity);
+      $entity = $this->updateStubEntity($entity,$existing_entity);
     }
+
+    // Save stub entities for entity reference fields.
+    $this->saveStubEntities($entity);
+
     return $entity;
   }
 
@@ -71,8 +76,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
         $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
       }
     }
-    $entity = $existing_entity;
-    $entity->isDefaultRevision(TRUE);
+    return $existing_entity;
   }
 
 }

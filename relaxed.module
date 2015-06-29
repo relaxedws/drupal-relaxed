@@ -2,9 +2,11 @@
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\taxonomy\TermStorageInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -77,4 +79,18 @@ function relaxed_entity_access(EntityInterface $entity, $operation, AccountInter
  */
 function relaxed_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
   return AccessResult::allowedIfHasPermission($account, 'perform content replication');
+}
+
+/**
+ * Implements hook_entity_create_stub().
+ */
+function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
+  $target_entity_values = array();
+
+  if ($target_storage instanceof TermStorageInterface) {
+    $target_entity_values['vid'] = 'tags';
+    $target_entity_values['name'] = 'Stub name for taxonomy term';
+  }
+
+  return $target_entity_values;
 }
