@@ -54,7 +54,7 @@ class BulkDocs implements BulkDocsInterface {
   public function __construct(WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace, StubEntityProcessorInterface $stub_entity_processor) {
     $this->workspaceManager = $workspace_manager;
     $this->workspace = $workspace;
-    $this->stub_entity_processor = $stub_entity_processor;
+    $this->stubEntityProcessor = $stub_entity_processor;
   }
 
   /**
@@ -94,7 +94,7 @@ class BulkDocs implements BulkDocsInterface {
         // This will save stub entities in case the entity has entity reference
         // fields and a referenced entity does not exist or will update stub
         // entities with the correct values.
-        $this->stub_entity_processor->processEntity($entity);
+        $entity = $this->stubEntityProcessor->processEntity($entity);
 
         $entity->save();
 

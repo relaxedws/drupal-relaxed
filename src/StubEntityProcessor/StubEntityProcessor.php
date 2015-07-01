@@ -22,7 +22,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
     $existing_entity = reset($existing_entities);
     // Update the stub entity with the correct values.
     if ($existing_entity && !$entity->id()) {
-      $entity = $this->updateStubEntity($entity,$existing_entity);
+      $entity = $this->updateStubEntity($entity, $existing_entity);
     }
 
     // Save stub entities for entity reference fields.
@@ -71,11 +71,14 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
    */
   protected function updateStubEntity(ContentEntityInterface $entity, ContentEntityInterface $existing_entity) {
     $id_key = $entity->getEntityType()->getKey('id');
+    $revision_key = $entity->getEntityType()->getKey('revision');
     foreach ($existing_entity as $field_name => $field) {
-      if ($field_name != $id_key && $entity->{$field_name}->value) {
+      if ($field_name != $id_key && $field_name != $revision_key
+        && $field_name != '_rev' && $entity->{$field_name}->value) {
         $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
       }
     }
+    $entity->_rev->new_edit = FALSE;
     return $existing_entity;
   }
 
