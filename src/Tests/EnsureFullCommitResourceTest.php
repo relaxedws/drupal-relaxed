@@ -30,4 +30,5 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     );
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
   }
+
 }
