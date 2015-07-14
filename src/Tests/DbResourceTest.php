@@ -89,7 +89,7 @@ class DbResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $entity = entity_create($entity_type);
+      $entity = entity_create($entity_type, array('user_id' => $account->id()));
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest($this->workspace->id(), 'POST', $serialized);
@@ -129,4 +129,5 @@ class DbResourceTest extends ResourceTestBase {
     $entity = entity_load('workspace', $entity->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
   }
+
 }

@@ -223,7 +223,7 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $entity = entity_create($entity_type);
+      $entity = entity_create($entity_type, ['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized);
@@ -231,7 +231,7 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = entity_create($entity_type);
+      $entity = entity_create($entity_type, ['user_id' => $account->id()]);
       $entity->save();
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
@@ -318,4 +318,5 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
     }
   }
+
 }
