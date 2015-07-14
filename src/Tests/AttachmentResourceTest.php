@@ -257,4 +257,5 @@ class AttachmentResourceTest extends ResourceTestBase {
     $entity = entity_load('entity_test_rev', $this->entity->id());
     $this->assertEqual($entity->{$field_name}->count(), 1, 'The file does not exist on the entity any more.');
   }
+
 }

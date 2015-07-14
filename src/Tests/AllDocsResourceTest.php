@@ -104,4 +104,5 @@ class AllDocsResourceTest extends ResourceTestBase {
       $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key when including docs.");
     }
   }
+
 }

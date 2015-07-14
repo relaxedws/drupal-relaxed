@@ -60,4 +60,5 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     ));
     return $entity;
   }
+
 }

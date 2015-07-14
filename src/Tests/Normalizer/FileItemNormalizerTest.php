@@ -214,4 +214,5 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     $this->assertIdentical($denormalized->bundle(), $this->entity->bundle(), 'Expected entity bundle found.');
     $this->assertIdentical($denormalized->uuid(), $this->entity->uuid(), 'Expected entity UUID found.');
   }
+
 }

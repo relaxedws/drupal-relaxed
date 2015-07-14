@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Tests;
 
-use DateTime;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\relaxed\Entity\ReplicationLog;
 use Drupal\multiversion\Tests\MultiversionWebTestBase;
@@ -16,9 +15,7 @@ class ReplicationLogTest extends MultiversionWebTestBase {
 
   protected $strictConfigSchema = FALSE;
 
-  // @todo 'node' needs to be enabled because relaxed depends on rest that seems
-  // to assumes certain things incorrectly. Revisit this.
-  public static $modules = array('entity_test', 'node', 'relaxed');
+  public static $modules = array('entity_test', 'relaxed');
 
   public function testOperations() {
     $entity = entity_create('replication_log');
@@ -70,4 +67,5 @@ class ReplicationLogTest extends MultiversionWebTestBase {
       $this->fail('Fail, trying to save entity with incorrect data format or length for history fields.');
     }
   }
+
 }

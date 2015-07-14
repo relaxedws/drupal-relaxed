@@ -245,14 +245,4 @@ abstract class ResourceTestBase extends RESTTestBase {
     return $entity;
   }
 
-  /*protected function assertHeader($header, $value, $message = '', $group = 'Browser') {
-    $header = strtolower($header);
-    $header_value = $this->drupalGetHeader($header);
-    // Strip attributes such as 'charset' from the content-type header for
-    // easier comparison.
-    if ($header == 'content-type') {
-      list($header_value) = explode(';', $header_value);
-    }
-    return $this->assertTrue($header_value == $value, $message ? $message : 'HTTP response header ' . $header . ' with value ' . $value . ' found.', $group);
-  }*/
 }

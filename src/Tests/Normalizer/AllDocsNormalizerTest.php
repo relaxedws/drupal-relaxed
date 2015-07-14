@@ -7,8 +7,6 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\multiversion\MultiversionManagerInterface;
 use Drupal\relaxed\AllDocs\AllDocs;
 
 /**
@@ -92,4 +90,5 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
       $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key when including docs.");
     }
   }
+
 }

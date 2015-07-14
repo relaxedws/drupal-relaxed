@@ -36,4 +36,5 @@ class AllDbsResourceTest extends ResourceTestBase {
     sort($workspaces);
     $this->assertEqual($data, $workspaces, 'All workspaces names received.');
   }
+
 }

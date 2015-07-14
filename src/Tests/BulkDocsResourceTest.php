@@ -11,10 +11,6 @@ use Drupal\Component\Serialization\Json;
  */
 class BulkDocsResourceTest extends ResourceTestBase {
 
-  protected function setUp() {
-    parent::setUp();
-  }
-
   public function testPostCreate() {
     $db = $this->workspace->id();
     $this->enableService('relaxed:bulk_docs', 'POST');
@@ -156,4 +152,5 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     return $entities;
   }
+
 }
