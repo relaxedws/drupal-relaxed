@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\ReplicationLogTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Core\Entity\EntityStorageException;

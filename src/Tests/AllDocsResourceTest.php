@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\AllDocsResourceTest.
+ * Contains \Drupal\relaxed\Tests\AllDocsResourceTest.
  */
 
 namespace Drupal\relaxed\Tests;

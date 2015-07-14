@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\AllDocsNormalizerTest.
+ * Contains \Drupal\relaxed\Tests\Normalizer\AllDocsNormalizerTest.
  */
 
 namespace Drupal\relaxed\Tests\Normalizer;

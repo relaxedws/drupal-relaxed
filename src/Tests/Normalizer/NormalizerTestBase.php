@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Normalizer\NormalizerTestBase.
+ */
+
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\serialization\Tests\NormalizerTestBase as CoreNormalizerTestBase;

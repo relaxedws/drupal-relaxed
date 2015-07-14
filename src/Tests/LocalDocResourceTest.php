@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\LocalDocResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 /**
