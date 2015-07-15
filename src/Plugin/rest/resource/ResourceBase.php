@@ -71,11 +71,6 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
             $route->addRequirements(array('_content_type_format' => implode('|', $this->serializerFormats)));
           }
           $collection->add("$route_name.$method", $route);
-          foreach ($this->serializerFormats as $format) {
-            $format_route = clone $route;
-            $format_route->addRequirements(array('_format' => $format));
-            $collection->add("$route_name.$method.$format", $format_route);
-          }
           break;
 
         case 'GET':
