@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
@@ -197,10 +196,8 @@ class ResourceController implements ContainerAwareInterface {
                     );
                     $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
                   }
-                  \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
                   if ($file instanceof FileInterface) {
-                    Cache::invalidateTags(array('file_list'));
-                    $file->save();
+                    $resource->putAttachment($file);
                   }
                 }
               }

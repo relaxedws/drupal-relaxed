@@ -2,8 +2,10 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\file\FileInterface;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -177,4 +179,21 @@ class DocResource extends ResourceBase {
 
     return new ResourceResponse(array('ok' => TRUE), 200);
   }
+
+  /**
+   * Saves a file.
+   *
+   * @param \Drupal\file\FileInterface $file
+   */
+  public function putAttachment(FileInterface $file) {
+    \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
+    Cache::invalidateTags(array('file_list'));
+    try {
+      $file->save();
+    }
+    catch (\Exception $e) {
+      throw new HttpException(500, NULL, $e);
+    }
+  }
+
 }
