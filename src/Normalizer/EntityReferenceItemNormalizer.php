@@ -33,7 +33,7 @@ class EntityReferenceItemNormalizer extends NormalizerBase implements Denormaliz
     $target_type = $field->getFieldDefinition()->getSetting('target_type');
     $storage = \Drupal::entityManager()->getStorage($target_type);
 
-    if ($target_type == 'user' || !($storage instanceof FieldableEntityStorageInterface)) {
+    if (!($storage instanceof FieldableEntityStorageInterface)) {
       return $value;
     }
 

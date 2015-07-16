@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -7,6 +8,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\TermStorageInterface;
+use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -90,6 +92,11 @@ function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
   if ($target_storage instanceof TermStorageInterface) {
     $target_entity_values['vid'] = 'tags';
     $target_entity_values['name'] = 'Stub name for taxonomy term';
+  }
+
+  if ($target_storage instanceof UserStorageInterface) {
+    $random = new Random();
+    $target_entity_values['name'] = $random->name(8, TRUE);
   }
 
   return $target_entity_values;

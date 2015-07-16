@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
+use Drupal\user\UserInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -122,7 +123,13 @@ class DbResource extends ResourceBase {
       throw new AccessDeniedHttpException();
     }
     foreach ($entity as $field_name => $field) {
-      if (!$field->access('create')) {
+      if ($entity instanceof UserInterface) {
+        // For user fields we need to check 'edit' permissions.
+        if (!$field->access('edit')) {
+          throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+        }
+      }
+      elseif (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
     }

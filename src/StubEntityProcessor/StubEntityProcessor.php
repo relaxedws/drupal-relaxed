@@ -78,7 +78,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
         $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
       }
     }
-    $entity->_rev->new_edit = FALSE;
+    $existing_entity->_rev->new_edit = FALSE;
     return $existing_entity;
   }
 
