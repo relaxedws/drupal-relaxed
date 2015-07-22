@@ -66,7 +66,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $uuid_key = $entity_type->getKey('uuid');
 
     $entity_uuid = $entity->uuid();
-    $entity_rev = $entity->_rev->value;
 
     $data = array(
       '@context' => array(
@@ -303,8 +302,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       $entity = NULL;
+      $entity_types_to_create = ['replication_log', 'user'];
       // @todo Use the passed $class to instantiate the entity.
-      if (!empty($bundle_key) && !empty($data[$bundle_key]) || $entity_type_id == 'replication_log') {
+      if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($data[$id_key], $data[$revision_key]);
         $entity = $storage->create($data);
       }
@@ -316,19 +316,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     return $entity;
-  }
-
-  /**
-   * Constructs the entity URI.
-   *
-   * @param $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   */
-  protected function getEntityUri($entity) {
-    return $entity->url('canonical', array('absolute' => TRUE));
   }
 
 }

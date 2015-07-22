@@ -81,3 +81,8 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
+  early_rendering_controller_subscriber:
+    class: Drupal\relaxed\EventSubscriber\EarlyRenderingControllerSubscriber
+    arguments: ['@controller_resolver', '@renderer']
+    tags:
+      - { name: event_subscriber }

@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\Core\Render\RenderContext;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
@@ -143,6 +144,8 @@ class ResourceController implements ContainerAwareInterface {
 
     $content = $this->request->getContent();
     $parameters = $this->getParameters();
+    $serializer = $this->serializer();
+
     // @todo Check if it's safe to pass all query parameters like this.
     $query = $this->request->query->all();
     $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
@@ -160,7 +163,7 @@ class ResourceController implements ContainerAwareInterface {
           }
         }
 
-        $entity = $this->serializer()->deserialize($content, $class, $format, $context);
+        $entity = $serializer->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -184,8 +187,10 @@ class ResourceController implements ContainerAwareInterface {
       try {
         $response_data = $response_part->getResponseData();
         if ($response_data != NULL) {
-          $response_output = $this->serializer()->serialize($response_data, $response_format, $context);
+          $response_output = $serializer->serialize($response_data, $response_format, $context);
           $response_part->setContent($response_output);
+          // Add relaxed settings config's cache tags.
+          $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
         }
       }
       catch (\Exception $e) {

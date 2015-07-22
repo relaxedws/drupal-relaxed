@@ -31,17 +31,4 @@ abstract class NormalizerTestBase extends CoreNormalizerTestBase {
     $workspace->save();
   }
 
-  /**
-   * Constructs the entity URI.
-   *
-   * @param $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   */
-  protected function getEntityUri($entity) {
-    return $entity->url('canonical', array('absolute' => TRUE));
-  }
-
 }

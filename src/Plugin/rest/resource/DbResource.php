@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
@@ -54,7 +55,10 @@ class DbResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
     // @todo: Access check.
-    return new ResourceResponse($entity, 200);
+    $response =  new ResourceResponse($entity, 200);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 
   /**

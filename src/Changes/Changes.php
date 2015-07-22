@@ -10,7 +10,6 @@ namespace Drupal\relaxed\Changes;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\SequenceIndex;
 use Drupal\multiversion\Entity\Index\SequenceIndexInterface;
-use Drupal\multiversion\Entity\Storage\ContentEntityStorageInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
