@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
@@ -251,6 +252,25 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Remove changed info, otherwise we can get validation errors.
     if (isset($data['changed'])) {
       unset($data['changed']);
+    }
+
+    // For the user entity type set a random name if an user with the same name
+    // already exists in the database.
+    // @todo Review from a performance perspective.
+    if ($entity_type_id == 'user') {
+      $query = db_select('users', 'u');
+      $query->fields('u', ['uuid']);
+      $query->join('users_field_data', 'ufd', 'u.uid = ufd.uid');
+      $query->fields('ufd', ['name']);
+      $existing_users_names = $query->execute()->fetchAllKeyed(1, 0);
+      $random = new Random();
+      $name = $data['name'][0]['value'];
+      if (!empty($name) && in_array($name, array_keys($existing_users_names)) && $existing_users_names[$name] != $entity_uuid) {
+        $data['name'][0]['value'] = $name . '_' . $random->name(8, TRUE);
+      }
+      elseif (empty($name)) {
+        $data['name'][0]['value'] = 'anonymous_' . $random->name(8, TRUE);
+      }
     }
 
     // @todo Move the below update logic to the resource plugin instead.

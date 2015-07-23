@@ -9,7 +9,7 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
-use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Stream\Stream;
 
 /**
  * Tests the /db/doc resource.
