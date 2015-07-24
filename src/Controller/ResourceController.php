@@ -171,7 +171,7 @@ class ResourceController implements ContainerAwareInterface {
         if ($method == 'put' && !$this->isValidJson($content)) {
           $stream = Psr7\stream_for($request);
           $parts = MultipartResponseParser::parseMultipartBody($stream);
-          $content = $parts[1]['body'] ?: $content;
+          $content = (isset($parts[1]['body']) && $parts[1]['body']) ?: $content;
 
           foreach ($parts as $key => $part) {
             if ($key > 1 && isset($part['headers']['content-disposition'])) {
