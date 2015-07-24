@@ -96,7 +96,13 @@ function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
 
   if ($target_storage instanceof UserStorageInterface) {
     $random = new Random();
-    $target_entity_values['name'] = $random->name(8, TRUE);
+    $name = $random->name(8, TRUE);
+    $target_entity_values = array(
+      'name' => $name,
+      'mail' => "$name@example.com",
+      'pass' => user_password(),
+      'status' => 1,
+    );
   }
 
   return $target_entity_values;
