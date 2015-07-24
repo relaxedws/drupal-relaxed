@@ -9,7 +9,7 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
-use GuzzleHttp\Stream\Stream;
+use GuzzleHttp\Psr7;
 
 /**
  * Tests the /db/doc resource.
@@ -178,7 +178,7 @@ class DocResourceTest extends ResourceTestBase {
         array('open_revs' => $open_revs_string, '_format' => 'mixed')
       );
 
-      $stream = Stream::factory($response);
+      $stream = Psr7\stream_for($response);
       $parts = MultipartResponse::parseMultipartBody($stream);
       $this->assertResponse('200', 'HTTP response code is correct.');
 

@@ -2,10 +2,9 @@
 
 namespace Drupal\relaxed\HttpMultipart\Message;
 
-use GuzzleHttp\Message\MessageFactory;
-use GuzzleHttp\Stream\Stream;
+use GuzzleHttp\Psr7;
 
-class MultipartMessageFactory extends MessageFactory {
+class MultipartMessageFactory {
 
   /**
    * {@inheritdoc}
@@ -13,7 +12,7 @@ class MultipartMessageFactory extends MessageFactory {
   public function createResponse($statusCode, array $headers = [], $body = null, array $options = [])
   {
     if (null !== $body) {
-      $body = Stream::factory($body);
+      $body = $stream = Psr7\stream_for($body);
     }
 
     return new MultipartResponse($statusCode, $headers, $body, $options);
