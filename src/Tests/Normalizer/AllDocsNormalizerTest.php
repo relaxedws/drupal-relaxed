@@ -2,13 +2,11 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\AllDocsNormalizerTest.
+ * Contains \Drupal\relaxed\Tests\Normalizer\AllDocsNormalizerTest.
  */
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\multiversion\MultiversionManagerInterface;
 use Drupal\relaxed\AllDocs\AllDocs;
 
 /**
@@ -18,7 +16,7 @@ use Drupal\relaxed\AllDocs\AllDocs;
  */
 class AllDocsNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'relaxed');
+  public static $modules = array('serialization', 'system', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'relaxed');
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
@@ -92,4 +90,5 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
       $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key when including docs.");
     }
   }
+
 }

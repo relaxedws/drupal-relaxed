@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Encoder\StreamEncoderTest.
+ */
+
 namespace Drupal\relaxed\Tests\Encoder;
 
 use Drupal\relaxed\Encoder\StreamEncoder;

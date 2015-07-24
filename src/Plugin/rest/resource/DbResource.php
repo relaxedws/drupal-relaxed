@@ -2,10 +2,13 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
+use Drupal\user\UserInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -52,7 +55,10 @@ class DbResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
     // @todo: Access check.
-    return new ResourceResponse($entity, 200);
+    $response =  new ResourceResponse($entity, 200);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 
   /**
@@ -107,30 +113,41 @@ class DbResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content received'));
     }
     $uuid = $entity->uuid();
-    $rev = $entity->_rev->value;
 
     // Check for conflicts.
-    if ($uuid) {
+    /*if ($uuid) {
       $entry = \Drupal::service('entity.index.uuid')->get($uuid);
       if (!empty($entry)) {
         throw new ConflictHttpException();
       }
-    }
+    }*/
 
     // Check entity and field level access.
     if (!$entity->access('create')) {
       throw new AccessDeniedHttpException();
     }
     foreach ($entity as $field_name => $field) {
-      if (!$field->access('create')) {
+      if ($entity instanceof UserInterface) {
+        // For user fields we need to check 'edit' permissions.
+        if (!$field->access('edit')) {
+          throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+        }
+      }
+      elseif (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
     }
+
+    // This will save stub entities in case the entity has entity reference
+    // fields and a referenced entity does not exist or will update stub
+    // entities with the correct values.
+    \Drupal::service('relaxed.stub_entity_processor')->processEntity($entity);
 
     // Validate the received data before saving.
     $this->validate($entity);
     try {
       $entity->save();
+      $rev = $entity->_rev->value;
       return new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
     }
     catch (EntityStorageException $e) {

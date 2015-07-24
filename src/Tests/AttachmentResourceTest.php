@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\AttachmentResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
@@ -125,7 +130,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
     $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->files['1']->getMimeType());
+    $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['1']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -136,7 +141,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->files['2']->getMimeType());
+    $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['2']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -169,7 +174,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->files['1']->getMimeType());
+    $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertEqual($response, $file_contents);
     $this->assertHeader('content-length', $this->files['1']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
@@ -181,7 +186,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->files['2']->getMimeType());
+    $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertEqual($response, $file_contents);
     $this->assertHeader('content-length', $this->files['2']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
@@ -257,4 +262,5 @@ class AttachmentResourceTest extends ResourceTestBase {
     $entity = entity_load('entity_test_rev', $this->entity->id());
     $this->assertEqual($entity->{$field_name}->count(), 1, 'The file does not exist on the entity any more.');
   }
+
 }

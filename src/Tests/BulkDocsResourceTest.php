@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\BulkDocsResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
@@ -10,10 +15,6 @@ use Drupal\Component\Serialization\Json;
  * @group relaxed
  */
 class BulkDocsResourceTest extends ResourceTestBase {
-
-  protected function setUp() {
-    parent::setUp();
-  }
 
   public function testPostCreate() {
     $db = $this->workspace->id();
@@ -156,4 +157,5 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     return $entities;
   }
+
 }

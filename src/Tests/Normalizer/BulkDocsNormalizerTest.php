@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Normalizer\BulkDocsNormalizerTest.
+ */
+
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
@@ -13,7 +18,7 @@ use Drupal\relaxed\BulkDocs\BulkDocsInterface;
  */
 class BulkDocsNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'uuid', 'relaxed');
+  public static $modules = array('serialization', 'system', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'relaxed');
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 

@@ -2,8 +2,8 @@
 
 namespace Drupal\relaxed\HttpMultipart\Message;
 
-use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Stream\StreamInterface;
+use GuzzleHttp\Psr7;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -24,7 +24,7 @@ class MultipartResponse extends Response
       $this->removeHeader('Transfer-Encoding');
     } else {
       foreach (self::parseMultipartBody($body) as $parts) {
-        $this->bodies[] = Stream::factory($parts['body']);
+        $this->bodies[] = Psr7\stream_for($parts['body']);
       }
     }
   }

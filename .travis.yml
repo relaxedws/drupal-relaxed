@@ -1,8 +1,8 @@
 language: php
 
 php:
-  - 5.4
   - 5.5
+  - 5.6
 
 mysql:
   database: drupal
@@ -60,8 +60,11 @@ install:
   - composer global require drush/drush:dev-master
 
 before_script:
+  # Add always_populate_raw_post_data=-1 to php.ini.
+  - echo "always_populate_raw_post_data=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
   # Checkout a directory structure with all dependencies.
-  - git clone --depth 1 --branch 8.0.0-beta10 http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
+  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
@@ -69,9 +72,14 @@ before_script:
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
+  # Create the private directory.
+  - sudo mkdir sites/default/files/private
+  - sudo chmod 777 -R sites/default/files
+  - sudo chmod 0664 sites/default/settings.php
+  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
 
   # Checkout second directory structure with all dependencies.
-  - git clone --depth 1 --branch 8.0.0-beta10 http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
+  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal2/modules/key_value
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed
@@ -79,6 +87,11 @@ before_script:
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal2
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal2 standard
+  # Create the private directory.
+  - sudo mkdir sites/default/files/private
+  - sudo chmod 777 -R sites/default/files
+  - sudo chmod 0664 sites/default/settings.php
+  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
 
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal

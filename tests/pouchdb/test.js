@@ -42,11 +42,11 @@ describe('Test replication', function () {
     //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
       db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
-        result.docs_written.should.equal(9);
+        result.docs_written.should.equal(11);
         db.info(function (err, info) {
           verifyInfo(info, {
-            update_seq: 9,
-            doc_count: 9
+            update_seq: 11,
+            doc_count: 11
           });
           done();
         });

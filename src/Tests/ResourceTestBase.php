@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\ResourceTestBase.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\rest\Tests\RESTTestBase;
@@ -98,6 +103,9 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     if ($mime_type === NULL) {
       $mime_type = $this->defaultMimeType;
+    }
+    if ($mime_type === $this->defaultMimeType && !isset($query['_format'])) {
+      $query[] = ['_format' => $this->defaultFormat];
     }
     if (!in_array($method, array('GET', 'HEAD', 'OPTIONS', 'TRACE'))) {
       // GET the CSRF token first for writing requests.
@@ -218,12 +226,15 @@ abstract class ResourceTestBase extends RESTTestBase {
     }
 
     $response = $this->curlExec($curl_options);
+
+    // Ensure that any changes to variables in the other thread are picked up.
+    $this->refreshVariables();
+
     $headers = $this->drupalGetHeaders();
-    $headers = implode("\n", $headers);
 
     $this->verbose($method . ' request to: ' . $url .
       '<hr />Code: ' . curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE) .
-      '<hr />Response headers: ' . $headers .
+      '<hr />Response headers: ' . nl2br(print_r($headers, TRUE)) .
       '<hr />Response body: ' . $response);
 
     return $response;
@@ -239,14 +250,4 @@ abstract class ResourceTestBase extends RESTTestBase {
     return $entity;
   }
 
-  protected function assertHeader($header, $value, $message = '', $group = 'Browser') {
-    $header = strtolower($header);
-    $header_value = $this->drupalGetHeader($header);
-    // Strip attributes such as 'charset' from the content-type header for
-    // easier comparison.
-    if ($header == 'content-type') {
-      list($header_value) = explode(';', $header_value);
-    }
-    return $this->assertTrue($header_value == $value, $message ? $message : 'HTTP response header ' . $header . ' with value ' . $value . ' found.', $group);
-  }
 }

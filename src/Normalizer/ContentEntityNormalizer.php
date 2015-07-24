@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
@@ -66,7 +67,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $uuid_key = $entity_type->getKey('uuid');
 
     $entity_uuid = $entity->uuid();
-    $entity_rev = $entity->_rev->value;
 
     $data = array(
       '@context' => array(
@@ -249,8 +249,61 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    // Remove changed info, otherwise we can get validation errors.
+    if (isset($data['changed'])) {
+      unset($data['changed']);
+    }
+
+    // For the user entity type set a random name if an user with the same name
+    // already exists in the database.
+    // @todo Review from a performance perspective.
+    if ($entity_type_id == 'user') {
+      $query = db_select('users', 'u');
+      $query->fields('u', ['uuid']);
+      $query->join('users_field_data', 'ufd', 'u.uid = ufd.uid');
+      $query->fields('ufd', ['name']);
+      $existing_users_names = $query->execute()->fetchAllKeyed(1, 0);
+      $random = new Random();
+      $name = $data['name'][0]['value'];
+      if (!empty($name) && in_array($name, array_keys($existing_users_names)) && $existing_users_names[$name] != $entity_uuid) {
+        $data['name'][0]['value'] = $name . '_' . $random->name(8, TRUE);
+      }
+      elseif (empty($name)) {
+        $data['name'][0]['value'] = 'anonymous_' . $random->name(8, TRUE);
+      }
+    }
+
     // @todo Move the below update logic to the resource plugin instead.
     $storage = $this->entityManager->getStorage($entity_type_id);
+
+    // Denormalize entity reference fields.
+    foreach ($data as $field_name => $field_info) {
+      if (!is_array($field_info)) {
+        continue;
+      }
+      foreach ($field_info as $delta => $item) {
+        if (isset($item['entity_type_id']) && isset($item['target_uuid'])) {
+          $target_storage = $this->entityManager->getStorage($item['entity_type_id']);
+          $target_entity = $target_storage->loadByProperties(array('uuid' => $item['target_uuid']));
+          $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
+          if ($target_entity) {
+            $data[$field_name][$delta] = array(
+              'target_id' => $target_entity->id(),
+            );
+            continue;
+          }
+          $target_entity_values = array('uuid' => $item['target_uuid']);
+
+          // Let other modules feedback about their own additions.
+          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', array($target_storage)));
+
+          $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
+          $data[$field_name][$delta] = array(
+            'entity_to_save' => $target_entity,
+          );
+        }
+      }
+    }
 
     if ($entity_id) {
       if ($entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id)) {
@@ -269,8 +322,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       $entity = NULL;
+      $entity_types_to_create = ['replication_log', 'user'];
       // @todo Use the passed $class to instantiate the entity.
-      if (!empty($bundle_key) && !empty($data[$bundle_key]) || $entity_type_id == 'replication_log') {
+      if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($data[$id_key], $data[$revision_key]);
         $entity = $storage->create($data);
       }
@@ -282,19 +336,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     return $entity;
-  }
-
-  /**
-   * Constructs the entity URI.
-   *
-   * @param $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   */
-  protected function getEntityUri($entity) {
-    return $entity->url('canonical', array('absolute' => TRUE));
   }
 
 }

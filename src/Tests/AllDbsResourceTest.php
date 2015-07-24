@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\AllDbsResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
@@ -36,4 +41,5 @@ class AllDbsResourceTest extends ResourceTestBase {
     sort($workspaces);
     $this->assertEqual($data, $workspaces, 'All workspaces names received.');
   }
+
 }

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Normalizer\AttachmentNormalizerTest.
+ */
+
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
@@ -11,7 +16,7 @@ use Drupal\Component\Utility\SafeMarkup;
  */
 class AttachmentNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'file', 'relaxed', 'key_value', 'multiversion', 'rest');
+  public static $modules = array('serialization', 'system', 'field', 'file', 'relaxed', 'key_value', 'multiversion', 'rest');
 
   /**
    * @var \Symfony\Component\Serializer\SerializerInterface

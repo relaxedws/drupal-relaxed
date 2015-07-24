@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Normalizer\WorkspaceNormalizerTest.
+ */
+
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
@@ -11,7 +16,7 @@ use Drupal\Component\Utility\SafeMarkup;
  */
 class WorkspaceNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'entity', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'uuid', 'rest', 'relaxed');
+  public static $modules = array('serialization', 'system', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'relaxed');
 
   protected $entityClass = 'Drupal\multiversion\Entity\Workspace';
 
@@ -60,4 +65,5 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     ));
     return $entity;
   }
+
 }

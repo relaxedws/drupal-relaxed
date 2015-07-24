@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Normalizer\FileItemNormalizerTest.
+ */
+
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
@@ -14,7 +19,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
   public static $modules = array(
     'serialization',
     'system',
-    'entity',
     'field',
     'entity_test',
     'text',
@@ -23,7 +27,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     'key_value',
     'multiversion',
     'rest',
-    'uuid',
     'relaxed',
     'file',
     'image'
@@ -216,4 +219,5 @@ class FileItemNormalizerTest extends NormalizerTestBase{
     $this->assertIdentical($denormalized->bundle(), $this->entity->bundle(), 'Expected entity bundle found.');
     $this->assertIdentical($denormalized->uuid(), $this->entity->uuid(), 'Expected entity UUID found.');
   }
+
 }

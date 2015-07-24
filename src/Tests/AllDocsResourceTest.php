@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\AllDocsResourceTest.
+ * Contains \Drupal\relaxed\Tests\AllDocsResourceTest.
  */
 
 namespace Drupal\relaxed\Tests;
@@ -37,7 +37,6 @@ class AllDocsResourceTest extends ResourceTestBase {
     }
 
     // Test without including docs.
-    $rows = array();
     foreach ($entities as $entity) {
       $rows[] = array(
         'id' => $entity->uuid(),
@@ -47,10 +46,18 @@ class AllDocsResourceTest extends ResourceTestBase {
         ),
       );
     }
+    // Add the info about the new created user.
+    $rows[] = array(
+      'id' => $account->uuid(),
+      'key' => $account->uuid(),
+      'value' => array(
+        'rev' => $account->_rev->value,
+      ),
+    );
     $expected = array(
-      'total_rows' => 2,
       'offset' => 0,
       'rows' => $rows,
+      'total_rows' => 3,
     );
 
     $response = $this->httpRequest("$db/_all_docs", 'GET');
@@ -73,8 +80,18 @@ class AllDocsResourceTest extends ResourceTestBase {
         ),
       );
     }
+    // Add the info about the new created user.
+    $account = entity_load('user', $account->id(), TRUE);
+    $rows[] = array(
+      'id' => $account->uuid(),
+      'key' => $account->uuid(),
+      'value' => array(
+        'rev' => $account->_rev->value,
+        'doc' => $serializer->normalize($account),
+      ),
+    );
     $expected = array(
-      'total_rows' => 2,
+      'total_rows' => 3,
       'offset' => 0,
       'rows' => $rows,
     );
@@ -87,4 +104,5 @@ class AllDocsResourceTest extends ResourceTestBase {
       $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key when including docs.");
     }
   }
+
 }

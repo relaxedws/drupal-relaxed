@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\Normalizer\NormalizerTestBase.
+ */
+
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\serialization\Tests\NormalizerTestBase as CoreNormalizerTestBase;
@@ -13,7 +18,6 @@ abstract class NormalizerTestBase extends CoreNormalizerTestBase {
 
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', array('router'));
     \Drupal::service('router.builder')->rebuild();
     $this->installSchema('key_value', array('key_value_sorted'));
 
@@ -25,19 +29,6 @@ abstract class NormalizerTestBase extends CoreNormalizerTestBase {
 
     $workspace = entity_create('workspace', array('id' => 'default'));
     $workspace->save();
-  }
-
-  /**
-   * Constructs the entity URI.
-   *
-   * @param $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   */
-  protected function getEntityUri($entity) {
-    return $entity->url('canonical', array('absolute' => TRUE));
   }
 
 }

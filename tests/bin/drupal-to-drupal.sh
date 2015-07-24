@@ -38,4 +38,6 @@ sudo cat /var/log/couchdb/couch.log
 #-----------------------------------
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
+USERS=4
+COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)

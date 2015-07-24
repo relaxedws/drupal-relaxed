@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\DocResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
-use GuzzleHttp\Stream\Stream;
+use GuzzleHttp\Psr7;
 
 /**
  * Tests the /db/doc resource.
@@ -170,10 +175,10 @@ class DocResourceTest extends ResourceTestBase {
         NULL,
         'multipart/mixed',
         NULL,
-        array('open_revs' => $open_revs_string)
+        array('open_revs' => $open_revs_string, '_format' => 'mixed')
       );
 
-      $stream = Stream::factory($response);
+      $stream = Psr7\stream_for($response);
       $parts = MultipartResponse::parseMultipartBody($stream);
       $this->assertResponse('200', 'HTTP response code is correct.');
 
@@ -195,7 +200,7 @@ class DocResourceTest extends ResourceTestBase {
         "$db/" . $entity->uuid(),
         'GET',
         NULL,
-        'application/json',
+        $this->defaultMimeType,
         NULL,
         array('open_revs' => $open_revs_string)
       );
@@ -223,7 +228,7 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $entity = entity_create($entity_type);
+      $entity = entity_create($entity_type, ['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'PUT', $serialized);
@@ -231,7 +236,7 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = entity_create($entity_type);
+      $entity = entity_create($entity_type, ['user_id' => $account->id()]);
       $entity->save();
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
@@ -318,4 +323,5 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
     }
   }
+
 }

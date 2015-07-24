@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\LocalDocResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 /**
@@ -76,7 +81,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $entity = entity_create($entity_type);
+      $entity = entity_create($entity_type, array('user_id' => $account->id()));
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
       $this->httpRequest("$db/_local/" . $entity->uuid(), 'PUT', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct');

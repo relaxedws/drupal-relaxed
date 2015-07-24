@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Tests\EnsureFullCommitResourceTest.
+ */
+
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
@@ -30,4 +35,5 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     );
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
   }
+
 }
