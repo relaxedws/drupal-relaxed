@@ -60,8 +60,8 @@ install:
   - composer global require drush/drush:dev-master
 
 before_script:
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  # Additional PHP config.
+  - phpenv config-add .travis.ini
 
   # Try to prevent Mysql has gone away.
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
