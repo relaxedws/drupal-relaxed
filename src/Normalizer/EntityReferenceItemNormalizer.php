@@ -37,7 +37,12 @@ class EntityReferenceItemNormalizer extends NormalizerBase implements Denormaliz
       return $value;
     }
 
-    $referenced_entity = entity_load($target_type, $value['target_id'], TRUE);
+    $taget_id = isset($value['target_id']) ? $value['target_id'] : NULL;
+    if (!$taget_id) {
+      return $value;
+    }
+
+    $referenced_entity = entity_load($target_type, $taget_id, TRUE);
     if (!$referenced_entity) {
       return $value;
     }
