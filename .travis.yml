@@ -33,6 +33,9 @@ install:
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi
 
+  # Add always_populate_raw_post_data=-1 to php.ini.
+  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
   # Set up PHP-FPM.
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
   - sudo a2enmod rewrite actions fastcgi alias
@@ -68,6 +71,9 @@ before_script:
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
   - mysql -e "SHOW VARIABLES LIKE 'max_allowed_packet';"
   - mysql -e "SHOW VARIABLES LIKE 'wait_timeout';"
+
+  - composer selfupdate
+  - composer global require drush/drush:dev-master
 
   # Checkout a directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
