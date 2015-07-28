@@ -31,6 +31,12 @@ sleep 120
 
 curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
+#-----------------------------------
+sudo cat /var/log/couchdb/couch.log
+#-----------------------------------
+sudo cat /var/log/apache2/error.log
+#-----------------------------------
+
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=2
 COUNT=$(($COUNT + $USERS));
