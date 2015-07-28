@@ -36,8 +36,6 @@ sudo cat /var/log/couchdb/couch.log
 #-----------------------------------
 sudo cat /var/log/apache2/error.log
 #-----------------------------------
-sudo cat /var/log/apache2/forensic.log
-#-----------------------------------
 
 USERS=2
 COUNT=$(($COUNT + $USERS));
