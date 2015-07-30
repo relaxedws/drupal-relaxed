@@ -32,7 +32,7 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
     $result = array();
     $definition = $data->getFieldDefinition();
     $values = $data->getValue();
-    $file = entity_load('file', $values['target_id']);
+    $file = isset($values['target_id']) ? entity_load('file', $values['target_id']) : NULL;
     if ($file) {
       $uri = $file->getFileUri();
       $scheme = file_uri_scheme($uri);
