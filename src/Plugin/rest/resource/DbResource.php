@@ -143,6 +143,7 @@ class DbResource extends ResourceBase {
         foreach ($field as $delta => $item) {
           if (isset($item->entity_to_save)) {
             $file = $item->entity_to_save;
+            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
             $file->save();
             $file_info = array('target_id' => $file->id());
 
