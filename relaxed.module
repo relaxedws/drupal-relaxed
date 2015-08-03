@@ -118,7 +118,7 @@ function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
     $random = new Random();
     $name = $random->name(8, TRUE);
     $target_entity_values = array(
-      'name' => $name,
+      'name' => "Stub name $name",
       'mail' => "$name@example.com",
       'pass' => user_password(),
       'status' => 1,
