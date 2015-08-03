@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\BulkDocs;
 
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\relaxed\StubEntityProcessor\StubEntityProcessorInterface;

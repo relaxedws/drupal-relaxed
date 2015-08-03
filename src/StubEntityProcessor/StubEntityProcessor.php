@@ -9,6 +9,7 @@ namespace Drupal\relaxed\StubEntityProcessor;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\user\UserInterface;
 
 class StubEntityProcessor implements StubEntityProcessorInterface {
 
@@ -55,11 +56,12 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
             // complete the field with the correct target_id.
             if ($existing_entity) {
               $entity->{$field_name}[$delta] = array('target_id' => $existing_entity->id());
-              continue;
             }
-            // Save the stub entity and set the target_id value to the field item.
-            $entity_to_save->save();
-            $entity->{$field_name}[$delta] = array('target_id' => $entity_to_save->id());
+            else {
+              // Save the stub entity and set the target_id value to the field item.
+              $entity_to_save->save();
+              $entity->{$field_name}[$delta] = array('target_id' => $entity_to_save->id());
+            }
           }
         }
       }
