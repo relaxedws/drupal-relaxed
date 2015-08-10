@@ -164,7 +164,9 @@ class DocResource extends ResourceBase {
     // This will save stub entities in case the entity has entity reference
     // fields and a referenced entity does not exist or will update stub
     // entities with the correct values.
-    \Drupal::service('relaxed.stub_entity_processor')->processEntity($received_entity);
+    if ($received_entity->getEntityTypeId() != 'replication_log') {
+      \Drupal::service('relaxed.stub_entity_processor')->processEntity($received_entity);
+    }
 
     try {
       $received_entity->save();
