@@ -31,7 +31,7 @@ class ReplicationLogTest extends MultiversionWebTestBase {
     $entity = entity_create('replication_log');
     $seq_id = \Drupal::service('multiversion.manager')->newSequenceId();
     $entity->source_last_seq->value = $seq_id;
-    //$entity->history->recorded_seq = $seq_id;
+    $entity->history->recorded_seq = $seq_id;
 
     try {
       $entity->save();
@@ -58,7 +58,7 @@ class ReplicationLogTest extends MultiversionWebTestBase {
     $entity->history->missing_checked = $max_int;
     $entity->history->docs_written = $max_int;
     $entity->history->doc_write_failures = $max_int;
-    //$entity->history->recorded_seq = $max_bigint;
+    $entity->history->recorded_seq = $max_bigint;
     $entity->history->start_last_seq = $max_int;
     $entity->history->end_time = date(DATE_RFC2822);
     $entity->history->start_time = date(DATE_RFC2822);
