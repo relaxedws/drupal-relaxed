@@ -167,6 +167,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       list($prefix, $entity_uuid) = explode('/', $data['_id']);
       if ($prefix == '_local' && $entity_uuid) {
         $entity_type_id = 'replication_log';
+        $data['uuid'] = $entity_uuid;
       }
     }
 
