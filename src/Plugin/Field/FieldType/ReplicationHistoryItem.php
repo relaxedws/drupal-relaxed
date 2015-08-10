@@ -63,10 +63,10 @@ class ReplicationHistoryItem extends FieldItemBase {
       ->setDescription(t('Number of missing documents found.'))
       ->setRequired(FALSE);
 
-//    $properties['recorded_seq'] = DataDefinition::create('integer')
-//      ->setLabel(t('Recorded sequence'))
-//      ->setDescription(t('Recorded intermediate sequence.'))
-//      ->setRequired(TRUE);
+    $properties['recorded_seq'] = DataDefinition::create('integer')
+      ->setLabel(t('Recorded sequence'))
+      ->setDescription(t('Recorded intermediate sequence.'))
+      ->setRequired(FALSE);
 
     $properties['session_id'] = DataDefinition::create('string')
       ->setLabel(t('Session ID'))
@@ -127,12 +127,12 @@ class ReplicationHistoryItem extends FieldItemBase {
           'unsigned' => TRUE,
           'not null' => FALSE,
         ),
-//        'recorded_seq' => array(
-//          'type' => 'int',
-//          'size' => 'big',
-//          'not null' => TRUE,
-//          'default' => 0,
-//        ),
+        'recorded_seq' => array(
+          'type' => 'int',
+          'size' => 'big',
+          'not null' => FALSE,
+          'default' => 0,
+        ),
         'session_id' => array(
           'type' => 'varchar',
           'length' => 128,
@@ -151,4 +151,5 @@ class ReplicationHistoryItem extends FieldItemBase {
       ),
     );
   }
+
 }
