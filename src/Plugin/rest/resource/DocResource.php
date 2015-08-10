@@ -104,6 +104,12 @@ class DocResource extends ResourceBase {
       }
     }
 
+    // For replication_log entity type the result should contain info just about
+    // one entity.
+    if ($entity_type_id == 'replication_log') {
+      $result = $revisions[0];
+    }
+
     // Normal response.
     return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
   }
