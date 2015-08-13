@@ -10,6 +10,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 use Drupal\relaxed\AllDocs\AllDocs;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
