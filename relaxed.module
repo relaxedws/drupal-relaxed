@@ -108,15 +108,17 @@ function relaxed_entity_field_access($operation, FieldDefinitionInterface $field
  */
 function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
   $target_entity_values = array();
+  $random = new Random();
+  $name = $random->name(8, TRUE);
 
   if ($target_storage instanceof TermStorageInterface) {
-    $target_entity_values['vid'] = 'tags';
-    $target_entity_values['name'] = 'Stub name for taxonomy term';
+    $target_entity_values = array(
+      'vid' => 'tags',
+      'name' => "Stub name $name",
+    );
   }
 
   if ($target_storage instanceof UserStorageInterface) {
-    $random = new Random();
-    $name = $random->name(8, TRUE);
     $target_entity_values = array(
       'name' => "Stub name $name",
       'mail' => "$name@example.com",
