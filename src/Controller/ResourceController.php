@@ -165,6 +165,7 @@ class ResourceController implements ContainerAwareInterface {
           }
         }
 
+        // @todo: Consider moving this file handling code to a separate method.
         if ($method == 'put' && !$this->isValidJson($content)) {
           $stream = Psr7\stream_for($request);
           $parts = MultipartResponseParser::parseMultipartBody($stream);
