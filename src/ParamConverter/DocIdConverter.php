@@ -112,6 +112,10 @@ class DocIdConverter implements ParamConverterInterface {
       return $storage->loadRevision($revision_id) ?: $uuid;
     }
     $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
+    // Do not return stub entities.
+    if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
+      return $uuid;
+    }
     return $entity ?: $uuid;
   }
 
