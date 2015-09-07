@@ -110,7 +110,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $default_branch = $this->revTree->getDefaultBranch($entity_uuid);
 
       $i = 0;
-      foreach ($default_branch as $rev => $status) {
+      foreach (array_reverse($default_branch) as $rev => $status) {
         // Build data for _revs_info.
         if (!empty($context['query']['revs_info'])) {
           $data['_revs_info'][] = array('rev' => $rev, 'status' => $status);
@@ -342,7 +342,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           if ($name == 'default_langcode') {
             continue;
           }
-          $entity->{$name} = $value;
+          if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
+            $entity->{$name} = $value;
+            $entity->_rev->is_stub = TRUE;
+          }
+          else {
+            $entity->{$name} = $value;
+          }
         }
       }
       elseif (isset($data[$id_key])) {

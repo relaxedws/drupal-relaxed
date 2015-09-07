@@ -24,6 +24,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
     // Update the stub entity with the correct values.
     if ($existing_entity && !$entity->id()) {
       $entity = $this->updateStubEntity($entity, $existing_entity);
+      $entity->_rev->is_stub = TRUE;
     }
 
     // Save stub entities for entity reference fields.
@@ -59,6 +60,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
             }
             else {
               // Save the stub entity and set the target_id value to the field item.
+              $entity_to_save->_rev->new_edit = FALSE;
               $entity_to_save->save();
               $entity->{$field_name}[$delta] = array('target_id' => $entity_to_save->id());
             }
@@ -80,7 +82,6 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
         $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
       }
     }
-    $existing_entity->_rev->new_edit = FALSE;
     return $existing_entity;
   }
 
