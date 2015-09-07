@@ -12,11 +12,6 @@ use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Denotes that a feed's items should never expire.
- */
-const STUB_WORKSPACE = 'stub_workspace';
-
-/**
  * Implements hook_entity_insert().
  */
 function relaxed_entity_insert(EntityInterface $entity) {
