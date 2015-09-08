@@ -2,9 +2,11 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Render\RenderContext;
+use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
+use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseParser;
+use GuzzleHttp\Psr7;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -163,7 +165,47 @@ class ResourceController implements ContainerAwareInterface {
           }
         }
 
-        $entity = $serializer->deserialize($content, $class, $format, $context);
+        if ($method == 'put' && !$this->isValidJson($content)) {
+          $stream = Psr7\stream_for($request);
+          $parts = MultipartResponseParser::parseMultipartBody($stream);
+          $content = (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $content;
+
+          foreach ($parts as $key => $part) {
+            if ($key > 1 && isset($part['headers']['content-disposition'])) {
+              $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
+              if ($file_info_found) {
+                list(, , $file_uuid, $scheme, $filename) = explode('/', $file_info[1]);
+                if ($file_uuid && $scheme && $filename) {
+                  $uri = "$scheme://$filename";
+                  // Check if exists a file with this uuid.
+                  $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+                  if (!$file) {
+                    // Check if exists a file with this $uri, if it exists then
+                    // change the URI and save the new file.
+                    $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
+                    if (count($existing_files)) {
+                      $uri = file_destination($uri, FILE_EXISTS_RENAME);
+                    }
+                  }
+                  if (!$file) {
+                    $file_context = array(
+                      'uri' => $uri,
+                      'uuid' => $file_uuid,
+                      'status' => FILE_STATUS_PERMANENT,
+                      'uid' => \Drupal::currentUser()->id(),
+                    );
+                    $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
+                  }
+                  if ($file instanceof FileInterface) {
+                    $resource->putAttachment($file);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        $entity = $this->serializer()->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -213,4 +255,17 @@ class ResourceController implements ContainerAwareInterface {
   public function csrfToken() {
     return new Response(\Drupal::csrfToken()->get('rest'), 200, array('Content-Type' => 'text/plain'));
   }
+
+  /**
+   * Check if a string is a valid json.
+   *
+   * @param $string
+   *
+   * @return bool
+   */
+  protected function isValidJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+  }
+
 }

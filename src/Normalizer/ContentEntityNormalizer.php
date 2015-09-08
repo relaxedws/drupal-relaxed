@@ -3,10 +3,12 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
+use Drupal\file\FileInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -108,7 +110,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $default_branch = $this->revTree->getDefaultBranch($entity_uuid);
 
       $i = 0;
-      foreach ($default_branch as $rev => $status) {
+      foreach (array_reverse($default_branch) as $rev => $status) {
         // Build data for _revs_info.
         if (!empty($context['query']['revs_info'])) {
           $data['_revs_info'][] = array('rev' => $rev, 'status' => $status);
@@ -165,6 +167,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       list($prefix, $entity_uuid) = explode('/', $data['_id']);
       if ($prefix == '_local' && $entity_uuid) {
         $entity_type_id = 'replication_log';
+        $data['uuid'] = $entity_uuid;
       }
     }
 
@@ -226,8 +229,29 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Denormalize File and Image field types.
     if (isset($data['_attachments'])) {
       foreach ($data['_attachments'] as $key => $value) {
-        list($field_name, $delta, $file_uuid,,) = explode('/', $key);
+        list($field_name, $delta, $file_uuid, $scheme, $filename) = explode('/', $key);
+        $uri = "$scheme://$filename";
+        // Check if exists a file with this uuid.
         $file = $this->entityManager->loadEntityByUuid('file', $file_uuid);
+        if (!$file) {
+          // Check if exists a file with this $uri, if it exists then
+          // change the URI and save the new file.
+          $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
+          if (count($existing_files)) {
+            $uri = file_destination($uri, FILE_EXISTS_RENAME);
+          }
+          $file_context = array(
+            'uri' => $uri,
+            'uuid' => $file_uuid,
+            'status' => FILE_STATUS_PERMANENT,
+            'uid' => \Drupal::currentUser()->id(),
+          );
+          $file = \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
+          if ($file instanceof FileInterface) {
+            $data[$field_name][$delta] = array('entity_to_save' => $file);
+          }
+          continue;
+        }
         $data[$field_name][$delta] = array(
           'target_id' => $file->id(),
         );
@@ -249,7 +273,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    // Remove changed info, otherwise we can get validation errors.
+    // Remove changed info, otherwise we can get validation errors when the
+    // 'changed' value for existing entity is higher than for the new entity (revision).
+    // @see \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityChangedConstraintValidator::validate().
     if (isset($data['changed'])) {
       unset($data['changed']);
     }
@@ -271,6 +297,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       elseif (empty($name)) {
         $data['name'][0]['value'] = 'anonymous_' . $random->name(8, TRUE);
       }
+    }
+
+    // Remove changed info, otherwise we can get validation errors.
+    if (isset($data['changed'])) {
+      unset($data['changed']);
     }
 
     // @todo Move the below update logic to the resource plugin instead.
@@ -311,7 +342,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           if ($name == 'default_langcode') {
             continue;
           }
-          $entity->{$name} = $value;
+          if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
+            $entity->{$name} = $value;
+            $entity->_rev->is_stub = TRUE;
+          }
+          else {
+            $entity->{$name} = $value;
+          }
         }
       }
       elseif (isset($data[$id_key])) {
@@ -334,6 +371,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity->enforceIsNew(FALSE);
       $entity->setNewRevision(FALSE);
     }
+
+    Cache::invalidateTags(array($entity_type_id . '_list'));
 
     return $entity;
   }

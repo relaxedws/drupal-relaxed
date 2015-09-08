@@ -77,6 +77,26 @@ function relaxed_entity_access(EntityInterface $entity, $operation, AccountInter
 }
 
 /**
+ * Implements hook_entity_create_access().
+ */
+function multiversion_entity_create_access(AccountInterface $account, array $context, $entity_bundle) {
+  /** @var \Drupal\multiversion\MultiversionManagerInterface $manager */
+  $multiversion_manager = \Drupal::service('multiversion.manager');
+  $bundles_info = \Drupal::entityManager()->getAllBundleInfo();
+  foreach ($bundles_info as $entity_type_id => $bundles) {
+    if (in_array($entity_bundle, array_keys($bundles))) {
+      $entity_type = \Drupal::entityManager()->getDefinition($entity_type_id);
+      if ($multiversion_manager->isSupportedEntityType($entity_type) || $entity_type_id == 'replication_log') {
+        return AccessResult::allowedIfHasPermission($account, 'perform content replication');
+      }
+    }
+  }
+
+  // No opinion.
+  return AccessResult::neutral();
+}
+
+/**
  * Implements hook_entity_field_access().
  */
 function relaxed_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
@@ -88,20 +108,27 @@ function relaxed_entity_field_access($operation, FieldDefinitionInterface $field
  */
 function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
   $target_entity_values = array();
+  $random = new Random();
+  $name = $random->name(8, TRUE);
+  // This revision will be set for a stub entities and will be used to detect
+  // the value for is_stub property for the _rev field.
+  $rev = '1-101010101010101010101010' . $name;
 
   if ($target_storage instanceof TermStorageInterface) {
-    $target_entity_values['vid'] = 'tags';
-    $target_entity_values['name'] = 'Stub name for taxonomy term';
+    $target_entity_values = array(
+      'vid' => 'tags',
+      'name' => "Stub name $name",
+      '_rev' => $rev,
+    );
   }
 
   if ($target_storage instanceof UserStorageInterface) {
-    $random = new Random();
-    $name = $random->name(8, TRUE);
     $target_entity_values = array(
-      'name' => $name,
+      'name' => "Stub name $name",
       'mail' => "$name@example.com",
       'pass' => user_password(),
       'status' => 1,
+      '_rev' => $rev,
     );
   }
 

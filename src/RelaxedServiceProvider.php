@@ -19,9 +19,12 @@ class RelaxedServiceProvider implements ServiceModifierInterface {
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    // Adds mixed as known format.
     if ($container->has('http_middleware.negotiation')) {
-      $container->getDefinition('http_middleware.negotiation')->addMethodCall('registerFormat', ['mixed', ['multipart/mixed']]);
+      $negotiation = $container->getDefinition('http_middleware.negotiation');
+      // Adds related as known format.
+      $negotiation->addMethodCall('registerFormat', ['related', ['multipart/related']]);
+      // Adds mixed as known format.
+      $negotiation->addMethodCall('registerFormat', ['mixed', ['multipart/mixed']]);
     }
 
     // Override the access_check.rest.csrf class with a new class.

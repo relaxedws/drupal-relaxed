@@ -2,8 +2,11 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\file\FileInterface;
+use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -101,6 +104,12 @@ class DocResource extends ResourceBase {
       }
     }
 
+    // For replication_log entity type the result should contain info just about
+    // one entity.
+    if ($entity_type_id == 'replication_log') {
+      $result = $revisions[0];
+    }
+
     // Normal response.
     return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
   }
@@ -119,11 +128,33 @@ class DocResource extends ResourceBase {
 
     // Check entity and field level access.
     if (!$received_entity->access('create')) {
-      throw new AccessDeniedHttpException();
+      throw new AccessDeniedHttpException(t('Access denied when creating the entity.'));
     }
     foreach ($received_entity as $field_name => $field) {
       if (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+      }
+
+      // Save the files for file and image fields.
+      if ($field instanceof FileFieldItemList) {
+        foreach ($field as $delta => $item) {
+          if (isset($item->entity_to_save)) {
+            $file = $item->entity_to_save;
+            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
+            $file->save();
+            $file_info = array('target_id' => $file->id());
+
+            $field_definitions = $received_entity->getFieldDefinitions();
+            $field_type = $field_definitions[$field_name]->getType();
+            // Add alternative text for image type fields.
+            if ($field_type == 'image') {
+              $file_info['alt'] = $file->getFilename();
+            }
+            $received_entity->{$field_name}[$delta] = $file_info;
+
+            unset($received_entity->{$field_name}[$delta]->entity_to_save);
+          }
+        }
       }
     }
 
@@ -134,6 +165,13 @@ class DocResource extends ResourceBase {
 
     if (!is_string($existing_entity) && $received_entity->_rev->value != $existing_entity->_rev->value) {
       throw new ConflictHttpException();
+    }
+
+    // This will save stub entities in case the entity has entity reference
+    // fields and a referenced entity does not exist or will update stub
+    // entities with the correct values.
+    if ($received_entity->getEntityTypeId() != 'replication_log') {
+      \Drupal::service('relaxed.stub_entity_processor')->processEntity($received_entity);
     }
 
     try {
@@ -177,4 +215,21 @@ class DocResource extends ResourceBase {
 
     return new ResourceResponse(array('ok' => TRUE), 200);
   }
+
+  /**
+   * Saves a file.
+   *
+   * @param \Drupal\file\FileInterface $file
+   */
+  public function putAttachment(FileInterface $file) {
+    \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
+    Cache::invalidateTags(array('file_list'));
+    try {
+      $file->save();
+    }
+    catch (\Exception $e) {
+      throw new HttpException(500, NULL, $e);
+    }
+  }
+
 }
