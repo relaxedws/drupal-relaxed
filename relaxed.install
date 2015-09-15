@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implements hook_install().
  */
@@ -10,4 +11,21 @@ function relaxed_install() {
   $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
   $rest_resource_config = $rest_config->get('resources');
   $rest_config->set('resources', array_merge($rest_resource_config, $relaxed_resource_config))->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function relaxed_uninstall() {
+  // Remove 'resource' settings defined by relaxed module from 'resource'
+  // settings define by rest module.
+  $relaxed_resource_config = \Drupal::config('relaxed.settings')->get('resources');
+  $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
+  $rest_resource_config = $rest_config->get('resources');
+  foreach ($relaxed_resource_config as $key => $item) {
+    if (isset($rest_resource_config[$key])) {
+      unset($rest_resource_config[$key]);
+    }
+  }
+  $rest_config->set('resources', $rest_resource_config)->save();
 }
