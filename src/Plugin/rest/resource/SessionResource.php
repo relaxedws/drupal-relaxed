@@ -53,4 +53,5 @@ class SessionResource extends ResourceBase {
     $response->addCacheableDependency($cacheable_metadata->setCacheContexts(['user']));
     return $response;
   }
+
 }
