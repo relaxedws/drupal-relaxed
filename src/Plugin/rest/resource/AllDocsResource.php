@@ -49,4 +49,5 @@ class AllDocsResource extends ResourceBase {
     }
     return new ResourceResponse($all_docs, 200);
   }
+
 }
