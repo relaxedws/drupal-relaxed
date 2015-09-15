@@ -36,7 +36,9 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       ), array(
         '_permission' => "restful " . $method_lower . " $this->pluginId" . "+perform content replication",
       ),
-        array(),
+        array(
+          'no_cache' => TRUE,
+        ),
         '',
         array(),
         // The HTTP method is a requirement for this route.
@@ -74,17 +76,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           break;
 
         case 'GET':
-          // Restrict on the Accept header if not an attachment resource.
-//          if (!$this->isAttachment()) {
-//            foreach ($this->serializerFormats as $format) {
-//              $format_route = clone $route;
-//              $format_route->addRequirements(array('_format' => $format));
-//              $collection->add("$route_name.$method.$format", $format_route);
-//            }
-//          }
-//          else {
-            $collection->add("$route_name.$method", $route);
-//          }
+          $collection->add("$route_name.$method", $route);
           break;
 
         case 'DELETE':

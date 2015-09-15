@@ -48,4 +48,5 @@ class SessionResource extends ResourceBase {
       200
     );
   }
+
 }
