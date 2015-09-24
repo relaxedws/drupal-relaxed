@@ -30,7 +30,7 @@ class RootResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
 
     $expected = array(
-      'couchdb' => t('Welcome'),
+      'couchdb' => 'Welcome',
       'uuid' => \Drupal::config('system.site')->get('uuid'),
       'vendor' => array(
         'name' => 'Drupal',
