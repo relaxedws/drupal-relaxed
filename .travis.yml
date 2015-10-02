@@ -13,6 +13,7 @@ services:
   - couchdb
 
 env:
+  - PATH=$PATH:/home/travis/.composer/vendor/bin
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
@@ -24,16 +25,14 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
 
 before_install:
+  # Update Composer so that the Drush installation doesn't fail.
+  - composer selfupdate
   - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
 
 install:
   - sudo apt-get update
   # Install Apache.
-  - sudo apt-get install apache2 libapache2-mod-fastcgi apache2-utils
-  - sudo a2enmod log_forensic
-
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - sudo apt-get install apache2 libapache2-mod-fastcgi
 
   # Set up PHP-FPM.
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
@@ -58,11 +57,15 @@ install:
   - sudo service apache2 restart
 
   # Install Drush.
-  - export PATH=$PATH:/home/travis/.composer/vendor/bin
-  - composer selfupdate
   - composer global require drush/drush:dev-master
 
 before_script:
+  # Try to prevent Mysql has gone away.
+  - mysql -e "SET GLOBAL wait_timeout = 36000;"
+  - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
+  - mysql -e "SHOW VARIABLES LIKE 'max_allowed_packet';"
+  - mysql -e "SHOW VARIABLES LIKE 'wait_timeout';"
+
   # Checkout a directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
@@ -71,7 +74,7 @@ before_script:
 
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal testing
   # Create the private directory.
   - sudo mkdir sites/default/files/private
   - sudo chmod 777 -R sites/default/files
@@ -86,7 +89,7 @@ before_script:
 
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal2
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --verbose --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal2 standard
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --verbose --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal2 testing
   # Create the private directory.
   - sudo mkdir sites/default/files/private
   - sudo chmod 777 -R sites/default/files
