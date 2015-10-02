@@ -1,7 +1,7 @@
 language: php
 
 php:
-  - 5.5
+  #- 5.5
   - 5.6
 
 mysql:
@@ -15,13 +15,13 @@ services:
 env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
-    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh'
-    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh'
-    - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+    #- SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
 
 before_install:
   # Update Composer so that the Drush installation doesn't fail.
@@ -80,6 +80,8 @@ before_script:
   - sudo chmod 777 -R sites/default/files
   - sudo chmod 0664 sites/default/settings.php
   - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
+  # Enable Simpletest
+  drush en --yes simpletest
 
   # Checkout second directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
@@ -95,6 +97,8 @@ before_script:
   - sudo chmod 777 -R sites/default/files
   - sudo chmod 0664 sites/default/settings.php
   - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
+  # Enable Simpletest
+  drush en --yes simpletest
 
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal

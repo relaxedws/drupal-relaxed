@@ -3,7 +3,7 @@
 set -ev
 
 # Enable dependencies.
-drush en --yes simpletest, key_value, multiversion, relaxed || true
+drush en --yes key_value, multiversion, relaxed || true
 
 php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://drupal.loc "key_value,multiversion,relaxed" | tee /tmp/test.txt
 export TEST_EXIT=${PIPESTATUS[0]}

@@ -11,7 +11,23 @@ use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
 
-  public static $modules = array('rest', 'entity_test', 'relaxed', 'relaxed_test');
+  /**
+   * The profile to install as a basis for testing.
+   *
+   * @var string
+   */
+  protected $profile = 'standard';
+
+  public static $modules = array(
+    'entity_test',
+    'multiversion',
+    'node',
+    'taxonomy',
+    'comment',
+    'block_content',
+    'menu_link_content',
+    'file',
+  );
 
   protected $strictConfigSchema = FALSE;
 
