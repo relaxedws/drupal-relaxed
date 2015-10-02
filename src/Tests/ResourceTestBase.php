@@ -17,7 +17,6 @@ abstract class ResourceTestBase extends RESTTestBase {
    * @var string
    */
   protected $profile = 'standard';
-
   public static $modules = array(
     'entity_test',
     'multiversion',
@@ -27,6 +26,9 @@ abstract class ResourceTestBase extends RESTTestBase {
     'block_content',
     'menu_link_content',
     'file',
+    'rest',
+    'relaxed',
+    'relaxed_test'
   );
 
   protected $strictConfigSchema = FALSE;

@@ -5,7 +5,7 @@ set -ev
 # Enable dependencies.
 drush en --yes key_value, multiversion, relaxed || true
 
-php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://drupal.loc "key_value,multiversion,relaxed" | tee /tmp/test.txt
+php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://drupal.loc "relaxed" | tee /tmp/test.txt
 export TEST_EXIT=${PIPESTATUS[0]}
 
 # Simpletest does not exit with code 0 on success, so we will need to analyze
