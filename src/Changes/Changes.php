@@ -13,8 +13,10 @@ use Drupal\multiversion\Entity\Index\SequenceIndexInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 class Changes implements ChangesInterface {
+  use DependencySerializationTrait;
 
   /**
    * @var string

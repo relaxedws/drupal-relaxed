@@ -7,8 +7,10 @@ use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\relaxed\StubEntityProcessor\StubEntityProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 class BulkDocs implements BulkDocsInterface {
+  use DependencySerializationTrait;
 
   /**
    * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface

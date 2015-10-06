@@ -8,8 +8,10 @@ use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\MultiversionManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 class AllDocs implements AllDocsInterface {
+  use DependencySerializationTrait;
 
   /**
    * @var \Drupal\Core\Entity\EntityManagerInterface
