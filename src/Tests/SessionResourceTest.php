@@ -60,7 +60,6 @@ class SessionResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
 
-    $roles = array_merge(['authenticated'], $roles);
     $expected = array(
       'info' => array(),
       'ok' => TRUE,

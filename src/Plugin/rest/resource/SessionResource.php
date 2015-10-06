@@ -9,6 +9,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * @RestResource(
@@ -36,7 +37,7 @@ class SessionResource extends ResourceBase {
       $roles[] = '_admin';
     }
 
-    return new ResourceResponse(
+    $response = new ResourceResponse(
       array(
         'info' => array(),
         'ok' => TRUE,
@@ -47,5 +48,9 @@ class SessionResource extends ResourceBase {
       ),
       200
     );
+
+    $cacheable_metadata = new CacheableMetadata();
+    $response->addCacheableDependency($cacheable_metadata->setCacheContexts(['user']));
+    return $response;
   }
 }
