@@ -189,6 +189,10 @@ class ResourceController implements ContainerAwareInterface {
         if ($response_data != NULL) {
           $response_output = $serializer->serialize($response_data, $response_format, $context);
           $response_part->setContent($response_output);
+          // Add cache tags for each parameter
+          foreach ($parameters as $parameter) {
+            $response_part->addCacheableDependency($parameter);
+          }
           // Add relaxed settings config's cache tags.
           $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
           // Add query args as a cache context
