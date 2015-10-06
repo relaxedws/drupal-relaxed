@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
@@ -191,6 +191,9 @@ class ResourceController implements ContainerAwareInterface {
           $response_part->setContent($response_output);
           // Add relaxed settings config's cache tags.
           $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
+          // Add query args as a cache context
+          $cacheable_metadata = new CacheableMetadata();
+          $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args']));
         }
       }
       catch (\Exception $e) {
