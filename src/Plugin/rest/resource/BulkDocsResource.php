@@ -7,12 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\relaxed\BulkDocs\BulkDocsInterface;
 use Drupal\rest\ResourceResponse;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
