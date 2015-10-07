@@ -42,7 +42,7 @@ class SessionResource extends ResourceBase {
         'info' => array(),
         'ok' => TRUE,
         'userCtx' => array(
-          'user' => $account->getUsername(),
+          'user' => $account->getAccountName(),
           'roles' => $roles,
         ),
       ),
