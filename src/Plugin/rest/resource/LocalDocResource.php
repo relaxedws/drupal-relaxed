@@ -61,6 +61,7 @@ class LocalDocResource extends DocResource {
   }
 
   /**
+   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    *
