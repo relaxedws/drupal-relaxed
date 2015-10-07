@@ -198,7 +198,7 @@ class ResourceController implements ContainerAwareInterface {
         $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
         // Add query args as a cache context
         $cacheable_metadata = new CacheableMetadata();
-        $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format']));
+        $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
