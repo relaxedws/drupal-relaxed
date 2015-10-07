@@ -24,11 +24,12 @@ class AllDbsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $workspaces_entities = entity_load_multiple('workspace');
+    $workspace_storage = \Drupal::entityManager()->getStorage('workspace');
+    $workspaces_entities = $workspace_storage->loadMultiple(NULL);
     $workspaces = array_keys($workspaces_entities);
     for ($i = 0; $i < 3; $i++) {
       $id = $this->randomMachineName();
-      $entity = entity_create('workspace', array('id' => $id));
+      $entity = $workspace_storage->create(array('id' => $id));
       $entity->save();
       $workspaces[] = $id;
     }
