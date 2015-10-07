@@ -9,7 +9,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
- * The content workspace entity class.
+ * The replication log entity type.
  *
  * @ContentEntityType(
  *   id = "replication_log",
