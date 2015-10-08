@@ -7,7 +7,6 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
 use Drupal\rest\ResourceResponse;
@@ -86,6 +85,8 @@ class AttachmentResource extends ResourceBase {
    * @param string $scheme
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
+   *
+   * @return Drupal\rest\ResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
     if (is_string($workspace) || is_string($entity)) {
@@ -130,6 +131,8 @@ class AttachmentResource extends ResourceBase {
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
+   *
+   * @return Drupal\rest\ResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     if (is_string($workspace) || is_string($entity) || is_string($file)) {
@@ -163,6 +166,7 @@ class AttachmentResource extends ResourceBase {
    *
    * @param \Drupal\file\FileInterface $file
    * @param array $headers_to_include
+   * @param int $rev
    * @return array
    */
   protected function responseHeaders(FileInterface $file, $headers_to_include = array(), $rev = NULL) {

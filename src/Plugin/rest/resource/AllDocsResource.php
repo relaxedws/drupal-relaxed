@@ -30,6 +30,8 @@ class AllDocsResource extends ResourceBase {
    * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
    *
    * @return \Drupal\rest\ResourceResponse
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($workspace) {
     if (is_string($workspace)) {
