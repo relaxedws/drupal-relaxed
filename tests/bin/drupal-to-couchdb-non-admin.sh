@@ -5,15 +5,8 @@ DRUPAL_ROOT=$1
 DRUPAL_DOMAIN=$2
 
 # Enable dependencies.
-if [ ! -f $DRUPAL_ROOT/modules/entity_test ];
-then
-  ln -s $DRUPAL_ROOT/core/modules/system/tests/modules/entity_test $DRUPAL_ROOT/modules/entity_test
-fi
-
-if [ ! -f $DRUPAL_ROOT/modules/entity_test ];
-then
-  ln -s $DRUPAL_ROOT/modules/relaxed/tests/modules/relaxed_test $DRUPAL_ROOT/modules/relaxed_test
-fi
+cp -R $DRUPAL_ROOT/core/modules/system/tests/modules/entity_test $DRUPAL_ROOT/modules/
+cp -R $DRUPAL_ROOT/modules/relaxed/tests/modules/relaxed_test $DRUPAL_ROOT/modules/
 
 drush en --yes entity_test, relaxed_test || true
 
