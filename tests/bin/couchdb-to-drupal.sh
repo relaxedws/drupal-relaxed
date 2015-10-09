@@ -1,10 +1,13 @@
 #!/bin/sh
 
 set -ev
+DRUPAL_ROOT=$1
+DRUPAL_DOMAIN=$2
 
 # Enable dependencies.
-mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
-mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
+cp -R $DRUPAL_ROOT/core/modules/system/tests/modules/entity_test $DRUPAL_ROOT/modules/
+cp -R $DRUPAL_ROOT/modules/relaxed/tests/modules/relaxed_test $DRUPAL_ROOT/modules/
+
 drush en --yes entity_test, relaxed_test || true
 
 # Create a target database and do the replication.
@@ -18,7 +21,7 @@ do
        -d "$document" \
        localhost:5984/source;
   sleep 2;
-done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
+done < $DRUPAL_ROOT/modules/relaxed/tests/fixtures/documents.txt
 
 # Get all docs from couchdb db.
 curl -X GET http://localhost:5984/source/_all_docs
@@ -26,12 +29,12 @@ curl -X GET http://localhost:5984/source/_all_docs
 drush cr
 
 # Run the replication.
-nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://admin:admin@drupal.loc/relaxed/default", "worker_processes": 1}' http://localhost:5984/_replicate &
+nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://$DRUPAL_DOMAIN/relaxed/default", "worker_processes": 1}' http://localhost:5984/_replicate &
 sleep 120
 
-curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/all_docs.txt
+curl -X GET http://$DRUPAL_DOMAIN/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
-COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
+COUNT=$(wc -l < $DRUPAL_ROOT/modules/relaxed/tests/fixtures/documents.txt)
 USERS=2
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
