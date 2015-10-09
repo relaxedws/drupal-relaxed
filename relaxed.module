@@ -62,7 +62,7 @@ function relaxed_entity_delete(EntityInterface $entity) {
 /**
  * Implements hook_entity_access().
  */
-function relaxed_entity_access(EntityInterface $entity, $operation, AccountInterface $account, $langcode) {
+function relaxed_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
   /** @var \Drupal\multiversion\MultiversionManagerInterface $manager */
   $multiversion_manager = \Drupal::service('multiversion.manager');
   $entity_type = $entity->getEntityType();
