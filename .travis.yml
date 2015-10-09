@@ -17,7 +17,7 @@ env:
     - SCRIPT="modules/relaxed/tests/bin/drupal.sh"
     - SCRIPT="modules/relaxed/tests/bin/drupal-to-couchdb.sh $TRAVIS_BUILD_DIR/../drupal admin:admin@drupal.loc"
     - SCRIPT="modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh $TRAVIS_BUILD_DIR/../drupal admin:admin@drupal.loc"
-    - SCRIPT="modules/relaxed/tests/bin/couchdb-to-drupal.sh"
+    - SCRIPT="modules/relaxed/tests/bin/couchdb-to-drupal.sh $TRAVIS_BUILD_DIR/../drupal admin:admin@drupal.loc"
     - SCRIPT="modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh"
     - SCRIPT="modules/relaxed/tests/bin/drupal-to-drupal.sh"
     - SCRIPT="modules/relaxed/tests/bin/pouchdb.sh"
