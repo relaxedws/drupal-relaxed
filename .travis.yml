@@ -33,9 +33,6 @@ install:
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi
 
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-
   # Set up PHP-FPM.
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
   - sudo a2enmod rewrite actions fastcgi alias
@@ -63,8 +60,8 @@ install:
   - composer global require drush/drush:dev-master
 
 before_script:
-  # Additional PHP config.
-  - phpenv config-add .travis.ini
+  # Add always_populate_raw_post_data=-1 to php.ini.
+  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
   # Try to prevent Mysql has gone away.
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
