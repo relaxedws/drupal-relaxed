@@ -52,6 +52,9 @@ install:
   - sudo sed -i "/FastCgiExternalServer/d" --in-place /etc/apache2/sites-available/drupal2
   - echo "127.0.0.1 drupal2.loc" | sudo tee -a /etc/hosts
 
+  # Add always_populate_raw_post_data=-1 to php.ini.
+  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
   - sudo a2ensite drupal2
   - sudo service apache2 restart
 
@@ -60,9 +63,6 @@ install:
   - composer global require drush/drush:dev-master
 
 before_script:
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-
   # Try to prevent Mysql has gone away.
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
