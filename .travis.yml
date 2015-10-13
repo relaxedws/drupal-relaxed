@@ -33,6 +33,9 @@ install:
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi
 
+  # Add always_populate_raw_post_data=-1 to php.ini.
+  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
   # Set up PHP-FPM.
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
   - sudo a2enmod rewrite actions fastcgi alias
@@ -51,9 +54,6 @@ install:
   - sudo sed -e "s?%TRAVIS_BUILD_SERVERNAME%?drupal2.loc?g" --in-place /etc/apache2/sites-available/drupal2
   - sudo sed -i "/FastCgiExternalServer/d" --in-place /etc/apache2/sites-available/drupal2
   - echo "127.0.0.1 drupal2.loc" | sudo tee -a /etc/hosts
-
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
   - sudo a2ensite drupal2
   - sudo service apache2 restart
@@ -75,7 +75,7 @@ before_script:
   # Checkout a directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
-  - git clone --branch add-is_stub-property https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
+  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
 
   # Install the site that will host our tests.
@@ -92,7 +92,7 @@ before_script:
   # Checkout second directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal2/modules/key_value
-  - git clone --branch add-is_stub-property https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
+  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed
 
   # Install the site that will be used for Drupal-to-Drupal replication.
