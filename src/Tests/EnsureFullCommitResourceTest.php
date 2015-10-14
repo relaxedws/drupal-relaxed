@@ -30,8 +30,8 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
     $expected = array(
-      'instance_start_time' => (string) $this->workspace->getStartTime(),
       'ok' => TRUE,
+      'instance_start_time' => (string) $this->workspace->getStartTime(),
     );
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
   }
