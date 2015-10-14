@@ -9,6 +9,7 @@ use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -40,7 +41,11 @@ class DbResource extends ResourceBase {
     if (!$entity instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
-    return new ResourceResponse(NULL, 200);
+    $response = new ResourceResponse(NULL, 200);
+    $cacheable_metadata = new CacheableMetadata();
+    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
+
+    return $response;
   }
 
   /**
@@ -56,6 +61,8 @@ class DbResource extends ResourceBase {
     // @todo: Access check.
     $response =  new ResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
+    $cacheable_metadata = new CacheableMetadata();
+    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
 
     return $response;
   }
@@ -88,7 +95,12 @@ class DbResource extends ResourceBase {
     catch (EntityStorageException $e) {
       throw new HttpException(500, t('Internal server error'), $e);
     }
-    return new ResourceResponse(array('ok' => TRUE), 201);
+    $response = new ResourceResponse(array('ok' => TRUE), 201);
+    $response->addCacheableDependency($entity);
+    $cacheable_metadata = new CacheableMetadata();
+    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
+
+    return $response;
   }
 
   /**
@@ -169,7 +181,11 @@ class DbResource extends ResourceBase {
     try {
       $entity->save();
       $rev = $entity->_rev->value;
-      return new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
+      $response = new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
+      $response->addCacheableDependency($entity);
+      $cacheable_metadata = new CacheableMetadata();
+      $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
+      return $response;
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, NULL, $e);
@@ -190,6 +206,11 @@ class DbResource extends ResourceBase {
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
     }
-    return new ResourceResponse(array('ok' => TRUE), 200);
+    $response = new ResourceResponse(array('ok' => TRUE), 200);
+    $response->addCacheableDependency($entity);
+    $cacheable_metadata = new CacheableMetadata();
+    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
+
+    return $response;
   }
 }
