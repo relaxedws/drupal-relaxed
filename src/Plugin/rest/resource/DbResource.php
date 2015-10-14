@@ -26,7 +26,8 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}",
- *   }
+ *   },
+ *   no_cache = TRUE
  * )
  */
 class DbResource extends ResourceBase {
@@ -42,8 +43,7 @@ class DbResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
     $response = new ResourceResponse(NULL, 200);
-    $cacheable_metadata = new CacheableMetadata();
-    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
+    $response->addCacheableDependency($entity);
 
     return $response;
   }
@@ -61,8 +61,6 @@ class DbResource extends ResourceBase {
     // @todo: Access check.
     $response =  new ResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
-    $cacheable_metadata = new CacheableMetadata();
-    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
 
     return $response;
   }
@@ -97,8 +95,6 @@ class DbResource extends ResourceBase {
     }
     $response = new ResourceResponse(array('ok' => TRUE), 201);
     $response->addCacheableDependency($entity);
-    $cacheable_metadata = new CacheableMetadata();
-    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
 
     return $response;
   }
@@ -183,8 +179,7 @@ class DbResource extends ResourceBase {
       $rev = $entity->_rev->value;
       $response = new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
       $response->addCacheableDependency($entity);
-      $cacheable_metadata = new CacheableMetadata();
-      $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
+
       return $response;
     }
     catch (EntityStorageException $e) {
@@ -208,8 +203,6 @@ class DbResource extends ResourceBase {
     }
     $response = new ResourceResponse(array('ok' => TRUE), 200);
     $response->addCacheableDependency($entity);
-    $cacheable_metadata = new CacheableMetadata();
-    $response->addCacheableDependency($cacheable_metadata->setCacheMaxAge(0));
 
     return $response;
   }
