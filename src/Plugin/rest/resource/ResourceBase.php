@@ -36,7 +36,9 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       ), array(
         '_permission' => "restful " . $method_lower . " $this->pluginId" . "+perform content replication",
       ),
-        array(),
+        array(
+          'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
+        ),
         '',
         array(),
         // The HTTP method is a requirement for this route.

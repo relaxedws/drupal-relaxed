@@ -21,7 +21,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_changes",
- *   }
+ *   },
+ *   no_cache = TRUE
  * )
  */
 class ChangesResource extends ResourceBase {

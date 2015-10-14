@@ -19,7 +19,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_revs_diff",
- *   }
+ *   },
+ *   no_cache = TRUE
  * )
  */
 class RevsDiffResource extends ResourceBase {
