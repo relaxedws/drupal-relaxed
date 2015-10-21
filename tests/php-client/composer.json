@@ -1,0 +1,19 @@
+{
+  "name": "relaxed/php-client",
+  "description": "Test php client for replication",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/relaxedws/couchdb-replicator"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/relaxedws/couchdb-client"
+    }
+  ],
+  "require": {
+    "relaxed/replicator": "dev-deploy"
+  }
+}
