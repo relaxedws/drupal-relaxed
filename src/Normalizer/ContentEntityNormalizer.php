@@ -99,12 +99,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         continue;
       }
 
-      // Exclude "name" field (the user name) for comment entity type because
-      // we'll change it during replication if it's a duplicate.
-      if ($entity_type_id == 'comment' && $name == 'name') {
-        continue;
-      }
-
       if ($items !== NULL) {
         $data[$name] = $items;
       }
@@ -312,6 +306,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Remove changed info, otherwise we can get validation errors.
     if (isset($data['changed'])) {
       unset($data['changed']);
+    }
+
+    // Exclude "name" field (the user name) for comment entity type because
+    // we'll change it during replication if it's a duplicate.
+    if ($entity_type_id == 'comment' && isset($data['name'])) {
+      unset($data['name']);
     }
 
     // @todo Move the below update logic to the resource plugin instead.

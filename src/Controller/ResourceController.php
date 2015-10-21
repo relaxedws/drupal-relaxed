@@ -2,10 +2,8 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\comment\CommentInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\RenderContext;
-use Drupal\Core\Cache\Cache;
 use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
@@ -157,9 +155,9 @@ class ResourceController implements ContainerAwareInterface {
     $query = $this->request->query->all();
     $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
     $entity = NULL;
+    $definition = $resource->getPluginDefinition();
     if (!empty($content)) {
       try {
-        $definition = $resource->getPluginDefinition();
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
 
         // If we have a workspace parameter, pass it to the deserializer.
@@ -231,29 +229,35 @@ class ResourceController implements ContainerAwareInterface {
       : 'json';
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
+    $no_cache = isset($definition['no_cache']) ? $definition['no_cache'] : FALSE;
     foreach ($responses as $response_part) {
       try {
-        if ($response_part instanceof ResourceResponse && $response_data = $response_part->getResponseData()) {
+        if ($response_data = $response_part->getResponseData()) {
           // Collect bubbleable metadata in a render context.
-          $context = new RenderContext();
-          $response_output = $this->container->get('renderer')->executeInRenderContext($context, function() use ($serializer, $response_data, $response_format) {
-            return $serializer->serialize($response_data, $response_format);
-          });
-          $response_part->setContent($response_output);
-          if (!$context->isEmpty()) {
-            $response_part->addCacheableDependency($context->pop());
+          if (!$no_cache) {
+            $context = new RenderContext();
+            $response_output = $this->container->get('renderer')->executeInRenderContext($context, function() use ($serializer, $response_data, $response_format) {
+              return $serializer->serialize($response_data, $response_format);
+            });
+            $response_part->setContent($response_output);
+            if (!$context->isEmpty()) {
+              $response_part->addCacheableDependency($context->pop());
+            }
           }
-
-          // Add cache tags for each parameter
-          foreach ($parameters as $parameter) {
-            $response_part->addCacheableDependency($parameter);
+          else {
+            $response_output = $serializer->serialize($response_data, $response_format, $context);
+            $response_part->setContent($response_output);
           }
-          // Add relaxed settings config's cache tags.
-          $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
-          // Add query args as a cache context
-          $cacheable_metadata = new CacheableMetadata();
-          $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
         }
+        // Add cache tags for each parameter
+        foreach ($parameters as $parameter) {
+          $response_part->addCacheableDependency($parameter);
+        }
+        // Add relaxed settings config's cache tags.
+        $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
+        // Add query args as a cache context
+        $cacheable_metadata = new CacheableMetadata();
+        $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
