@@ -21,7 +21,7 @@ do
        -d "$document" \
        localhost:5984/source;
   sleep 2;
-done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
+done < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt
 
 # Get all docs from couchdb db.
 curl -X GET http://localhost:5984/source/_all_docs
