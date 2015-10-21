@@ -11,8 +11,8 @@ use Relaxed\Replicator\Replicator;
       throw new Exception('Invalid JSON.');
   }
 
-  $source = CouchDBClient::create($json['source']);
-  $target = CouchDBClient::create($json['target']);
+  $source = CouchDBClient::create($json->source);
+  $target = CouchDBClient::create($json->target);
 
   $task = new ReplicationTask();
   $replicator = new Replicator($source, $target, $task);
