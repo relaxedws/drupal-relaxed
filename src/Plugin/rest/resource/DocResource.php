@@ -131,7 +131,8 @@ class DocResource extends ResourceBase {
       throw new AccessDeniedHttpException(t('Access denied when creating the entity.'));
     }
     foreach ($received_entity as $field_name => $field) {
-      if (!$field->access('create')) {
+      // @todo Check if it's safe to exclude the password field here.
+      if (!$field->access('create') && $field_name != 'pass') {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
 
@@ -151,7 +152,6 @@ class DocResource extends ResourceBase {
               $file_info['alt'] = $file->getFilename();
             }
             $received_entity->{$field_name}[$delta] = $file_info;
-
             unset($received_entity->{$field_name}[$delta]->entity_to_save);
           }
         }

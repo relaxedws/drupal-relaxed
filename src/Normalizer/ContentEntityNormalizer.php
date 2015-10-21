@@ -95,6 +95,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         }
         continue;
       }
+      if ($field_type == 'password') {
+        continue;
+      }
       if ($items !== NULL) {
         $data[$name] = $items;
       }
