@@ -36,7 +36,7 @@ curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/a
 sudo cat /var/log/apache2/error.log
 #-----------------------------------
 
-COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
+COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt)
 USERS=2
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
