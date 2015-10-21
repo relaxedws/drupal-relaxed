@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\comment\CommentStorageInterface;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
@@ -121,13 +122,21 @@ function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
       '_rev' => $rev,
     );
   }
-
   if ($target_storage instanceof UserStorageInterface) {
     $target_entity_values = array(
       'name' => "Stub name $name",
       'mail' => "$name@example.com",
       'pass' => user_password(),
       'status' => 1,
+      '_rev' => $rev,
+    );
+  }
+  if ($target_storage instanceof CommentStorageInterface) {
+    $target_entity_values = array(
+      'entity_type' => 'node',
+      'field_name' => 'comment',
+      'subject' => "Stub comment $name.",
+      'mail' => "$name@example.com",
       '_rev' => $rev,
     );
   }

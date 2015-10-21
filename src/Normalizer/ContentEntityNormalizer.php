@@ -98,6 +98,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       if ($field_type == 'password') {
         continue;
       }
+
+      // Exclude "name" field (the user name) for comment entity type because
+      // we'll change it during replication if it's a duplicate.
+      if ($entity_type_id == 'comment' && $name == 'name') {
+        continue;
+      }
+
       if ($items !== NULL) {
         $data[$name] = $items;
       }
