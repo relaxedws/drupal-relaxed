@@ -229,24 +229,17 @@ class ResourceController implements ContainerAwareInterface {
       : 'json';
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
-    $no_cache = isset($definition['no_cache']) ? $definition['no_cache'] : FALSE;
     foreach ($responses as $response_part) {
       try {
         if ($response_data = $response_part->getResponseData()) {
           // Collect bubbleable metadata in a render context.
-          if (!$no_cache) {
-            $context = new RenderContext();
-            $response_output = $this->container->get('renderer')->executeInRenderContext($context, function() use ($serializer, $response_data, $response_format) {
-              return $serializer->serialize($response_data, $response_format);
-            });
-            $response_part->setContent($response_output);
-            if (!$context->isEmpty()) {
-              $response_part->addCacheableDependency($context->pop());
-            }
-          }
-          else {
-            $response_output = $serializer->serialize($response_data, $response_format, $context);
-            $response_part->setContent($response_output);
+          $render_context = new RenderContext();
+          $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
+            return $serializer->serialize($response_data, $response_format, $context);
+          });
+          $response_part->setContent($response_output);
+          if (!$render_context->isEmpty()) {
+            $response_part->addCacheableDependency($render_context->pop());
           }
         }
         // Add cache tags for each parameter
@@ -255,7 +248,7 @@ class ResourceController implements ContainerAwareInterface {
         }
         // Add relaxed settings config's cache tags.
         $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
-        // Add query args as a cache context
+        // Add query args as a cache context.
         $cacheable_metadata = new CacheableMetadata();
         $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
       }
