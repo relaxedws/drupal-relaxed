@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 function relaxed_entity_insert(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'workspace') {
     // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo Fix this.
+    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
     }
@@ -34,7 +34,7 @@ function relaxed_entity_insert(EntityInterface $entity) {
 function relaxed_entity_update(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'workspace') {
     // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo Fix this.
+    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
     }
@@ -50,7 +50,7 @@ function relaxed_entity_update(EntityInterface $entity) {
 function relaxed_entity_delete(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'workspace') {
     // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo Fix this.
+    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
     }
@@ -113,6 +113,7 @@ function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
   $name = $random->name(8, TRUE);
   // This revision will be set for a stub entities and will be used to detect
   // the value for is_stub property for the _rev field.
+  // @todo {@link https://www.drupal.org/node/2599870 Come up with a better way for this.}
   $rev = '1-101010101010101010101010' . $name;
 
   if ($target_storage instanceof TermStorageInterface) {

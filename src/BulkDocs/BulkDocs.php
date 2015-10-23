@@ -112,7 +112,7 @@ class BulkDocs implements BulkDocsInterface {
           'id' => $entity->uuid(),
           'rev' => $entity->_rev->value,
         );
-        // @todo Inject logger or use \Drupal::logger().
+        // @todo {@link https://www.drupal.org/node/2599902 Inject logger or use \Drupal::logger().}
         watchdog_exception('relaxed', $e);
       }
     }

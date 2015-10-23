@@ -97,8 +97,7 @@ class ResourceController implements ContainerAwareInterface {
   /**
    * Helper method for returning error responses.
    *
-   * @todo Consider providing a better API where throwing an exception can
-   *   provide both error and reason message.
+   * @todo {@link https://www.drupal.org/node/2599912 Improve to handle error and reason messages more generically.}
    */
   public function errorResponse(\Exception $e) {
     // Default to 400 Bad Request.

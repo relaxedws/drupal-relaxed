@@ -4,6 +4,9 @@ namespace Drupal\relaxed\Normalizer;
 
 use Drupal\serialization\Normalizer\EntityNormalizer;
 
+/**
+ * @todo {@link https://www.drupal.org/node/2599920 Don't extend EntityNormalizer.}
+ */
 class WorkspaceNormalizer extends EntityNormalizer {
 
   /**

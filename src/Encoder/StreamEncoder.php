@@ -10,7 +10,6 @@ class StreamEncoder implements EncoderInterface, DecoderInterface {
 
   /**
    * @var array
-   * @todo Make this dynamic.
    */
   protected $formats = array('stream', 'base64_stream');
 

@@ -14,8 +14,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * @todo Don't extend EntityNormalizer. Follow the pattern of
- *   \Drupal\hal\Entity\Normalizer\ContentEntityNormalizer
+ * @todo {@link https://www.drupal.org/node/2599920 Don't extend EntityNormalizer.}
  */
 class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInterface {
 
@@ -109,7 +108,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $data['_rev'] = $entity->_rev->value;
     }
 
-    // @todo: Needs test.
+    // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
     if (!empty($context['query']['revs']) || !empty($context['query']['revs_info'])) {
       $default_branch = $this->revTree->getDefaultBranch($entity_uuid);
 
@@ -182,12 +181,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
-    // @todo Needs test for situation when a replication overwrites a delete.
+    // @todo {@link https://www.drupal.org/node/2599938 Needs test for situation when a replication overwrites delete.}
     $deleted = isset($data['_deleted']) ? $data['_deleted'] : FALSE;
     $data['_deleted'] = array(array('value' => $deleted));
 
     // Map data from the UUID index.
-    // @todo Needs test.
+    // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
     if (!empty($entity_uuid)) {
       if ($record = $this->uuidIndex->get($entity_uuid)) {
         $entity_id = $record['entity_id'];
@@ -213,7 +212,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $bundle_key = $entity_type->getKey('bundle');
 
     if ($entity_id) {
-      // @todo Needs test.
+      // @todo {@link https://www.drupal.org/node/2599938 Needs test.}
       $data[$id_key] = $entity_id;
     }
 
@@ -286,7 +285,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // For the user entity type set a random name if an user with the same name
     // already exists in the database.
-    // @todo Review from a performance perspective.
     if ($entity_type_id == 'user') {
       $query = db_select('users', 'u');
       $query->fields('u', ['uuid']);
@@ -314,7 +312,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       unset($data['name']);
     }
 
-    // @todo Move the below update logic to the resource plugin instead.
+    // @todo {@link https://www.drupal.org/node/2599946 Move the below update logic to the resource plugin instead.}
     $storage = $this->entityManager->getStorage($entity_type_id);
 
     // Denormalize entity reference fields.
@@ -337,6 +335,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
           // Let other modules feedback about their own additions.
           $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', array($target_storage)));
+
 
           $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
           $data[$field_name][$delta] = array(
@@ -370,7 +369,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     else {
       $entity = NULL;
       $entity_types_to_create = ['replication_log', 'user'];
-      // @todo Use the passed $class to instantiate the entity.
+      // @todo {https://www.drupal.org/node/2599926 Use the passed $class to instantiate the entity.}
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($data[$id_key], $data[$revision_key]);
         $entity = $storage->create($data);
