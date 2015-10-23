@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/dickolsson/drupal-relaxed.svg?branch=8.x-1.x)](https://travis-ci.org/dickolsson/drupal-relaxed)
+[![Build Status](https://travis-ci.org/relaxedws/drupal-relaxed.svg?branch=8.x-1.x)](https://travis-ci.org/relaxedws/drupal-relaxed)
 
 Relaxed Web Services
 ====================
