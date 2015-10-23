@@ -129,11 +129,12 @@ class Changes implements ChangesInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo {@link https://www.drupal.org/node/2599908 Implement this longpoll functionality fully.}
    */
   public function getLongpoll() {
     $no_change = TRUE;
     do {
-      // @todo Implement exponential wait time.
       $change = $this->sequenceIndex
         ->useWorkspace($this->workspaceId)
         ->getRange($this->lastSeq, NULL);

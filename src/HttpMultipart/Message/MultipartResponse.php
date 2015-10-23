@@ -6,9 +6,6 @@ use GuzzleHttp\Psr7;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @todo Patch Response and AbstractMessage to declare their properties as protected rather than private.
- */
 class MultipartResponse extends Response
 {
   /** @var StreamInterface[] */

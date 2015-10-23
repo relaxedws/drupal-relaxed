@@ -152,8 +152,8 @@ class AllDocs implements AllDocsInterface {
   /**
    * {@inheritdoc}
    *
-   * @todo Move any logic around 'includeDocs' and the serialization format into
-   *   the serializer to better separate concerns.
+   * @todo {@link https://www.drupal.org/node/2599900 Move any logic around 'includeDocs' and the serialization format
+   *   into the serializer to better separate concerns.}
    */
   public function execute() {
     $rows = array();

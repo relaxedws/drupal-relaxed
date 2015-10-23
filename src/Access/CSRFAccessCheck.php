@@ -22,7 +22,7 @@ class CSRFAccessCheck extends CoreCSRFAccessCheck {
     $defaults = $route->getDefaults();
     if (isset($defaults['_plugin']) && substr($defaults['_plugin'], 0, 7) === 'relaxed') {
       // Disable CSRF access check for routes defined by Relaxed module.
-      // @todo Revisit this before beta release: https://www.drupal.org/node/2470691
+      // @todo {@link https://www.drupal.org/node/2470691 Revisit this before beta release.}
       return FALSE;
     }
     else {

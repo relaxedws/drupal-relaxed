@@ -30,7 +30,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
       throw new LogicException('A \'workspace\' context is required to denormalize revision diff data.');
     }
 
-    // @todo Use injected container.
+    // @todo {@link https://www.drupal.org/node/2599930 Use injected container.}
     /** @var \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs */
     $bulk_docs = $class::createInstance(
       \Drupal::getContainer(),
@@ -49,8 +49,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
     if (isset($data['docs'])) {
       foreach ($data['docs'] as $doc) {
         if (!empty($doc)) {
-          // @todo Find a more generic way to denormalize this w/o calling a
-          // specific normalization service.
+          // @todo {@link https://www.drupal.org/node/2599934 Find a more generic way to denormalize.}
           $entity = \Drupal::service('relaxed.normalizer.content_entity')->denormalize($doc, 'Drupal\Core\Entity\ContentEntityInterface', $format, $context);
           if ($entity) {
             $entities[] = $entity;

@@ -8,8 +8,7 @@ use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * @todo Don't extend EntityNormalizer. Follow the pattern of
- *   \Drupal\hal\Entity\Normalizer\ContentEntityNormalizer
+ * @todo {@link https://www.drupal.org/node/2599920 Don't extend EntityNormalizer.}
  */
 class AttachmentNormalizer extends NormalizerBase implements DenormalizerInterface {
 
@@ -20,7 +19,6 @@ class AttachmentNormalizer extends NormalizerBase implements DenormalizerInterfa
 
   /**
    * @var string[]
-   * @todo Make this dynamic.
    */
   protected $format = array('stream', 'base64_stream');
 
@@ -45,7 +43,7 @@ class AttachmentNormalizer extends NormalizerBase implements DenormalizerInterfa
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     $meta_data = is_resource($data) ? stream_get_meta_data($data) : NULL;
-    // @todo Use $class to instantiate the entity.
+    // @todo {@link https://www.drupal.org/node/2599926 Use $class to instantiate the entity.}
     $file_data = array();
     if (isset($meta_data['uri'])) {
       $file_data['uri'] = $meta_data['uri'];
