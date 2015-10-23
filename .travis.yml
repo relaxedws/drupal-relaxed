@@ -14,14 +14,15 @@ services:
 
 env:
   matrix:
-    - SCRIPT="modules/relaxed/tests/bin/drupal.sh"
-    - SCRIPT="modules/relaxed/tests/bin/drupal-to-couchdb.sh $TRAVIS_BUILD_DIR/../drupal admin:admin@drupal.loc"
-    - SCRIPT="modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh $TRAVIS_BUILD_DIR/../drupal admin:admin@drupal.loc"
-    - SCRIPT="modules/relaxed/tests/bin/couchdb-to-drupal.sh $TRAVIS_BUILD_DIR/../drupal admin:admin@drupal.loc"
-    - SCRIPT="modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh"
-    - SCRIPT="modules/relaxed/tests/bin/drupal-to-drupal.sh"
-    - SCRIPT="modules/relaxed/tests/bin/pouchdb.sh"
-    - SCRIPT="modules/relaxed/tests/bin/pouchdb-non-admin.sh"
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb-non-admin.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-non-admin.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-php.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
 
 before_install:
   # Update Composer so that the Drush installation doesn't fail.
@@ -32,6 +33,9 @@ install:
   - sudo apt-get update
   # Install Apache.
   - sudo apt-get install apache2 libapache2-mod-fastcgi
+
+  # Add always_populate_raw_post_data=-1 to php.ini.
+  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
   # Set up PHP-FPM.
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
@@ -60,9 +64,6 @@ install:
   - composer global require drush/drush:dev-master
 
 before_script:
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-
   # Try to prevent Mysql has gone away.
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"

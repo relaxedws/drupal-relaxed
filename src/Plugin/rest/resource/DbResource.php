@@ -4,9 +4,12 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -23,7 +26,8 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}",
- *   }
+ *   },
+ *   no_cache = TRUE
  * )
  */
 class DbResource extends ResourceBase {
@@ -38,7 +42,10 @@ class DbResource extends ResourceBase {
     if (!$entity instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
-    return new ResourceResponse(NULL, 200);
+    $response = new ResourceResponse(NULL, 200);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 
   /**
@@ -86,7 +93,10 @@ class DbResource extends ResourceBase {
     catch (EntityStorageException $e) {
       throw new HttpException(500, t('Internal server error'), $e);
     }
-    return new ResourceResponse(array('ok' => TRUE), 201);
+    $response = new ResourceResponse(array('ok' => TRUE), 201);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 
   /**
@@ -133,6 +143,28 @@ class DbResource extends ResourceBase {
       elseif (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
+
+      // Save the files for file and image fields.
+      if ($field instanceof FileFieldItemList) {
+        foreach ($field as $delta => $item) {
+          if (isset($item->entity_to_save)) {
+            $file = $item->entity_to_save;
+            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
+            $file->save();
+            $file_info = array('target_id' => $file->id());
+
+            $field_definitions = $entity->getFieldDefinitions();
+            $field_type = $field_definitions[$field_name]->getType();
+            // Add alternative text for image type fields.
+            if ($field_type == 'image') {
+              $file_info['alt'] = $file->getFilename();
+            }
+            $entity->{$field_name}[$delta] = $file_info;
+
+            unset($entity->{$field_name}[$delta]->entity_to_save);
+          }
+        }
+      }
     }
 
     // This will save stub entities in case the entity has entity reference
@@ -145,7 +177,10 @@ class DbResource extends ResourceBase {
     try {
       $entity->save();
       $rev = $entity->_rev->value;
-      return new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
+      $response = new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
+      $response->addCacheableDependency($entity);
+
+      return $response;
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, NULL, $e);
@@ -166,6 +201,9 @@ class DbResource extends ResourceBase {
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
     }
-    return new ResourceResponse(array('ok' => TRUE), 200);
+    $response = new ResourceResponse(array('ok' => TRUE), 200);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 }

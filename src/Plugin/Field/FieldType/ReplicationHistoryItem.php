@@ -66,7 +66,7 @@ class ReplicationHistoryItem extends FieldItemBase {
     $properties['recorded_seq'] = DataDefinition::create('integer')
       ->setLabel(t('Recorded sequence'))
       ->setDescription(t('Recorded intermediate sequence.'))
-      ->setRequired(TRUE);
+      ->setRequired(FALSE);
 
     $properties['session_id'] = DataDefinition::create('string')
       ->setLabel(t('Session ID'))
@@ -130,7 +130,7 @@ class ReplicationHistoryItem extends FieldItemBase {
         'recorded_seq' => array(
           'type' => 'int',
           'size' => 'big',
-          'not null' => TRUE,
+          'not null' => FALSE,
           'default' => 0,
         ),
         'session_id' => array(
@@ -151,4 +151,5 @@ class ReplicationHistoryItem extends FieldItemBase {
       ),
     );
   }
+
 }

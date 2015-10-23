@@ -5,7 +5,13 @@ set -ev
 # Enable dependencies.
 mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
 mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
+mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/php-client $TRAVIS_BUILD_DIR/
 drush en --yes entity_test, relaxed_test || true
+cd $TRAVIS_BUILD_DIR/php-client
+composer install
+
+# Create a target database and do the replication.
+curl -X PUT localhost:5984/source
 
 # Load documents from documents.txt and save them in the 'source' database.
 while read document
@@ -13,26 +19,24 @@ do
   curl -X POST \
        -H "Content-Type: application/json" \
        -d "$document" \
-       admin:admin@drupal.loc/relaxed/default;
+       localhost:5984/source;
   sleep 2;
-done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
+done < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt
 
-# Create a target database and do the replication.
-curl -X PUT localhost:5984/target
+# Get all docs from couchdb db.
+curl -X GET http://localhost:5984/source/_all_docs
 
 # Run the replication.
-nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@drupal.loc/relaxed/default", "target": "http://localhost:5984/target", "worker_processes": 1}' http://localhost:5984/_replicate &
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "drupal.loc", "path": "relaxed", "port": 80, "user": "admin", "password": "admin", "dbname": "default"}}';
 sleep 120
 
-curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
+curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
-#-----------------------------------
-sudo cat /var/log/couchdb/couch.log
 #-----------------------------------
 sudo cat /var/log/apache2/error.log
 #-----------------------------------
 
-COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
+COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt)
 USERS=2
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)

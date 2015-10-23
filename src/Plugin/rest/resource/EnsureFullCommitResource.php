@@ -34,8 +34,8 @@ class EnsureFullCommitResource extends ResourceBase {
     }
 
     $response_data = array(
-      'instance_start_time' => (string) $workspace->getStartTime(),
       'ok' => TRUE,
+      'instance_start_time' => (string) $workspace->getStartTime(),
     );
 
     return new ResourceResponse($response_data, 201);

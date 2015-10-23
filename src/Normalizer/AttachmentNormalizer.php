@@ -44,9 +44,23 @@ class AttachmentNormalizer extends NormalizerBase implements DenormalizerInterfa
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
-    $meta_data = stream_get_meta_data($data);
+    $meta_data = is_resource($data) ? stream_get_meta_data($data) : NULL;
     // @todo Use $class to instantiate the entity.
-    return $this->entityManager->getStorage('file')->create(array('uri' => $meta_data['uri']));
+    $file_data = array();
+    if (isset($meta_data['uri'])) {
+      $file_data['uri'] = $meta_data['uri'];
+    }
+    elseif (isset($context['uri'])) {
+      $file_data['uri'] = $context['uri'];
+    }
+
+    $file_info_keys = array('uuid', 'status', 'uid');
+    foreach ($file_info_keys as $key) {
+      if (isset($context[$key])) {
+        $file_data[$key] = $context[$key];
+      }
+    }
+    return $this->entityManager->getStorage('file')->create($file_data);
   }
 
 }

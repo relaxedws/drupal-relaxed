@@ -3,8 +3,13 @@
 namespace Drupal\relaxed\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
+use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
+use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseParser;
+use Drupal\rest\ResourceResponse;
+use GuzzleHttp\Psr7;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -150,9 +155,9 @@ class ResourceController implements ContainerAwareInterface {
     $query = $this->request->query->all();
     $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
     $entity = NULL;
+    $definition = $resource->getPluginDefinition();
     if (!empty($content)) {
       try {
-        $definition = $resource->getPluginDefinition();
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
 
         // If we have a workspace parameter, pass it to the deserializer.
@@ -163,7 +168,48 @@ class ResourceController implements ContainerAwareInterface {
           }
         }
 
-        $entity = $serializer->deserialize($content, $class, $format, $context);
+        // @todo: Consider moving this file handling code to a separate method.
+        if ($method == 'put' && !$this->isValidJson($content)) {
+          $stream = Psr7\stream_for($request);
+          $parts = MultipartResponseParser::parseMultipartBody($stream);
+          $content = (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $content;
+
+          foreach ($parts as $key => $part) {
+            if ($key > 1 && isset($part['headers']['content-disposition'])) {
+              $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
+              if ($file_info_found) {
+                list(, , $file_uuid, $scheme, $filename) = explode('/', $file_info[1]);
+                if ($file_uuid && $scheme && $filename) {
+                  $uri = "$scheme://$filename";
+                  // Check if exists a file with this uuid.
+                  $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+                  if (!$file) {
+                    // Check if exists a file with this $uri, if it exists then
+                    // change the URI and save the new file.
+                    $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
+                    if (count($existing_files)) {
+                      $uri = file_destination($uri, FILE_EXISTS_RENAME);
+                    }
+                  }
+                  if (!$file) {
+                    $file_context = array(
+                      'uri' => $uri,
+                      'uuid' => $file_uuid,
+                      'status' => FILE_STATUS_PERMANENT,
+                      'uid' => \Drupal::currentUser()->id(),
+                    );
+                    $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
+                  }
+                  if ($file instanceof FileInterface) {
+                    $resource->putAttachment($file);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        $entity = $this->serializer()->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -185,10 +231,16 @@ class ResourceController implements ContainerAwareInterface {
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
     foreach ($responses as $response_part) {
       try {
-        $response_data = $response_part->getResponseData();
-        if ($response_data != NULL) {
-          $response_output = $serializer->serialize($response_data, $response_format, $context);
+        if ($response_data = $response_part->getResponseData()) {
+          // Collect bubbleable metadata in a render context.
+          $render_context = new RenderContext();
+          $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
+            return $serializer->serialize($response_data, $response_format, $context);
+          });
           $response_part->setContent($response_output);
+          if (!$render_context->isEmpty()) {
+            $response_part->addCacheableDependency($render_context->pop());
+          }
         }
         // Add cache tags for each parameter
         foreach ($parameters as $parameter) {
@@ -196,7 +248,7 @@ class ResourceController implements ContainerAwareInterface {
         }
         // Add relaxed settings config's cache tags.
         $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
-        // Add query args as a cache context
+        // Add query args as a cache context.
         $cacheable_metadata = new CacheableMetadata();
         $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
       }
@@ -220,4 +272,17 @@ class ResourceController implements ContainerAwareInterface {
   public function csrfToken() {
     return new Response(\Drupal::csrfToken()->get('rest'), 200, array('Content-Type' => 'text/plain'));
   }
+
+  /**
+   * Check if a string is a valid json.
+   *
+   * @param $string
+   *
+   * @return bool
+   */
+  protected function isValidJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+  }
+
 }

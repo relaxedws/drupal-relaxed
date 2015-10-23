@@ -30,14 +30,15 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
 
   public function testNormalize() {
     $expected = array(
-      'db_name' => $this->entity->id(),
-      'instance_start_time' => $this->entity->getStartTime(),
+      'db_name' => (string) $this->entity->id(),
+      'instance_start_time' => (string) $this->entity->getStartTime(),
     );
     $normalized = $this->serializer->normalize($this->entity);
 
     foreach (array_keys($expected) as $fieldName) {
       $this->assertEqual($expected[$fieldName], $normalized[$fieldName], "Field $fieldName is normalized correctly.");
     }
+    $this->assert(is_string($normalized['instance_start_time']), 'Instance start time is a string.');
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
   }
 

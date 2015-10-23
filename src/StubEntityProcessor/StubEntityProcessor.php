@@ -9,6 +9,7 @@ namespace Drupal\relaxed\StubEntityProcessor;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\user\UserInterface;
 
 class StubEntityProcessor implements StubEntityProcessorInterface {
 
@@ -18,11 +19,15 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
   public function processEntity(ContentEntityInterface $entity) {
     // Check if the entity is a stub entity and exists, if it already exists,
     // update it if needed.
-    $existing_entities = entity_load_multiple_by_properties($entity->getEntityTypeId(), array('uuid' => $entity->uuid()));
-    $existing_entity = reset($existing_entities);
-    // Update the stub entity with the correct values.
-    if ($existing_entity && !$entity->id()) {
-      $entity = $this->updateStubEntity($entity, $existing_entity);
+    $controller = \Drupal::entityManager()
+      ->getStorage($entity->getEntityTypeId());
+    $existing_entities = $controller
+      ->loadByProperties(array('uuid' => $entity->uuid()));
+    $entity_by_uuid = reset($existing_entities);
+
+    if ($entity_by_uuid && !$entity->id()) {
+      $entity = $this->updateStubEntity($entity, $entity_by_uuid);
+      $entity->_rev->is_stub = TRUE;
     }
 
     // Save stub entities for entity reference fields.
@@ -44,10 +49,10 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
           // it doesn't exist.
           if (isset($item->entity_to_save)) {
             $entity_to_save = $item->entity_to_save;
-            $existing_entities = entity_load_multiple_by_properties(
-              $item->entity_to_save->getEntityTypeId(),
-              array('uuid' => $item->entity_to_save->uuid())
-            );
+            $controller = \Drupal::entityManager()
+              ->getStorage($entity_to_save->getEntityTypeId());
+            $existing_entities = $controller
+              ->loadByProperties(array('uuid' =>  $entity_to_save->uuid()));
             $existing_entity = reset($existing_entities);
             // Unset information about the entity_to_save.
             unset($entity->{$field_name}[$delta]->entity_to_save);
@@ -55,11 +60,13 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
             // complete the field with the correct target_id.
             if ($existing_entity) {
               $entity->{$field_name}[$delta] = array('target_id' => $existing_entity->id());
-              continue;
             }
-            // Save the stub entity and set the target_id value to the field item.
-            $entity_to_save->save();
-            $entity->{$field_name}[$delta] = array('target_id' => $entity_to_save->id());
+            else {
+              // Save the stub entity and set the target_id value to the field item.
+              $entity_to_save->_rev->new_edit = FALSE;
+              $entity_to_save->save();
+              $entity->{$field_name}[$delta] = array('target_id' => $entity_to_save->id());
+            }
           }
         }
       }
@@ -72,13 +79,12 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
   protected function updateStubEntity(ContentEntityInterface $entity, ContentEntityInterface $existing_entity) {
     $id_key = $entity->getEntityType()->getKey('id');
     $revision_key = $entity->getEntityType()->getKey('revision');
+    $exclude = [$id_key, $revision_key, 'uuid', '_rev'];
     foreach ($existing_entity as $field_name => $field) {
-      if ($field_name != $id_key && $field_name != $revision_key
-        && $field_name != '_rev' && $entity->{$field_name}->value) {
+      if (!in_array($field_name, $exclude) && $entity->{$field_name}->value) {
         $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
       }
     }
-    $existing_entity->_rev->new_edit = FALSE;
     return $existing_entity;
   }
 

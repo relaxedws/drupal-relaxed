@@ -16,7 +16,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
    * Our API is rather static so this doesn't need to be dynamic.
    */
   public function routes() {
-    $this->serializerFormats[] = 'mixed';
+    $this->serializerFormats = array_merge($this->serializerFormats, array('mixed', 'related'));
     $collection = new RouteCollection();
     $definition = $this->getPluginDefinition();
     $api_root = trim(\Drupal::config('relaxed.settings')->get('api_root'), '/');
@@ -36,7 +36,9 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       ), array(
         '_permission' => "restful " . $method_lower . " $this->pluginId" . "+perform content replication",
       ),
-        array(),
+        array(
+          'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
+        ),
         '',
         array(),
         // The HTTP method is a requirement for this route.
@@ -74,17 +76,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           break;
 
         case 'GET':
-          // Restrict on the Accept header if not an attachment resource.
-//          if (!$this->isAttachment()) {
-//            foreach ($this->serializerFormats as $format) {
-//              $format_route = clone $route;
-//              $format_route->addRequirements(array('_format' => $format));
-//              $collection->add("$route_name.$method.$format", $format_route);
-//            }
-//          }
-//          else {
-            $collection->add("$route_name.$method", $route);
-//          }
+          $collection->add("$route_name.$method", $route);
           break;
 
         case 'DELETE':
