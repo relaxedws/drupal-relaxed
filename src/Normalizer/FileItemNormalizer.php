@@ -41,6 +41,7 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
       // Create the attachment key, the format is: field_name/delta/uuid/scheme/filename.
       $key = $field_name . '/' . $data->getName() . '/' . $file->uuid() . '/' . $scheme . '/' . $file->getFileName();
 
+      // @todo {@link https://www.drupal.org/node/2600354 Align file data normalization with attachment normalization.}
       $file_contents = file_get_contents($uri);
       if (in_array(file_uri_scheme($uri), array('public', 'private')) == FALSE) {
         $file_data = '';
@@ -49,8 +50,7 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
         $file_data = base64_encode($file_contents);
       }
 
-      // @todo Add 'revpos' value to the result array.
-      // @todo Utilize the FileNormalizer to normalize the 'data' field.
+      // @todo {@link https://www.drupal.org/node/2600360 Add revpos and other missing properties to the result array.}
       $result = array(
         $key => array(
           'content_type' => $file->getMimeType(),

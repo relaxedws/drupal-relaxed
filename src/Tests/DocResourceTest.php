@@ -15,7 +15,7 @@ use GuzzleHttp\Psr7;
  * Tests the /db/doc resource.
  *
  * @group relaxed
- * @todo Test more entity types, at least node, taxonomy term, comment and user.
+ * @todo {@link https://www.drupal.org/node/2600490 Test more entity types.}
  */
 class DocResourceTest extends ResourceTestBase {
 
@@ -42,7 +42,6 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertResponse('200', 'HTTP response code is correct.');
-      // @todo Change when a proper event handler is implemented for ETag.
       $this->assertHeader('x-relaxed-etag', $first_rev);
       $this->assertTrue(empty($response), 'HEAD request returned no body.');
 
@@ -101,7 +100,6 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$db/" . $entity->uuid(), 'GET', NULL);
       $this->assertResponse('200', 'HTTP response code is correct.');
       $this->assertHeader('content-type', $this->defaultMimeType);
-      // @todo Change when a proper event handler is implemented for ETag.
       $this->assertHeader('x-relaxed-etag', $entity->_rev->value);
       $data = Json::decode($response);
       // Only assert one example property here, other properties should be

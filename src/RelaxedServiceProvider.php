@@ -28,7 +28,8 @@ class RelaxedServiceProvider implements ServiceModifierInterface {
     }
 
     // Override the access_check.rest.csrf class with a new class.
-    // @todo Revisit this before beta release: https://www.drupal.org/node/2470691
+    // @todo {@link https://www.drupal.org/node/2470691 Revisit this before beta
+    // release.}
     try {
       $definition = $container->getDefinition('access_check.rest.csrf');
       $definition->setClass('Drupal\relaxed\Access\CSRFAccessCheck');

@@ -312,7 +312,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       unset($data['name']);
     }
 
-    // @todo {@link https://www.drupal.org/node/2599946 Move the below update logic to the resource plugin instead.}
+    // @todo {@link https://www.drupal.org/node/2599946 Move the below update
+    // logic to the resource plugin instead.}
     $storage = $this->entityManager->getStorage($entity_type_id);
 
     // Denormalize entity reference fields.
@@ -369,7 +370,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     else {
       $entity = NULL;
       $entity_types_to_create = ['replication_log', 'user'];
-      // @todo {https://www.drupal.org/node/2599926 Use the passed $class to instantiate the entity.}
+      // @todo {@link https://www.drupal.org/node/2599926 Use the passed $class to instantiate the entity.}
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($data[$id_key], $data[$revision_key]);
         $entity = $storage->create($data);

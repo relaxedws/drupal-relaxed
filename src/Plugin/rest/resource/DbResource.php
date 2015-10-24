@@ -58,7 +58,7 @@ class DbResource extends ResourceBase {
     if (!$entity instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
-    // @todo: Access check.
+    // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
     $response =  new ResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
 
@@ -84,7 +84,7 @@ class DbResource extends ResourceBase {
     }
 
     try {
-      // @todo Consider using the container injected in parent::create()
+      // @todo {@link https://www.drupal.org/node/2599930 Use the container injected in parent::create()}
       $entity = \Drupal::service('entity.manager')
         ->getStorage('workspace')
         ->create(array('id' => $name))
@@ -195,7 +195,7 @@ class DbResource extends ResourceBase {
    */
   public function delete(WorkspaceInterface $entity) {
     try {
-      // @todo: Access check.
+      // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
       $entity->delete();
     }
     catch (\Exception $e) {
