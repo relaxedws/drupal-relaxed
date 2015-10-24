@@ -34,6 +34,51 @@ class ReplicationLog extends ContentEntityBase implements ReplicationLogInterfac
   /**
    * {@inheritdoc}
    */
+  public function getHistory() {
+    return $this->get('history')->getValue();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setHistory($history) {
+    $this->set('history', $history);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSessionId() {
+    return $this->get('session_id')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSessionId($session_id) {
+    $this->set('session_id', $session_id);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourceLastSeq() {
+    return $this->get('source_last_seq')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSourceLastSeq($source_last_seq) {
+    $this->set('source_last_seq', $source_last_seq);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('ID'))
