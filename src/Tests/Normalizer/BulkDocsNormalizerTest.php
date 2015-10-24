@@ -110,7 +110,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
       $this->assertIdentical($entity->uuid(), $this->testEntities[$key]->uuid(), "Expected entity UUID found for entity number $entity_number.");
     }
 
-    // @todo Test context switches.
+    // @todo {@link https://www.drupal.org/node/2600460 Test context switches.}
   }
 
   protected function createTestEntities($entity_type, $number = 3) {

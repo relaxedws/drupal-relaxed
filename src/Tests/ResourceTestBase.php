@@ -111,9 +111,9 @@ abstract class ResourceTestBase extends RESTTestBase {
   /**
    * {@inheritdoc}
    *
-   * @todo Remove the bulk of function body when https://drupal.org/node/2274153
-   *   has been committed. However, the prepending of self::apiRoot needs to be
-   *   kept.
+   * @todo {@link https://www.drupal.org/node/2600494 Simplify this method}
+   *   when {@link https://drupal.org/node/2274153 core tests supporting HEAD
+   *   requests} gets committed.
    */
   protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL, $headers = NULL, $query = NULL) {
     // Keep in overridden method when removing the bulk of this method.

@@ -32,7 +32,7 @@ class ChangesResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
 
-    // @todo: Inject the container without using deprecated method call.
+    // @todo: {@link https://www.drupal.org/node/2599930 Use injected container instead.}
     $changes = Changes::createInstance(
       \Drupal::getContainer(),
       \Drupal::service('entity.index.sequence'),

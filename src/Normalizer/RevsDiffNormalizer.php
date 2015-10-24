@@ -35,7 +35,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
       throw new LogicException('A \'workspace\' context is required to denormalize revision diff data.');
     }
 
-    // @todo Use injected container.
+    // @todo {@link https://www.drupal.org/node/2599930 Use injected container.}
     /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
     $revs_diff = $class::createInstance(
       \Drupal::getContainer(),

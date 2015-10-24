@@ -23,7 +23,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // @todo: Attach a file field once multiversion supports attachments.
+    // @todo: {@link https://www.drupal.org/node/2600468 Attach a file field.}
 
     // Create a test entity to serialize.
     $this->values = array(
@@ -102,7 +102,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $this->assertTrue($expected['_revisions']['start'] === $normalized['_revisions']['start'], "Correct data type for the start field.");
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
 
-    // @todo Test context switches.
+    // @todo {@link https://www.drupal.org/node/2600460 Test context switches.}
   }
 
   public function testSerialize() {
@@ -121,7 +121,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $this->assertIdentical($denormalized->bundle(), $this->entity->bundle(), 'Expected entity bundle found.');
     $this->assertIdentical($denormalized->uuid(), $this->entity->uuid(), 'Expected entity UUID found.');
 
-    // @todo Test context switches.
+    // @todo {@link https://www.drupal.org/node/2600460 Test context switches.}
   }
 
 }

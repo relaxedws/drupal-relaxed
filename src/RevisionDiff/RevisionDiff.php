@@ -55,7 +55,8 @@ class RevisionDiff implements RevisionDiffInterface {
   /**
    * {@inheritdoc}
    *
-   * @todo Implement the possible_ancestors key.
+   * @todo {@link https://www.drupal.org/node/2344005 Implement the
+   *   possible_ancestors key.}
    */
   public function getMissing() {
     $missing = array();

@@ -27,8 +27,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   }
  * )
  *
- * @todo We should probably make it not possible to save '_local' documents
- *   through this resource.
+ * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
  */
 class DocResource extends ResourceBase {
 
@@ -51,7 +50,6 @@ class DocResource extends ResourceBase {
       }
     }
 
-    // @todo Create a event handler and override the ETag that's set by core.
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
     return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
   }
@@ -84,16 +82,18 @@ class DocResource extends ResourceBase {
     }
 
     $result = $revisions[0];
-    $request = Request::createFromGlobals();
+
     if (is_array($existing)) {
       $parts = array();
-      if (strpos($request->headers->get('Accept'), 'application/json') === FALSE
-        && strpos($request->headers->get('Content-Type'), 'application/json') === FALSE) {
+      $request = Request::createFromGlobals();
+      // If not a JSON request then it's a request for multiple revisions.
+      if (
+        strpos($request->headers->get('Accept'), 'application/json') === FALSE &&
+        strpos($request->headers->get('Content-Type'), 'application/json') === FALSE
+      ) {
         foreach ($revisions as $revision) {
           $parts[] = new ResourceResponse($revision, 200);
         }
-
-        // Multipart response.
         return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
       }
       else {
@@ -110,7 +110,6 @@ class DocResource extends ResourceBase {
       $result = $revisions[0];
     }
 
-    // Normal response.
     return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
   }
 
@@ -131,7 +130,7 @@ class DocResource extends ResourceBase {
       throw new AccessDeniedHttpException(t('Access denied when creating the entity.'));
     }
     foreach ($received_entity as $field_name => $field) {
-      // @todo Check if it's safe to exclude the password field here.
+      // @todo {@link https://www.drupal.org/node/2600438 Sanity check this.}
       if (!$field->access('create') && $field_name != 'pass') {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
@@ -158,7 +157,8 @@ class DocResource extends ResourceBase {
       }
     }
 
-    // @todo Ensure that $received_entity is being saved with the UUID from $existing_entity
+    // @todo {@link https://www.drupal.org/node/2600440 Ensure $received_entity
+    // is saved with UUID from $existing_entity}
 
     // Validate the received data before saving.
     $this->validate($received_entity);

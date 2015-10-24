@@ -50,8 +50,8 @@ class DocIdConverter implements ParamConverterInterface {
    * @return string | \Drupal\Core\Entity\EntityInterface[]
    *   An array of the entity or entity revisions that was requested, if
    *   existing, or else the original UUID string.
-   * @todo Add test to make sure empty arrays are never returned.
-   * @todo Fall back to a stub entity instead of UUID string when it doesn't exist.
+   * @todo {@link https://www.drupal.org/node/2600374 Add test to make sure empty arrays are never returned.}
+   * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
    */
   public function convert($uuid, $definition, $name, array $defaults) {
     $request = \Drupal::request();
@@ -83,7 +83,6 @@ class DocIdConverter implements ParamConverterInterface {
       return $uuid;
     }
 
-    // @todo: We need to load regardless of deleted status below.
     $storage = $this->entityManager->getStorage($entity_type_id);
     if ($open_revs_query && in_array($request->getMethod(), array('GET', 'HEAD'))) {
       $open_revs = array();
@@ -113,6 +112,7 @@ class DocIdConverter implements ParamConverterInterface {
     }
     $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
     // Do not return stub entities.
+    // @todo Needs to change as part of https://www.drupal.org/node/2599870 and https://www.drupal.org/node/2600370
     if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
       return $uuid;
     }

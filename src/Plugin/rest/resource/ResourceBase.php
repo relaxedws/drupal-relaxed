@@ -12,8 +12,6 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
   /**
    * {@inheritdoc}
-   * @todo Consider moving this rather complex/abstracted code to each plugin.
-   * Our API is rather static so this doesn't need to be dynamic.
    */
   public function routes() {
     $this->serializerFormats = array_merge($this->serializerFormats, array('mixed', 'related'));
@@ -49,7 +47,8 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         $route->setPath($definition['uri_paths'][$method_lower]);
       }
 
-      // @todo Move the parameter logic to a generic route enhancer instead.
+      // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
+      // logic to a generic route enhancer instead.}
       $parameters = array();
       foreach (array('db', 'docid') as $parameter) {
         if (strpos($route->getPath(), '{' . $parameter . '}')) {

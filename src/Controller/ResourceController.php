@@ -150,7 +150,7 @@ class ResourceController implements ContainerAwareInterface {
     $parameters = $this->getParameters();
     $serializer = $this->serializer();
 
-    // @todo Check if it's safe to pass all query parameters like this.
+    // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
     $query = $this->request->query->all();
     $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
     $entity = NULL;
@@ -167,12 +167,11 @@ class ResourceController implements ContainerAwareInterface {
           }
         }
 
-        // @todo: Consider moving this file handling code to a separate method.
+        // @todo: {@link https://www.drupal.org/node/2600504 Move this elsewhere.}
         if ($method == 'put' && !$this->isValidJson($content)) {
           $stream = Psr7\stream_for($request);
           $parts = MultipartResponseParser::parseMultipartBody($stream);
           $content = (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $content;
-
           foreach ($parts as $key => $part) {
             if ($key > 1 && isset($part['headers']['content-disposition'])) {
               $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);

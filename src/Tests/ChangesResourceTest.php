@@ -140,7 +140,7 @@ class ChangesResourceTest extends ResourceTestBase {
     $expected_without_docs['results'] = array();
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    // @todo: Assert the sort order of all results.
+    // @todo: {@link https://www.drupal.org/node/2600488 Assert the sort order.}
   }
 
 }

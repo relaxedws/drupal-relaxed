@@ -105,7 +105,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
 
     $entities = $this->createTestEntities($entity_type, TRUE);
-    // @todo The below code is copied from above and should probably be in a method
     foreach ($entities as $key => $entity) {
       $patched_entities['docs'][$key] = entity_load($entity_type, $entity->id(), TRUE);
       $patched_entities['docs'][$key]->set(

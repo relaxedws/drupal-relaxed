@@ -15,6 +15,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
+/**
+ * @todo {@link https://www.drupal.org/node/2282295 Implement remaining feed
+ *   query types.}
+ */
 class Changes implements ChangesInterface {
   use DependencySerializationTrait;
 
@@ -129,8 +133,6 @@ class Changes implements ChangesInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo {@link https://www.drupal.org/node/2599908 Implement this longpoll functionality fully.}
    */
   public function getLongpoll() {
     $no_change = TRUE;
@@ -140,7 +142,6 @@ class Changes implements ChangesInterface {
         ->getRange($this->lastSeq, NULL);
       $no_change = empty($change) ? TRUE : FALSE;
     } while ($no_change);
-    // Format longpoll change to API spec.
     return $change;
   }
 

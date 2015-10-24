@@ -31,6 +31,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     }
  *   }
  * )
+ *
+ * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
  */
 class AttachmentResource extends ResourceBase {
 
@@ -117,7 +119,7 @@ class AttachmentResource extends ResourceBase {
       $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value);
       return new ResourceResponse($data, 200, $this->responseHeaders($file, array('Content-MD5', 'X-Relaxed-ETag')));
     }
-    // @todo We should probablt catch a more generic exception here and on other places.
+    // @todo {@https://www.drupal.org/node/2599912 Catch more generic exceptions here and on other places.}
     catch (EntityStorageException $e) {
       throw new HttpException(500, NULL, $e);
     }
