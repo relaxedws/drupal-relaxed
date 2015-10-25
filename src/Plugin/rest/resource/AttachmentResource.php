@@ -119,7 +119,8 @@ class AttachmentResource extends ResourceBase {
       $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value);
       return new ResourceResponse($data, 200, $this->responseHeaders($file, array('Content-MD5', 'X-Relaxed-ETag')));
     }
-    // @todo {@https://www.drupal.org/node/2599912 Catch more generic exceptions here and on other places.}
+    // @todo {@link https://www.drupal.org/node/2599912 Catch more generic
+    // exceptions here and on other places.}
     catch (EntityStorageException $e) {
       throw new HttpException(500, NULL, $e);
     }
