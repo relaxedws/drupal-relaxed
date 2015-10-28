@@ -60,6 +60,10 @@ services:
     class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
+  relaxed.normalizer.comment_item:
+    class: Drupal\relaxed\Normalizer\CommentItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
   relaxed.stub_entity_processor:
       class: Drupal\relaxed\StubEntityProcessor\StubEntityProcessor
   paramconverter.docid:
