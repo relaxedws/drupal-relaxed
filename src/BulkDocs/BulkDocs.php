@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\BulkDocs;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\relaxed\StubEntityProcessor\StubEntityProcessorInterface;
@@ -88,6 +89,12 @@ class BulkDocs implements BulkDocsInterface {
     $inital_workspace = $this->workspaceManager->getActiveWorkspace();
     $this->workspaceManager->setActiveWorkspace($this->workspace);
 
+    $batch = array(
+      'title' => t('Save entities in BulkDocs'),
+      'operations' => array(),
+      'init_message' => t('Saving entities.'),
+      'finished' => array(get_class($this), 'finishBatch'),
+    );
     foreach ($this->entities as $entity) {
       try {
         $entity->_rev->new_edit = $this->newEdits;
@@ -100,23 +107,22 @@ class BulkDocs implements BulkDocsInterface {
         $entity->save();
 
         $this->result[] = array(
-          'ok' => TRUE,
-          'id' => $entity->uuid(),
-          'rev' => $entity->_rev->value,
+            'ok' => TRUE,
+            'id' => $entity->uuid(),
+            'rev' => $entity->_rev->value,
         );
-      }
-      catch (\Exception $e) {
+      } catch (\Exception $e) {
         $this->result[] = array(
-          'error' => $e->getMessage(),
-          'reason' => 'exception',
-          'id' => $entity->uuid(),
-          'rev' => $entity->_rev->value,
+            'error' => $e->getMessage(),
+            'reason' => 'exception',
+            'id' => $entity->uuid(),
+            'rev' => $entity->_rev->value,
         );
         // @todo {@link https://www.drupal.org/node/2599902 Inject logger or use \Drupal::logger().}
         watchdog_exception('relaxed', $e);
       }
     }
-
+    
     // Switch back to the initial workspace.
     $this->workspaceManager->setActiveWorkspace($inital_workspace);
 
