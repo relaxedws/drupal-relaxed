@@ -137,4 +137,50 @@ class BulkDocs implements BulkDocsInterface {
     return $this->result;
   }
 
+  public static function batchSaveEntity(BulkDocsInterface $bulk_docs, ContentEntityInterface $entity) {
+    try {
+      // This will save stub entities in case the entity has entity reference
+      // fields and a referenced entity does not exist or will update stub
+      // entities with the correct values.
+      $entity = $bulk_docs->stubEntityProcessor->processEntity($entity);
+
+      $entity->save();
+
+      $bulk_docs->result[] = array(
+        'ok' => TRUE,
+        'id' => $entity->uuid(),
+        'rev' => $entity->_rev->value,
+      );
+    }
+    catch (\Exception $e) {
+      $bulk_docs->result[] = array(
+        'error' => $e->getMessage(),
+        'reason' => 'exception',
+        'id' => $entity->uuid(),
+        'rev' => $entity->_rev->value,
+      );
+      \Drupal::logger('relaxed')->log('error', $e->getMessage());
+    }
+  }
+
+  /**
+   * Finish batch.
+   */
+  public static function finishBatch($success, $results, $operations) {
+    if ($success) {
+      if (!empty($results['errors'])) {
+        foreach ($results['errors'] as $error) {
+          \Drupal::logger('relaxed')->log('error', $error);
+        }
+      }
+    }
+    else {
+      // An error occurred.
+      // $operations contains the operations that remained unprocessed.
+      $error_operation = reset($operations);
+      $message = \Drupal::translation()->translate('An error occurred while processing %error_operation with arguments: @arguments', array('%error_operation' => $error_operation[0], '@arguments' => print_r($error_operation[1], TRUE)));
+      \Drupal::logger('relaxed')->log('error', $message);
+    }
+  }
+
 }
