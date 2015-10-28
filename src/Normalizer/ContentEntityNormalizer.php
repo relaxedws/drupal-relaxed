@@ -333,7 +333,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
             );
             continue;
           }
-          $target_entity_values = array('uuid' => $item['target_uuid']);
+          $item_copy = $item;
+          unset($item_copy['entity_type_id'], $item_copy['target_uuid']);
+          $target_entity_values = array_merge(array('uuid' => $item['target_uuid']), $item_copy);
 
           // Let other modules feedback about their own additions.
           $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', array($target_storage)));
