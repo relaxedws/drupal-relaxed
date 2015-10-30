@@ -75,6 +75,18 @@ before_script:
 
   - sudo chmod 777 -R sites/default/files
   - sudo chmod 0664 sites/default/settings.php
+  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
+  # Enable Simpletest
+  - drush en --yes simpletest
+
+  # Test with disabled rdf module, because it's causing comments replication failing.
+  - drush pmu --yes rdf
+
+  # Checkout second directory structure with all dependencies.
+  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
+  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal2/modules/key_value
+  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
+  - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed
 
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal
@@ -83,6 +95,8 @@ before_script:
   - sudo chmod 777 -R sites/drupal2.loc/files
   - sudo chmod 0664 sites/drupal2.loc/settings.php
 
+  # Test with disabled rdf module, because it's causing comments replication failing.
+  - drush pmu --yes rdf
 
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal
