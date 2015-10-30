@@ -98,6 +98,9 @@ before_script:
   # Test with disabled rdf module, because it's causing comments replication failing.
   - drush pmu --yes rdf
 
+  # Test with disabled rdf module, because it's causing comments replication failing.
+  - drush pmu --yes rdf
+
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal
   - bash $SCRIPT
