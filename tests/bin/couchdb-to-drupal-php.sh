@@ -20,15 +20,19 @@ do
        -H "Content-Type: application/json" \
        -d "$document" \
        localhost:5984/source;
+<<<<<<< HEAD
   sleep 2;
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
+=======
+done < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt
+>>>>>>> fd37d2a... Change sleep time.
 
 # Get all docs from couchdb db.
 curl -X GET http://localhost:5984/source/_all_docs
 
 # Run the replication.
 php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "drupal.loc", "path": "relaxed", "port": 80, "user": "admin", "password": "admin", "dbname": "default"}}';
-sleep 120
+sleep 60
 
 curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
