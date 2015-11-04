@@ -28,11 +28,7 @@ drush cr
 
 # Run the replication.
 nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@drupal.loc/relaxed/default", "target": "http://admin:admin@drupal2.loc/relaxed/default", "worker_processes": 1}' http://localhost:5984/_replicate &
-<<<<<<< 265dc99134564538a0ee465499ffb6da4da0443c
 sleep 60
-=======
-sleep 120
->>>>>>> Test replication with one worker for all replication types.
 
 curl -X GET http://admin:admin@drupal2.loc/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
