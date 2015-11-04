@@ -21,7 +21,7 @@ do
        -d "$document" \
        localhost:5984/source;
   sleep 2;
-done < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt
+done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 
 # Get all docs from couchdb db.
 curl -X GET http://localhost:5984/source/_all_docs
@@ -36,7 +36,7 @@ curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs | tee /tmp/a
 sudo cat /var/log/apache2/error.log
 #-----------------------------------
 
-COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/no-attachments-documents.txt)
+COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=2
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
