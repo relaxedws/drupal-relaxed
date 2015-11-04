@@ -122,7 +122,7 @@ class BulkDocs implements BulkDocsInterface {
         watchdog_exception('relaxed', $e);
       }
     }
-    
+
     // Switch back to the initial workspace.
     $this->workspaceManager->setActiveWorkspace($inital_workspace);
 
