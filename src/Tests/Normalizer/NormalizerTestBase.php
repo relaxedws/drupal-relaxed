@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\serialization\Tests\NormalizerTestBase as CoreNormalizerTestBase;
+use Drupal\multiversion\Entity\Workspace;
 
 abstract class NormalizerTestBase extends CoreNormalizerTestBase {
 
@@ -27,7 +28,7 @@ abstract class NormalizerTestBase extends CoreNormalizerTestBase {
       ->get('entity.definition_update_manager')
       ->applyUpdates();
 
-    $workspace = entity_create('workspace', array('id' => 'default'));
+    $workspace = Workspace::create(['id' => 'default']);
     $workspace->save();
   }
 
