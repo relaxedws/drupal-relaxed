@@ -73,7 +73,7 @@ before_script:
   # Checkout a directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
-  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
+  - git clone --branch generic-migration https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
 
   # Install the site that will host our tests.
@@ -90,7 +90,7 @@ before_script:
   # Checkout second directory structure with all dependencies.
   - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
   - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal2/modules/key_value
-  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
+  - git clone --branch generic-migration https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
   - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed
 
   # Install the site that will be used for Drupal-to-Drupal replication.

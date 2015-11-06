@@ -160,7 +160,7 @@ class AllDocs implements AllDocsInterface {
 
     $entity_types = $this->entityManager->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
-      if ($this->multiversionManager->isSupportedEntityType($entity_type) && !$entity_type->get('local')) {
+      if ($this->multiversionManager->isEnabledEntityType($entity_type) && !$entity_type->get('local')) {
         try {
           $ids = $this->entityManager
             ->getStorage($entity_type_id)
