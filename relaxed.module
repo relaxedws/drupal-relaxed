@@ -69,7 +69,7 @@ function relaxed_entity_access(EntityInterface $entity, $operation, AccountInter
   $entity_type = $entity->getEntityType();
   $entity_type_id = $entity_type->id();
 
-  if ($multiversion_manager->isSupportedEntityType($entity_type) || $entity_type_id == 'replication_log') {
+  if ($multiversion_manager->isEnabledEntityType($entity_type) || $entity_type_id == 'replication_log') {
     return AccessResult::allowedIfHasPermission($account, 'perform content replication');
   }
 
@@ -87,7 +87,7 @@ function multiversion_entity_create_access(AccountInterface $account, array $con
   foreach ($bundles_info as $entity_type_id => $bundles) {
     if (in_array($entity_bundle, array_keys($bundles))) {
       $entity_type = \Drupal::entityManager()->getDefinition($entity_type_id);
-      if ($multiversion_manager->isSupportedEntityType($entity_type) || $entity_type_id == 'replication_log') {
+      if ($multiversion_manager->isEnabledEntityType($entity_type) || $entity_type_id == 'replication_log') {
         return AccessResult::allowedIfHasPermission($account, 'perform content replication');
       }
     }

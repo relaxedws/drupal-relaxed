@@ -70,10 +70,6 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->defaultAuth = array('cookie');
     $this->apiRoot = \Drupal::config('relaxed.settings')->get('api_root');
 
-    $this->container
-      ->get('entity.definition_update_manager')
-      ->applyUpdates();
-
     $this->multiversionManager = $this->container->get('multiversion.manager');
     $this->workspaceManager = $this->container->get('workspace.manager');
 
