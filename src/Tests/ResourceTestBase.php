@@ -71,6 +71,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->apiRoot = \Drupal::config('relaxed.settings')->get('api_root');
 
     $this->multiversionManager = $this->container->get('multiversion.manager');
+    $this->multiversionManager->enableEntityTypes();
     $this->workspaceManager = $this->container->get('workspace.manager');
 
     $name = $this->randomMachineName();

@@ -21,6 +21,7 @@ abstract class NormalizerTestBase extends CoreNormalizerTestBase {
     parent::setUp();
     \Drupal::service('router.builder')->rebuild();
     $this->installSchema('key_value', array('key_value_sorted'));
+    \Drupal::service('multiversion.manager')->enableEntityTypes();
 
     $this->serializer = $this->container->get('serializer');
 
