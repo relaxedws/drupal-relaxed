@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Tests\Normalizer;
 
+use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\relaxed\AllDocs\AllDocs;
 
 /**
@@ -28,9 +29,18 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $values = array(
+      'name' => $this->randomMachineName(),
+      'user_id' => 0,
+      'field_test_text' => array(
+        'value' => $this->randomMachineName(),
+        'format' => 'full_html',
+      ),
+    );
+
     $this->entities = array();
     for ($i = 0; $i < 3; $i++) {
-      $this->entities[$i] = entity_create('entity_test_mulrev');
+      $this->entities[$i] = EntityTestMulRev::create($values);
       $this->entities[$i]->save();
     }
   }

@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\entity_test\Entity\EntityTestMulRev;
 
 /**
  * Tests the content serialization format.
@@ -35,20 +36,17 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
       ),
     );
 
-    $this->entity = entity_create('entity_test_mulrev', $this->values);
+    $this->entity = EntityTestMulRev::create($this->values);
     $this->entity->save();
   }
 
   public function testNormalize() {
-    $entity = entity_load('entity_test_mulrev', 1);
-    $entity_rev = $entity->_rev->value;
-
     $expected = array(
       '@context' => array(
         '_id' => '@id',
         'entity_test_mulrev' => \Drupal::service('rest.link_manager')->getTypeUri(
           'entity_test_mulrev',
-          $entity->bundle()
+          $this->entity->bundle()
         ),
       ),
       '@type' => 'entity_test_mulrev',
@@ -76,8 +74,8 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           'format' => $this->values['field_test_text']['format'],
         ),
       ),
-      '_id' => $entity->uuid(),
-      '_rev' => $entity_rev ?: NULL,
+      '_id' => $this->entity->uuid(),
+      '_rev' => $this->entity->_rev->value,
     );
 
     $normalized = $this->serializer->normalize($this->entity);
@@ -88,7 +86,7 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $this->assertEqual(array_diff_key($normalized, $expected), array(), 'No unexpected data is added to the normalized array.');
 
     // Test normalization when is set the revs query parameter.
-    $parts = explode('-', $entity->_rev->value);
+    $parts = explode('-', $this->entity->_rev->value);
     $expected['_revisions'] = array(
       'ids' => array($parts[1]),
       'start' => (int) $parts[0],
