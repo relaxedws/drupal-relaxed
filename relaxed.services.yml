@@ -12,6 +12,11 @@ services:
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager']
     tags:
       - { name: normalizer, priority: 10 }
+  relaxed.normalizer.replication_log:
+    class: Drupal\relaxed\Normalizer\ReplicationLogNormalizer
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager']
+    tags:
+      - { name: normalizer, priority: 20 }
   relaxed.normalizer.bulk_docs:
     class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
     tags:
