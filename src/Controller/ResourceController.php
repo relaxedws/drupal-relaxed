@@ -131,6 +131,7 @@ class ResourceController implements ContainerAwareInterface {
       $data = array('error' => $error, 'reason' => $reason);
       $content = $this->serializer()->serialize($data, $format);
     }
+    watchdog_exception('multiversion', $e);
     return new Response($content, $status, $headers);
   }
 
