@@ -156,7 +156,7 @@ class DocResource extends ResourceBase {
         }
       }
     }
-    
+
     // @todo {@link https://www.drupal.org/node/2600440 Ensure $received_entity
     // is saved with UUID from $existing_entity}
 
