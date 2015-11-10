@@ -19,4 +19,8 @@ drush en --yes entity_test, relaxed_test || true
 
 mocha-phantomjs -s localToRemoteUrlAccessEnabled=true -s webSecurityEnabled=false test.html | tee /tmp/output.txt
 
+#-----------------------------------
+sudo cat /var/log/apache2/error.log
+#-----------------------------------
+
 test 1 -eq $(egrep -c "(2 passing)" /tmp/output.txt)

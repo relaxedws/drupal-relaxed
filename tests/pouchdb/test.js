@@ -11,7 +11,7 @@ var docs = [
 ];
 
 // Enable debugging mode.
-//PouchDB.debug.enable('*');
+PouchDB.debug.enable('*');
 //PouchDB.debug.enable('pouchdb:api');
 //PouchDB.debug.enable('pouchdb:http');
 
