@@ -100,16 +100,17 @@ class BulkDocs implements BulkDocsInterface {
         $entity->save();
 
         $this->result[] = array(
-            'ok' => TRUE,
-            'id' => $entity->uuid(),
-            'rev' => $entity->_rev->value,
+          'ok' => TRUE,
+          'id' => $entity->uuid(),
+          'rev' => $entity->_rev->value,
         );
-      } catch (\Exception $e) {
+      }
+      catch (\Exception $e) {
         $this->result[] = array(
-            'error' => $e->getMessage(),
-            'reason' => 'exception',
-            'id' => $entity->uuid(),
-            'rev' => $entity->_rev->value,
+          'error' => $e->getMessage(),
+          'reason' => 'exception',
+          'id' => $entity->uuid(),
+          'rev' => $entity->_rev->value,
         );
 
         // @todo {@link https://www.drupal.org/node/2599902 Inject logger or use \Drupal::logger().}
