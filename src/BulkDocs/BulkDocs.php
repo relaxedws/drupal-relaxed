@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\BulkDocs;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\relaxed\StubEntityProcessor\StubEntityProcessorInterface;
@@ -88,6 +89,12 @@ class BulkDocs implements BulkDocsInterface {
     $inital_workspace = $this->workspaceManager->getActiveWorkspace();
     $this->workspaceManager->setActiveWorkspace($this->workspace);
 
+    $batch = array(
+      'title' => t('Save entities in BulkDocs'),
+      'operations' => array(),
+      'init_message' => t('Saving entities.'),
+      'finished' => array(get_class($this), 'finishBatch'),
+    );
     foreach ($this->entities as $entity) {
       try {
         $entity->_rev->new_edit = $this->newEdits;
