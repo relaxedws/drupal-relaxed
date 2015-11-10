@@ -29,8 +29,8 @@ class CommentItemNormalizer extends NormalizerBase implements DenormalizerInterf
    */
   public function normalize($field, $format = NULL, array $context = array()) {
     $value = $field->getValue();
-    $field_info = array();
-    $reference_fields = array('cid', 'last_comment_uid');
+    $field_info = [];
+    $reference_fields = ['cid', 'last_comment_uid'];
     foreach ($value as $key => $item) {
       if (in_array($key, $reference_fields) && is_numeric($item)) {
         $field_info[$key] = NULL;

@@ -21,7 +21,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = array('Drupal\Core\Entity\ContentEntityInterface');
+  protected $supportedInterfaceOrClass = ['Drupal\Core\Entity\ContentEntityInterface'];
 
   /**
    * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
@@ -41,7 +41,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * @var string[]
    */
-  protected $format = array('json');
+  protected $format = ['json'];
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -59,7 +59,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = array()) {
+  public function normalize($entity, $format = NULL, array $context = []) {
     $entity_type_id = $context['entity_type'] = $entity->getEntityTypeId();
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
 
@@ -69,14 +69,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     $entity_uuid = $entity->uuid();
 
-    $data = array(
-      '@context' => array(
+    $data = [
+      '@context' => [
         '_id' => '@id',
         $entity_type_id => $this->linkManager->getTypeUri($entity_type_id, $entity->bundle()),
-      ),
+      ],
       '@type' => $entity_type_id,
       '_id' => $entity_uuid,
-    );
+    ];
 
     $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity as $name => $field) {
@@ -86,7 +86,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       if ($field_type == 'file' || $field_type == 'image') {
         if ($items !== NULL) {
           if (!isset($data['_attachments']) && !empty($items)) {
-            $data['_attachments'] = array();
+            $data['_attachments'] = [];
           }
           foreach ($items as $item) {
             $data['_attachments'] = array_merge($data['_attachments'], $item);
@@ -116,7 +116,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       foreach (array_reverse($default_branch) as $rev => $status) {
         // Build data for _revs_info.
         if (!empty($context['query']['revs_info'])) {
-          $data['_revs_info'][] = array('rev' => $rev, 'status' => $status);
+          $data['_revs_info'][] = ['rev' => $rev, 'status' => $status];
         }
         if (!empty($context['query']['revs'])) {
           list($start, $hash) = explode('-', $rev);
@@ -154,7 +154,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = array()) {
+  public function denormalize($data, $class, $format = NULL, array $context = []) {
     $entity_type_id = NULL;
     $entity_uuid = NULL;
     $entity_id = NULL;
@@ -183,7 +183,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // structure since it's un-nested to follow the API spec when normalized.
     // @todo {@link https://www.drupal.org/node/2599938 Needs test for situation when a replication overwrites delete.}
     $deleted = isset($data['_deleted']) ? $data['_deleted'] : FALSE;
-    $data['_deleted'] = array(array('value' => $deleted));
+    $data['_deleted'] = [['value' => $deleted]];
 
     // Map data from the UUID index.
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
@@ -239,38 +239,38 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         if (!$file) {
           // Check if exists a file with this $uri, if it exists then
           // change the URI and save the new file.
-          $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
+          $existing_files = entity_load_multiple_by_properties('file', ['uri' => $uri]);
           if (count($existing_files)) {
             $uri = file_destination($uri, FILE_EXISTS_RENAME);
           }
-          $file_context = array(
+          $file_context = [
             'uri' => $uri,
             'uuid' => $file_uuid,
             'status' => FILE_STATUS_PERMANENT,
             'uid' => \Drupal::currentUser()->id(),
-          );
+          ];
           $file = \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
           if ($file instanceof FileInterface) {
-            $data[$field_name][$delta] = array('entity_to_save' => $file);
+            $data[$field_name][$delta] = ['entity_to_save' => $file];
           }
           continue;
         }
-        $data[$field_name][$delta] = array(
+        $data[$field_name][$delta] = [
           'target_id' => $file->id(),
-        );
+        ];
       }
     }
 
     // Add the _rev field to the $data array.
     if (isset($data['_rev'])) {
-      $data['_rev'] = array(array('value' => $data['_rev']));
+      $data['_rev'] = [['value' => $data['_rev']]];
     }
     if (isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
       $data['_rev'][0]['revisions'] = $data['_revisions']['ids'];
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('@context', '@type', '_id', '_attachments', '_revisions') as $key) {
+    foreach (['@context', '@type', '_id', '_attachments', '_revisions'] as $key) {
       if (isset($data[$key])) {
         unset($data[$key]);
       }
@@ -324,26 +324,26 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       foreach ($field_info as $delta => $item) {
         if (isset($item['entity_type_id']) && isset($item['target_uuid'])) {
           $target_storage = $this->entityManager->getStorage($item['entity_type_id']);
-          $target_entity = $target_storage->loadByProperties(array('uuid' => $item['target_uuid']));
+          $target_entity = $target_storage->loadByProperties(['uuid' => $item['target_uuid']]);
           $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
           if ($target_entity) {
-            $data[$field_name][$delta] = array(
+            $data[$field_name][$delta] = [
               'target_id' => $target_entity->id(),
-            );
+            ];
             continue;
           }
           $item_copy = $item;
           unset($item_copy['entity_type_id'], $item_copy['target_uuid']);
-          $target_entity_values = array_merge(array('uuid' => $item['target_uuid']), $item_copy);
+          $target_entity_values = array_merge(['uuid' => $item['target_uuid']], $item_copy);
 
           // Let other modules feedback about their own additions.
-          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', array($target_storage)));
+          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', [$target_storage]));
 
 
           $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
-          $data[$field_name][$delta] = array(
+          $data[$field_name][$delta] = [
             'entity_to_save' => $target_entity,
-          );
+          ];
         }
       }
     }
@@ -384,7 +384,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity->setNewRevision(FALSE);
     }
 
-    Cache::invalidateTags(array($entity_type_id . '_list'));
+    Cache::invalidateTags([$entity_type_id . '_list']);
 
     return $entity;
   }
