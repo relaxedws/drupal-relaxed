@@ -86,7 +86,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
     $exclude = [$id_key, $revision_key, 'uuid', '_rev'];
     foreach ($existing_entity as $field_name => $field) {
       if (!in_array($field_name, $exclude) && $entity->{$field_name}->value) {
-        $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
+        $existing_entity->set($field_name, $entity->get($field_name)->getValue());
       }
     }
     return $existing_entity;
