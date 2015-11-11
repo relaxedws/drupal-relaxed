@@ -30,7 +30,7 @@ class AllDbsResourceTest extends ResourceTestBase {
     $workspaces = array_keys($workspaces_entities);
     for ($i = 0; $i < 3; $i++) {
       $id = $this->randomMachineName();
-      $entity = $workspace_storage->create(array('id' => $id));
+      $entity = $workspace_storage->create(['id' => $id]);
       $entity->save();
       $workspaces[] = $id;
     }
