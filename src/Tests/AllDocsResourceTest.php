@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\user\Entity\User;
 
 /**
  * Tests the /db/_all_docs resource.
@@ -15,6 +16,15 @@ use Drupal\Component\Serialization\Json;
  * @group relaxed
  */
 class AllDocsResourceTest extends ResourceTestBase {
+
+  public static $modules = [
+    'entity_test',
+    'multiversion',
+    'rest',
+    'relaxed',
+    'relaxed_test',
+    'user',
+  ];
 
   public function testGet() {
     $this->enableService('relaxed:all_docs', 'GET');
@@ -27,12 +37,14 @@ class AllDocsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $entities = array();
+    $entities = [];
     $entity_types = array('entity_test_rev');
+    $entity_manager = \Drupal::entityManager();
     foreach ($entity_types as $entity_type) {
-      $entities[0] = entity_create($entity_type);
+      $storage = $entity_manager->getStorage($entity_type);
+      $entities[0] = $storage->create();
       $entities[0]->save();
-      $entities[1] = entity_create($entity_type);
+      $entities[1] = $storage->create();
       $entities[1]->save();
     }
 
@@ -54,11 +66,11 @@ class AllDocsResourceTest extends ResourceTestBase {
         'rev' => $account->_rev->value,
       ),
     );
-    $expected = array(
+    $expected = [
       'offset' => 0,
       'rows' => $rows,
       'total_rows' => 3,
-    );
+    ];
 
     $response = $this->httpRequest("$db/_all_docs", 'GET');
     $this->assertResponse('200', 'HTTP response code is correct.');
@@ -69,7 +81,7 @@ class AllDocsResourceTest extends ResourceTestBase {
     }
 
     // Test with including docs.
-    $rows = array();
+    $rows = [];
     foreach ($entities as $entity) {
       $rows[] = array(
         'id' => $entity->uuid(),
@@ -81,7 +93,7 @@ class AllDocsResourceTest extends ResourceTestBase {
       );
     }
     // Add the info about the new created user.
-    $account = entity_load('user', $account->id(), TRUE);
+    $account = User::load($account->id());
     $rows[] = array(
       'id' => $account->uuid(),
       'key' => $account->uuid(),
@@ -90,13 +102,13 @@ class AllDocsResourceTest extends ResourceTestBase {
         'doc' => $serializer->normalize($account),
       ),
     );
-    $expected = array(
+    $expected = [
       'total_rows' => 3,
       'offset' => 0,
       'rows' => $rows,
-    );
+    ];
 
-    $response = $this->httpRequest("$db/_all_docs", 'GET', NULL, NULL, NULL, array('include_docs' => 'true'));
+    $response = $this->httpRequest("$db/_all_docs", 'GET', NULL, NULL, NULL, ['include_docs' => 'true']);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
