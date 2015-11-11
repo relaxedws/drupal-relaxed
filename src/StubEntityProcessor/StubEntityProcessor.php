@@ -9,7 +9,6 @@ namespace Drupal\relaxed\StubEntityProcessor;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
-use Drupal\user\UserInterface;
 
 class StubEntityProcessor implements StubEntityProcessorInterface {
 
@@ -22,7 +21,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
     $controller = \Drupal::entityManager()
       ->getStorage($entity->getEntityTypeId());
     $existing_entities = $controller
-      ->loadByProperties(array('uuid' => $entity->uuid()));
+      ->loadByProperties(['uuid' => $entity->uuid()]);
     $entity_by_uuid = reset($existing_entities);
 
     if ($entity_by_uuid && !$entity->id()) {
@@ -52,20 +51,25 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
             $controller = \Drupal::entityManager()
               ->getStorage($entity_to_save->getEntityTypeId());
             $existing_entities = $controller
-              ->loadByProperties(array('uuid' =>  $entity_to_save->uuid()));
+              ->loadByProperties(['uuid' => $entity_to_save->uuid()]);
             $existing_entity = reset($existing_entities);
             // Unset information about the entity_to_save.
             unset($entity->{$field_name}[$delta]->entity_to_save);
             // If the entity already exists, don't save the stub entity, just
             // complete the field with the correct target_id.
             if ($existing_entity) {
-              $entity->{$field_name}[$delta] = array('target_id' => $existing_entity->id());
+              $entity->{$field_name}[$delta] = ['target_id' => $existing_entity->id()];
             }
             else {
-              // Save the stub entity and set the target_id value to the field item.
               $entity_to_save->_rev->new_edit = FALSE;
+              $entity_type = $entity_to_save->getEntityType();
+              $id_key = $entity_type->getKey('id');
+              if ($entity_to_save->{$id_key} && $entity_to_save->{$id_key}->value) {
+                unset($entity_to_save->{$id_key}->value);
+              }
+              // Save the stub entity and set the target_id value to the field item.
               $entity_to_save->save();
-              $entity->{$field_name}[$delta] = array('target_id' => $entity_to_save->id());
+              $entity->{$field_name}[$delta] = ['target_id' => $entity_to_save->id()];
             }
           }
         }
@@ -82,7 +86,7 @@ class StubEntityProcessor implements StubEntityProcessorInterface {
     $exclude = [$id_key, $revision_key, 'uuid', '_rev'];
     foreach ($existing_entity as $field_name => $field) {
       if (!in_array($field_name, $exclude) && $entity->{$field_name}->value) {
-        $existing_entity->{$field_name}->value = $entity->{$field_name}->value;
+        $existing_entity->set($field_name, $entity->get($field_name)->getValue());
       }
     }
     return $existing_entity;
