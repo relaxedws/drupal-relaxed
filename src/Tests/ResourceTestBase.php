@@ -7,26 +7,14 @@
 
 namespace Drupal\relaxed\Tests;
 
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
 
-  /**
-   * The profile to install as a basis for testing.
-   *
-   * @var string
-   */
-  protected $profile = 'standard';
-
   public static $modules = array(
     'entity_test',
     'multiversion',
-    'node',
-    'taxonomy',
-    'comment',
-    'block_content',
-    'menu_link_content',
-    'file',
     'rest',
     'relaxed',
     'relaxed_test'
@@ -259,10 +247,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    $entity = entity_create('workspace', array(
-      'id' => $name,
-    ));
-    return $entity;
+    return workspace::create(['id' => $name]);
   }
 
 }
