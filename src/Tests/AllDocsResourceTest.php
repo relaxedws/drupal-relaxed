@@ -17,15 +17,6 @@ use Drupal\user\Entity\User;
  */
 class AllDocsResourceTest extends ResourceTestBase {
 
-  public static $modules = [
-    'entity_test',
-    'multiversion',
-    'rest',
-    'relaxed',
-    'relaxed_test',
-    'user',
-  ];
-
   public function testGet() {
     $this->enableService('relaxed:all_docs', 'GET');
     $serializer = \Drupal::service('serializer');
