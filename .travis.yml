@@ -1,7 +1,4 @@
 language: php
-cache: apt
-  directories:
-  - $TRAVIS_BUILD_DIR/../drupal
 
 php:
   - 5.5
