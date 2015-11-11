@@ -72,24 +72,17 @@ before_script:
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
-  # Create the private directory.
-  - sudo mkdir sites/default/files/private
+
   - sudo chmod 777 -R sites/default/files
   - sudo chmod 0664 sites/default/settings.php
-  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
-  # Enable Simpletest
-  - drush en --yes simpletest
 
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2 --db-url=mysql://root:@127.0.0.1/drupal2 standard
-  # Create the private directory.
-  - sudo mkdir sites/drupal2/files/private
+
   - sudo chmod 777 -R sites/drupal2/files
   - sudo chmod 0664 sites/drupal2/settings.php
-  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/drupal2/files/private';" >> sites/drupal2/settings.php
-  # Enable Simpletest
-  - drush en --yes simpletest
+
 
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal

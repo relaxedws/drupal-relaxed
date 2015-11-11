@@ -3,17 +3,11 @@
 set -ev
 
 mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
-mv $TRAVIS_BUILD_DIR/../drupal2/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal2/modules/entity_test
-
-cp -r $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
-mv $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed_test
+mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
 
 # Enable dependencies for the first drupal instance.
-drush en --yes entity_test, relaxed_test || true
-
-# Enable dependencies for the second drupal instance.
-cd $TRAVIS_BUILD_DIR/../drupal2
-drush en --yes entity_test, relaxed_test || true
+drush -l http://drupal.loc en --yes entity_test, relaxed_test || true
+drush -l http://drupal2.loc en --yes entity_test, relaxed_test || true
 
 # Load documents from documents.txt and save them in the 'source' database.
 while read document
