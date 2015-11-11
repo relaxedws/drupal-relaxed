@@ -72,11 +72,11 @@ class AttachmentNormalizerTest extends NormalizerTestBase {
 
     // Test serialize.
     $serialized = $this->serializer->serialize($this->fileEntity, 'stream');
-    $this->assertEqual($serialized, $this->fileContents, 'File entity was serialized to file contents.');
+    $this->assertEquals($serialized, $this->fileContents, 'File entity was serialized to file contents.');
 
     // Test denormalize.
     $denormalized = $this->serializer->denormalize($this->fileHandle, $this->entityClass, 'stream');
-    $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
+    $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', ['@class' => $this->entityClass]));
     $this->assertSame($this->fileEntity->getEntityTypeId(), $denormalized->getEntityTypeId(), 'Expected entity type found.');
   }
 

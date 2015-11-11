@@ -107,7 +107,6 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
     }
 
     $all_docs->includeDocs(TRUE);
-    $normalized = $normalizer->normalize($all_docs);
     foreach (array_keys($expected) as $key) {
       $this->assertEquals($expected[$key], $normalized[$key], "Correct value for $key key when including docs.");
     }
