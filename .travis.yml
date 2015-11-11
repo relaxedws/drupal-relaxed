@@ -25,8 +25,6 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
 
 before_install:
-  # Update Composer so that the Drush installation doesn't fail.
-  - composer selfupdate
   - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
 
 install:
@@ -47,21 +45,16 @@ install:
   - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/default
   - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal?g" --in-place /etc/apache2/sites-available/default
   - sudo sed -e "s?%TRAVIS_BUILD_SERVERNAME%?drupal.loc?g" --in-place /etc/apache2/sites-available/default
+  - sudo sed -e "s?%TRAVIS_BUILD_SERVERALIAS%?drupal2.loc?g" --in-place /etc/apache2/sites-available/default
   - echo "127.0.0.1 drupal.loc" | sudo tee -a /etc/hosts
-
-  # Set up the Apache vhost for the second Drupal instance.
-  - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/drupal2
-  - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal2?g" --in-place /etc/apache2/sites-available/drupal2
-  - sudo sed -e "s?%TRAVIS_BUILD_SERVERNAME%?drupal2.loc?g" --in-place /etc/apache2/sites-available/drupal2
-  - sudo sed -i "/FastCgiExternalServer/d" --in-place /etc/apache2/sites-available/drupal2
   - echo "127.0.0.1 drupal2.loc" | sudo tee -a /etc/hosts
-
-  - sudo a2ensite drupal2
   - sudo service apache2 restart
 
   # Install Drush.
-  - export PATH=$PATH:/home/travis/.composer/vendor/bin
-  - composer global require drush/drush:dev-master
+  - wget https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar
+  - chmod +x drush.phar
+  - sudo mv drush.phar /usr/local/bin/drush
+  - drush init
 
 before_script:
   # Try to prevent Mysql has gone away.
@@ -78,31 +71,18 @@ before_script:
 
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
-  # Create the private directory.
-  - sudo mkdir sites/default/files/private
+  - php -d sendmail_path=`which true` /usr/local/bin/drush --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
+
   - sudo chmod 777 -R sites/default/files
   - sudo chmod 0664 sites/default/settings.php
-  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
-  # Enable Simpletest
-  - drush en --yes simpletest
-
-  # Checkout second directory structure with all dependencies.
-  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal2
-  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal2/modules/key_value
-  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal2/modules/multiversion
-  - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal2/modules/relaxed
 
   # Install the site that will be used for Drupal-to-Drupal replication.
-  - cd $TRAVIS_BUILD_DIR/../drupal2
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --verbose --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal2 standard
-  # Create the private directory.
-  - sudo mkdir sites/default/files/private
-  - sudo chmod 777 -R sites/default/files
-  - sudo chmod 0664 sites/default/settings.php
-  - sudo echo -e "$a\$settings['file_private_path'] = 'sites/default/files/private';" >> sites/default/settings.php
-  # Enable Simpletest
-  - drush en --yes simpletest
+  - cd $TRAVIS_BUILD_DIR/../drupal
+  - php -d sendmail_path=`which true` /usr/local/bin/drush --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2.loc --db-url=mysql://root:@127.0.0.1/drupal2 standard
+
+  - sudo chmod 777 -R sites/drupal2.loc/files
+  - sudo chmod 0664 sites/drupal2.loc/settings.php
+
 
 script:
   - cd $TRAVIS_BUILD_DIR/../drupal
