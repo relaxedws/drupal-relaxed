@@ -53,8 +53,10 @@ install:
   - sudo service apache2 restart
 
   # Install Drush.
-  - export PATH=$PATH:/home/travis/.composer/vendor/bin
-  - composer global require drush/drush:dev-master
+  - wget https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar
+  - chmod +x drush.phar
+  - sudo mv drush.phar /usr/local/bin/drush
+  - drush init
 
 before_script:
   # Try to prevent Mysql has gone away.
