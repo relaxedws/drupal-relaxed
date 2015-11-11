@@ -73,14 +73,14 @@ before_script:
 
   # Install the site that will host our tests.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
+  - php -d sendmail_path=`which true` /usr/local/bin/drush --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
 
   - sudo chmod 777 -R sites/default/files
   - sudo chmod 0664 sites/default/settings.php
 
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2 --db-url=mysql://root:@127.0.0.1/drupal2 standard
+  - php -d sendmail_path=`which true` /usr/local/bin/drush --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2 --db-url=mysql://root:@127.0.0.1/drupal2 standard
 
   - sudo chmod 777 -R sites/drupal2/files
   - sudo chmod 0664 sites/drupal2/settings.php
