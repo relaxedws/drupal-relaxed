@@ -7,8 +7,8 @@
 
 namespace Drupal\relaxed\Tests\Encoder;
 
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\relaxed\Encoder\StreamEncoder;
-use Drupal\simpletest\KernelTestBase;
 
 /**
  * Tests the stream encoder.
@@ -40,8 +40,8 @@ class StreamEncoderTest extends KernelTestBase {
     fwrite($b, $b_string);
     rewind($b);
 
-    $this->assertEqual($a_string, $this->encoder->encode($a, 'stream'));
-    $this->assertEqual(base64_encode($b_string), $this->encoder->encode($b, 'base64_stream'));
+    $this->assertEquals($a_string, $this->encoder->encode($a, 'stream'));
+    $this->assertEquals(base64_encode($b_string), $this->encoder->encode($b, 'base64_stream'));
   }
 
   public function testDencode() {
@@ -52,10 +52,10 @@ class StreamEncoderTest extends KernelTestBase {
     $b = $this->encoder->decode($b_string, 'base64_stream');
 
     $this->assertTrue(is_resource($a));
-    $this->assertEqual(stream_get_contents($a), $a_string);
+    $this->assertEquals(stream_get_contents($a), $a_string);
 
     $this->assertTrue(is_resource($b));
-    $this->assertEqual(stream_get_contents($b), base64_decode($b_string));
+    $this->assertEquals(stream_get_contents($b), base64_decode($b_string));
   }
 
 }

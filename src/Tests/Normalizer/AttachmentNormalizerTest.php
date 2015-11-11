@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\file\Entity\File;
 
 /**
  * Tests the attachment serialization format.
@@ -16,7 +17,16 @@ use Drupal\Component\Utility\SafeMarkup;
  */
 class AttachmentNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'field', 'file', 'relaxed', 'key_value', 'multiversion', 'rest');
+  public static $modules = [
+    'serialization',
+    'system',
+    'field',
+    'file',
+    'relaxed',
+    'key_value',
+    'multiversion',
+    'rest'
+  ];
 
   /**
    * @var \Symfony\Component\Serializer\SerializerInterface
@@ -52,23 +62,22 @@ class AttachmentNormalizerTest extends NormalizerTestBase {
     rewind($this->fileHandle);
 
     $meta = stream_get_meta_data($this->fileHandle);
-    $this->fileEntity = entity_create('file', array('uri' => $meta['uri']));
+    $this->fileEntity = File::Create(['uri' => $meta['uri']]);
   }
 
-  public function testNormalize() {
+  public function testNormalizer() {
+    // Test normalize.
     $normalized = $this->serializer->normalize($this->fileEntity);
     $this->assertTrue(is_resource($normalized), 'File entity was normalized to a file resource.');
-  }
 
-  public function testSerialize() {
+    // Test serialize.
     $serialized = $this->serializer->serialize($this->fileEntity, 'stream');
     $this->assertEqual($serialized, $this->fileContents, 'File entity was serialized to file contents.');
-  }
 
-  public function testDenormalize() {
+    // Test denormalize.
     $denormalized = $this->serializer->denormalize($this->fileHandle, $this->entityClass, 'stream');
     $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', array('@class' => $this->entityClass)));
-    $this->assertIdentical($denormalized->getEntityTypeId(), $this->fileEntity->getEntityTypeId(), 'Expected entity type found.');
+    $this->assertSame($this->fileEntity->getEntityTypeId(), $denormalized->getEntityTypeId(), 'Expected entity type found.');
   }
 
 }
