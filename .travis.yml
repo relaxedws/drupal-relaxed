@@ -80,10 +80,10 @@ before_script:
 
   # Install the site that will be used for Drupal-to-Drupal replication.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` /usr/local/bin/drush --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2 --db-url=mysql://root:@127.0.0.1/drupal2 standard
+  - php -d sendmail_path=`which true` /usr/local/bin/drush --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2.loc --db-url=mysql://root:@127.0.0.1/drupal2 standard
 
-  - sudo chmod 777 -R sites/drupal2/files
-  - sudo chmod 0664 sites/drupal2/settings.php
+  - sudo chmod 777 -R sites/drupal2.loc/files
+  - sudo chmod 0664 sites/drupal2.loc/settings.php
 
 
 script:
