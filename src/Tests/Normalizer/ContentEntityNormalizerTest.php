@@ -123,7 +123,6 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     $this->assertSame($actual, $expected, 'Entity serializes correctly to JSON.');
 
     // Test denormalize.
-    $normalized = $this->serializer->normalize($this->entity);
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
     $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', ['@class' => $this->entityClass]));
     $this->assertSame($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');

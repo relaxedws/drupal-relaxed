@@ -15,6 +15,7 @@ use Drupal\Component\Serialization\Json;
  * @group relaxed
  */
 class AllDbsResourceTest extends ResourceTestBase {
+
   public function testGet() {
     $this->enableService('relaxed:all_dbs', 'GET');
 

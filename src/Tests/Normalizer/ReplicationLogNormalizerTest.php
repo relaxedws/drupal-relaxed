@@ -62,11 +62,10 @@ class ReplicationLogNormalizerTest extends NormalizerTestBase {
     $this->assertEquals(array_diff_key($normalized, $expected), [], 'No unexpected data is added to the normalized array.');
 
     $entity = ReplicationLog::create();
-    $normalized = $this->serializer->normalize($entity);
-    $this->assertSame(NULL, $normalized['source_last_seq'], "Field is normalized correctly when emtpy.");
+    $normalized_empty_field = $this->serializer->normalize($entity);
+    $this->assertSame(NULL, $normalized_empty_field['source_last_seq'], "Field is normalized correctly when emtpy.");
 
     // Test denormalize.
-    $normalized = $this->serializer->normalize($this->entity);
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
     $this->assertTrue($denormalized instanceof $this->entityClass, 'Denormalized entity is an instance of ' . $this->entityClass);
     $this->assertSame($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');

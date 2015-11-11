@@ -17,6 +17,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    * @var string
    */
   protected $profile = 'standard';
+
   public static $modules = array(
     'entity_test',
     'multiversion',

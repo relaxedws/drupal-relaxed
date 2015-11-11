@@ -55,14 +55,12 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     $this->assertEquals(array_diff_key($normalized, $expected), [], 'No unexpected data is added to the normalized array.');
 
     // Test serialize.
-    $normalized = $this->serializer->normalize($this->entity);
     $expected = json_encode($normalized);
     // Paranoid test because JSON serialization is tested elsewhere.
     $actual = $this->serializer->serialize($this->entity, 'json');
     $this->assertSame($expected, $actual, 'Entity serializes correctly to JSON.');
 
     // Test denormalize.
-    $normalized = $this->serializer->normalize($this->entity);
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json');
     $this->assertTrue($denormalized instanceof $this->entityClass, SafeMarkup::format('Denormalized entity is an instance of @class', ['@class' => $this->entityClass]));
     $this->assertSame($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');
