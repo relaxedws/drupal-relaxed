@@ -20,7 +20,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $db = $this->workspace->id();
     $this->enableService('relaxed:bulk_docs', 'POST');
 
-    $entity_types = array('entity_test_rev');
+    $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
@@ -28,7 +28,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $data = array('docs' => array());
+      $data = array('docs' => []);
       foreach ($this->createTestEntities($entity_type) as $entity) {
         $data['docs'][] = $this->container->get('relaxed.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
       }
@@ -58,17 +58,17 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $input = array('docs' => array());
+    $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
       $entity->set(
         'field_test_text',
-        array(
-          0 => array(
+        [
+          0 => [
             'value' => $this->randomString(),
             'format' => 'plain_text',
-          )
-        )
+          ],
+        ]
       );
       if ($key == 1) {
         // Delete an entity.
@@ -89,7 +89,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     foreach ($input['docs'] as $key => $value) {
       $entity_number = $key+1;
-      $entity = $this->entityManager->loadEntityByUuid($entity_type, $value['_id']);
+      $entity = $this->entityRepository->loadEntityByUuid($entity_type, $value['_id']);
       if ($key == 1) {
         $this->assertEqual($entity, NULL, "Entity number $entity_number has been deleted.");
       }
@@ -106,15 +106,15 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
-      $patched_entities['docs'][$key] = entity_load($entity_type, $entity->id(), TRUE);
+      $patched_entities['docs'][$key] = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
       $patched_entities['docs'][$key]->set(
         'field_test_text',
-        array(
-          0 => array(
+        [
+          0 => [
             'value' => $this->randomString(),
             'format' => 'plain_text',
-          )
-        )
+          ],
+        ]
       );
       if ($key == 1) {
         // Delete an entity.
@@ -143,10 +143,10 @@ class BulkDocsResourceTest extends ResourceTestBase {
    * Creates test entities.
    */
   protected function createTestEntities($entity_type, $save = FALSE, $number = 3) {
-    $entities = array();
+    $entities = [];
 
     while ($number >= 1) {
-      $entity = entity_create($entity_type);
+      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       if ($save) {
         $entity->save();
       }

@@ -27,73 +27,73 @@ class ChangesResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $expected_with_docs = $expected_without_docs = array('last_seq' => NULL, 'results' => array());
+    $expected_with_docs = $expected_without_docs = ['last_seq' => NULL, 'results' => []];
 
     // Add info for the new created user.
-    $account = entity_load('user', $account->id(), TRUE);
+    $account = $this->entityTypeManager->getStorage('user')->load($account->id());
     $account_first_seq = $this->multiversionManager->lastSequenceId();
-    $expected_without_docs['results'][] = array(
-      'changes' => array(array('rev' => $account->_rev->value)),
+    $expected_without_docs['results'][] = [
+      'changes' => [['rev' => $account->_rev->value]],
       'id' => $account->uuid(),
       'seq' => $account_first_seq,
-    );
-    $expected_with_docs['results'][] = array(
-      'changes' => array(array('rev' => $account->_rev->value)),
+    ];
+    $expected_with_docs['results'][] = [
+      'changes' => [['rev' => $account->_rev->value]],
       'id' => $account->uuid(),
       'seq' => $account_first_seq,
       'doc' => $serializer->normalize($account)
-    );
+    ];
 
-    $entity = entity_create('entity_test_rev');
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
     $entity->save();
     // Update the field_test_text field.
-    $entity->set('field_test_text', array(array('value' => $this->randomString(), 'format' => 'plain_text')));
+    $entity->set('field_test_text', [['value' => $this->randomString(), 'format' => 'plain_text']]);
     $entity->save();
 
     // Update the name filed.
-    $entity->set('name', array(array('value' => $this->randomString(12), 'format' => 'plain_text')));
+    $entity->set('name', [['value' => $this->randomString(12), 'format' => 'plain_text']]);
     $entity->save();
 
     // Update the name filed again.
-    $entity->set('name', array(array('value' => $this->randomString(25), 'format' => 'plain_text')));
+    $entity->set('name', [['value' => $this->randomString(25), 'format' => 'plain_text']]);
     $entity->save();
     $first_seq = $this->multiversionManager->lastSequenceId();
-    $expected_without_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_rev->value)),
+    $expected_without_docs['results'][] = [
+      'changes' => [['rev' => $entity->_rev->value]],
       'id' => $entity->uuid(),
       'seq' => $first_seq,
-    );
-    $expected_with_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_rev->value)),
+    ];
+    $expected_with_docs['results'][] = [
+      'changes' => [['rev' => $entity->_rev->value]],
       'id' => $entity->uuid(),
       'seq' => $first_seq,
       'doc' => $serializer->normalize($entity)
-    );
+    ];
 
     // Create a new entity.
-    $entity = entity_create('entity_test_rev');
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
     $entity->save();
 
     // Update the field_test_text field.
-    $entity->set('field_test_text', array(array('value' => $this->randomString(), 'format' => 'plain_text')));
+    $entity->set('field_test_text', [['value' => $this->randomString(), 'format' => 'plain_text']]);
     $entity->save();
 
     // Delete the entity.
     $entity->delete();
     $second_seq = $this->multiversionManager->lastSequenceId();
-    $expected_without_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_rev->value)),
+    $expected_without_docs['results'][] = [
+      'changes' => [['rev' => $entity->_rev->value]],
       'id' => $entity->uuid(),
       'seq' => $second_seq,
       'deleted' => true,
-    );
-    $expected_with_docs['results'][] = array(
-      'changes' => array(array('rev' => $entity->_rev->value)),
+    ];
+    $expected_with_docs['results'][] = [
+      'changes' => [['rev' => $entity->_rev->value]],
       'id' => $entity->uuid(),
       'seq' => $second_seq,
       'doc' => $serializer->normalize($entity),
       'deleted' => true,
-    );
+    ];
 
     $expected_with_docs['last_seq'] = $expected_without_docs['last_seq'] = $this->multiversionManager->lastSequenceId();
 
@@ -104,7 +104,7 @@ class ChangesResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('include_docs' => 'true'));
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['include_docs' => 'true']);
     $this->assertResponse('200', 'HTTP response code is correct when including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
@@ -112,14 +112,14 @@ class ChangesResourceTest extends ResourceTestBase {
     $this->assertEqual($data, $expected_with_docs, 'The result is correct when including docs.');
 
     // Test when using 'since' query parameter.
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => 1));
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => 1]);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => $first_seq));
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $first_seq]);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
@@ -131,13 +131,13 @@ class ChangesResourceTest extends ResourceTestBase {
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, array('since' => $second_seq));
+    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $second_seq]);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
     // The result array should be empty in this case.
-    $expected_without_docs['results'] = array();
+    $expected_without_docs['results'] = [];
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     // @todo: {@link https://www.drupal.org/node/2600488 Assert the sort order.}
