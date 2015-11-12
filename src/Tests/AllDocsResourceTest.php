@@ -29,7 +29,7 @@ class AllDocsResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     $entities = [];
-    $entity_types = array('entity_test_rev')
+    $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       $storage = $this->entityTypeManager->getStorage($entity_type);
       $entities[0] = $storage->create();
