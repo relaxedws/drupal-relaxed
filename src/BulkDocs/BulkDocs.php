@@ -99,20 +99,20 @@ class BulkDocs implements BulkDocsInterface {
 
         $entity->save();
 
-        $this->result[] = array(
+        $this->result[] = [
           'ok' => TRUE,
           'id' => $entity->uuid(),
           'rev' => $entity->_rev->value,
-        );
+        ];
       }
       catch (\Exception $e) {
-        $this->result[] = array(
+        $this->result[] = [
           'error' => $e->getMessage(),
           'reason' => 'exception',
           'id' => $entity->uuid(),
           'rev' => $entity->_rev->value,
-        );
-        
+        ];
+
         // @todo {@link https://www.drupal.org/node/2599902 Inject logger or use \Drupal::logger().}
         watchdog_exception('relaxed', $e);
       }
