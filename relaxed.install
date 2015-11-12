@@ -17,8 +17,8 @@ function relaxed_install() {
  * Implements hook_uninstall().
  */
 function relaxed_uninstall() {
-  // Remove 'resource' settings defined by relaxed module from 'resource'
-  // settings define by rest module.
+  // Remove 'resource' settings defined by RELAXed Web Services module from
+  // 'resource' settings defined by RESTful Web Services module.
   $relaxed_resource_config = \Drupal::config('relaxed.settings')->get('resources');
   $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
   $rest_resource_config = $rest_config->get('resources');
