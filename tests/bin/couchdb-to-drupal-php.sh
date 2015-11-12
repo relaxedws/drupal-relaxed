@@ -44,6 +44,6 @@ sudo cat /var/log/apache2/error.log
 #-----------------------------------
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
-USERS=2
+USERS=3
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
