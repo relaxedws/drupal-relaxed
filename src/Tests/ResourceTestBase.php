@@ -52,6 +52,16 @@ abstract class ResourceTestBase extends RESTTestBase {
    */
   protected $revTree;
 
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityRepository
+   */
+  protected $entityRepository;
+
   protected function setUp() {
     parent::setUp();
     $this->defaultFormat = 'json';
@@ -68,6 +78,8 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     $this->multiversionManager->setActiveWorkspaceId($name);
     $this->entityManager = $this->container->get('entity.manager');
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
+    $this->entityRepository = $this->container->get('entity.repository');
     $this->revTree = $this->container->get('entity.index.rev.tree');
   }
 
