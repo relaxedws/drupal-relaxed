@@ -39,9 +39,7 @@ class UninstallTest extends ModuleTestBase {
     $relaxed_config = \Drupal::config('relaxed.settings')->get('resources');
     $rest_config = \Drupal::config('rest.settings')->get('resources');
     foreach ($relaxed_config as $key => $item) {
-      if (isset($rest_config[$key])) {
-        $this->pass("Relaxed module configuration ($key) found in Rest module configuration.");
-      }
+      $this->assertTrue(isset($rest_config[$key]), "Relaxed module configuration ($key) found in Rest module configuration.");
     }
     // Only uninstall Relaxed.
     $this->moduleInstaller->uninstall(['relaxed']);
@@ -49,9 +47,7 @@ class UninstallTest extends ModuleTestBase {
     $this->assertModules(['relaxed'], FALSE);
     $this->assertNoModuleConfig('relaxed');
     foreach ($relaxed_config as $key => $item) {
-      if (isset($rest_config[$key])) {
-        $this->fail("Relaxed module configuration ($key) found in Rest module configuration.");
-      }
+      $this->assertTrue(!isset($rest_config[$key]), "Relaxed module configuration ($key) not found in Rest module configuration.");
     }
   }
 
