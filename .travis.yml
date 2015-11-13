@@ -22,7 +22,7 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-php.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
 
 before_install:
   - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
