@@ -42,7 +42,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     // Add an entity to the workspace to test the update_seq property.
-    $entity = entity_create('entity_test_rev');
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
     $entity->save();
     $entity->name = $this->randomMachineName();
     $entity->save();
@@ -86,7 +86,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->enableService('relaxed:db', 'POST');
     $serializer = $this->container->get('serializer');
 
-    $entity_types = array('entity_test_rev');
+    $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
@@ -94,22 +94,15 @@ class DbResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $entity = entity_create($entity_type, array('user_id' => $account->id()));
+      $entity = $this->entityTypeManager
+        ->getStorage($entity_type)
+        ->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest($this->workspace->id(), 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when posting new entity');
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
-
-      //$this->workspaceManager->setActiveWorkspace($this->workspace);
-      // Load the entity that was saved in the previous POST call.
-//      $entity = $this->entityManager->loadEntityByUuid($entity_type, $data['id']);
-//      $entity = entity_load($entity_type, $entity->id());
-//      $serialized = $serializer->serialize($entity, $this->defaultFormat);
-//
-//      $this->httpRequest($this->workspace->id(), 'POST', $serialized);
-//      $this->assertResponse('409', 'HTTP response code is correct when posting conflicting entity');
     }
   }
 
@@ -131,7 +124,9 @@ class DbResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
-    $entity = entity_load('workspace', $entity->id());
+    $entity = $this->entityTypeManager
+      ->getStorage('workspace')
+      ->load($entity->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
   }
 

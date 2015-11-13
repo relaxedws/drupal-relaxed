@@ -20,15 +20,24 @@ class ReplicationLogTest extends MultiversionWebTestBase {
 
   protected $strictConfigSchema = FALSE;
 
-  public static $modules = array('entity_test', 'relaxed');
+  public static $modules = ['entity_test', 'relaxed'];
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  protected function setUp() {
+    parent::setUp();
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
+  }
 
   public function testOperations() {
-    $entity = entity_create('replication_log');
-
+    $entity = $this->entityTypeManager->getStorage('replication_log')->create();
     $this->assertTrue($entity instanceof ReplicationLog, 'Replication Log entity was created.');
 
     // Set required fields.
-    $entity = entity_create('replication_log');
+    $entity = $this->entityTypeManager->getStorage('replication_log')->create();
     $seq_id = \Drupal::service('multiversion.manager')->newSequenceId();
     $entity->source_last_seq->value = $seq_id;
     $entity->history->recorded_seq = $seq_id;
@@ -50,7 +59,7 @@ class ReplicationLogTest extends MultiversionWebTestBase {
 
     $max_int = 2147483647;
     $max_bigint = 9223372036854775807;
-    $entity = entity_create('replication_log');
+    $entity = $this->entityTypeManager->getStorage('replication_log')->create();
     $entity->history->start_last_seq = $max_int;
     $entity->history->missing_found = $max_int;
     $entity->history->docs_read = $max_int;

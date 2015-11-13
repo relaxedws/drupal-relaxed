@@ -17,28 +17,40 @@ use Drupal\relaxed\AllDocs\AllDocs;
  */
 class AllDocsNormalizerTest extends NormalizerTestBase {
 
-  public static $modules = array('serialization', 'system', 'field', 'entity_test', 'text', 'filter', 'user', 'key_value', 'multiversion', 'rest', 'relaxed');
+  public static $modules = [
+    'serialization',
+    'system',
+    'field',
+    'entity_test',
+    'text',
+    'filter',
+    'user',
+    'key_value',
+    'multiversion',
+    'rest',
+    'relaxed'
+  ];
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
   /**
    * @var \Drupal\Core\Entity\ContentEntityInterface[]
    */
-  protected $entities = array();
+  protected $entities = [];
 
   protected function setUp() {
     parent::setUp();
 
-    $values = array(
+    $values = [
       'name' => $this->randomMachineName(),
       'user_id' => 0,
-      'field_test_text' => array(
+      'field_test_text' => [
         'value' => $this->randomMachineName(),
         'format' => 'full_html',
-      ),
-    );
+      ],
+    ];
 
-    $this->entities = array();
+    $this->entities = [];
     for ($i = 0; $i < 3; $i++) {
       $this->entities[$i] = EntityTestMulRev::create($values);
       $this->entities[$i]->save();
@@ -57,47 +69,47 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
     );
 
     // Test without including docs.
-    $expected = array(
+    $expected = [
       'total_rows' => 3,
       'offset' => 0,
-      'rows' => array()
-    );
+      'rows' => [],
+    ];
     foreach ($this->entities as $entity) {
-      $expected['rows'][] = array(
+      $expected['rows'][] = [
         'id' => $entity->uuid(),
         'key' => $entity->uuid(),
-        'value' => array(
+        'value' => [
           'rev' => $entity->_rev->value,
-        ),
-      );
+        ],
+      ];
     }
 
     $normalized = $normalizer->normalize($all_docs);
     foreach (array_keys($expected) as $key) {
-      $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key when not including docs.");
+      $this->assertEquals($expected[$key], $normalized[$key], "Correct value for $key key when not including docs.");
     }
 
     // Test with including docs.
-    $expected = array(
+    $expected = [
       'total_rows' => 3,
       'offset' => 0,
-      'rows' => array()
-    );
+      'rows' =>[],
+    ];
     foreach ($this->entities as $entity) {
-      $expected['rows'][] = array(
+      $expected['rows'][] = [
         'id' => $entity->uuid(),
         'key' => $entity->uuid(),
-        'value' => array(
+        'value' => [
           'rev' => $entity->_rev->value,
           'doc' => $serializer->normalize($entity),
-        ),
-      );
+        ],
+      ];
     }
 
     $all_docs->includeDocs(TRUE);
     $normalized = $normalizer->normalize($all_docs);
     foreach (array_keys($expected) as $key) {
-      $this->assertEqual($expected[$key], $normalized[$key], "Correct value for $key key when including docs.");
+      $this->assertEquals($expected[$key], $normalized[$key], "Correct value for $key key when including docs.");
     }
   }
 

@@ -7,25 +7,14 @@
 
 namespace Drupal\relaxed\Tests;
 
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
 
-  /**
-   * The profile to install as a basis for testing.
-   *
-   * @var string
-   */
-  protected $profile = 'standard';
   public static $modules = array(
     'entity_test',
     'multiversion',
-    'node',
-    'taxonomy',
-    'comment',
-    'block_content',
-    'menu_link_content',
-    'file',
     'rest',
     'relaxed',
     'relaxed_test'
@@ -63,6 +52,16 @@ abstract class ResourceTestBase extends RESTTestBase {
    */
   protected $revTree;
 
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityRepository
+   */
+  protected $entityRepository;
+
   protected function setUp() {
     parent::setUp();
     $this->defaultFormat = 'json';
@@ -79,6 +78,8 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     $this->multiversionManager->setActiveWorkspaceId($name);
     $this->entityManager = $this->container->get('entity.manager');
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
+    $this->entityRepository = $this->container->get('entity.repository');
     $this->revTree = $this->container->get('entity.index.rev.tree');
   }
 
@@ -258,10 +259,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    $entity = entity_create('workspace', array(
-      'id' => $name,
-    ));
-    return $entity;
+    return workspace::create(['id' => $name]);
   }
 
 }

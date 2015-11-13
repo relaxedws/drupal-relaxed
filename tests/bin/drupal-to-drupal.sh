@@ -16,7 +16,6 @@ do
        -H "Content-Type: application/json" \
        -d "$document" \
        admin:admin@drupal.loc/relaxed/default;
-  sleep 2;
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 
 drush cr
