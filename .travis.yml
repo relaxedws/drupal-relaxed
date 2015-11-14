@@ -1,19 +1,20 @@
+sudo: false
+
 language: php
 
 php:
   - 5.5
   - 5.6
+  - 7.0
 
-mysql:
-  database: drupal
-  username: root
-  encoding: utf8
-
-services:
+service:
+  - mysql
   - couchdb
 
-notifications:
-  slack: det:YiOiwfzUBtt9aTnWvocK8uDI
+addons:
+  apt:
+    packages:
+    - nginx
 
 env:
   matrix:
@@ -22,68 +23,29 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-php.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb-non-admin.sh'
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+
+notifications:
+  slack: det:YiOiwfzUBtt9aTnWvocK8uDI
+
+cache:
+  directories:
+  - $HOME/.drush/cache/download
 
 before_install:
-  - mysql -e "create database IF NOT EXISTS drupal2;" -uroot
+  - mysql -uroot < $TRAVIS_BUILD_DIR/.travis/mysql.sql
+  - cp $TRAVIS_BUILD_DIR/.travis/php.ini ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/
+  - cp $TRAVIS_BUILD_DIR/.travis/php-fpm.conf ~/.phpenv/versions/$(phpenv version-name)/etc/
+  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+  - nginx -c $TRAVIS_BUILD_DIR/.travis/nginx.conf
+  - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
+  - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/drupal.make.yml $HOME/www
+  # TODO: Run tests on testing profile with dependencies set up in relaxed_test
+  - php ~/drush.phar --root=$HOME/www --yes site-install --db-url=mysql://root:@127.0.0.1/drupal0 standard
+  - php ~/drush.phar --root=$HOME/www --yes pm-uninstall rdf
 
 install:
-  - sudo apt-get update
-  # Install Apache.
-  - sudo apt-get install apache2 libapache2-mod-fastcgi
-
-  # Add always_populate_raw_post_data=-1 to php.ini.
-  - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-
-  # Set up PHP-FPM.
-  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
-  - sudo a2enmod rewrite actions fastcgi alias
-  - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
-
-  # Set up the Apache vhost for the first Drupal instance.
-  - sudo cp -f $TRAVIS_BUILD_DIR/.travis/apache-vhost.conf /etc/apache2/sites-available/default
-  - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$TRAVIS_BUILD_DIR/../drupal?g" --in-place /etc/apache2/sites-available/default
-  - sudo sed -e "s?%TRAVIS_BUILD_SERVERNAME%?drupal.loc?g" --in-place /etc/apache2/sites-available/default
-  - sudo sed -e "s?%TRAVIS_BUILD_SERVERALIAS%?drupal2.loc?g" --in-place /etc/apache2/sites-available/default
-  - echo "127.0.0.1 drupal.loc" | sudo tee -a /etc/hosts
-  - echo "127.0.0.1 drupal2.loc" | sudo tee -a /etc/hosts
-  - sudo service apache2 restart
-
-  # Install Drush.
-  - wget https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar
-  - chmod +x drush.phar
-  - sudo mv drush.phar /usr/local/bin/drush
-  - drush init
-
-before_script:
-  # Try to prevent Mysql has gone away.
-  - mysql -e "SET GLOBAL wait_timeout = 36000;"
-  - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
-  - mysql -e "SHOW VARIABLES LIKE 'max_allowed_packet';"
-  - mysql -e "SHOW VARIABLES LIKE 'wait_timeout';"
-
-  # Checkout a directory structure with all dependencies.
-  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git $TRAVIS_BUILD_DIR/../drupal
-  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-key_value.git $TRAVIS_BUILD_DIR/../drupal/modules/key_value
-  - git clone --branch 8.x-1.x https://github.com/dickolsson/drupal-multiversion.git $TRAVIS_BUILD_DIR/../drupal/modules/multiversion
-  - ln -s $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/relaxed
-
-  # Install the site that will host our tests.
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` /usr/local/bin/drush --yes site-install --account-name=admin --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal standard
-
-  - sudo chmod 777 -R sites/default/files
-  - sudo chmod 0664 sites/default/settings.php
-
-  # Install the site that will be used for Drupal-to-Drupal replication.
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - php -d sendmail_path=`which true` /usr/local/bin/drush --verbose --yes site-install --account-name=admin --account-pass=admin --sites-subdir=drupal2.loc --db-url=mysql://root:@127.0.0.1/drupal2 standard
-
-  - sudo chmod 777 -R sites/drupal2.loc/files
-  - sudo chmod 0664 sites/drupal2.loc/settings.php
-
+  - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
 
 script:
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - bash $SCRIPT
+  - cd ~/www && bash $SCRIPT

@@ -1,0 +1,8 @@
+api: 2
+
+core: 8.x
+
+projects:
+  drupal: 8.0.x
+  key_value: 1.x
+  multiversion: 8.x-1.x
