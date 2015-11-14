@@ -7,20 +7,23 @@ npm install -g mocha-phantomjs
 npm install chai
 npm install es5-shim
 npm install mocha
-npm install pouchdb@"~4.0"
+npm install pouchdb
 
-mv $TRAVIS_BUILD_DIR/../drupal/core/modules/system/tests/modules/entity_test $TRAVIS_BUILD_DIR/../drupal/modules/entity_test
-mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/pouchdb/test.html $TRAVIS_BUILD_DIR/../drupal/test.html
-mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/pouchdb/test.js $TRAVIS_BUILD_DIR/../drupal/test.js
-mv $TRAVIS_BUILD_DIR/../drupal/modules/relaxed/tests/modules/relaxed_test $TRAVIS_BUILD_DIR/../drupal/modules/relaxed_test
+mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
+mv ~/www/modules/relaxed/tests/pouchdb/test-non-admin.html ~/www/test-non-admin.html
+mv ~/www/modules/relaxed/tests/pouchdb/test-non-admin.js ~/www/test-non-admin.js
+mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 
 # Enable dependencies.
-drush en --yes entity_test, relaxed_test || true
+php ~/drush.phar en --yes entity_test, relaxed_test || true
+
+# Create a new role, add 'perform content replication' permission to this role
+# and create a user with this role.
+php ~/drush.phar role-create 'Replicator'
+php ~/drush.phar role-add-perm 'Replicator' 'perform content replication'
+php ~/drush.phar user-create replicator --mail="replicator@example.com" --password="replicator"
+php ~/drush.phar user-add-role 'Replicator' replicator
 
 mocha-phantomjs -s localToRemoteUrlAccessEnabled=true -s webSecurityEnabled=false test.html | tee /tmp/output.txt
-
-#-----------------------------------
-sudo cat /var/log/apache2/error.log
-#-----------------------------------
 
 test 1 -eq $(egrep -c "(2 passing)" /tmp/output.txt)
