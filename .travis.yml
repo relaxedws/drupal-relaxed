@@ -19,6 +19,7 @@ env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb-php.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal-php.sh'
     - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'

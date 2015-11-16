@@ -96,13 +96,13 @@ class MultipartResponse extends Response
     $content = '';
     foreach ($this->parts as $part) {
       $content .= "--{$this->boundary}\r\n";
-      $content .= "{$part->headers}\r\n";
+      $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n";
       $content .= $part->getContent();
       $content .= "\r\n";
     }
     $content .= "--{$this->boundary}--";
     // Finally send all the content.
-    echo strlen($content) . "\r\n" . $content;
+    echo $content;
     return $this;
   }
 
