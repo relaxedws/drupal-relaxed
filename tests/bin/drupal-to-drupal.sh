@@ -6,7 +6,7 @@ mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 
 # TODO: Run tests on testing profile with dependencies set up in relaxed_test
-php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --db-url=mysql://root:@127.0.0.1/drupal1 standard
+php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal1 standard
 php ~/drush.phar --yes --uri=http://localhost:8081 pm-uninstall rdf
 
 php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxed_test || true
@@ -28,12 +28,6 @@ nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/j
 sleep 120
 
 curl -X GET http://admin:admin@localhost:8081/relaxed/default/_all_docs | tee /tmp/all_docs.txt
-
-#-----------------------------------
-sudo cat /var/log/couchdb/couch.log
-#-----------------------------------
-sudo cat /var/log/apache2/error.log
-#-----------------------------------
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=4

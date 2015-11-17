@@ -41,7 +41,7 @@ before_install:
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/drupal.make.yml $HOME/www
   # TODO: Run tests on testing profile with dependencies set up in relaxed_test
-  - php ~/drush.phar --root=$HOME/www --yes site-install --db-url=mysql://root:@127.0.0.1/drupal0 standard
+  - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 standard
   - php ~/drush.phar --root=$HOME/www --yes pm-uninstall rdf
 
 install:
