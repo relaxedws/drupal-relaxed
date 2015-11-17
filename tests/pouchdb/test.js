@@ -1,3 +1,4 @@
+var request = require('request');
 var docsInfo = request('http://localhost:8080/tests/fixtures/documents.txt');
 var docs = docsInfo.split(/\r\n|\n/);
 

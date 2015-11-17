@@ -8,7 +8,7 @@ npm install chai
 npm install es5-shim
 npm install mocha
 npm install pouchdb
-npm install -g request
+npm install request
 
 mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/pouchdb/test.html ~/www/test.html
