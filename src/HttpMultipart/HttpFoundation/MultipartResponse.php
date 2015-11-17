@@ -96,7 +96,7 @@ class MultipartResponse extends Response
     $content = '';
     foreach ($this->parts as $part) {
       $content .= "--{$this->boundary}\r\n";
-      $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n";
+      $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
       $content .= $part->getContent();
       $content .= "\r\n";
     }
