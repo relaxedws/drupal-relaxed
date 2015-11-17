@@ -38,7 +38,7 @@ php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "drupal.loc"
 sleep 60
 
 # Get all docs from target to check replication worked.
-curl -X GET http://localhost:5984/source/_all_docs | tee /tmp/all_docs.txt
+curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
 #-----------------------------------
 sudo cat /var/log/apache2/error.log
