@@ -3,6 +3,7 @@
 set -ev
 
 # Install mocha-phantomjs, pouchdb and other dependences.
+npm install -g mocha-phantomjs
 npm install ~/www/modules/relaxed/tests/pouchdb
 
 mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
