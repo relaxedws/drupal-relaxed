@@ -1,5 +1,5 @@
 var request = require('request');
-var docsInfo = request('http://localhost:8080/tests/fixtures/documents.txt');
+var docsInfo = request('http://localhost:8080/modules/relaxed/tests/fixtures/documents.txt');
 var docs = docsInfo.split(/\r\n|\n/);
 
 // Enable debugging mode.
