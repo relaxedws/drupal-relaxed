@@ -44,9 +44,15 @@ curl -X GET http://localhost:5984/source/_all_docs
 php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "drupal.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
 sleep 60
 
+# Get all docs from drupal.loc for debugging.
+curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs
+
 # Run the replication from Drupal.loc to Drupal2.loc.
 php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "drupal.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "drupal2.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
 sleep 60
+
+# Get all docs from drupal.loc for debugging.
+curl -X GET http://admin:admin@drupal2.loc/relaxed/default/_all_docs
 
 # Run the replication from Drupal2.loc to CouchDB.
 php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "drupal2.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "target"}}';
@@ -60,6 +66,6 @@ sudo cat /var/log/apache2/error.log
 #-----------------------------------
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
-USERS=3
+USERS=6
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
