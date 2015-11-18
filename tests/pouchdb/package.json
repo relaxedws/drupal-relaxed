@@ -5,9 +5,7 @@
     "mocha-phantomjs": "^4.0.1",
     "chai": "^3.4.1",
     "es5-shim": "^4.3.1",
-    "mocha": "^2.3.4",
-    "pouchdb": "^5.1.0",
-    "requirejs": "^2.1.20",
-    "request": "^2.65.0"
+    "mocha": "^2.3.4", 
+    "pouchdb": "^5.1.0"
   }
 }

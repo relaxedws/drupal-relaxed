@@ -1,11 +1,31 @@
-var request = require('request');
-var docsInfo = '';
-request('http://localhost:8080/modules/relaxed/tests/fixtures/documents.txt', function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-    docsInfo = body;
+var getJSON = function(url) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('get', url, true);
+    xhr.responseType = 'txt';
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status == 200) {
+        resolve(xhr.response);
+      } else {
+        reject(status);
+      }
+    };
+    xhr.send();
+  });
+};
+
+var docs = [];
+var document = 'http://localhost:8080/modules/relaxed/tests/fixtures/documents.txt';
+getJSON(document).then(function(data) {
+  var lines = data.split(/\r\n|\n/);
+  // Create an array with all docs.
+  for(var line = 0; line < lines.length; line++) {
+    docs.push(JSON.parse(lines[line]));
   }
+}, function(status) {
+  console.log('Something went wrong.');
 });
-var docs = docsInfo.split(/\r\n|\n/);
 
 // Enable debugging mode.
 PouchDB.debug.enable('*');
