@@ -1,54 +1,73 @@
-var request = require('request');
-var docsInfo = '';
-request('http://localhost:8080/modules/relaxed/tests/fixtures/documents.txt', function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-    docsInfo = body;
-  }
-});
-var docs = docsInfo.split(/\r\n|\n/);
+var getFixtures = function(url, successHandler, errorHandler) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('get', url, true);
+  xhr.responseType = 'text';
+  xhr.onload = function() {
+    var status = xhr.status;
+    if (status == 200) {
+      successHandler && successHandler(xhr.response);
+    } else {
+      errorHandler && errorHandler(status);
+    }
+  };
+  xhr.send();
+};
 
 // Enable debugging mode.
 PouchDB.debug.enable('*');
 //PouchDB.debug.enable('pouchdb:api');
 //PouchDB.debug.enable('pouchdb:http');
 
+var baseUrl = 'http://replicator:replicator@localhost:8080';
 describe('Test replication', function () {
 
   it('Test basic push replication', function (done) {
+    var docs = [];
     var db = new PouchDB('pouch_to_drupal');
-    var remote = new PouchDB('http://replicator:replicator@localhost:8080/relaxed/default');
-    db.bulkDocs({ docs: docs }, {}, function (err, results) {
-      db.replicate.to(remote, function (err, result) {
-        result.ok.should.equal(true);
-        result.docs_written.should.equal(docs.length);
-        db.info(function (err, info) {
-          console.log(err);
-          verifyInfo(info, {
-            update_seq: 9,
-            doc_count: 9
+    var remote = new PouchDB(baseUrl + '/relaxed/default');
+    getFixtures(baseUrl + '/documents.txt', function(data) {
+      var lines = data.split(/\r\n|\n/);
+      // Create an array with all docs.
+      for(var line = 0; line < lines.length; line++) {
+        if (lines[line]) {
+          docs.push(JSON.parse(lines[line]));
+        }
+      }
+
+      db.bulkDocs({ docs: docs }, {}, function (err, results) {
+        db.replicate.to(remote, function (err, result) {
+          result.ok.should.equal(true);
+          result.docs_written.should.equal(docs.length);
+          db.info(function (err, info) {
+            console.log(err);
+            verifyInfo(info, {
+              update_seq: 12,
+              doc_count: 12
+            });
+            done();
           });
-          done();
         });
       });
+
+    }, function(status) {
+      console.log('Something went wrong.');
     });
   });
 
   it('Test basic pull replication', function (done) {
     var db = new PouchDB('drupal_to_pouch');
-    var remote = new PouchDB('http://replicator:replicator@localhost:8080/relaxed/default');
-    //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
-      db.replicate.from(remote, {}, function (err, result) {
-        result.ok.should.equal(true);
-        result.docs_written.should.equal(11);
-        db.info(function (err, info) {
-          verifyInfo(info, {
-            update_seq: 11,
-            doc_count: 11
-          });
-          done();
+    var remote = new PouchDB(baseUrl + '/relaxed/default');
+    db.replicate.from(remote, {}, function (err, result) {
+      result.ok.should.equal(true);
+      result.docs_written.should.equal(14);
+      db.info(function (err, info) {
+        verifyInfo(info, {
+          update_seq: 14,
+          doc_count: 14
         });
+        done();
       });
-    //});
+    });
   });
 });
 
