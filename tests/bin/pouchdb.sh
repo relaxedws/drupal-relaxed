@@ -10,6 +10,7 @@ mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/pouchdb/test.html ~/www/test.html
 mv ~/www/modules/relaxed/tests/pouchdb/test.js ~/www/test.js
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
+mv ~/www/modules/relaxed/tests/fixtures/documents.txt ~/www/documents.txt
 
 # Enable dependencies.
 php ~/drush.phar en --yes entity_test, relaxed_test || true
