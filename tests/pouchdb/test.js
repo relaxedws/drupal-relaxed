@@ -44,8 +44,8 @@ describe('Test replication', function () {
         db.info(function (err, info) {
           console.log(err);
           verifyInfo(info, {
-            update_seq: 9,
-            doc_count: 9
+            update_seq: 12,
+            doc_count: 12
           });
           done();
         });
@@ -59,11 +59,11 @@ describe('Test replication', function () {
     //remote.bulkDocs({ docs: docs }, {}, function (err, results) {
       db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
-        result.docs_written.should.equal(11);
+        result.docs_written.should.equal(14);
         db.info(function (err, info) {
           verifyInfo(info, {
-            update_seq: 11,
-            doc_count: 11
+            update_seq: 14,
+            doc_count: 14
           });
           done();
         });
