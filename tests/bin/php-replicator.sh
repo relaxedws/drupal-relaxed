@@ -61,10 +61,6 @@ sleep 60
 # Get all docs from target to check replication worked.
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
-#-----------------------------------
-sudo cat /var/log/apache2/error.log
-#-----------------------------------
-
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=6
 COUNT=$(($COUNT + $USERS));
