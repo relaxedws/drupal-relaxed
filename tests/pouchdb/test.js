@@ -1,7 +1,7 @@
-var getJSON = function(url, successHandler, errorHandler) {
+var getFixtures = function(url, successHandler, errorHandler) {
   var xhr = new XMLHttpRequest();
   xhr.open('get', url, true);
-  xhr.responseType = 'txt';
+  xhr.responseType = 'text';
   xhr.onload = function() {
     var status = xhr.status;
     if (status == 200) {
@@ -18,12 +18,14 @@ PouchDB.debug.enable('*');
 //PouchDB.debug.enable('pouchdb:api');
 //PouchDB.debug.enable('pouchdb:http');
 
+var baseUrl = 'http://replicator:replicator@localhost:8080';
 describe('Test replication', function () {
 
   it('Test basic push replication', function (done) {
+    var docs = [];
     var db = new PouchDB('pouch_to_drupal');
-    var remote = new PouchDB('http://replicator:replicator@localhost:8080/relaxed/default');
-    getJSON('http://localhost:8080/documents.txt', function(data) {
+    var remote = new PouchDB(baseUrl + '/relaxed/default');
+    getFixtures(baseUrl + '/documents.txt', function(data) {
       var lines = data.split(/\r\n|\n/);
       // Create an array with all docs.
       for(var line = 0; line < lines.length; line++) {
@@ -54,7 +56,7 @@ describe('Test replication', function () {
 
   it('Test basic pull replication', function (done) {
     var db = new PouchDB('drupal_to_pouch');
-    var remote = new PouchDB('http://replicator:replicator@localhost:8080/relaxed/default');
+    var remote = new PouchDB(baseUrl + '/relaxed/default');
     db.replicate.from(remote, {}, function (err, result) {
       result.ok.should.equal(true);
       result.docs_written.should.equal(14);
