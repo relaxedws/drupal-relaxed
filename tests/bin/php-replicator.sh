@@ -6,20 +6,24 @@ set -ev
 mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 mv ~/www/modules/relaxed/tests/php-client $TRAVIS_BUILD_DIR/
-php ~/drush.phar -l http://drupal.loc en --yes entity_test, relaxed_test || true
-php ~/drush.phar -l http://drupal2.loc en --yes entity_test, relaxed_test || true
+
+php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal1 standard
+php ~/drush.phar --yes --uri=http://localhost:8081 pm-uninstall rdf
+
+php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxed_test || true
+php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxed_test || true
 
 # Create a new role, add 'perform content replication' permission to this role
 # and create a user with this role.
-php ~/drush.phar -l http://drupal.loc role-create 'Replicator'
-php ~/drush.phar -l http://drupal.loc role-add-perm 'Replicator' 'perform content replication'
-php ~/drush.phar -l http://drupal.loc user-create replicator --mail="replicator@example.com" --password="replicator"
-php ~/drush.phar -l http://drupal.loc user-add-role 'Replicator' replicator
+php ~/drush.phar --yes --uri=http://localhost:8080 role-create 'Replicator'
+php ~/drush.phar --yes --uri=http://localhost:8080 role-add-perm 'Replicator' 'perform content replication'
+php ~/drush.phar --yes --uri=http://localhost:8080 user-create replicator --mail="replicator@example.com" --password="replicator"
+php ~/drush.phar --yes --uri=http://localhost:8080 user-add-role 'Replicator' replicator
 
-php ~/drush.phar -l http://drupal2.loc role-create 'Replicator'
-php ~/drush.phar -l http://drupal2.loc role-add-perm 'Replicator' 'perform content replication'
-php ~/drush.phar -l http://drupal2.loc user-create replicator --mail="replicator@example.com" --password="replicator"
-php ~/drush.phar -l http://drupal2.loc user-add-role 'Replicator' replicator
+php ~/drush.phar --yes --uri=http://localhost:8081 role-create 'Replicator'
+php ~/drush.phar --yes --uri=http://localhost:8081 role-add-perm 'Replicator' 'perform content replication'
+php ~/drush.phar --yes --uri=http://localhost:8081 user-create replicator --mail="replicator@example.com" --password="replicator"
+php ~/drush.phar --yes --uri=http://localhost:8081 user-add-role 'Replicator' replicator
 
 cd $TRAVIS_BUILD_DIR/php-client
 composer install
@@ -40,22 +44,22 @@ done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 # Get all docs from source for debugging.
 curl -X GET http://localhost:5984/source/_all_docs
 
-# Run the replication from CouchDB to Drupal.loc.
-php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "drupal.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
+# Run the replication from CouchDB to localhost:8080.
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
 sleep 60
 
-# Get all docs from drupal.loc for debugging.
-curl -X GET http://admin:admin@drupal.loc/relaxed/default/_all_docs
+# Get all docs from localhost:8080 for debugging.
+curl -X GET http://admin:admin@localhost:8080/relaxed/default/_all_docs
 
-# Run the replication from Drupal.loc to Drupal2.loc.
-php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "drupal.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "drupal2.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
+# Run the replication from localhost:8080 to localhost:8081.
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
 sleep 60
 
-# Get all docs from drupal.loc for debugging.
-curl -X GET http://admin:admin@drupal2.loc/relaxed/default/_all_docs
+# Get all docs from localhost:8080 for debugging.
+curl -X GET http://admin:admin@localhost:8081/relaxed/default/_all_docs
 
-# Run the replication from Drupal2.loc to CouchDB.
-php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "drupal2.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "target"}}';
+# Run the replication from localhost:8081 to CouchDB.
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "target"}}';
 sleep 60
 
 # Get all docs from target to check replication worked.
