@@ -2,13 +2,10 @@
 
 set -ev
 
-# Enable dependencies.
-drush en --yes key_value, multiversion, relaxed || true
 
-php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --sqlite /tmp/test.sqlite --url http://drupal.loc "relaxed" | tee /tmp/test.txt
-export TEST_EXIT=${PIPESTATUS[0]}
+php ./core/scripts/run-tests.sh --verbose --keep-results --color --concurrency 4 --php `which php` --sqlite /tmp/test.sqlite --url http://localhost:8080 "multiversion" | tee /tmp/test.log
+export STATUS_SCRIPT=${PIPESTATUS[0]}
 
-# Simpletest does not exit with code 0 on success, so we will need to analyze
-# the output to ascertain whether the tests passed.
-TEST_SIMPLETEST=$(! egrep -i "([0-9]+ fails)|(PHP Fatal error)|([0-9]+ exceptions)" /tmp/test.txt > /dev/null)$?
-if [ $TEST_EXIT -eq 0 ] && [ $TEST_SIMPLETEST -eq 0 ]; then exit 0; else exit 1; fi
+# Workaround so that we exit with the correct status.
+STATUS_LOG=$(! egrep -i "([0-9]+ fails)|([0-9]+ exceptions)|(PHP Fatal error)|(FATAL)" /tmp/test.log > /dev/null)$?
+test $STATUS_SCRIPT -eq 0 && test $STATUS_LOG -eq 0
