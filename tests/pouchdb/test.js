@@ -23,7 +23,7 @@ describe('Test replication', function () {
   it('Test basic push replication', function (done) {
     var db = new PouchDB('pouch_to_drupal');
     var remote = new PouchDB('http://replicator:replicator@localhost:8080/relaxed/default');
-    getJSON('http://drupal8dev.loc/documents.txt', function(data) {
+    getJSON('http://localhost:8080/documents.txt', function(data) {
       var lines = data.split(/\r\n|\n/);
       // Create an array with all docs.
       for(var line = 0; line < lines.length; line++) {
