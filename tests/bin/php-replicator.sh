@@ -6,20 +6,20 @@ set -ev
 mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 mv ~/www/modules/relaxed/tests/php-client $TRAVIS_BUILD_DIR/
-drush -l http://drupal.loc en --yes entity_test, relaxed_test || true
-drush -l http://drupal2.loc en --yes entity_test, relaxed_test || true
+php ~/drush.phar -l http://drupal.loc en --yes entity_test, relaxed_test || true
+php ~/drush.phar -l http://drupal2.loc en --yes entity_test, relaxed_test || true
 
 # Create a new role, add 'perform content replication' permission to this role
 # and create a user with this role.
-drush -l http://drupal.loc role-create 'Replicator'
-drush -l http://drupal.loc role-add-perm 'Replicator' 'perform content replication'
-drush -l http://drupal.loc user-create replicator --mail="replicator@example.com" --password="replicator"
-drush -l http://drupal.loc user-add-role 'Replicator' replicator
+php ~/drush.phar -l http://drupal.loc role-create 'Replicator'
+php ~/drush.phar -l http://drupal.loc role-add-perm 'Replicator' 'perform content replication'
+php ~/drush.phar -l http://drupal.loc user-create replicator --mail="replicator@example.com" --password="replicator"
+php ~/drush.phar -l http://drupal.loc user-add-role 'Replicator' replicator
 
-drush -l http://drupal2.loc role-create 'Replicator'
-drush -l http://drupal2.loc role-add-perm 'Replicator' 'perform content replication'
-drush -l http://drupal2.loc user-create replicator --mail="replicator@example.com" --password="replicator"
-drush -l http://drupal2.loc user-add-role 'Replicator' replicator
+php ~/drush.phar -l http://drupal2.loc role-create 'Replicator'
+php ~/drush.phar -l http://drupal2.loc role-add-perm 'Replicator' 'perform content replication'
+php ~/drush.phar -l http://drupal2.loc user-create replicator --mail="replicator@example.com" --password="replicator"
+php ~/drush.phar -l http://drupal2.loc user-add-role 'Replicator' replicator
 
 cd $TRAVIS_BUILD_DIR/php-client
 composer install
