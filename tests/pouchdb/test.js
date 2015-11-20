@@ -59,11 +59,11 @@ describe('Test replication', function () {
     var remote = new PouchDB(baseUrl + '/relaxed/default');
     db.replicate.from(remote, {}, function (err, result) {
       result.ok.should.equal(true);
-      result.docs_written.should.equal(14);
+      result.docs_written.should.equal(15);
       db.info(function (err, info) {
         verifyInfo(info, {
-          update_seq: 14,
-          doc_count: 14
+          update_seq: 15,
+          doc_count: 15
         });
         done();
       });
