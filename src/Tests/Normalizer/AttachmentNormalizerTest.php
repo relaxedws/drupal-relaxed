@@ -62,7 +62,7 @@ class AttachmentNormalizerTest extends NormalizerTestBase {
     rewind($this->fileHandle);
 
     $meta = stream_get_meta_data($this->fileHandle);
-    $this->fileEntity = File::Create(['uri' => $meta['uri']]);
+    $this->fileEntity = File::create(['uri' => $meta['uri']]);
   }
 
   public function testNormalizer() {
