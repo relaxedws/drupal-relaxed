@@ -167,11 +167,6 @@ class DbResource extends ResourceBase {
       }
     }
 
-    // This will save stub entities in case the entity has entity reference
-    // fields and a referenced entity does not exist or will update stub
-    // entities with the correct values.
-    \Drupal::service('relaxed.stub_entity_processor')->processEntity($entity);
-
     // Validate the received data before saving.
     $this->validate($entity);
     try {
@@ -183,7 +178,7 @@ class DbResource extends ResourceBase {
       return $response;
     }
     catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage());
     }
   }
 

@@ -9,7 +9,7 @@ services:
       - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.replication_log:
@@ -60,8 +60,10 @@ services:
     class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
-  relaxed.stub_entity_processor:
-      class: Drupal\relaxed\StubEntityProcessor\StubEntityProcessor
+  relaxed.normalizer.comment_item:
+    class: Drupal\relaxed\Normalizer\CommentItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev', '@entity.index.rev.tree']

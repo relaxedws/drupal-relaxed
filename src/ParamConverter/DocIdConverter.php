@@ -112,8 +112,8 @@ class DocIdConverter implements ParamConverterInterface {
     }
     $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id);
     // Do not return stub entities.
-    // @todo Needs to change as part of https://www.drupal.org/node/2599870 and https://www.drupal.org/node/2600370
-    if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
+    // @todo Needs to change as part of https://www.drupal.org/node/2600370
+    if ($entity->_rev->is_stub) {
       return $uuid;
     }
     return $entity ?: $uuid;

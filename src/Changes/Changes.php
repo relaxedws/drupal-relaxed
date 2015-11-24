@@ -98,7 +98,7 @@ class Changes implements ChangesInterface {
     // Format the result array.
     $changes = array();
     foreach ($sequences as $sequence) {
-      if (!empty($sequence['local']) || strpos($sequence['rev'], '1-101010101010101010101010') !== FALSE) {
+      if (!empty($sequence['local']) || !empty($sequence['is_stub'])) {
         continue;
       }
 

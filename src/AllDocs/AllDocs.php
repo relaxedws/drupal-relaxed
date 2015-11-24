@@ -185,7 +185,7 @@ class AllDocs implements AllDocsInterface {
         if ($this->includeDocs) {
           $entities = $this->entityManager->getStorage($entity_type_id)->loadMultiple($ids);
           foreach ($entities as $entity) {
-            if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
+            if ($entity->_rev->is_stub) {
               continue;
             }
             $rows[$entity->uuid()]['doc'] = $this->serializer->normalize($entity, 'json');

@@ -1,15 +1,10 @@
 <?php
 
-use Drupal\comment\CommentStorageInterface;
-use Drupal\Component\Utility\Random;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\taxonomy\TermStorageInterface;
-use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -102,45 +97,4 @@ function multiversion_entity_create_access(AccountInterface $account, array $con
  */
 function relaxed_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
   return AccessResult::allowedIfHasPermission($account, 'perform content replication');
-}
-
-/**
- * Implements hook_entity_create_stub().
- */
-function relaxed_entity_create_stub(EntityStorageInterface $target_storage) {
-  $target_entity_values = array();
-  $random = new Random();
-  $name = $random->name(8, TRUE);
-  // This revision will be set for a stub entities and will be used to detect
-  // the value for is_stub property for the _rev field.
-  // @todo {@link https://www.drupal.org/node/2599870 Come up with a better way for this.}
-  $rev = '1-101010101010101010101010' . $name;
-
-  if ($target_storage instanceof TermStorageInterface) {
-    $target_entity_values = array(
-      'vid' => 'tags',
-      'name' => "Stub name $name",
-      '_rev' => $rev,
-    );
-  }
-  if ($target_storage instanceof UserStorageInterface) {
-    $target_entity_values = array(
-      'name' => "Stub name $name",
-      'mail' => "$name@example.com",
-      'pass' => user_password(),
-      'status' => 1,
-      '_rev' => $rev,
-    );
-  }
-  if ($target_storage instanceof CommentStorageInterface) {
-    $target_entity_values = array(
-      'entity_type' => 'node',
-      'field_name' => 'comment',
-      'subject' => "Stub comment $name.",
-      'mail' => "$name@example.com",
-      '_rev' => $rev,
-    );
-  }
-
-  return $target_entity_values;
 }

@@ -5,6 +5,10 @@ namespace Drupal\relaxed\Normalizer;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
@@ -39,6 +43,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   protected $linkManager;
 
   /**
+   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
+   */
+  protected $selectionManager;
+
+  /**
    * @var string[]
    */
   protected $format = array('json');
@@ -48,12 +57,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
    * @param \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface $rev_tree
    * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
+   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionTreeIndexInterface $rev_tree, LinkManagerInterface $link_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionTreeIndexInterface $rev_tree, LinkManagerInterface $link_manager, SelectionPluginManagerInterface $selection_manager = NULL) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
     $this->revTree = $rev_tree;
     $this->linkManager = $link_manager;
+    $this->selectionManager = $selection_manager;
   }
 
   /**
@@ -216,16 +227,17 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $data[$id_key] = $entity_id;
     }
 
+    $bundle_id = $entity_type_id;
     if ($entity_type->hasKey('bundle')) {
       if (!empty($data[$bundle_key][0]['value'])) {
         // Add bundle info when entity is not new.
-        $type = $data[$bundle_key][0]['value'];
-        $data[$bundle_key] = $type;
+        $bundle_id = $data[$bundle_key][0]['value'];
+        $data[$bundle_key] = $bundle_id;
       }
       elseif (!empty($data[$bundle_key][0]['target_id'])) {
         // Add bundle info when entity is new.
-        $type = $data[$bundle_key][0]['target_id'];
-        $data[$bundle_key] = $type;
+        $bundle_id = $data[$bundle_key][0]['target_id'];
+        $data[$bundle_key] = $bundle_id;
       }
     }
 
@@ -302,6 +314,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Remove changed info, otherwise we can get validation errors.
+    // @todo: For true replication behavior we need to remove the validation.
     if (isset($data['changed'])) {
       unset($data['changed']);
     }
@@ -323,24 +336,58 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
       foreach ($field_info as $delta => $item) {
         if (isset($item['entity_type_id']) && isset($item['target_uuid'])) {
-          $target_storage = $this->entityManager->getStorage($item['entity_type_id']);
-          $target_entity = $target_storage->loadByProperties(array('uuid' => $item['target_uuid']));
+          $target_entity_type_id = $item['entity_type_id'];
+          $target_entity_uuid = $item['target_uuid'];
+
+          $target_storage = $this->entityManager->getStorage($target_entity_type_id);
+          $target_entity = $target_storage->loadByProperties(['uuid' => $target_entity_uuid]);
           $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
+
           if ($target_entity) {
             $data[$field_name][$delta] = array(
               'target_id' => $target_entity->id(),
             );
             continue;
           }
-          $target_entity_values = array('uuid' => $item['target_uuid']);
 
-          // Let other modules feedback about their own additions.
-          $target_entity_values = array_merge($target_entity_values, \Drupal::moduleHandler()->invokeAll('entity_create_stub', array($target_storage)));
+          // If the target entity doesn't exist we need to create a stub entity
+          // in its place to ensure that the replication continues to work.
+          // The stub entity will be updated when it's full entity comes around
+          // later in the replication.
+          $fields = $this->entityManager->getFieldDefinitions($entity_type_id, $bundle_id);
+          // Figure out what bundle we should use when creating the stub.
+          $settings = $fields[$field_name]->getSettings();
+          if (isset($settings['handler_settings']['target_bundles'])) {
+            $target_bundle_id = reset($settings['handler_settings']['target_bundles']);
+          }
+          else {
+            // @todo: Update when {@link https://www.drupal.org/node/2412569
+            // this setting is configurable}.
+            $bundles = $this->entityManager->getBundleInfo($settings['target_type']);
+            $target_bundle_id = key($bundles);
+          }
+          $options = [
+            'target_type' => $target_entity_type_id,
+            'handler_settings' => $settings['handler_settings'],
+          ];
 
+          /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $selection_instance */
+          $selection_instance = $this->selectionManager->getInstance($options);
+          // We use a temporary label and entity owner ID as this will be
+          // backfilled later anyhow, when the real entity comes around.
+          $target_entity = $selection_instance
+            ->createNewEntity($target_entity_type_id, $target_bundle_id, rand(), 1);
 
-          $target_entity = entity_create($item['entity_type_id'], $target_entity_values);
+          // Set the UUID to what we received to ensure it gets updated when
+          // the full entity comes around later.
+          $target_entity->uuid->value = $target_entity_uuid;
+          // Indicate that this revision is a stub.
+          $target_entity->_rev->is_stub = TRUE;
+
+          // Populate the data field.
           $data[$field_name][$delta] = array(
-            'entity_to_save' => $target_entity,
+            'target_id' => NULL,
+            'entity' => $target_entity,
           );
         }
       }
@@ -368,13 +415,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           if ($name == 'default_langcode') {
             continue;
           }
-          if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
-            $entity->{$name} = $value;
-            $entity->_rev->is_stub = TRUE;
-          }
-          else {
-            $entity->{$name} = $value;
-          }
+          $entity->{$name} = $value;
         }
       }
       elseif (isset($data[$id_key])) {

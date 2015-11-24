@@ -157,19 +157,12 @@ class DocResource extends ResourceBase {
     // @todo {@link https://www.drupal.org/node/2600440 Ensure $received_entity
     // is saved with UUID from $existing_entity}
 
-    // Validate the received data before saving.
-    $this->validate($received_entity);
-
     if (!is_string($existing_entity) && $received_entity->_rev->value != $existing_entity->_rev->value) {
       throw new ConflictHttpException();
     }
 
-    // This will save stub entities in case the entity has entity reference
-    // fields and a referenced entity does not exist or will update stub
-    // entities with the correct values.
-    if ($received_entity->getEntityTypeId() != 'replication_log') {
-      \Drupal::service('relaxed.stub_entity_processor')->processEntity($received_entity);
-    }
+    // Validate the received data before saving.
+    $this->validate($received_entity);
 
     try {
       $received_entity->save();
@@ -178,7 +171,7 @@ class DocResource extends ResourceBase {
       return new ResourceResponse($data, 201, array('X-Relaxed-ETag' => $rev));
     }
     catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage());
     }
   }
 
