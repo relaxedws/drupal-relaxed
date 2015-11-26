@@ -9,6 +9,8 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
+use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 use GuzzleHttp\Psr7;
 
 /**
@@ -322,4 +324,60 @@ class DocResourceTest extends ResourceTestBase {
     }
   }
 
+  public function testStub() {
+    $db = $this->workspace->id();
+
+    $this->enableService('relaxed:doc', 'PUT');
+    $serializer = $this->container->get('serializer');
+    $entity_types = ['entity_test_rev'];
+    foreach ($entity_types as $entity_type_id) {
+      // Create a user with the correct permissions.
+      $permissions = $this->entityPermissions($entity_type_id, 'create');
+      $permissions[] = 'restful put relaxed:doc';
+      $account = $this->drupalCreateUser($permissions);
+      $this->drupalLogin($account);
+
+      $entity_uuid = 'fe36b529-e2d7-4625-9b07-7ee8f84928b2';
+      $reference_uuid = '0aec21a0-8e36-11e5-8994-feff819cdc9f';
+
+      $normalized = [
+        '@type' => $entity_type_id,
+        '_id' => $entity_uuid,
+        'name' => [],
+        'type' => [['value' => $entity_type_id]],
+        'created' => [['value' => 1447877434]],
+        'user_id' => [[
+          'entity_type_id' => 'user',
+          'target_uuid' => $reference_uuid,
+        ]],
+        'default_langcode' => [['value' => TRUE]],
+      ];
+
+      $response = $this->httpRequest("$db/" . $entity_uuid, 'PUT', Json::encode($normalized));
+      $data = Json::decode($response);
+      $this->assertResponse('201', 'HTTP response code is correct');
+      $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
+
+      $storage = $this->entityManager->getStorage('user');
+      $referenced_users = $storage->loadByProperties(['uuid' => $reference_uuid]);
+      /** @var \Drupal\user\UserInterface $referenced_user */
+      $referenced_user = reset($referenced_users);
+
+      $this->assertTrue(!empty($referenced_user), 'Referenced user way created.');
+      $this->assertTrue($referenced_user->_rev->is_stub, 'References user was saved as stub.');
+
+      $new_name = $this->randomMachineName();
+      $referenced_user->name->value = $new_name;
+      $serialized = $serializer->serialize($referenced_user, $this->defaultFormat);
+      $response = $this->httpRequest("$db/" . $reference_uuid, 'PUT', $serialized);
+      $data = Json::decode($response);
+      $this->assertResponse('201', 'HTTP response code is correct');
+      $this->assertNotEqual('0-00000000000000000000000000000000', $data['rev'], 'PUT request returned a revision hash.');
+
+      $referenced_users = $storage->loadByProperties(['uuid' => $reference_uuid]);
+      /** @var \Drupal\user\UserInterface $referenced_user */
+      $referenced_user = reset($referenced_users);
+      $this->assertEqual($new_name, $referenced_user->name->value, 'The name was updated successfully.');
+    }
+  }
 }

@@ -73,11 +73,13 @@ class StubTest extends WebTestBase {
     $entity->save();
 
     // Ensure that the references entity way created.
-    $referenced = $entity_type_manager
+    $references = $entity_type_manager
       ->getStorage('entity_test_mulrev')
       ->loadByProperties(['uuid' => '0aec21a0-8e36-11e5-8994-feff819cdc9f']);
+    $reference = reset($references);
 
-    $this->assertEqual(1, count($referenced), 'The referenced entity was saved as a stub when serialized.');
+    $this->assertTrue(!empty($reference), 'The referenced entity was saved when serialized.');
+    $this->assertTrue($reference->_rev->is_stub, 'The references entity was saved as a stub.');
 
     // Ensure that we now have the correct number of entities in the system.
     $entities = $entity_type_manager
