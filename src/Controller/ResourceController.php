@@ -150,6 +150,7 @@ class ResourceController implements ContainerAwareInterface {
     $content = $this->request->getContent();
     $parameters = $this->getParameters();
     $serializer = $this->serializer();
+    $render_contexts = [];
 
     // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
     $query = $this->request->query->all();
@@ -216,8 +217,14 @@ class ResourceController implements ContainerAwareInterface {
     }
 
     try {
+      $render_context = new RenderContext();
       /** @var \Drupal\rest\ResourceResponse $response */
-      $response = call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $this->request)));
+      $response = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($resource, $method, $parameters, $entity, $request) {
+        return call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $request)));
+      });
+      if (!$render_context->isEmpty()) {
+        $render_contexts[] = $render_context->pop();
+      }
     }
     catch (\Exception $e) {
       return $this->errorResponse($e);
@@ -229,7 +236,6 @@ class ResourceController implements ContainerAwareInterface {
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
 
-    $render_contexts = [];
     foreach ($responses as $response_part) {
       try {
         if ($response_data = $response_part->getResponseData()) {
@@ -238,11 +244,10 @@ class ResourceController implements ContainerAwareInterface {
           $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
             return $serializer->serialize($response_data, $response_format, $context);
           });
-          $response_part->setContent($response_output);
-          // Stash the contexts and add it to the main response later.
           if (!$render_context->isEmpty()) {
             $render_contexts[] = $render_context->pop();
           }
+          $response_part->setContent($response_output);
         }
       }
       catch (\Exception $e) {
@@ -253,17 +258,13 @@ class ResourceController implements ContainerAwareInterface {
       }
     }
 
-    // Add render contexts.
     foreach ($render_contexts as $render_context) {
       $response->addCacheableDependency($render_context);
     }
-    // Add cache tags for each parameter.
     foreach ($parameters as $parameter) {
       $response->addCacheableDependency($parameter);
     }
-    // Add relaxed settings config's cache tags.
-    $response->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
-    // Add query args as a cache context.
+    $response->addCacheableDependency($this->container->get('config.factory')->get('rest.settings'));
     $cacheable_metadata = new CacheableMetadata();
     $response->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
 
