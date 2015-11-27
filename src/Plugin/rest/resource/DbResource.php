@@ -119,15 +119,6 @@ class DbResource extends ResourceBase {
     elseif (empty($entity)) {
       throw new BadRequestHttpException(t('No content received'));
     }
-    $uuid = $entity->uuid();
-
-    // Check for conflicts.
-    /*if ($uuid) {
-      $entry = \Drupal::service('entity.index.uuid')->get($uuid);
-      if (!empty($entry)) {
-        throw new ConflictHttpException();
-      }
-    }*/
 
     // Check entity and field level access.
     if (!$entity->access('create')) {
@@ -142,28 +133,6 @@ class DbResource extends ResourceBase {
       }
       elseif (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
-      }
-
-      // Save the files for file and image fields.
-      if ($field instanceof FileFieldItemList) {
-        foreach ($field as $delta => $item) {
-          if (isset($item->entity_to_save)) {
-            $file = $item->entity_to_save;
-            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
-            $file->save();
-            $file_info = array('target_id' => $file->id());
-
-            $field_definitions = $entity->getFieldDefinitions();
-            $field_type = $field_definitions[$field_name]->getType();
-            // Add alternative text for image type fields.
-            if ($field_type == 'image') {
-              $file_info['alt'] = $file->getFilename();
-            }
-            $entity->{$field_name}[$delta] = $file_info;
-
-            unset($entity->{$field_name}[$delta]->entity_to_save);
-          }
-        }
       }
     }
 

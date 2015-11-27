@@ -263,7 +263,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           );
           $file = \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
           if ($file instanceof FileInterface) {
-            $data[$field_name][$delta] = array('entity_to_save' => $file);
+            $data[$field_name][$delta] = array(
+              'target_id' => NULL,
+              'entity' => $file,
+            );
           }
           continue;
         }

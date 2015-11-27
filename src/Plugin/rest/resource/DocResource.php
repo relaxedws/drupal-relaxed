@@ -131,27 +131,6 @@ class DocResource extends ResourceBase {
       if (!$field->access('create') && $field_name != 'pass') {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
-
-      // Save the files for file and image fields.
-      if ($field instanceof FileFieldItemList) {
-        foreach ($field as $delta => $item) {
-          if (isset($item->entity_to_save)) {
-            $file = $item->entity_to_save;
-            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
-            $file->save();
-            $file_info = array('target_id' => $file->id());
-
-            $field_definitions = $received_entity->getFieldDefinitions();
-            $field_type = $field_definitions[$field_name]->getType();
-            // Add alternative text for image type fields.
-            if ($field_type == 'image') {
-              $file_info['alt'] = $file->getFilename();
-            }
-            $received_entity->{$field_name}[$delta] = $file_info;
-            unset($received_entity->{$field_name}[$delta]->entity_to_save);
-          }
-        }
-      }
     }
 
     // @todo {@link https://www.drupal.org/node/2600440 Ensure $received_entity
