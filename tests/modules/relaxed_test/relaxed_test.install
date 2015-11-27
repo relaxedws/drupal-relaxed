@@ -1,6 +1,8 @@
 <?php
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Implements hook_install().
@@ -13,4 +15,23 @@ function relaxed_test_install() {
   }
   $permissions[] = 'view test entity';
   user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, $permissions);
+
+  FieldStorageConfig::create([
+    'field_name' => 'files',
+    'entity_type' => 'entity_test_mulrev',
+    'type' => 'file',
+    'cardinality' => 4,
+    'translatable' => FALSE,
+  ])->save();
+
+  FieldConfig::create([
+    'field_name' => 'files',
+    'entity_type' => 'entity_test_mulrev',
+    'bundle' => 'entity_test_mulrev',
+    'label' => 'Files',
+    'widget' => [
+      'type' => 'file',
+      'weight' => 0,
+    ],
+  ])->save();
 }
