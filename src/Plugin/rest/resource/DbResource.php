@@ -141,7 +141,7 @@ class DbResource extends ResourceBase {
     try {
       $entity->save();
       $rev = $entity->_rev->value;
-      $response = new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
+      $response = new ResourceResponse(array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev), 201, array('ETag' => $rev));
       $response->addCacheableDependency($entity);
 
       return $response;
