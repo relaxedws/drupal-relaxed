@@ -7,13 +7,6 @@ mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 php ~/drush.phar en --yes entity_test, relaxed_test || true
 
-# Create a new role, add 'perform content replication' permission to this role
-# and create a user with this role.
-php ~/drush.phar role-create 'Replicator'
-php ~/drush.phar role-add-perm 'Replicator' 'perform content replication'
-php ~/drush.phar user-create replicator --mail="replicator@example.com" --password="replicator"
-php ~/drush.phar user-add-role 'Replicator' replicator
-
 # Load documents from documents.txt and save them in the 'source' database.
 while read document
 do

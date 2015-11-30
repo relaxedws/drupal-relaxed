@@ -8,22 +8,9 @@ mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 mv ~/www/modules/relaxed/tests/php-client $TRAVIS_BUILD_DIR/
 
 php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal1 standard
-php ~/drush.phar --yes --uri=http://localhost:8081 pm-uninstall rdf
 
 php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxed_test || true
 php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxed_test || true
-
-# Create a new role, add 'perform content replication' permission to this role
-# and create a user with this role.
-php ~/drush.phar --yes --uri=http://localhost:8080 role-create 'Replicator'
-php ~/drush.phar --yes --uri=http://localhost:8080 role-add-perm 'Replicator' 'perform content replication'
-php ~/drush.phar --yes --uri=http://localhost:8080 user-create replicator --mail="replicator@example.com" --password="replicator"
-php ~/drush.phar --yes --uri=http://localhost:8080 user-add-role 'Replicator' replicator
-
-php ~/drush.phar --yes --uri=http://localhost:8081 role-create 'Replicator'
-php ~/drush.phar --yes --uri=http://localhost:8081 role-add-perm 'Replicator' 'perform content replication'
-php ~/drush.phar --yes --uri=http://localhost:8081 user-create replicator --mail="replicator@example.com" --password="replicator"
-php ~/drush.phar --yes --uri=http://localhost:8081 user-add-role 'Replicator' replicator
 
 cd $TRAVIS_BUILD_DIR/php-client
 composer install
