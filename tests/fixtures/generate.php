@@ -44,6 +44,13 @@ $docs = [
     'type' => [['value' => 'entity_test_mulrev']],
     'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
   ],
+  // Another entity with the same non-existing user reference as previous.
+  [
+    '@type' => 'entity_test_mulrev',
+    '_id' => '52ff018d-8834-4a3f-bcdc-1db1a264f734',
+    'type' => [['value' => 'entity_test_mulrev']],
+    'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+  ],
   // User entity that will update first stub.
   [
     '@type' => 'user',
