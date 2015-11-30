@@ -1,9 +1,21 @@
 <?php
 
+use Drupal\user\Entity\Role;
+
 /**
  * Implements hook_install().
  */
 function relaxed_install() {
+  // Demonstrate best security practise and create a separate role with the
+  // only permissions needed to perform content replication.
+  Role::create([
+    'id' => 'replicator',
+    'label' => 'Replicator',
+    'weight' => 0,
+    'is_admin' => 0,
+    'permissions' => ['perform content replication']
+  ])->save();
+
   $module_handler = \Drupal::moduleHandler();
   // Merge 'resource' settings from relaxed module with 'resource' settings from rest module,
   // these settings are not loaded if added to /config/install/rest.settings.yml.
