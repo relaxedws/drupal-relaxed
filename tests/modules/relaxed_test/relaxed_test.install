@@ -3,6 +3,7 @@
 use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use \Drupal\user\Entity\User;
 
 /**
  * Implements hook_install().
@@ -15,6 +16,13 @@ function relaxed_test_install() {
   }
   $permissions[] = 'view test entity';
   user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, $permissions);
+
+  User::create([
+    'name' => 'replicator',
+    'mail' => 'foo@bar.baz',
+    'pass' => 'replicator',
+    'status' => 1,
+  ])->save();
 
   FieldStorageConfig::create([
     'field_name' => 'files',
