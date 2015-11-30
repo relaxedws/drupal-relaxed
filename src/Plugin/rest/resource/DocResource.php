@@ -6,7 +6,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
-use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -117,7 +116,7 @@ class DocResource extends ResourceBase {
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity) {
+  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (is_string($workspace)) {
       throw new NotFoundHttpException();
     }
@@ -142,6 +141,11 @@ class DocResource extends ResourceBase {
 
     // Validate the received data before saving.
     $this->validate($received_entity);
+
+    // Check if a requester wan't a new edit or not.
+    if ($request->get('new_edits') == 'false') {
+      $received_entity->_rev->new_edit = FALSE;
+    }
 
     try {
       $received_entity->save();

@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -67,11 +68,11 @@ class LocalDocResource extends DocResource {
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity) {
+  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (!$received_entity->getEntityType()->get('local')) {
       throw new BadRequestHttpException('This endpoint only support local entity types.');
     }
-    return parent::put($workspace, $existing_entity, $received_entity);
+    return parent::put($workspace, $existing_entity, $received_entity, $request);
   }
 
 }
