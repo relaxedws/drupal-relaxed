@@ -195,7 +195,6 @@ class DocResource extends ResourceBase {
    * @param \Drupal\file\FileInterface $file
    */
   public function putAttachment(FileInterface $file) {
-    \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
     Cache::invalidateTags(array('file_list'));
     try {
       $file->save();
