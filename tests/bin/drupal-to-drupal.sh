@@ -28,6 +28,6 @@ sleep 120
 curl -X GET http://admin:admin@localhost:8081/relaxed/default/_all_docs | tee /tmp/all_docs.txt
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
-USERS=4
+USERS=6
 COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
