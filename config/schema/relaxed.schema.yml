@@ -49,3 +49,25 @@ rest_request:
       sequence:
         type: string
         label: 'Authentication'
+
+relaxed.endpoint.*:
+  type: config_entity
+  label: 'Endpoint config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+      label: 'UUID'
+    plugin:
+      type: string
+      label: 'Plugin'
+    settings:
+      type: relaxed.endpoint.configuration.[%parent.plugin]
+
+relaxed.endpoint.configuration.*:
+  type: endpoint_configuration
