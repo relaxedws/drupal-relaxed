@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Form\EndpointSetupForm.
+ * Contains \Drupal\relaxed\Form\EndpointSetupForm.
  */
 
 namespace Drupal\relaxed\Form;

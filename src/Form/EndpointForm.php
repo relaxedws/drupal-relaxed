@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Form\EndpointForm.
+ * Contains \Drupal\relaxed\Form\EndpointForm.
  */
 
 namespace Drupal\relaxed\Form;
@@ -14,7 +14,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 /**
  * Class EndpointForm.
  *
- * @package Drupal\deploy\Form
+ * @package Drupal\relaxed\Form
  */
 class EndpointForm extends EntityForm {
 
@@ -53,7 +53,7 @@ class EndpointForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $endpoint->id(),
       '#machine_name' => array(
-        'exists' => '\Drupal\deploy\Entity\Endpoint::load',
+        'exists' => '\Drupal\relaxed\Entity\Endpoint::load',
       ),
       '#disabled' => !$endpoint->isNew(),
     );

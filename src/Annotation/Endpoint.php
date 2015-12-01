@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Annotation\Endpoint.
+ * Contains \Drupal\relaxed\Annotation\Endpoint.
  */
 
 namespace Drupal\relaxed\Annotation;
@@ -12,7 +12,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a Endpoint item annotation object.
  *
- * @see \Drupal\deploy\Plugin\EndpointManager
+ * @see \Drupal\relaxed\Plugin\EndpointManager
  * @see plugin_api
  *
  * @Annotation

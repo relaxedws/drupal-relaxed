@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Plugin\EndpointBase.
+ * Contains \Drupal\relaxed\Plugin\EndpointBase.
  */
 
 namespace Drupal\relaxed\Plugin;

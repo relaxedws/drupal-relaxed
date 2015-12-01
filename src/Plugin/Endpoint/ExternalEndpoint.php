@@ -2,7 +2,7 @@
 
 /**
  * @file
- * contains \Drupal\deploy\Plugin\Endpoint\WorkspaceEndpoint
+ * contains \Drupal\relaxed\Plugin\Endpoint\WorkspaceEndpoint
  */
 
 namespace Drupal\relaxed\Plugin\Endpoint;

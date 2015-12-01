@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Entity\Endpoint.
+ * Contains \Drupal\relaxed\Entity\Endpoint.
  */
 
 namespace Drupal\relaxed\Entity;

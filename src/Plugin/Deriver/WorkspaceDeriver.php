@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * contains \Drupal\deploy\Plugin\Endpoint\WorkspaceDeriver
+ * contains \Drupal\relaxed\Plugin\Endpoint\WorkspaceDeriver
  */
 
 namespace Drupal\relaxed\Plugin\Deriver;

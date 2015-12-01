@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Form\EndpointDeleteForm.
+ * Contains \Drupal\relaxed\Form\EndpointDeleteForm.
  */
 
 namespace Drupal\relaxed\Form;

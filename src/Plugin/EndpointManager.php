@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\deploy\Plugin\EndpointManager.
+ * Contains \Drupal\relaxed\Plugin\EndpointManager.
  */
 
 namespace Drupal\relaxed\Plugin;
@@ -30,8 +30,8 @@ class EndpointManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/Endpoint', $namespaces, $module_handler, 'Drupal\relaxed\Plugin\EndpointInterface', 'Drupal\relaxed\Annotation\Endpoint');
 
-    $this->alterInfo('deploy_endpoint_info');
-    $this->setCacheBackend($cache_backend, 'deploy_endpoint_plugins');
+    $this->alterInfo('relaxed_endpoint_info');
+    $this->setCacheBackend($cache_backend, 'relaxed_endpoint_plugins');
   }
 
 }
