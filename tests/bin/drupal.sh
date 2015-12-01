@@ -3,7 +3,7 @@
 set -ev
 
 
-php ./core/scripts/run-tests.sh --verbose --keep-results --color --concurrency 4 --php `which php` --sqlite /tmp/test.sqlite --url http://localhost:8080 "multiversion" | tee /tmp/test.log
+php ./core/scripts/run-tests.sh --verbose --keep-results --color --concurrency 4 --php `which php` --sqlite /tmp/test.sqlite --url http://localhost:8080 "relaxed" | tee /tmp/test.log
 export STATUS_SCRIPT=${PIPESTATUS[0]}
 
 # Workaround so that we exit with the correct status.
