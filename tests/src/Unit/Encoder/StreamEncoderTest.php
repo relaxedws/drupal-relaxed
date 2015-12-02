@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Tests\Encoder\StreamEncoderTest.
+ * Contains \Drupal\Tests\relaxed\Unit\Encoder\StreamEncoderTest.
  */
 
-namespace Drupal\relaxed\Tests\Encoder;
+namespace Drupal\Tests\relaxed\Unit\Encoder;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\relaxed\Encoder\StreamEncoder;

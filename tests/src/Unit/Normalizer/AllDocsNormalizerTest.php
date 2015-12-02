@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Tests\Normalizer\AllDocsNormalizerTest.
+ * Contains \Drupal\Tests\relaxed\Unit\Normalizer\AllDocsNormalizerTest.
  */
 
-namespace Drupal\relaxed\Tests\Normalizer;
+namespace Drupal\Tests\relaxed\Unit\Normalizer;
 
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\relaxed\AllDocs\AllDocs;

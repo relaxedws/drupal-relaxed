@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\relaxed\EndpointPluginTest;
+ * Contains \Drupal\Tests\relaxed\Unit\EndpointPluginTest;
  */
 
-namespace Drupal\relaxed\Tests;
+namespace Drupal\Tests\relaxed\Unit;
 
 use Drupal\KernelTests\KernelTestBase;
 use Doctrine\CouchDB\CouchDBClient;

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Tests\Normalizer\FileItemNormalizerTest.
+ * Contains \Drupal\Tests\relaxed\Unit\Normalizer\FileItemNormalizerTest.
  */
 
-namespace Drupal\relaxed\Tests\Normalizer;
+namespace Drupal\Tests\relaxed\Unit\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\entity_test\Entity\EntityTestMulRev;

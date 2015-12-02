@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Tests\Normalizer\AttachmentNormalizerTest.
+ * Contains \Drupal\Tests\relaxed\Unit\Normalizer\AttachmentNormalizerTest.
  */
 
-namespace Drupal\relaxed\Tests\Normalizer;
+namespace Drupal\Tests\relaxed\Unit\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\file\Entity\File;
