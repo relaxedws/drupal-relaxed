@@ -15,6 +15,4 @@ use Psr\Http\Message\UriInterface;
  */
 interface EndpointInterface extends ConfigurablePluginInterface, UriInterface  {
 
-  // Add get/set methods for your plugin type here.
-
 }

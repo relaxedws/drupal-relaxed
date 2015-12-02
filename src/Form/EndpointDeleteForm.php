@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Builds the form to delete Endpoint entities.
  */
 class EndpointDeleteForm extends EntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -48,7 +49,7 @@ class EndpointDeleteForm extends EntityConfirmFormBase {
           '@type' => $this->entity->bundle(),
           '@label' => $this->entity->label()
         ]
-        )
+      )
     );
 
     $form_state->setRedirectUrl($this->getCancelUrl());

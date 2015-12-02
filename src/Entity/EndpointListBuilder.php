@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Provides a listing of Endpoint entities.
  */
 class EndpointListBuilder extends ConfigEntityListBuilder {
+
   /**
    * {@inheritdoc}
    */

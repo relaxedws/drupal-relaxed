@@ -13,8 +13,6 @@ use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
  * Class EndpointForm.
- *
- * @package Drupal\relaxed\Form
  */
 class EndpointForm extends EntityForm {
 

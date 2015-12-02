@@ -48,6 +48,7 @@ use Drupal\relaxed\EndpointPluginCollection;
  * )
  */
 class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWithPluginCollectionInterface {
+
   /**
    * The Endpoint ID.
    *
@@ -63,12 +64,12 @@ class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWith
   protected $label;
 
   /**
-   * @var
+   * @var string
    */
   protected $uuid;
 
   /**
-   * @var
+   * @var string
    */
   protected $plugin;
 
@@ -78,7 +79,7 @@ class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWith
   protected $configuration = [];
 
   /**
-   * @var
+   * @var \Drupal\Component\Plugin\LazyPluginCollection
    */
   protected $pluginCollection;
 
@@ -96,7 +97,7 @@ class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWith
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getPluginCollections()
   {
@@ -104,13 +105,16 @@ class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWith
   }
 
   /**
-   * @param $plugin_id
+   * {@inheritdoc}
    */
   public function setPlugin($plugin_id) {
     $this->plugin = $plugin_id;
     $this->getPluginCollection()->addInstanceId($plugin_id);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPlugin() {
     return $this->getPluginCollection()->get($this->plugin);
   }
