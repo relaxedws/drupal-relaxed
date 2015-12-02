@@ -23,6 +23,7 @@ class EndpointConfigurationTest extends WebTestBase {
    * @var array
    */
   public static $modules = array(
+    'file',
     'entity_test',
     'multiversion',
     'rest',
