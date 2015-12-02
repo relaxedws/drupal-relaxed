@@ -47,10 +47,10 @@ class EntityReferenceItemNormalizer extends NormalizerBase implements Denormaliz
       return $value;
     }
 
-    $field_info = array(
+    $field_info = [
       'entity_type_id' => $target_type,
       'target_uuid' => $referenced_entity->uuid(),
-    );
+    ];
 
     $bundle_key = $referenced_entity->getEntityType()->getKey('bundle');
     $bundle = $referenced_entity->bundle();
