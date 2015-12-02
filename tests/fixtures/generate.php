@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * @file
+ * This file is used to re-generate the documents.txt file with new fixture
+ * documents that are used for testing.
+ *
+ * Simply re-generate the documents by executing `php generate.php` from the
+ * command line, inside the `tests/fixtures` directory.
+ */
+
 define('DOCUMENTS', './documents.txt');
 define('FILE1', './file1.txt');
 
