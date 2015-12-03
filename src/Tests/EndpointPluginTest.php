@@ -9,6 +9,7 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\KernelTests\KernelTestBase;
 use Doctrine\CouchDB\CouchDBClient;
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\relaxed\Entity\Endpoint;
 
 
@@ -30,6 +31,10 @@ class EndpointPluginTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installConfig(['multiversion', 'relaxed']);
+    $this->installEntitySchema('workspace');
+    // Create the default workspace because the multiversion_install() hook is
+    // not executed in unit tests.
+    Workspace::create(['id' => 'default'])->save();
   }
 
   /**
