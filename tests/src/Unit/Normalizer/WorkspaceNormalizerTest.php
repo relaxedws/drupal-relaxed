@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Tests\Normalizer\WorkspaceNormalizerTest.
+ * Contains \Drupal\Tests\relaxed\Unit\Normalizer\WorkspaceNormalizerTest.
  */
 
-namespace Drupal\relaxed\Tests\Normalizer;
+namespace Drupal\Tests\relaxed\Unit\Normalizer;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\multiversion\Entity\Workspace;

@@ -2,10 +2,11 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Tests\Normalizer\ReplicationLogNormalizerTest.
+ * Contains \Drupal\Tests\relaxed\Unit\Normalizer\ReplicationLogNormalizerTest.
  */
 
-namespace Drupal\relaxed\Tests\Normalizer;
+namespace Drupal\Tests\relaxed\Unit\Normalizer;
+
 use Drupal\relaxed\Entity\ReplicationLog;
 
 /**
