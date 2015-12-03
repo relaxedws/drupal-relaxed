@@ -26,19 +26,18 @@ class WorkspaceNormalizer extends EntityNormalizer {
     $context['entity_type'] = 'workspace';
     $data = parent::normalize($entity, $format, $context);
 
+    $return_data = [];
     if (isset($data['id'])) {
-      $data['db_name'] = (string) $data['id'];
-      unset($data['id']);
+      $return_data['db_name'] = (string) $entity->id();
     }
     if ($update_seq = $entity->getUpdateSeq()) {
-      $data['update_seq'] = (int) $update_seq;
+      $return_data['update_seq'] = (int) $update_seq;
     }
     if (isset($data['created'])) {
-      $data['instance_start_time'] = (string) $entity->getStartTime();
-      unset($data['created']);
+      $return_data['instance_start_time'] = (string) $entity->getStartTime();
     }
 
-    return $data;
+    return $return_data;
   }
 
   /**
