@@ -33,6 +33,7 @@ Class ExternalEndpoint extends EndpointBase {
       '#type' => 'textfield',
       '#title' => t('Full URL'),
       '#required' => TRUE,
+      '#default_value' => $this->configuration['url'],
     ];
 
     $form += parent::buildConfigurationForm($form, $form_state);
