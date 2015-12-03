@@ -33,7 +33,7 @@ services:
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
-      - { name: normalizer, priority: 10 }
+      - { name: normalizer, priority: 20 }
     arguments: ['@entity.manager']
   relaxed.normalizer.deleted_flag_item_list:
     class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
