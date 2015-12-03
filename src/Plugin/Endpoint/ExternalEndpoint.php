@@ -28,6 +28,18 @@ Class ExternalEndpoint extends EndpointBase {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public function defaultConfiguration() {
+    return [
+      'url' => '',
+    ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['url'] = [
       '#type' => 'textfield',
@@ -43,12 +55,18 @@ Class ExternalEndpoint extends EndpointBase {
     return $form;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     if (empty($form_state->getValue('url'))) {
       $form_state->setErrorByName('url', t('Full URL not set.'));
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['url'] = $form_state->getValue('url');
     parent::submitConfigurationForm($form, $form_state);
