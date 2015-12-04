@@ -69,6 +69,20 @@ class SessionResourceTest extends ResourceTestBase {
       ),
     );
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
+
+    // Create a user with the 'perform pull replication' permission and test the
+    // response code. It should be 403.
+    $account = $this->drupalCreateUser(['perform pull replication']);
+    $this->drupalLogin($account);
+    $this->httpRequest('_session', 'GET', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct.');
+
+    // Create a user with the 'perform push replication' permission and test the
+    // response code. It should be 201.
+    $account = $this->drupalCreateUser(['perform push replication']);
+    $this->drupalLogin($account);
+    $this->httpRequest('_session', 'GET', NULL);
+    $this->assertResponse('200', 'HTTP response code is correct.');
   }
 
 }

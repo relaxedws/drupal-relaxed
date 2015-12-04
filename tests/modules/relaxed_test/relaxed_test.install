@@ -10,12 +10,8 @@ use \Drupal\user\Entity\User;
  */
 function relaxed_test_install() {
   // Set permissions.
-  $permissions = \Drupal::service('user.permissions')->getPermissions();
-  if (!empty($permissions)) {
-    $permissions = array_keys($permissions);
-  }
-  $permissions[] = 'view test entity';
-  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, $permissions);
+  $permissions = ['perform push replication'];
+  user_role_grant_permissions('replicator', $permissions);
 
   User::create([
     'name' => 'replicator',
