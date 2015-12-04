@@ -16,6 +16,7 @@ function relaxed_entity_insert(EntityInterface $entity) {
     // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+      \Drupal::service('plugin.manager.endpoint.processor')->clearCachedDefinitions();
     }
     catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
@@ -32,6 +33,7 @@ function relaxed_entity_update(EntityInterface $entity) {
     // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+      \Drupal::service('plugin.manager.endpoint.processor')->clearCachedDefinitions();
     }
     catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
@@ -48,6 +50,7 @@ function relaxed_entity_delete(EntityInterface $entity) {
     // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
+      \Drupal::service('plugin.manager.endpoint.processor')->clearCachedDefinitions();
     }
     catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
