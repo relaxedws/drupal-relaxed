@@ -334,6 +334,7 @@ class DocResourceTest extends ResourceTestBase {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type_id, 'create');
       $permissions[] = 'restful put relaxed:doc';
+      $permissions[] = 'administer users';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
