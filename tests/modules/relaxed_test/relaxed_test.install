@@ -1,23 +1,19 @@
 <?php
 
-use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use \Drupal\user\Entity\User;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_install().
  */
 function relaxed_test_install() {
-  // Set permissions.
-  $permissions = ['perform push replication'];
-  user_role_grant_permissions('replicator', $permissions);
-
   User::create([
     'name' => 'replicator',
     'mail' => 'foo@bar.baz',
     'pass' => 'replicator',
     'status' => 1,
+    'roles' => ['replicator'],
   ])->save();
 
   FieldStorageConfig::create([
