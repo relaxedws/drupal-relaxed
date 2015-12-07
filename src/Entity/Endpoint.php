@@ -91,7 +91,7 @@ class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWith
    */
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
-      $this->pluginCollection = new EndpointPluginCollection(\Drupal::service('plugin.manager.endpoint.processor'), $this->plugin, $this->configuration);
+      $this->pluginCollection = new EndpointPluginCollection(\Drupal::service('plugin.manager.endpoint'), $this->plugin, $this->configuration);
     }
     return $this->pluginCollection;
   }
