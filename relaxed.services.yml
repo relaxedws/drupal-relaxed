@@ -91,3 +91,6 @@ services:
   plugin.manager.endpoint.processor:
     class: Drupal\relaxed\Plugin\EndpointManager
     parent: default_plugin_manager
+  plugin.manager.endpoint_check.processor:
+    class: Drupal\relaxed\Plugin\EndpointCheckManager
+    parent: default_plugin_manager
