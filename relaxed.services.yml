@@ -88,6 +88,9 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
+  relaxed.endpoint_check:
+    class: Drupal\relaxed\EndpointCheck
+    arguments: ['@plugin.manager.endpoint_check']
   plugin.manager.endpoint:
     class: Drupal\relaxed\Plugin\EndpointManager
     parent: default_plugin_manager

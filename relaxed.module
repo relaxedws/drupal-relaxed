@@ -5,6 +5,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\relaxed\Entity\Endpoint;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -17,8 +18,7 @@ function relaxed_entity_insert(EntityInterface $entity) {
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
       \Drupal::service('plugin.manager.endpoint')->clearCachedDefinitions();
-    }
-    catch (InvalidArgumentException $e) {
+    } catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
     }
   }
@@ -34,8 +34,7 @@ function relaxed_entity_update(EntityInterface $entity) {
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
       \Drupal::service('plugin.manager.endpoint')->clearCachedDefinitions();
-    }
-    catch (InvalidArgumentException $e) {
+    } catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
     }
   }
@@ -51,8 +50,7 @@ function relaxed_entity_delete(EntityInterface $entity) {
     try {
       \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
       \Drupal::service('plugin.manager.endpoint')->clearCachedDefinitions();
-    }
-    catch (InvalidArgumentException $e) {
+    } catch (InvalidArgumentException $e) {
       watchdog_exception('relaxed', $e);
     }
   }
@@ -111,5 +109,36 @@ function relaxed_entity_field_access($operation, FieldDefinitionInterface $field
   }
   else {
     return AccessResult::allowedIfHasPermission($account, 'perform push replication');
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function relaxed_requirements($phase) {
+  if ($phase === 'runtime') {
+    $requirements = [];
+    $endpoint_checks = \Drupal::service('relaxed.endpoint_check')->runAll();
+    foreach ($endpoint_checks as $endpoint_id => $checks) {
+      $endpoint = Endpoint::load($endpoint_id);
+      $severity = true;
+      $messages = [];
+      foreach ($checks as $check_id => $check) {
+        $messages[] = $check['message'];
+        $severity = $check['result'] ? true : false;
+      }
+      $build = [
+        '#theme' => 'item_list',
+        '#items' => $messages,
+      ];
+      $description = \Drupal::service('renderer')->render($build);
+      $requirements[$endpoint_id] = [
+        'title' => t('Relaxed Endpoint: @endpoint', ['@endpoint' => $endpoint->label()]),
+        'description' => $description,
+        'severity' => $severity ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+      ];
+    }
+
+    return $requirements;
   }
 }

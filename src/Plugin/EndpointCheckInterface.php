@@ -5,7 +5,7 @@
  * Contains \Drupal\relaxed\Plugin\EndpointCheckInterface.
  */
 
-namespace Drupal\relaxed;
+namespace Drupal\relaxed\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\relaxed\Entity\EndpointInterface;
@@ -15,11 +15,18 @@ use Drupal\relaxed\Entity\EndpointInterface;
 interface EndpointCheckInterface extends PluginInspectionInterface {
 
   /**
-   * Check to be executed for a given endpoint.
+   * Return true if check passes.
    *
-   * @param \Drupal\relaxed\Entity\EndpointInterface $endpoint
-   * @return mixed
+   * @return boolean
    */
-  public function execute(EndpointInterface $endpoint);
+  public function getResult();
+
+  /**
+   * Return a message relating to the check result.
+   *
+   * @return string
+   */
+  public function getMessage();
+
 
 }

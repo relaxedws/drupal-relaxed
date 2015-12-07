@@ -14,4 +14,28 @@ use Drupal\Component\Plugin\PluginBase;
  */
 abstract class EndpointCheckBase extends PluginBase implements EndpointCheckInterface {
 
+  /**
+   * @var bool
+   */
+  protected $result = false;
+
+  /**
+   * @var string
+   */
+  protected $message = '';
+
+  /**
+   * @inheritDoc
+   */
+  public function getResult() {
+    return $this->result;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getMessage() {
+    return $this->message;
+  }
+
 }

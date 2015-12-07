@@ -5,7 +5,7 @@
  * Contains \Drupal\relaxed\Plugin\EndpointCheckManager.
  */
 
-namespace Drupal\relaxed;
+namespace Drupal\relaxed\Plugin;
 
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
