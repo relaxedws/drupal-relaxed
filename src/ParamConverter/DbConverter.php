@@ -27,8 +27,9 @@ class DbConverter implements ParamConverterInterface {
    *   The entity if it exists in the database or else the original UUID string.
    * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
    */
-  public function convert($entity_id, $definition, $name, array $defaults) {
-    return $this->entityManager->getStorage('workspace')->load($entity_id) ?: $entity_id;
+  public function convert($machine_name, $definition, $name, array $defaults) {
+    $workspaces = $this->entityManager->getStorage('workspace')->loadByProperties(['machine_name' => $machine_name]);
+    return current($workspaces);
   }
 
   /**
