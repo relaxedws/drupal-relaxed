@@ -9,7 +9,7 @@ interface EndpointCheckInterface {
   /**
    * Run checks against all endpoints.
    *
-   * @return mixed
+   * @return array
    */
   public function runAll();
 
@@ -17,7 +17,7 @@ interface EndpointCheckInterface {
    * Run checks against one endpoint.
    *
    * @param \Drupal\relaxed\Entity\EndpointInterface $endpoint
-   * @return mixed
+   * @return array
    */
   public function run(EndpointInterface $endpoint);
 }
