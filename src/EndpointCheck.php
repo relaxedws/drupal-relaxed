@@ -40,7 +40,8 @@ class EndpointCheck implements EndpointCheckInterface {
     $results = [];
     $checks = $this->manager->getDefinitions();
     foreach ($checks as $check) {
-      $checker = $this->manager->createInstance($check['id'], ['endpoint' => $endpoint]);
+      $checker = $this->manager->createInstance($check['id']);
+      $checker->execute($endpoint);
       $results[$check['id']] = [
         'result' => $checker->getResult(),
         'message' => $checker->getMessage(),

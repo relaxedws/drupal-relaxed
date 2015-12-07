@@ -15,6 +15,14 @@ use Drupal\relaxed\Entity\EndpointInterface;
 interface EndpointCheckInterface extends PluginInspectionInterface {
 
   /**
+   * Process the check based on the given Endpoint.
+   *
+   * @param \Drupal\relaxed\Entity\EndpointInterface $endpoint
+   * @return mixed
+   */
+  public function execute(EndpointInterface $endpoint);
+
+  /**
    * Return true if check passes.
    *
    * @return boolean
