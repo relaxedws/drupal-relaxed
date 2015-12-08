@@ -43,7 +43,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
   public function testNormalizer() {
     // Test normalize.
     $expected = array(
-      'db_name' => (string) $this->entity->id(),
+      'db_name' => (string) $this->entity->get('machine_name')->value,
       'instance_start_time' => (string) $this->entity->getStartTime(),
     );
     $normalized = $this->serializer->normalize($this->entity);
@@ -70,7 +70,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    return Workspace::create(['id' => $name]);
+    return Workspace::create(['machine_name' => $name]);
   }
 
 }

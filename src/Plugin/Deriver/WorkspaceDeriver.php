@@ -28,11 +28,11 @@ class WorkspaceDeriver implements DeriverInterface {
     $derivatives = [];
     $workspaces = Workspace::loadMultiple();
     foreach ($workspaces as $workspace) {
-      $workspace_id = $workspace->id();
-      $derivatives[$workspace_id] = [
-          'label' => ucfirst($workspace_id) . ' workspace',
-          'id' => 'workspace:' . $workspace_id,
-          'dbname' => $workspace_id
+      $machine_name = $workspace->get('machine_name')->value;
+      $derivatives[$machine_name] = [
+          'label' => $workspace->label() . ' workspace',
+          'id' => 'workspace:' . $machine_name,
+          'dbname' => $machine_name
         ] + $base_plugin_definition;
     }
 

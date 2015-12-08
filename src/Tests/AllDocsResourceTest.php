@@ -20,7 +20,6 @@ class AllDocsResourceTest extends ResourceTestBase {
   public function testGet() {
     $this->enableService('relaxed:all_docs', 'GET');
     $serializer = \Drupal::service('serializer');
-    $db = $this->workspace->id();
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('workspace', 'view');
@@ -62,7 +61,7 @@ class AllDocsResourceTest extends ResourceTestBase {
       'total_rows' => 3,
     ];
 
-    $response = $this->httpRequest("$db/_all_docs", 'GET');
+    $response = $this->httpRequest("$this->dbname/_all_docs", 'GET');
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
@@ -98,7 +97,8 @@ class AllDocsResourceTest extends ResourceTestBase {
       'rows' => $rows,
     ];
 
-    $response = $this->httpRequest("$db/_all_docs", 'GET', NULL, NULL, NULL, ['include_docs' => 'true']);
+    $this->rebuildCache();
+    $response = $this->httpRequest("$this->dbname/_all_docs", 'GET', NULL, NULL, NULL, ['include_docs' => 'true']);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);

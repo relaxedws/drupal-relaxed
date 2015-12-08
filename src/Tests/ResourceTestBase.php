@@ -34,6 +34,11 @@ abstract class ResourceTestBase extends RESTTestBase {
   protected $workspace;
 
   /**
+   * @var string
+   */
+  protected $dbname;
+
+  /**
    * @var \Drupal\multiversion\MultiversionManager
    */
   protected $multiversionManager;
@@ -76,6 +81,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);
     $this->workspace->save();
+    $this->dbname = $this->workspace->get('machine_name')->value;
 
     $this->multiversionManager->setActiveWorkspaceId($name);
     $this->entityManager = $this->container->get('entity.manager');
@@ -260,7 +266,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    return workspace::create(['id' => $name]);
+    return workspace::create(['machine_name' => $name]);
   }
 
 }

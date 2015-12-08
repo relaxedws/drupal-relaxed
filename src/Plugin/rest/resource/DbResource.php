@@ -4,12 +4,10 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
-use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -85,10 +83,8 @@ class DbResource extends ResourceBase {
 
     try {
       // @todo {@link https://www.drupal.org/node/2599930 Use the container injected in parent::create()}
-      $entity = \Drupal::service('entity.manager')
-        ->getStorage('workspace')
-        ->create(array('id' => $name))
-        ->save();
+      $entity = Workspace::create(['machine_name' => $name, 'label' => $name]);
+      $entity->save();
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, t('Internal server error'), $e);

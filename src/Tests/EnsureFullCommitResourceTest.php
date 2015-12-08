@@ -17,7 +17,6 @@ use Drupal\Component\Serialization\Json;
 class EnsureFullCommitResourceTest extends ResourceTestBase {
 
   public function testPost() {
-    $db = $this->workspace->id();
     $this->enableService('relaxed:ensure_full_commit', 'POST');
 
     // Create a user with the correct permissions.
@@ -25,7 +24,7 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest("$db/_ensure_full_commit", 'POST', NULL);
+    $response = $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST', NULL);
     $this->assertResponse('201', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);

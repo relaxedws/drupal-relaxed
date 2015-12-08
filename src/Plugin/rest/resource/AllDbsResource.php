@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\rest\ResourceResponse;
+use Drupal\multiversion\Entity\Workspace;
 
 /**
  * Implements http://docs.couchdb.org/en/latest/api/server/common.html#all-dbs
@@ -33,9 +34,11 @@ class AllDbsResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get() {
-    $workspaces = entity_load_multiple('workspace');
-    $workspaces_names = array_keys($workspaces);
+    $workspaces = [];
+    foreach (Workspace::loadMultiple() as $workspace) {
+      $workspaces[] = $workspace->get('machine_name')->value;
+    }
 
-    return new ResourceResponse($workspaces_names, 200);
+    return new ResourceResponse($workspaces, 200);
   }
 }
