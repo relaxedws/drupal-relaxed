@@ -21,7 +21,10 @@ Class ExternalEndpoint extends EndpointBase {
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $url = $this->configuration['url'];
-    $this->applyParts(parse_url($url));
+    $parsed_url = parse_url($url);
+    if ($parsed_url) {
+      $this->applyParts($parsed_url);
+    }
     $this->userInfo = isset($this->configuration['username']) ? $this->configuration['username'] : '';
     if (isset($this->configuration['password'])) {
       $this->userInfo .= ':' . base64_decode($this->configuration['password']);
@@ -61,6 +64,9 @@ Class ExternalEndpoint extends EndpointBase {
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     if (empty($form_state->getValue('url'))) {
       $form_state->setErrorByName('url', t('Full URL not set.'));
+    }
+    if (!parse_url($form_state->getValue('url'))) {
+      $form_state->setErrorByName('url', t('Invalid URL.'));
     }
   }
 
