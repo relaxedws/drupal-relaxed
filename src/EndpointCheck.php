@@ -21,7 +21,7 @@ class EndpointCheck implements EndpointCheckInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function runAll() {
     $results = [];
@@ -34,7 +34,7 @@ class EndpointCheck implements EndpointCheckInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function run(EndpointInterface $endpoint) {
     $results = [];

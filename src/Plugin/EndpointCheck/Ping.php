@@ -23,7 +23,7 @@ Class Ping extends EndpointCheckBase {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function execute(EndpointInterface $endpoint) {
     $url = (string) $endpoint->getPlugin();

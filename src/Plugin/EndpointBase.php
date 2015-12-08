@@ -52,7 +52,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   protected $fragment = '';
 
   /**
-   * {{@inheritDoc}}
+   * {{@inheritdoc}}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -60,14 +60,14 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getScheme() {
     return $this->scheme;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getAuthority() {
     if (empty($this->host)) {
@@ -84,49 +84,49 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getUserInfo() {
     return $this->userInfo;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getHost() {
     return $this->host;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getPort() {
     return $this->port;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getPath() {
     return $this->path == null ? '' : $this->path;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getQuery() {
     return $this->query;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getFragment() {
     return $this->fragment;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withScheme($scheme) {
     $new = clone $this;
@@ -135,7 +135,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withUserInfo($user, $password = NULL) {
     $info = $user;
@@ -149,7 +149,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withHost($host) {
     $new = clone $this;
@@ -158,7 +158,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withPort($port) {
     $new = clone $this;
@@ -167,7 +167,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withPath($path) {
     $new = clone $this;
@@ -176,7 +176,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withQuery($query) {
     $new = clone $this;
@@ -185,7 +185,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function withFragment($fragment) {
     $new = clone $this;
@@ -194,7 +194,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function __toString() {
     $uri = '';
@@ -249,21 +249,21 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getConfiguration() {
     return $this->configuration;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = $configuration;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function defaultConfiguration() {
     return [
@@ -273,14 +273,14 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function calculateDependencies() {
     return [];
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['username'] = [
@@ -299,7 +299,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     if (empty($form_state->getValue('username'))) {
@@ -311,7 +311,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['username'] = $form_state->getValue('username');

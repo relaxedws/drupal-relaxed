@@ -97,7 +97,7 @@ class Endpoint extends ConfigEntityBase implements EndpointInterface, EntityWith
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getPluginCollections()
   {
