@@ -31,18 +31,4 @@ class ResourceMultipartResponse extends MultipartResponse implements CacheableRe
     return parent::prepare($request);
   }
 
-  /**
-   * Returns the length of all the parts in the response body.
-   *
-   * @return int
-   */
-  protected function getSize() {
-    $size = 0;
-    foreach ($this->parts as $part) {
-      $content = $part->getContent();
-      $output = "--{$this->boundary}" . "{$part->headers}" . $content;
-      $size += strlen($output);
-    }
-    return $size;
-  }
 }
