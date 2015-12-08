@@ -9,6 +9,7 @@ namespace Drupal\relaxed\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\relaxed\Entity\EndpointInterface;
+
 /**
  * Defines an interface for Endpoint check plugins.
  */
@@ -35,6 +36,5 @@ interface EndpointCheckInterface extends PluginInspectionInterface {
    * @return string
    */
   public function getMessage();
-
 
 }
