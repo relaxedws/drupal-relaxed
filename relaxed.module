@@ -67,8 +67,14 @@ function relaxed_entity_access(EntityInterface $entity, $operation, AccountInter
   $entity_type = $entity->getEntityType();
   $entity_type_id = $entity_type->id();
 
+  // Set entity access restrictions depending on pull and push permissions.
   if ($multiversion_manager->isEnabledEntityType($entity_type) || $entity_type_id == 'replication_log') {
-    return AccessResult::allowedIfHasPermissions($account, ['perform push replication', 'perform pull replication'], 'OR');
+    if ($operation == 'view') {
+      return AccessResult::allowedIfHasPermissions($account, ['perform push replication', 'perform pull replication'], 'OR');
+    }
+    else {
+      return AccessResult::allowedIfHasPermission($account, 'perform push replication');
+    }
   }
 
   // No opinion.
@@ -86,7 +92,7 @@ function multiversion_entity_create_access(AccountInterface $account, array $con
     if (in_array($entity_bundle, array_keys($bundles))) {
       $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
       if ($multiversion_manager->isEnabledEntityType($entity_type) || $entity_type_id == 'replication_log') {
-        return AccessResult::allowedIfHasPermissions($account, ['perform push replication', 'perform pull replication'], 'OR');
+        return AccessResult::allowedIfHasPermission($account, 'perform push replication');
       }
     }
   }
@@ -99,5 +105,11 @@ function multiversion_entity_create_access(AccountInterface $account, array $con
  * Implements hook_entity_field_access().
  */
 function relaxed_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-  return AccessResult::allowedIfHasPermissions($account, ['perform push replication', 'perform pull replication'], 'OR');
+  // Set entity access restrictions depending on pull and push permissions.
+  if ($operation == 'view') {
+    return AccessResult::allowedIfHasPermissions($account, ['perform push replication', 'perform pull replication'], 'OR');
+  }
+  else {
+    return AccessResult::allowedIfHasPermission($account, 'perform push replication');
+  }
 }
