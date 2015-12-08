@@ -25,14 +25,14 @@ abstract class EndpointCheckBase extends PluginBase implements EndpointCheckInte
   protected $message = '';
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getResult() {
     return $this->result;
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getMessage() {
     return $this->message;
