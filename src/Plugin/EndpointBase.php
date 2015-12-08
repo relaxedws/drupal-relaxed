@@ -32,7 +32,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   protected $host = '';
 
   /**
-   * @var int|null Uri port.
+   * @var int|NULL Uri port.
    */
   protected $port = 80;
 
@@ -108,7 +108,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
    * {@inheritdoc}
    */
   public function getPath() {
-    return $this->path == null ? '' : $this->path;
+    return $this->path == NULL ? '' : $this->path;
   }
 
   /**
@@ -204,17 +204,17 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
     if (!empty($this->getAuthority())) {
       $uri .= $this->getAuthority();
     }
-    if ($this->getPath() != null) {
+    if ($this->getPath() != NULL) {
       // Add a leading slash if necessary.
       if ($uri && substr($this->getPath(), 0, 1) !== '/') {
         $uri .= '/';
       }
       $uri .= $this->getPath();
     }
-    if ($this->query != null) {
+    if ($this->query != NULL) {
       $uri .= '?' . $this->query;
     }
-    if ($this->fragment != null) {
+    if ($this->fragment != NULL) {
       $uri .= '#' . $this->fragment;
     }
     return $uri;

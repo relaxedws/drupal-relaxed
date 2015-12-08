@@ -55,8 +55,8 @@ class EndpointPluginTest extends KernelTestBase {
     $this->assertEquals($plugin->getHost(), 'localhost');
     $this->assertEquals($plugin->getPort(), 80);
     $this->assertEquals($plugin->getPath(), '/relaxed/default');
-    $this->assertEquals($plugin->getQuery(), null);
-    $this->assertEquals($plugin->getFragment(), null);
+    $this->assertEquals($plugin->getQuery(), NULL);
+    $this->assertEquals($plugin->getFragment(), NULL);
     $this->assertEquals($plugin->withScheme('https')->getScheme(), 'https');
     $this->assertEquals($plugin->withUserInfo('bar', 'baz')->getUserInfo(), 'bar:baz');
     $this->assertEquals($plugin->withHost('drupal.dev')->getHost(), 'drupal.dev');
@@ -90,8 +90,8 @@ class EndpointPluginTest extends KernelTestBase {
     $this->assertEquals($plugin->getHost(), 'localhost');
     $this->assertEquals($plugin->getPort(), 5984);
     $this->assertEquals($plugin->getPath(), '/target');
-    $this->assertEquals($plugin->getQuery(), null);
-    $this->assertEquals($plugin->getFragment(), null);
+    $this->assertEquals($plugin->getQuery(), NULL);
+    $this->assertEquals($plugin->getFragment(), NULL);
     $this->assertEquals($plugin->withScheme('https')->getScheme(), 'https');
     $this->assertEquals($plugin->withUserInfo('bar', 'baz')->getUserInfo(), 'bar:baz');
     $this->assertEquals($plugin->withHost('couchdb.local')->getHost(), 'couchdb.local');
