@@ -52,7 +52,7 @@ Class EndpointBase extends PluginBase implements EndpointInterface, PluginFormIn
   protected $fragment = '';
 
   /**
-   * {{@inheritdoc}}
+   * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
