@@ -29,14 +29,13 @@ Class Ping extends EndpointCheckBase {
     $url = (string) $endpoint->getPlugin();
     $client = \Drupal::httpClient();
     try {
-      $response = $client->request('GET', $url);
-      $body = json_decode($response->getBody());
-      if ($body->db_name) {
+      $response = $client->request('HEAD', $url);
+      if ($response->getStatusCode() === 200) {
         $this->result = true;
-        $this->message = t('This endpoint returned database %database.', ['%database' => $body->db_name]);
+        $this->message = t('This endpoint is ok');
       }
       else {
-        $this->message = t('This endpoint is reachable, but no database found');
+        $this->message = t('This endpoint returns status code @status.', ['@status' => $response->getStatusCode()]);
       }
     }
     catch (\Exception $e) {
