@@ -50,6 +50,6 @@ class EndpointCheckTest extends WebTestBase {
     $this->assertResponse(200);
 
     $this->assertText('Relaxed Endpoint: Workspace Default', 'Workspace Default found on status page.');
-    $this->assertText('This endpoint returned database default.', 'Ping plugin message found.');
+    $this->assertText('This endpoint is ok.', 'Ping plugin message found.');
   }
 }

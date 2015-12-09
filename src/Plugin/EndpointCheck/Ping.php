@@ -32,7 +32,7 @@ Class Ping extends EndpointCheckBase {
       $response = $client->request('HEAD', $url);
       if ($response->getStatusCode() === 200) {
         $this->result = true;
-        $this->message = t('This endpoint is ok');
+        $this->message = t('This endpoint is ok.');
       }
       else {
         $this->message = t('This endpoint returns status code @status.', ['@status' => $response->getStatusCode()]);

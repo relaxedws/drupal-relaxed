@@ -35,8 +35,11 @@ class EndpointCheckManager extends DefaultPluginManager {
     $this->alterInfo('relaxed_endpoint_check_info');
     $this->setCacheBackend($cache_backend, 'relaxed_endpoint_check_plugins');
   }
+
   /**
-   * {@inheritdoc}
+   * Runs a checks for all Endpoints.
+   *
+   * @return array
    */
   public function runAll() {
     $results = [];
@@ -49,7 +52,10 @@ class EndpointCheckManager extends DefaultPluginManager {
   }
 
   /**
-   * {@inheritdoc}
+   * Runs checks on given Endpoint.
+   *
+   * @param \Drupal\relaxed\Entity\EndpointInterface $endpoint
+   * @return array
    */
   public function run(EndpointInterface $endpoint) {
     $results = [];
@@ -62,5 +68,7 @@ class EndpointCheckManager extends DefaultPluginManager {
         'message' => $checker->getMessage(),
       ];
     }
+
+    return $results;
   }
 }
