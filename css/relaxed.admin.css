@@ -1,0 +1,24 @@
+.relaxed-endpoint-check__status-icon {
+  position: relative;
+  padding-left: 40px;
+}
+.relaxed-endpoint-check__status-icon:before {
+  content: "";
+  background-repeat: no-repeat;
+  height: 16px;
+  width: 16px;
+  display: block;
+  position: absolute;
+  left: 12px; /* LTR */
+  top: 14px;
+}
+[dir="rtl"] .relaxed-endpoint-check__status-icon:before  {
+  left: auto;
+  right: 12px;
+}
+.relaxed-endpoint-check__status-icon--error:before {
+  background-image: url(../../../core/misc/icons/e32700/error.svg);
+}
+.relaxed-endpoint-check__status-icon--warning:before {
+  background-image: url(../../../core/misc/icons/e29700/warning.svg);
+}
