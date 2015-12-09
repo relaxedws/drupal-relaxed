@@ -118,7 +118,7 @@ function relaxed_entity_field_access($operation, FieldDefinitionInterface $field
 function relaxed_requirements($phase) {
   if ($phase === 'runtime') {
     $requirements = [];
-    $endpoint_checks = \Drupal::service('relaxed.endpoint_check')->runAll();
+    $endpoint_checks = \Drupal::service('plugin.manager.endpoint_check')->runAll();
     foreach ($endpoint_checks as $endpoint_id => $checks) {
       $endpoint = Endpoint::load($endpoint_id);
       $severity = true;

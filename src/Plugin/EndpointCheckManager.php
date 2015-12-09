@@ -10,6 +10,8 @@ namespace Drupal\relaxed\Plugin;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\relaxed\Entity\Endpoint;
+use Drupal\relaxed\Entity\EndpointInterface;
 
 /**
  * Provides the Endpoint check plugin manager.
@@ -33,5 +35,32 @@ class EndpointCheckManager extends DefaultPluginManager {
     $this->alterInfo('relaxed_endpoint_check_info');
     $this->setCacheBackend($cache_backend, 'relaxed_endpoint_check_plugins');
   }
+  /**
+   * {@inheritdoc}
+   */
+  public function runAll() {
+    $results = [];
+    $endpoints = Endpoint::loadMultiple();
+    foreach ($endpoints as $endpoint) {
+      $results[$endpoint->id()] = $this->run($endpoint);
+    }
 
+    return $results;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function run(EndpointInterface $endpoint) {
+    $results = [];
+    $checks = $this->getDefinitions();
+    foreach ($checks as $check) {
+      $checker = $this->createInstance($check['id']);
+      $checker->execute($endpoint);
+      $results[$check['id']] = [
+        'result' => $checker->getResult(),
+        'message' => $checker->getMessage(),
+      ];
+    }
+  }
 }

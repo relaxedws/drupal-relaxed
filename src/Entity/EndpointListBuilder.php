@@ -36,7 +36,7 @@ class EndpointListBuilder extends ConfigEntityListBuilder {
       ],
     ];
     $row['class'] = 'color-error';
-    $checks = \Drupal::service('relaxed.endpoint_check')->run($entity);
+    $checks = \Drupal::service('plugin.manager.endpoint_check')->run($entity);
     foreach ($checks as $check) {
       if ($check['result'] === true) {
         $row['class'] = 'color-success';
