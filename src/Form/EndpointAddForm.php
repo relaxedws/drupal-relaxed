@@ -43,7 +43,7 @@ class EndpointAddForm extends EndpointForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager')->getStorage('action'),
-      $container->get('plugin.manager.endpoint.processor')
+      $container->get('plugin.manager.endpoint')
     );
   }
 
