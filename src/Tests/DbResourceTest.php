@@ -35,7 +35,7 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->workspace->id(), 'GET', NULL);
+    $this->httpRequest($this->dbname, 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
 
     // Create a user with the 'perform push replication' permission and test the
@@ -158,14 +158,14 @@ class DbResourceTest extends ResourceTestBase {
       // response code. It should be 403.
       $account = $this->drupalCreateUser(['perform pull replication']);
       $this->drupalLogin($account);
-      $this->httpRequest($this->workspace->id(), 'POST', $serialized);
+      $this->httpRequest($this->dbname, 'POST', $serialized);
       $this->assertResponse('403', 'HTTP response code is correct.');
 
       // Create a user with the 'perform push replication' permission and test the
       // response code. It should be 201.
       $account = $this->drupalCreateUser(['perform push replication']);
       $this->drupalLogin($account);
-      $this->httpRequest($this->workspace->id(), 'POST', $serialized);
+      $this->httpRequest($this->dbname, 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct.');
     }
   }
