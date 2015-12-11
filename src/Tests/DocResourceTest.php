@@ -22,8 +22,6 @@ use GuzzleHttp\Psr7;
 class DocResourceTest extends ResourceTestBase {
 
   public function testHead() {
-    $this->dbname = $this->workspace->id();
-
     // HEAD and GET is handled by the same resource.
     $this->enableService('relaxed:doc', 'GET');
     $entity_types = ['entity_test_rev'];

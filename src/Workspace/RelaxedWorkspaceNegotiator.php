@@ -43,7 +43,10 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
   public function getWorkspaceId(Request $request) {
     $path_info = trim($request->getPathInfo(), '/');
     $paths = explode('/', $path_info);
-    return $paths[1];
+
+    $workspaces = \Drupal::service('entity.manager')->getStorage('workspace')->loadByProperties(['machine_name' => $paths[1]]);
+    $workspace = current($workspaces);
+    return $workspace->id();
   }
 
 }
