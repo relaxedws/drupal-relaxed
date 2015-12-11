@@ -42,7 +42,7 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->workspace->id(), 'GET', NULL);
+    $this->httpRequest($this->dbname, 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
   }
 

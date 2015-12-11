@@ -45,7 +45,7 @@ class WorkspaceNormalizer extends EntityNormalizer {
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     if (isset($data['db_name'])) {
-      $data['id'] = $data['db_name'];
+      $data['machine_name'] = $data['db_name'];
       unset($data['db_name']);
     }
     if (isset($data['instance_start_time'])) {
