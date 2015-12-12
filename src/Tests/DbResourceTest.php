@@ -93,8 +93,8 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $id = $this->randomMachineName();
-    $response = $this->httpRequest($id, 'PUT', NULL);
+    $machine_name = $this->randomMachineName();
+    $response = $this->httpRequest($machine_name, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
@@ -179,8 +179,8 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $id = $this->randomMachineName();
-    $entity = $this->createWorkspace($id);
+    $machine_name = $this->randomMachineName();
+    $entity = $this->createWorkspace($machine_name);
     $entity->save();
 
     $response = $this->httpRequest($entity->get('machine_name')->value, 'DELETE', NULL);
@@ -194,22 +194,22 @@ class DbResourceTest extends ResourceTestBase {
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
 
     // Create a new workspace.
-    $id = $this->randomMachineName();
-    $entity = $this->createWorkspace($id);
+    $machine_name = $this->randomMachineName();
+    $entity = $this->createWorkspace($machine_name);
     $entity->save();
 
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->id(), 'DELETE', NULL);
+    $this->httpRequest($entity->get('machine_name')->value, 'DELETE', NULL);
     $this->assertResponse('403', 'HTTP response code is correct.');
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->id(), 'DELETE', NULL);
+    $this->httpRequest($entity->get('machine_name')->value, 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
   }
 
