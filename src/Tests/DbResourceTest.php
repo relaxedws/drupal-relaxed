@@ -104,7 +104,7 @@ class DbResourceTest extends ResourceTestBase {
     $entity->save();
 
     // Test putting an existing workspace.
-    $response = $this->httpRequest($entity->get('machine_name')->value, 'PUT', NULL);
+    $response = $this->httpRequest($entity->getMachineName(), 'PUT', NULL);
     $this->assertResponse('412', 'HTTP response code is correct for existing database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['error']), 'PUT request returned error.');
@@ -183,7 +183,7 @@ class DbResourceTest extends ResourceTestBase {
     $entity = $this->createWorkspace($machine_name);
     $entity->save();
 
-    $response = $this->httpRequest($entity->get('machine_name')->value, 'DELETE', NULL);
+    $response = $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
@@ -202,14 +202,14 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->get('machine_name')->value, 'DELETE', NULL);
+    $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
     $this->assertResponse('403', 'HTTP response code is correct.');
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->get('machine_name')->value, 'DELETE', NULL);
+    $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
   }
 

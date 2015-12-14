@@ -45,8 +45,7 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
     $path_info = trim($request->getPathInfo(), '/');
     $paths = explode('/', $path_info);
 
-    $workspaces = \Drupal::service('entity.manager')->getStorage('workspace')->loadByProperties(['machine_name' => $paths[1]]);
-    $workspace = current($workspaces);
+    $workspace = $this->workspaceManager->loadByMachineName($paths[1]);
     if (!$workspace) {
       $workspace = Workspace::create(['machine_name' => $paths[1]]);
     }

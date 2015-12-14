@@ -28,7 +28,7 @@ class WorkspaceDeriver implements DeriverInterface {
     $derivatives = [];
     $workspaces = Workspace::loadMultiple();
     foreach ($workspaces as $workspace) {
-      $machine_name = $workspace->get('machine_name')->value;
+      $machine_name = $workspace->getMachineName();
       $derivatives[$machine_name] = [
           'label' => $workspace->label() . ' workspace',
           'id' => 'workspace:' . $machine_name,

@@ -36,7 +36,7 @@ class AllDbsResource extends ResourceBase {
   public function get() {
     $workspaces = [];
     foreach (Workspace::loadMultiple() as $workspace) {
-      $workspaces[] = $workspace->get('machine_name')->value;
+      $workspaces[] = $workspace->getMachineName();
     }
 
     return new ResourceResponse($workspaces, 200);

@@ -81,7 +81,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);
     $this->workspace->save();
-    $this->dbname = $this->workspace->get('machine_name')->value;
+    $this->dbname = $this->workspace->getMachineName();
 
     $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
     $this->entityManager = $this->container->get('entity.manager');

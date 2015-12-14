@@ -28,7 +28,7 @@ class WorkspaceNormalizer extends EntityNormalizer {
 
     $return_data = [];
     if (isset($data['machine_name'])) {
-      $return_data['db_name'] = (string) $entity->get('machine_name')->value;
+      $return_data['db_name'] = (string) $entity->getMachineName();
     }
     if ($update_seq = $entity->getUpdateSeq()) {
       $return_data['update_seq'] = (int) $update_seq;

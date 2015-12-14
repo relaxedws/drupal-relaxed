@@ -2,35 +2,33 @@
 
 namespace Drupal\relaxed\ParamConverter;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
-use Drupal\multiversion\Entity\Workspace;
 use Symfony\Component\Routing\Route;
 
 class DbConverter implements ParamConverterInterface {
 
   /**
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
    */
-  protected $entityManager;
+  protected $workspaceManager;
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->entityManager = $entity_manager;
+  public function __construct(WorkspaceManagerInterface $workspace_manager) {
+    $this->workspaceManager = $workspace_manager;
   }
 
   /**
-   * Converts a UUID into an existing entity.
+   * Converts a machine name into an existing workspace entity.
    *
    * @return string | \Drupal\Core\Entity\EntityInterface
    *   The entity if it exists in the database or else the original UUID string.
    * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
    */
   public function convert($machine_name, $definition, $name, array $defaults) {
-    $workspaces = $this->entityManager->getStorage('workspace')->loadByProperties(['machine_name' => $machine_name]);
-    $workspace = current($workspaces);
+    $workspace = $this->workspaceManager->loadByMachineName($machine_name);
     if (!$workspace) {
       $workspace = $machine_name;
     }

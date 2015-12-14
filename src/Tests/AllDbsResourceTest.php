@@ -28,7 +28,7 @@ class AllDbsResourceTest extends ResourceTestBase {
 
     $workspaces = [];
     foreach (Workspace::loadMultiple() as $workspace) {
-      $workspaces[] = $workspace->get('machine_name')->value;
+      $workspaces[] = $workspace->getMachineName();
     }
     for ($i = 0; $i < 3; $i++) {
       $machine_name = $this->randomMachineName();
