@@ -4,6 +4,7 @@ namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
+use Drupal\multiversion\Entity\Workspace;
 use Symfony\Component\Routing\Route;
 
 class DbConverter implements ParamConverterInterface {
@@ -29,7 +30,11 @@ class DbConverter implements ParamConverterInterface {
    */
   public function convert($machine_name, $definition, $name, array $defaults) {
     $workspaces = $this->entityManager->getStorage('workspace')->loadByProperties(['machine_name' => $machine_name]);
-    return current($workspaces);
+    $workspace = current($workspaces);
+    if (!$workspace) {
+      $workspace = $machine_name;
+    }
+    return $workspace;
   }
 
   /**

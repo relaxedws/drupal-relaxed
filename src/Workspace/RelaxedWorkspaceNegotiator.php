@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Workspace;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Workspace\WorkspaceNegotiatorBase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -46,6 +47,9 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
 
     $workspaces = \Drupal::service('entity.manager')->getStorage('workspace')->loadByProperties(['machine_name' => $paths[1]]);
     $workspace = current($workspaces);
+    if (!$workspace) {
+      $workspace = Workspace::create(['machine_name' => $paths[1]]);
+    }
     return $workspace->id();
   }
 
