@@ -97,7 +97,6 @@ class AllDocsResourceTest extends ResourceTestBase {
       'rows' => $rows,
     ];
 
-    $this->rebuildCache();
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET', NULL, NULL, NULL, ['include_docs' => 'true']);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);

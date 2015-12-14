@@ -24,7 +24,7 @@ class DbConverter implements ParamConverterInterface {
    * Converts a machine name into an existing workspace entity.
    *
    * @return string | \Drupal\Core\Entity\EntityInterface
-   *   The entity if it exists in the database or else the original UUID string.
+   *   The entity if it exists in the database or else the original machine name string.
    * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
    */
   public function convert($machine_name, $definition, $name, array $defaults) {
