@@ -33,7 +33,9 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
       // If we have more than one part, and the second part is not an internal
       // resource, then it means the second part is the workspace ID.
       if (count($paths) > 1 && substr($paths[1], 0, 1) != '_') {
-        return TRUE;
+        if ($this->workspaceManager->loadByMachineName($paths[1])) {
+          return TRUE;
+        }
       }
     }
   }
@@ -47,7 +49,7 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
 
     $workspace = $this->workspaceManager->loadByMachineName($paths[1]);
     if (!$workspace) {
-      $workspace = Workspace::create(['machine_name' => $paths[1]]);
+      throw new NotFoundHttpException();
     }
     return $workspace->id();
   }
