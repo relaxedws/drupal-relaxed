@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\ParamConverter;
 
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Symfony\Component\Routing\Route;
@@ -23,14 +24,16 @@ class DbConverter implements ParamConverterInterface {
   /**
    * Converts a machine name into an existing workspace entity.
    *
-   * @return string | \Drupal\Core\Entity\EntityInterface
-   *   The entity if it exists in the database or else the original machine name string.
-   * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
+   * @param mixed $machine_name
+   * @param mixed $definition
+   * @param string $name
+   * @param array $defaults
+   * @return \Drupal\Core\Entity\EntityInterface
    */
   public function convert($machine_name, $definition, $name, array $defaults) {
     $workspace = $this->workspaceManager->loadByMachineName($machine_name);
     if (!$workspace) {
-      $workspace = $machine_name;
+      $workspace = Workspace::create(['machine_name' => $machine_name, 'label' => ucfirst($machine_name)]);
     }
     return $workspace;
   }

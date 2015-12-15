@@ -64,26 +64,22 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param $name
+   * @param $entity
    *
    * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
-  public function put($name) {
-    // If the name parameter was upcasted to an entity it means it an entity
-    // already exists.
-    if ($name instanceof WorkspaceInterface) {
-      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
+  public function put($entity) {
+    if (!$entity instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
     }
-    elseif (!is_string($name)) {
-      throw new BadRequestHttpException(t('Database name is missing'));
+    elseif (!$entity->isNew()) {
+      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
     }
 
     try {
-      // @todo {@link https://www.drupal.org/node/2599930 Use the container injected in parent::create()}
-      $entity = Workspace::create(['machine_name' => $name, 'label' => $name]);
       $entity->save();
     }
     catch (EntityStorageException $e) {
