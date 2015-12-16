@@ -51,7 +51,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
         $data[$uuid][] = $rev;
       }
 
-      $response = $this->httpRequest($this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data));
+      $response = $this->httpRequest($this->dbname . '/_revs_diff', 'POST', Json::encode($data));
       $this->assertResponse('200', 'HTTP response code is correct.');
       $this->assertEqual($response, '{}', 'Data format is correct.');
     }
@@ -110,7 +110,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
         '33-1214293f06b11ea6da4c9da0593333zz',
         '44-1214293f06b11ea6da4c9da0594444zz',
       ];
-      $response = $this->httpRequest($this->workspace->id() . '/_revs_diff', 'POST', Json::encode($data));
+      $response = $this->httpRequest($this->dbname . '/_revs_diff', 'POST', Json::encode($data));
       $this->assertResponse('200', 'HTTP response code is correct.');
       $response_data = Json::decode($response);
       $this->assertTrue(

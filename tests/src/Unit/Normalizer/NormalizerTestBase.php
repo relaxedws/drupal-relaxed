@@ -67,7 +67,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
 
     $this->serializer = $this->container->get('serializer');
 
-    $workspace = Workspace::create(['id' => 'default']);
+    $workspace = Workspace::create(['machine_name' => 'default']);
     $workspace->save();
   }
 

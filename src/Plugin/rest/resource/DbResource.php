@@ -4,12 +4,10 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
-use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -66,29 +64,23 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param $name
+   * @param $entity
    *
    * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
-  public function put($name) {
-    // If the name parameter was upcasted to an entity it means it an entity
-    // already exists.
-    if ($name instanceof WorkspaceInterface) {
-      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
+  public function put($entity) {
+    if (!$entity instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
     }
-    elseif (!is_string($name)) {
-      throw new BadRequestHttpException(t('Database name is missing'));
+    elseif (!$entity->isNew()) {
+      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
     }
 
     try {
-      // @todo {@link https://www.drupal.org/node/2599930 Use the container injected in parent::create()}
-      $entity = \Drupal::service('entity.manager')
-        ->getStorage('workspace')
-        ->create(array('id' => $name))
-        ->save();
+      $entity->save();
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, t('Internal server error'), $e);

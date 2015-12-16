@@ -17,7 +17,6 @@ use Drupal\Component\Serialization\Json;
 class ChangesResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $db = $this->workspace->id();
     $serializer = \Drupal::service('serializer');
     $this->enableService('relaxed:changes', 'GET');
 
@@ -97,14 +96,14 @@ class ChangesResourceTest extends ResourceTestBase {
 
     $expected_with_docs['last_seq'] = $expected_without_docs['last_seq'] = $this->multiversionManager->lastSequenceId();
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType);
+    $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['include_docs' => 'true']);
+    $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['include_docs' => 'true']);
     $this->assertResponse('200', 'HTTP response code is correct when including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
@@ -112,14 +111,14 @@ class ChangesResourceTest extends ResourceTestBase {
     $this->assertEqual($data, $expected_with_docs, 'The result is correct when including docs.');
 
     // Test when using 'since' query parameter.
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => 1]);
+    $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => 1]);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $first_seq]);
+    $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $first_seq]);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 
@@ -131,7 +130,7 @@ class ChangesResourceTest extends ResourceTestBase {
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
-    $response = $this->httpRequest("$db/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $second_seq]);
+    $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $second_seq]);
     $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
     $this->assertHeader('content-type', $this->defaultMimeType);
 

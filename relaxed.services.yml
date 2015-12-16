@@ -71,7 +71,7 @@ services:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
     class: Drupal\relaxed\ParamConverter\DbConverter
-    arguments: ['@entity.manager']
+    arguments: ['@workspace.manager']
     tags:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:

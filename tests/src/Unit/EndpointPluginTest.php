@@ -34,7 +34,7 @@ class EndpointPluginTest extends KernelTestBase {
     $this->installEntitySchema('workspace');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
-    Workspace::create(['id' => 'default'])->save();
+    Workspace::create(['machine_name' => 'default'])->save();
   }
 
   /**

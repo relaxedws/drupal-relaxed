@@ -27,8 +27,8 @@ class WorkspaceNormalizer extends EntityNormalizer {
     $data = parent::normalize($entity, $format, $context);
 
     $return_data = [];
-    if (isset($data['id'])) {
-      $return_data['db_name'] = (string) $entity->id();
+    if (isset($data['machine_name'])) {
+      $return_data['db_name'] = (string) $entity->getMachineName();
     }
     if ($update_seq = $entity->getUpdateSeq()) {
       $return_data['update_seq'] = (int) $update_seq;
@@ -45,7 +45,7 @@ class WorkspaceNormalizer extends EntityNormalizer {
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     if (isset($data['db_name'])) {
-      $data['id'] = $data['db_name'];
+      $data['machine_name'] = $data['db_name'];
       unset($data['db_name']);
     }
     if (isset($data['instance_start_time'])) {
