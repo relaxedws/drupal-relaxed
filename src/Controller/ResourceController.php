@@ -262,7 +262,14 @@ class ResourceController implements ContainerAwareInterface {
       $response->addCacheableDependency($render_context);
     }
     foreach ($parameters as $parameter) {
-      $response->addCacheableDependency($parameter);
+      if (is_array($parameter)) {
+        foreach ($parameter as $item) {
+          $response->addCacheableDependency($item);
+        }
+      }
+      else {
+        $response->addCacheableDependency($parameter);
+      }
     }
     $response->addCacheableDependency($this->container->get('config.factory')->get('rest.settings'));
     $cacheable_metadata = new CacheableMetadata();
