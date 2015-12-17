@@ -79,44 +79,56 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $uuid_key = $entity_type->getKey('uuid');
 
     $entity_uuid = $entity->uuid();
+    $entity_default_language = $entity->language();
+    $entity_languages = $entity->getTranslationLanguages();
 
     $data = array(
       '@context' => array(
         '_id' => '@id',
         $entity_type_id => $this->linkManager->getTypeUri($entity_type_id, $entity->bundle()),
+        '@language' => $entity_default_language->getId(),
       ),
       '@type' => $entity_type_id,
       '_id' => $entity_uuid,
     );
 
-    $field_definitions = $entity->getFieldDefinitions();
-    foreach ($entity as $name => $field) {
-      $field_type = $field_definitions[$name]->getType();
-      $items = $this->serializer->normalize($field, $format, $context);
-      // Add file and image field types into _attachments key.
-      if ($field_type == 'file' || $field_type == 'image') {
-        if ($items !== NULL) {
-          if (!isset($data['_attachments']) && !empty($items)) {
-            $data['_attachments'] = array();
-          }
-          foreach ($items as $item) {
-            $data['_attachments'] = array_merge($data['_attachments'], $item);
-          }
-        }
-        continue;
-      }
-      if ($field_type == 'password') {
-        continue;
-      }
-
-      if ($items !== NULL) {
-        $data[$name] = $items;
-      }
-    }
-
     // New or mocked entities might not have a rev yet.
     if (!empty($entity->_rev->value)) {
       $data['_rev'] = $entity->_rev->value;
+    }
+
+    $field_definitions = $entity->getFieldDefinitions();
+    foreach ($entity_languages as $entity_language) {
+      $translation = $entity->getTranslation($entity_language->getId());
+      $data[$entity_language->getId()] =
+        [
+          '@context' => [
+            '@language' => $entity_language->getId(),
+          ]
+        ];
+      foreach ($translation as $name => $field) {
+        $field_type = $field_definitions[$name]->getType();
+        $items = $this->serializer->normalize($field, $format, $context);
+        // Add file and image field types into _attachments key.
+        if ($field_type == 'file' || $field_type == 'image') {
+          if ($items !== NULL) {
+            if (!isset($data['_attachments']) && !empty($items)) {
+              $data['_attachments'] = array();
+            }
+            foreach ($items as $item) {
+              $data['_attachments'] = array_merge($data['_attachments'], $item);
+            }
+          }
+          continue;
+        }
+        if ($field_type == 'password') {
+          continue;
+        }
+
+        if ($items !== NULL) {
+          $data[$entity_language->getId()][$name] = $items;
+        }
+      }
     }
 
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
