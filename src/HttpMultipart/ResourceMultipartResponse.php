@@ -11,7 +11,6 @@ use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheableResponseTrait;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Contains data for serialization before sending the response.
