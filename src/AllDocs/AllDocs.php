@@ -90,7 +90,8 @@ class AllDocs implements AllDocsInterface {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    * @param \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\multiversion\Entity\Index\EntityIndexInterface $entity_index
+   * @param \Drupal\multiversion\Entity\Index\EntityIndexInterface
+   * @param \Symfony\Component\Serializer\SerializerInterface
    */
   public function __construct(EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace, EntityIndexInterface $entity_index, SerializerInterface $serializer) {
     $this->entityManager = $entity_manager;
