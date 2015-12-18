@@ -5,10 +5,7 @@ namespace Drupal\relaxed\Normalizer;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
-use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
-use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
@@ -17,9 +14,6 @@ use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-/**
- * @todo {@link https://www.drupal.org/node/2599920 Don't extend EntityNormalizer.}
- */
 class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInterface {
 
   /**
