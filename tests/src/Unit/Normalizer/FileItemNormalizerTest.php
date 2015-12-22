@@ -160,34 +160,61 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         '_id' => '@id',
         'entity_test_mulrev' => \Drupal::service('rest.link_manager')->getTypeUri(
           'entity_test_mulrev',
-          $entity->bundle()
+          $this->entity->bundle()
         ),
+        '@language' => 'en'
       ),
       '@type' => 'entity_test_mulrev',
-      'langcode' => array(
-        array('value' => 'en'),
-      ),
-      'name' => array(
-        array('value' => $this->values['name']),
-      ),
-      'type' => array(
-        array('value' => 'entity_test_mulrev'),
-      ),
-      'created' => array(
-        array('value' => $this->entity->created->value),
-      ),
-      'default_langcode' => array(
-        array('value' => TRUE),
-      ),
-      'user_id' => array(
-        array('target_id' => $this->values['user_id']),
-      ),
-      'field_test_text' => array(
-        array(
-          'value' => $this->values['field_test_text']['value'],
-          'format' => $this->values['field_test_text']['format'],
-        ),
-      ),
+      'en' => [
+        '@context' => [
+          '@language' => 'en',
+        ],
+        'id' => [
+          ['value' => $this->entity->id()],
+        ],
+        'uuid' => [
+          ['value' => $this->entity->uuid()],
+        ],
+        'langcode' => [
+          ['value' => 'en'],
+        ],
+        'name' => [
+          ['value' => $this->values['name']],
+        ],
+        'type' => [
+          ['value' => 'entity_test_mulrev'],
+        ],
+        'created' => [
+          ['value' => $this->entity->created->value],
+        ],
+        'default_langcode' => [
+          ['value' => TRUE],
+        ],
+        'user_id' => [
+          ['target_id' => $this->values['user_id']],
+        ],
+        'revision_id' => [
+          ['value' => $this->entity->getRevisionId()],
+        ],
+        'workspace' => [
+          [
+            'entity_type_id' => $this->entity->get('workspace')->entity->getEntityTypeId(),
+            'target_uuid' => $this->entity->get('workspace')->entity->uuid(),
+          ]
+        ],
+        '_deleted' => [
+          ['value' => FALSE],
+        ],
+        '_rev' => [
+          ['value' => $this->entity->_rev->value],
+        ],
+        'field_test_text' => [
+          [
+            'value' => $this->values['field_test_text']['value'],
+            'format' => $this->values['field_test_text']['format'],
+          ],
+        ],
+      ],
       '_attachments' => $expected_attachments,
       '_id' => $entity->uuid(),
       '_rev' => $entity->_rev->value,

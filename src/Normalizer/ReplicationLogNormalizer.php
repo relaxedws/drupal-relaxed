@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
+use Drupal\relaxed\Entity\ReplicationLog;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -77,20 +78,14 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
       'source_last_seq' => $entity->getSourceLastSeq(),
     ];
 
-    foreach ($entity as $name => $field) {
-      $items = $this->serializer->normalize($field, $format, $context);
-      if ($items !== NULL) {
-        $data[$name] = $items;
-      }
-    }
-
     return $data;
   }
   /**
    * @inheritDoc
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
-
+    $entity = ReplicationLog::create($data);
+    return $entity;
   }
 
 }

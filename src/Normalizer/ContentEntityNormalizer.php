@@ -183,13 +183,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     elseif (!empty($context['entity_type'])) {
       $entity_type_id = $context['entity_type'];
     }
-    elseif (!empty($data['_id']) && strpos($data['_id'], '/') !== FALSE) {
-      list($prefix, $entity_uuid) = explode('/', $data['_id']);
-      if ($prefix == '_local' && $entity_uuid) {
-        $entity_type_id = 'replication_log';
-        $data['uuid'] = $entity_uuid;
-      }
-    }
 
     // Resolve the UUID.
     if (empty($entity_uuid) && !empty($data['_id'])) {
@@ -404,20 +397,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    // For deserialization the Relaxed resources are not granular enough to be
-    // able to pass in the correct $class property. So we'll have to deal with
-    // replication_log here, instead of in ReplicationLogNormalizer.
-    // @todo: We should fix this at some point.
-    if ($entity_type_id == 'replication_log') {
-      // Inflate some properties to follow what Drupal expects.
-      foreach (['session_id', 'source_last_seq'] as $field_name) {
-        if (isset($data[$field_name])) {
-          $value = $data[$field_name];
-          $data[$field_name] = [['value' => $value]];
-        }
-      }
-    }
-
     // @todo {@link https://www.drupal.org/node/2599926 Use the passed $class to instantiate the entity.}
 
     if ($entity_id) {
@@ -437,7 +416,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     else {
       $entity = NULL;
-      $entity_types_to_create = ['replication_log', 'user'];
+      $entity_types_to_create = ['user'];
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($data[$id_key], $data[$revision_key]);
         $entity = $storage->create($data);
