@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
@@ -53,11 +54,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionTreeIndexInterface $rev_tree, LinkManagerInterface $link_manager, SelectionPluginManagerInterface $selection_manager = NULL) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionTreeIndexInterface $rev_tree, LinkManagerInterface $link_manager, LanguageManagerInterface $language_manager, SelectionPluginManagerInterface $selection_manager = NULL) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
     $this->revTree = $rev_tree;
     $this->linkManager = $link_manager;
+    $this->languageManager = $language_manager;
     $this->selectionManager = $selection_manager;
   }
 
@@ -175,6 +177,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_type_id = NULL;
     $entity_uuid = NULL;
     $entity_id = NULL;
+    $default_language = $data['@language'];
+    $site_languages = $this->languageManager->getLanguages();
 
     // Resolve the entity type ID.
     if (isset($data['@type'])) {
@@ -186,7 +190,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Resolve the UUID.
     if (empty($entity_uuid) && !empty($data['_id'])) {
-      $entity_uuid = $data['uuid'][0]['value'] = $data['_id'];
+      $entity_uuid = $data[$default_language]['uuid'][0]['value'] = $data['_id'];
     }
 
     // We need to nest the data for the _deleted field in its Drupal-specific
@@ -332,66 +336,69 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $storage = $this->entityManager->getStorage($entity_type_id);
 
     // Denormalize entity reference fields.
-    foreach ($data as $field_name => $field_info) {
-      if (!is_array($field_info)) {
-        continue;
-      }
-      foreach ($field_info as $delta => $item) {
-        if (isset($item['target_uuid'])) {
-          $fields = $this->entityManager->getFieldDefinitions($entity_type_id, $bundle_id);
-          // Figure out what bundle we should use when creating the stub.
-          $settings = $fields[$field_name]->getSettings();
+    foreach ($site_languages as $site_language) {
+      $langcode = $site_language->getId();
+      foreach ($data[$langcode] as $field_name => $field_info) {
+        if (!is_array($field_info)) {
+          continue;
+        }
+        foreach ($field_info as $delta => $item) {
+          if (isset($item['target_uuid'])) {
+            $fields = $this->entityManager->getFieldDefinitions($entity_type_id, $bundle_id);
+            // Figure out what bundle we should use when creating the stub.
+            $settings = $fields[$field_name]->getSettings();
 
-          // Find the target entity type and target bundle IDs and figure out if
-          // the referenced entity exists or not.
-          $target_entity_uuid = $item['target_uuid'];
-          $target_entity_type_id = $settings['target_type'];
+            // Find the target entity type and target bundle IDs and figure out if
+            // the referenced entity exists or not.
+            $target_entity_uuid = $item['target_uuid'];
+            $target_entity_type_id = $settings['target_type'];
 
-          if (isset($settings['handler_settings']['target_bundles'])) {
-            $target_bundle_id = reset($settings['handler_settings']['target_bundles']);
-          }
-          else {
-            // @todo: Update when {@link https://www.drupal.org/node/2412569
-            // this setting is configurable}.
-            $bundles = $this->entityManager->getBundleInfo($target_entity_type_id);
-            $target_bundle_id = key($bundles);
-          }
-          $target_storage = $this->entityManager->getStorage($target_entity_type_id);
-          $target_entity = $target_storage->loadByProperties(['uuid' => $target_entity_uuid]);
-          $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
+            if (isset($settings['handler_settings']['target_bundles'])) {
+              $target_bundle_id = reset($settings['handler_settings']['target_bundles']);
+            }
+            else {
+              // @todo: Update when {@link https://www.drupal.org/node/2412569
+              // this setting is configurable}.
+              $bundles = $this->entityManager->getBundleInfo($target_entity_type_id);
+              $target_bundle_id = key($bundles);
+            }
+            $target_storage = $this->entityManager->getStorage($target_entity_type_id);
+            $target_entity = $target_storage->loadByProperties(['uuid' => $target_entity_uuid]);
+            $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
 
-          if ($target_entity) {
-            $data[$field_name][$delta] = array(
-              'target_id' => $target_entity->id(),
-            );
-          }
-          // If the target entity doesn't exist we need to create a stub entity
-          // in its place to ensure that the replication continues to work.
-          // The stub entity will be updated when it's full entity comes around
-          // later in the replication.
-          else {
-            $options = [
-              'target_type' => $target_entity_type_id,
-              'handler_settings' => $settings['handler_settings'],
-            ];
-            /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $selection_instance */
-            $selection_instance = $this->selectionManager->getInstance($options);
-            // We use a temporary label and entity owner ID as this will be
-            // backfilled later anyhow, when the real entity comes around.
-            $target_entity = $selection_instance
-              ->createNewEntity($target_entity_type_id, $target_bundle_id, rand(), 1);
+            if ($target_entity) {
+              $data[$field_name][$delta] = array(
+                'target_id' => $target_entity->id(),
+              );
+            }
+            // If the target entity doesn't exist we need to create a stub entity
+            // in its place to ensure that the replication continues to work.
+            // The stub entity will be updated when it's full entity comes around
+            // later in the replication.
+            else {
+              $options = [
+                'target_type' => $target_entity_type_id,
+                'handler_settings' => $settings['handler_settings'],
+              ];
+              /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $selection_instance */
+              $selection_instance = $this->selectionManager->getInstance($options);
+              // We use a temporary label and entity owner ID as this will be
+              // backfilled later anyhow, when the real entity comes around.
+              $target_entity = $selection_instance
+                ->createNewEntity($target_entity_type_id, $target_bundle_id, rand(), 1);
 
-            // Set the UUID to what we received to ensure it gets updated when
-            // the full entity comes around later.
-            $target_entity->uuid->value = $target_entity_uuid;
-            // Indicate that this revision is a stub.
-            $target_entity->_rev->is_stub = TRUE;
+              // Set the UUID to what we received to ensure it gets updated when
+              // the full entity comes around later.
+              $target_entity->uuid->value = $target_entity_uuid;
+              // Indicate that this revision is a stub.
+              $target_entity->_rev->is_stub = TRUE;
 
-            // Populate the data field.
-            $data[$field_name][$delta] = array(
-              'target_id' => NULL,
-              'entity' => $target_entity,
-            );
+              // Populate the data field.
+              $data[$langcode][$field_name][$delta] = array(
+                'target_id' => NULL,
+                'entity' => $target_entity,
+              );
+            }
           }
         }
       }
@@ -401,17 +408,26 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     if ($entity_id) {
       if ($entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id)) {
-        foreach ($data as $name => $value) {
-          if ($name == 'default_langcode') {
-            continue;
+        if (!empty($data[$entity->language()])) {
+          foreach ($data[$entity->language()] as $name => $value) {
+            if ($name == 'default_langcode') {
+              continue;
+            }
+            $entity->{$name} = $value;
           }
-          $entity->{$name} = $value;
         }
       }
       elseif (isset($data[$id_key])) {
         unset($data[$id_key], $data[$revision_key]);
         $entity_id = NULL;
-        $entity = $storage->create($data);
+        $entity = $storage->create($data[$default_language]);
+      }
+
+      foreach ($site_languages as $site_language) {
+        $langcode = $site_language->getId();
+        if ($entity->language() != $langcode) {
+          $entity->addTranslation($langcode, $data[$langcode]);
+        }
       }
     }
     else {
@@ -419,7 +435,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity_types_to_create = ['user'];
       if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($data[$id_key], $data[$revision_key]);
-        $entity = $storage->create($data);
+        $entity = $storage->create($data[$default_language]);
       }
     }
 
