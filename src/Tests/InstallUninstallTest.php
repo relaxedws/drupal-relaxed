@@ -55,13 +55,14 @@ class InstallUninstallTest extends ModuleTestBase {
   public function setUp() {
     parent::setUp();
     $this->moduleInstaller = $this->container->get('module_installer');
-    $this->moduleInstaller->install($this->installModules);
   }
 
   /**
-   * Tests that relaxed module can be installed properly.
+   * Tests that relaxed module can be installed and uninstalled properly.
    */
-  public function testInstall() {
+  public function testInstallUninstall() {
+    // Install Multiversion and Relaxed
+    $this->moduleInstaller->install($this->installModules);
     $this->assertModules($this->installModules, TRUE);
     $this->assertModuleConfig('relaxed');
     $relaxed_config = \Drupal::config('relaxed.settings')->get('resources');
@@ -70,14 +71,8 @@ class InstallUninstallTest extends ModuleTestBase {
       $this->assertTrue(in_array($key, $this->expectedResources), "Expected resource ($key) found.");
       $this->assertTrue(isset($rest_config[$key]), "Relaxed module configuration ($key) found in Rest module configuration.");
     }
-  }
 
-  /**
-   * Tests that relaxed module can be uninstalled properly.
-   */
-  public function testUninstall() {
     // Only uninstall Relaxed.
-    $this->assertModuleConfig('relaxed');
     $this->moduleInstaller->uninstall(['relaxed']);
     $this->assertModules(['relaxed'], FALSE);
     $this->assertNoModuleConfig('relaxed');
