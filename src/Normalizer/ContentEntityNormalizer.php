@@ -177,7 +177,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_type_id = NULL;
     $entity_uuid = NULL;
     $entity_id = NULL;
-    $default_language = $data['@language'];
+    $default_language = $data['@context']['@language'];
     $site_languages = $this->languageManager->getLanguages();
 
     // Resolve the entity type ID.
@@ -196,8 +196,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
     // @todo {@link https://www.drupal.org/node/2599938 Needs test for situation when a replication overwrites delete.}
-    $deleted = isset($data['_deleted']) ? $data['_deleted'] : FALSE;
-    $data['_deleted'] = array(array('value' => $deleted));
+    //$deleted = isset($data['_deleted']) ? $data['_deleted'] : FALSE;
+    //$data['_deleted'] = array(array('value' => $deleted));
 
     // Map data from the UUID index.
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
@@ -232,15 +232,18 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     $bundle_id = $entity_type_id;
     if ($entity_type->hasKey('bundle')) {
-      if (!empty($data[$bundle_key][0]['value'])) {
-        // Add bundle info when entity is not new.
-        $bundle_id = $data[$bundle_key][0]['value'];
-        $data[$bundle_key] = $bundle_id;
-      }
-      elseif (!empty($data[$bundle_key][0]['target_id'])) {
-        // Add bundle info when entity is new.
-        $bundle_id = $data[$bundle_key][0]['target_id'];
-        $data[$bundle_key] = $bundle_id;
+      foreach ($site_languages as $site_language) {
+        $langcode = $site_language->getId();
+        if (!empty($data[$langcode][$bundle_key][0]['value'])) {
+          // Add bundle info when entity is not new.
+          $bundle_id = $data[$langcode][$bundle_key][0]['value'];
+          $data[$langcode][$bundle_key] = $bundle_id;
+        }
+        elseif (!empty($data[$langcode][$bundle_key][0]['target_id'])) {
+          // Add bundle info when entity is new.
+          $bundle_id = $data[$langcode][$bundle_key][0]['target_id'];
+          $data[$langcode][$bundle_key] = $bundle_id;
+        }
       }
     }
 
@@ -288,17 +291,19 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Clean-up attributes we don't needs anymore.
-    foreach (array('@context', '@type', '_id', '_attachments', '_revisions') as $key) {
-      if (isset($data[$key])) {
-        unset($data[$key]);
-      }
-    }
-
     // Remove changed info, otherwise we can get validation errors when the
     // 'changed' value for existing entity is higher than for the new entity (revision).
     // @see \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityChangedConstraintValidator::validate().
-    if (isset($data['changed'])) {
-      unset($data['changed']);
+    foreach (array('@context', '@type', '_id', '_attachments', '_revisions', 'changed') as $key) {
+      if (isset($data[$key])) {
+        unset($data[$key]);
+      }
+      foreach ($site_languages as $site_language) {
+        $langcode = $site_language->getId();
+        if (isset($data[$langcode][$key])) {
+          unset($data[$langcode][$key]);
+        }
+      }
     }
 
     // For the user entity type set a random name if an user with the same name
@@ -319,16 +324,15 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
-    // Remove changed info, otherwise we can get validation errors.
-    // @todo: For true replication behavior we need to remove the validation.
-    if (isset($data['changed'])) {
-      unset($data['changed']);
-    }
-
     // Exclude "name" field (the user name) for comment entity type because
     // we'll change it during replication if it's a duplicate.
-    if ($entity_type_id == 'comment' && isset($data['name'])) {
-      unset($data['name']);
+    if ($entity_type_id == 'comment') {
+      foreach ($site_languages as $site_language) {
+        $langcode = $site_language->getId();
+        if (isset($data[$langcode]['name'])) {
+          unset($data[$langcode]['name']);
+        }
+      }
     }
 
     // @todo {@link https://www.drupal.org/node/2599946 Move the below update
@@ -417,7 +421,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           }
         }
       }
-      elseif (isset($data[$id_key])) {
+      elseif (isset($data[$default_language][$id_key])) {
         unset($data[$id_key], $data[$revision_key]);
         $entity_id = NULL;
         $entity = $storage->create($data[$default_language]);
