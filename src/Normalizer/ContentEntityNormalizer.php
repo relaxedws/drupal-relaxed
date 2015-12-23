@@ -429,7 +429,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
       foreach ($site_languages as $site_language) {
         $langcode = $site_language->getId();
-        if ($entity->language() != $langcode) {
+        if ($entity->language()->getId() != $langcode) {
           $entity->addTranslation($langcode, $data[$langcode]);
         }
       }
@@ -437,8 +437,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     else {
       $entity = NULL;
       $entity_types_to_create = ['user'];
-      if (!empty($bundle_key) && !empty($data[$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
-        unset($data[$id_key], $data[$revision_key]);
+      if (!empty($bundle_key) && !empty($data[$default_language][$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
+        unset($data[$default_language][$id_key], $data[$default_language][$revision_key]);
         $entity = $storage->create($data[$default_language]);
       }
     }
