@@ -412,8 +412,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     if ($entity_id) {
       if ($entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id)) {
-        if (!empty($data[$entity->language()])) {
-          foreach ($data[$entity->language()] as $name => $value) {
+        if (!empty($data[$entity->language()->getId()])) {
+          foreach ($data[$entity->language()->getId()] as $name => $value) {
             if ($name == 'default_langcode') {
               continue;
             }
