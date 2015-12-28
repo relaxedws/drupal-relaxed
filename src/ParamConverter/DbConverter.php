@@ -33,7 +33,11 @@ class DbConverter implements ParamConverterInterface {
   public function convert($machine_name, $definition, $name, array $defaults) {
     $workspace = $this->workspaceManager->loadByMachineName($machine_name);
     if (!$workspace) {
-      $workspace = Workspace::create(['machine_name' => $machine_name, 'label' => ucfirst($machine_name)]);
+      $workspace = $machine_name;
+      $methods = $defaults['_route_object']->getMethods();
+      if (in_array('PUT', $methods) && $defaults['_plugin'] == 'relaxed:db') {
+        $workspace = Workspace::create(['machine_name' => $machine_name, 'label' => ucfirst($machine_name)]);
+      }
     }
     return $workspace;
   }
