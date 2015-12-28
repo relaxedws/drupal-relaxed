@@ -33,7 +33,7 @@ class DbConverter implements ParamConverterInterface {
   public function convert($machine_name, $definition, $name, array $defaults) {
     $workspace = $this->workspaceManager->loadByMachineName($machine_name);
     if (!$workspace) {
-      $workspace = Workspace::create(['machine_name' => $machine_name, 'label' => ucfirst($machine_name)]);
+      $workspace = $machine_name;
     }
     return $workspace;
   }
