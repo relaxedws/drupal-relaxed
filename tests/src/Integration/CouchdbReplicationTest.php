@@ -109,15 +109,15 @@ class CouchdbReplicationTest extends KernelTestBase {
    */
   public function testCouchdbReplicator() {
     // Run CouchDB to Drupal replication.
-    $this->couchDbReplicate($this->couchdb_url, $this->couchdb_url . "/$this->source_db", 'http://replicator:replicator@drupal8dev.loc/relaxed/default');
+    $this->couchDbReplicate($this->couchdb_url, $this->couchdb_url . "/$this->source_db", 'http://replicator:replicator@localhost:8080/relaxed/default');
     sleep(30);
 
     // Run Drupal to CouchDB replication.
-    $this->couchDbReplicate($this->couchdb_url, 'http://replicator:replicator@drupal8dev.loc/relaxed/default', $this->couchdb_url . "/$this->target_db");
+    $this->couchDbReplicate($this->couchdb_url, 'http://replicator:replicator@localhost:8080/relaxed/default', $this->couchdb_url . "/$this->target_db");
     sleep(30);
 
     // Run Drupal to Drupal replication.
-    $this->couchDbReplicate($this->couchdb_url, 'http://replicator:replicator@drupal8dev.loc/relaxed/default', 'http://replicator:replicator@drupal8.loc/relaxed/default');
+    $this->couchDbReplicate($this->couchdb_url, 'http://replicator:replicator@localhost:8080/relaxed/default', 'http://replicator:replicator@localhost:8081/relaxed/default');
     sleep(30);
 
     // Get all docs from couchdb target db.
@@ -125,7 +125,7 @@ class CouchdbReplicationTest extends KernelTestBase {
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => TRUE,
       CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_URL => 'http://replicator:replicator@drupal8.loc/relaxed/default/_all_docs',
+      CURLOPT_URL => 'http://replicator:replicator@localhost:8081/relaxed/default/_all_docs',
     ]);
     $response = curl_exec($curl);
     $this->assertContains('"total_rows":14', $response, 'The request returned the correct number of docs.');
@@ -142,15 +142,15 @@ class CouchdbReplicationTest extends KernelTestBase {
     $this->assertEquals(201, $response_code);
     
     // Run CouchDB to Drupal replication.
-    $this->phpReplicate('{"source": {"dbname": "' . $this->source_db . '"}, "target": {"host": "drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
+    $this->phpReplicate('{"source": {"dbname": "' . $this->source_db . '"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
     sleep(30);
 
     // Run Drupal to CouchDB replication.
-    $this->phpReplicate('{"source": {"host": "drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "' . $target_db . '"}}');
+    $this->phpReplicate('{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "' . $target_db . '"}}');
     sleep(30);
 
     // Run Drupal to Drupal replication.
-    $this->phpReplicate('{"source": {"host": "drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "drupal8.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
+    $this->phpReplicate('{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
     sleep(30);
 
     // Get all docs from couchdb target db.
@@ -158,7 +158,7 @@ class CouchdbReplicationTest extends KernelTestBase {
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => TRUE,
       CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_URL => 'http://replicator:replicator@drupal8.loc/relaxed/default/_all_docs',
+      CURLOPT_URL => 'http://replicator:replicator@localhost:8081/relaxed/default/_all_docs',
     ]);
     $response = curl_exec($curl);
     $this->assertContains('"total_rows":14', $response, 'The request returned the correct number of docs.');
