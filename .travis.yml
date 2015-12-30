@@ -23,6 +23,7 @@ env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh'
 
 notifications:
   slack: det:YiOiwfzUBtt9aTnWvocK8uDI

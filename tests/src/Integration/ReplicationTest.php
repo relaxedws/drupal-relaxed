@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\relaxed\Integration\CouchdbReplicationTest.
+ * Contains \Drupal\Tests\relaxed\Integration\ReplicationTest.
  */
 
 namespace Drupal\Tests\relaxed\Integration;
@@ -17,7 +17,7 @@ use Relaxed\Replicator\Replicator;
 /**
  * @group relaxed
  */
-class CouchdbReplicationTest extends KernelTestBase {
+class ReplicationTest extends KernelTestBase {
 
   protected $strictConfigSchema = FALSE;
 
