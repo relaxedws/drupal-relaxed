@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\relaxed\Integration\ReplicationTest.
+ * Contains \Drupal\Tests\relaxed\Integration\ReplicationTestBase.
  */
 
 namespace Drupal\Tests\relaxed\Integration;
@@ -14,16 +14,13 @@ use Exception;
 use Relaxed\Replicator\ReplicationTask;
 use Relaxed\Replicator\Replicator;
 
-/**
- * @group relaxed
- */
-class ReplicationTest extends KernelTestBase {
+abstract class ReplicationTestBase extends KernelTestBase {
 
   protected $strictConfigSchema = FALSE;
 
   /**
    * CouchDB source database name.
-   * 
+   *
    * @var string
    */
   protected $source_db;
@@ -71,11 +68,11 @@ class ReplicationTest extends KernelTestBase {
     $this->couchdb_url = 'http://localhost:5984';
 
     // Create a source database.
-    $response_code = $this->createDb($this->couchdb_url, $this->source_db);
+    $response_code = $this->createDb($this->source_db);
     $this->assertEquals(201, $response_code);
 
     // Create a target database.
-    $response_code = $this->createDb($this->couchdb_url, $this->target_db);
+    $response_code = $this->createDb($this->target_db);
     $this->assertEquals(201, $response_code);
 
     // Load documents from documents.txt and save them in the 'source' database.
@@ -105,76 +102,14 @@ class ReplicationTest extends KernelTestBase {
   }
 
   /**
-   * Test the replication using the CouchDB replicator.
-   */
-  public function testCouchdbReplicator() {
-    // Run CouchDB to Drupal replication.
-    $this->couchDbReplicate($this->couchdb_url, $this->couchdb_url . "/$this->source_db", 'http://replicator:replicator@localhost:8080/relaxed/default');
-    sleep(30);
-
-    // Run Drupal to CouchDB replication.
-    $this->couchDbReplicate($this->couchdb_url, 'http://replicator:replicator@localhost:8080/relaxed/default', $this->couchdb_url . "/$this->target_db");
-    sleep(30);
-
-    // Run Drupal to Drupal replication.
-    $this->couchDbReplicate($this->couchdb_url, 'http://replicator:replicator@localhost:8080/relaxed/default', 'http://replicator:replicator@localhost:8081/relaxed/default');
-    sleep(30);
-
-    // Get all docs from couchdb target db.
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-      CURLOPT_HTTPGET => TRUE,
-      CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_URL => 'http://replicator:replicator@localhost:8081/relaxed/default/_all_docs',
-    ]);
-    $response = curl_exec($curl);
-    $this->assertContains('"total_rows":14', $response, 'The request returned the correct number of docs.');
-    curl_close($curl);
-  }
-
-  /**
-   * Test the replication using the PHP replicator.
-   */
-  public function testPhpReplicator() {
-    // Create a new target database.
-    $target_db = 'target2';
-    $response_code = $this->createDb($this->couchdb_url, $target_db);
-    $this->assertEquals(201, $response_code);
-    
-    // Run CouchDB to Drupal replication.
-    $this->phpReplicate('{"source": {"dbname": "' . $this->source_db . '"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
-    sleep(30);
-
-    // Run Drupal to CouchDB replication.
-    $this->phpReplicate('{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "' . $target_db . '"}}');
-    sleep(30);
-
-    // Run Drupal to Drupal replication.
-    $this->phpReplicate('{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
-    sleep(30);
-
-    // Get all docs from couchdb target db.
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-      CURLOPT_HTTPGET => TRUE,
-      CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_URL => 'http://replicator:replicator@localhost:8081/relaxed/default/_all_docs',
-    ]);
-    $response = curl_exec($curl);
-    $this->assertContains('"total_rows":14', $response, 'The request returned the correct number of docs.');
-    curl_close($curl);
-  }
-
-  /*
    * Creates a new database.
    */
-  private function createDb($site_url, $db_name) {
+  protected function createDb($db_name) {
     $curl = curl_init();
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => FALSE,
-      CURLOPT_RETURNTRANSFER => TRUE,
       CURLOPT_CUSTOMREQUEST => 'PUT',
-      CURLOPT_URL => "$site_url/$db_name",
+      CURLOPT_URL => "$this->couchdb_url/$db_name",
     ]);
 
     curl_exec($curl);
@@ -184,16 +119,34 @@ class ReplicationTest extends KernelTestBase {
     return $code;
   }
 
-  /*
+  /**
+   * Creates delete a database.
+   */
+  protected function deleteDb($db_name) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+      CURLOPT_HTTPGET => FALSE,
+      CURLOPT_CUSTOMREQUEST => 'DELETE',
+      CURLOPT_URL => "$this->couchdb_url/$db_name",
+    ]);
+
+    curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    return $code;
+  }
+
+  /**
    * Replicates content from source and target using the CouchDB replicator.
    */
-  private function couchDbReplicate($replicator_path, $source, $target) {
+  protected function couchDbReplicate($source, $target) {
     $curl = curl_init();
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_POST => TRUE,
       CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "worker_processes": 1}',
-      CURLOPT_URL => "$replicator_path/_replicate",
+      CURLOPT_URL => "$this->couchdb_url/_replicate",
       CURLOPT_HTTPHEADER => [
         'Content-Type: application/json',
         'Accept: application/json',
@@ -205,10 +158,10 @@ class ReplicationTest extends KernelTestBase {
     return $response;
   }
 
-  /*
+  /**
    * Replicates content from source to target using the PHP replicator.
    */
-  private function phpReplicate($data) {
+  protected function phpReplicate($data) {
     $json = json_decode($data, true);
     if (json_last_error() != JSON_ERROR_NONE) {
       throw new Exception('Invalid JSON.');

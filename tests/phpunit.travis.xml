@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- TODO set checkForUnintentionallyCoveredCode="true" once https://www.drupal.org/node/2626832 is resolved. -->
-<phpunit colors="true"
+<phpunit bootstrap="./core/tests/bootstrap.php" colors="true"
          beStrictAboutTestsThatDoNotTestAnything="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutChangesToGlobalState="true"
@@ -18,11 +18,31 @@
   </php>
   <testsuites>
     <testsuite name="integration">
-      <directory>./tests/src/Integration</directory>
+      <directory>./modules/*/tests/src/Integration</directory>
+      <directory>./sites/*/modules/*/tests/src/Integration</directory>
+      <!-- Exclude Composer's vendor directory so we don't run tests there. -->
+      <exclude>./core/vendor</exclude>
+      <!-- Exclude Drush tests. -->
+      <exclude>./drush/tests</exclude>
     </testsuite>
   </testsuites>
   <listeners>
     <listener class="\Drupal\Tests\Listeners\DrupalStandardsListener">
     </listener>
   </listeners>
+  <!-- Filter for coverage reports. -->
+  <filter>
+    <whitelist>
+      <directory>./core/includes</directory>
+      <directory>./core/lib</directory>
+      <directory>./core/modules</directory>
+      <directory>./modules</directory>
+      <directory>./sites</directory>
+      <!-- By definition test classes have no tests. -->
+      <exclude>
+        <directory suffix="Test.php">./core/</directory>
+        <directory suffix="TestBase.php">./core/</directory>
+      </exclude>
+    </whitelist>
+  </filter>
 </phpunit>
