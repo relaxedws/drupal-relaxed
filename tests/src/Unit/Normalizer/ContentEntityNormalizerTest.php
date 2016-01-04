@@ -101,9 +101,6 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
             'target_uuid' => $this->entity->get('workspace')->entity->uuid(),
           ]
         ],
-        '_deleted' => [
-          ['value' => FALSE],
-        ],
         '_rev' => [
           ['value' => $this->entity->_rev->value],
         ],
