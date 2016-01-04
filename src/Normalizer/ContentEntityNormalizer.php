@@ -125,6 +125,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           $data[$entity_language->getId()][$name] = $items;
         }
       }
+      // Override the normalization for the _deleted special field, just so that we
+      // follow the API spec.
+      if (isset($translation->_deleted->value) && $translation->_deleted->value == TRUE) {
+        $data[$entity_language->getId()]['_deleted'] = TRUE;
+      }
+      elseif (isset($data[$entity_language->getId()]['_deleted'])) {
+        unset($data[$entity_language->getId()]['_deleted']);
+      }
     }
 
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
@@ -153,15 +161,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       foreach ($conflicts as $rev => $status) {
         $data['_conflicts'][] = $rev;
       }
-    }
-
-    // Override the normalization for the _deleted special field, just so that we
-    // follow the API spec.
-    if (isset($entity->_deleted->value) && $entity->_deleted->value == TRUE) {
-      $data['_deleted'] = TRUE;
-    }
-    elseif (isset($data['_deleted'])) {
-      unset($data['_deleted']);
     }
 
     // Finally we remove certain fields that are "local" to this host.
