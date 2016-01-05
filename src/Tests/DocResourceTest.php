@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -245,7 +246,8 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
+      $entities = EntityTestRev::loadMultiple();
+      $entity = $entities[$entity->id()];
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $first_rev]);
