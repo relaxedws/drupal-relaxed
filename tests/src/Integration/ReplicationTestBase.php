@@ -176,4 +176,22 @@ abstract class ReplicationTestBase extends KernelTestBase {
     return $replicator->startReplication();
   }
 
+  /**
+   * Assert that the database contain the correct number of docs.
+   *
+   * @param $db_url
+   * @param $docs_number
+   */
+  protected function assertAllDocsNumber($db_url, $docs_number) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+      CURLOPT_HTTPGET => TRUE,
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_URL => $db_url,
+    ]);
+    $response = curl_exec($curl);
+    $this->assertContains('"total_rows":' . $docs_number, $response, 'The request returned the correct number of docs.');
+    curl_close($curl);
+  }
+
 }

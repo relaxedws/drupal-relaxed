@@ -18,26 +18,15 @@ class PhpReplicatorTest extends ReplicationTestBase {
   public function testPhpReplicator() {
     // Run CouchDB to Drupal replication.
     $this->phpReplicate('{"source": {"dbname": "' . $this->source_db . '"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
-    sleep(30);
+    $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/default/_all_docs', 11);
 
     // Run Drupal to Drupal replication.
     $this->phpReplicate('{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}');
-    sleep(30);
+    $this->assertAllDocsNumber('http://replicator:replicator@localhost:8081/relaxed/default/_all_docs', 14);
 
     // Run Drupal to CouchDB replication.
     $this->phpReplicate('{"source": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "' . $this->target_db . '"}}');
-    sleep(30);
-
-    // Get all docs from CouchDB target db.
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-      CURLOPT_HTTPGET => TRUE,
-      CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_URL => "$this->couchdb_url/$this->target_db/_all_docs",
-    ]);
-    $response = curl_exec($curl);
-    $this->assertContains('"total_rows":14', $response, 'The request returned the correct number of docs.');
-    curl_close($curl);
+    $this->assertAllDocsNumber($this->couchdb_url . "/$this->target_db/_all_docs", 14);
 
     // Delete source database.
     $response_code = $this->deleteDb($this->source_db);
