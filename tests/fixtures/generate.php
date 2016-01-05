@@ -25,67 +25,115 @@ function _file_info($filename) {
 $docs = [
   // User entity.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'user',
     '_id' => '43155828-70db-486b-9057-f6cc905d8470',
-    'name' => [['value' => 'a']],
-    'mail' => [['value' => 'a@foo.bar']],
-    'pass' => [['value' => 'a']],
-    'status' => [['value' => 1]],
+    'en' => [
+      'name' => [['value' => 'a']],
+      'mail' => [['value' => 'a@foo.bar']],
+      'pass' => [['value' => 'a']],
+      'status' => [['value' => 1]],
+    ],
   ],
   // Entity without user reference.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'entity_test_mulrev',
     '_id' => '549dab6c-8e85-48d4-994d-b023ff6f22f6',
-    'type' => [['value' => 'entity_test_mulrev']],
-    'user_id' => [],
+    'en' => [
+      'type' => [['value' => 'entity_test_mulrev']],
+      'user_id' => [],
+    ],
   ],
   // Entity with existing user reference.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'entity_test_mulrev',
     '_id' => 'f98c1d30-2db1-4628-a497-eba5e900d47e',
-    'type' => [['value' => 'entity_test_mulrev']],
-    'user_id' => [['target_uuid' => '43155828-70db-486b-9057-f6cc905d8470']],
+    'en' => [
+      'type' => [['value' => 'entity_test_mulrev']],
+      'user_id' => [['target_uuid' => '43155828-70db-486b-9057-f6cc905d8470']],
+    ]
   ],
   // Entity with non-existing user reference (will be created as stub).
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'entity_test_mulrev',
     '_id' => '966f2c87-e0f0-4ca4-80f3-f271e797b31e',
-    'type' => [['value' => 'entity_test_mulrev']],
-    'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+    'en' => [
+      'type' => [['value' => 'entity_test_mulrev']],
+      'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+    ],
   ],
   // Another entity with the same non-existing user reference as previous.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'entity_test_mulrev',
     '_id' => '52ff018d-8834-4a3f-bcdc-1db1a264f734',
-    'type' => [['value' => 'entity_test_mulrev']],
-    'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+    'en' => [
+      'type' => [['value' => 'entity_test_mulrev']],
+      'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+    ],
   ],
   // User entity that will update first stub.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'user',
     '_id' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b',
-    'name' => [['value' => 'b']],
-    'mail' => [['value' => 'b@foo.bar']],
-    'pass' => [['value' => 'b']],
-    'status' => [['value' => 1]],
+    'en' => [
+      'name' => [['value' => 'b']],
+      'mail' => [['value' => 'b@foo.bar']],
+      'pass' => [['value' => 'b']],
+      'status' => [['value' => 1]],
+    ],
   ],
   // Entity with existing revision.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'entity_test_mulrev',
     '_id' => '1da2a674-4740-4edb-ad3d-2e243c9e6821',
     '_rev' => '1-e4af2d5d944d64db082b484bc1088d1a',
-    'type' => [['value' => 'entity_test_mulrev']],
-    'user_id' => [],
+    'en' => [
+      'type' => [['value' => 'entity_test_mulrev']],
+      'user_id' => [],
+    ],
   ],
   // Entity with attachment.
   [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
     '@type' => 'entity_test_mulrev',
     '_id' => 'ad3d5c67-e82a-4faf-a7fd-c5ad3975b622',
-    'type' => [['value' => 'entity_test_mulrev']],
-    'user_id' => [],
+    'en' => [
+      'type' => [['value' => 'entity_test_mulrev']],
+      'user_id' => [],
+    ],
     '_attachments' => [
       'files/0/effb530e-5529-46ed-bec4-1b8f05c274d6/public/file1.txt' => _file_info(FILE1),
-    ]
+    ],
   ],
 ];
 
