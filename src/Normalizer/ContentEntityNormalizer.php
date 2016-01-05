@@ -341,6 +341,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // Denormalize entity reference fields.
     foreach ($site_languages as $site_language) {
       $langcode = $site_language->getId();
+      if (!is_array($data[$langcode])) {
+        continue;
+      }
       foreach ($data[$langcode] as $field_name => $field_info) {
         if (!is_array($field_info)) {
           continue;
