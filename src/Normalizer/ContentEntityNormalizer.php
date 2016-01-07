@@ -195,8 +195,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     // We need to nest the data for the _deleted field in its Drupal-specific
     // structure since it's un-nested to follow the API spec when normalized.
     // @todo {@link https://www.drupal.org/node/2599938 Needs test for situation when a replication overwrites delete.}
-    //$deleted = isset($data['_deleted']) ? $data['_deleted'] : FALSE;
-    //$data['_deleted'] = array(array('value' => $deleted));
+    foreach ($site_languages as $site_language) {
+      $langcode = $site_language->getId();
+      if (!empty($data[$langcode])) {
+        $deleted = isset($data[$langcode]['_deleted']) ? $data[$langcode]['_deleted'] : FALSE;
+        $data[$langcode]['_deleted'] = array(array('value' => $deleted));
+      }
+    }
 
     // Map data from the UUID index.
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
@@ -314,12 +319,18 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $query->fields('ufd', ['name']);
       $existing_users_names = $query->execute()->fetchAllKeyed(1, 0);
       $random = new Random();
-      $name = $data['name'][0]['value'];
-      if (!empty($name) && in_array($name, array_keys($existing_users_names)) && $existing_users_names[$name] != $entity_uuid) {
-        $data['name'][0]['value'] = $name . '_' . $random->name(8, TRUE);
-      }
-      elseif (empty($name)) {
-        $data['name'][0]['value'] = 'anonymous_' . $random->name(8, TRUE);
+
+      foreach ($site_languages as $site_language) {
+        $langcode = $site_language->getId();
+        if (empty($data[$langcode]['name'][0]['value'])) {
+          $data[$langcode]['name'][0]['value'] = 'anonymous_' . $random->name(8, TRUE);
+        }
+        else {
+          $name = $data[$langcode]['name'][0]['value'];
+          if (in_array($name, array_keys($existing_users_names)) && $existing_users_names[$name] != $entity_uuid) {
+            $data[$langcode]['name'][0]['value'] = $name . '_' . $random->name(8, TRUE);
+          }
+        }
       }
     }
 
@@ -373,7 +384,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
             $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
 
             if ($target_entity) {
-              $data[$field_name][$delta] = array(
+              $data[$langcode][$field_name][$delta] = array(
                 'target_id' => $target_entity->id(),
               );
             }
