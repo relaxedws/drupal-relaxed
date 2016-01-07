@@ -129,6 +129,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       // follow the API spec.
       if (isset($translation->_deleted->value) && $translation->_deleted->value == TRUE) {
         $data[$entity_language->getId()]['_deleted'] = TRUE;
+        $data['_deleted'] = TRUE;
       }
       elseif (isset($data[$entity_language->getId()]['_deleted'])) {
         unset($data[$entity_language->getId()]['_deleted']);
