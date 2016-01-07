@@ -246,8 +246,7 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entities = EntityTestRev::loadMultiple();
-      $entity = $entities[$entity->id()];
+      $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $first_rev]);
