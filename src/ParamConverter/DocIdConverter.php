@@ -45,7 +45,16 @@ class DocIdConverter implements ParamConverterInterface {
   }
 
   /**
-   * Converts a UUID into an existing entity.
+   * Converts a UUID into an existing entity.   *
+   *
+   * @param mixed $uuid
+   *   The raw value.
+   * @param mixed $definition
+   *   The parameter definition provided in the route options.
+   * @param string $name
+   *   The name of the parameter.
+   * @param array $defaults
+   *   The route defaults array.
    *
    * @return string | \Drupal\Core\Entity\EntityInterface[]
    *   An array of the entity or entity revisions that was requested, if
