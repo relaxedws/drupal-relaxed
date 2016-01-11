@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\file\Entity\File;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -32,7 +33,7 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
     $result = array();
     $definition = $data->getFieldDefinition();
     $values = $data->getValue();
-    $file = isset($values['target_id']) ? entity_load('file', $values['target_id']) : NULL;
+    $file = isset($values['target_id']) ? File::load($values['target_id']) : NULL;
     if ($file) {
       $uri = $file->getFileUri();
       $scheme = file_uri_scheme($uri);
