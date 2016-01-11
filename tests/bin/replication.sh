@@ -16,4 +16,4 @@ composer config repositories.couchdb-client git https://github.com/jeqq/couchdb-
 composer config repositories.replicator git https://github.com/jeqq/couchdb-replicator
 composer require relaxedws/replicator:dev-test-multipart-streams-with-size --prefer-source
 
-phpunit --verbose --debug --configuration ~/www/phpunit.travis.xml --bootstrap ~/www/core/tests/bootstrap.php
+vendor/phpunit/phpunit/phpunit --verbose --debug --configuration ~/www/phpunit.travis.xml --bootstrap ~/www/core/tests/bootstrap.php

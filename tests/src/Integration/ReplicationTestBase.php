@@ -190,7 +190,8 @@ abstract class ReplicationTestBase extends KernelTestBase {
       CURLOPT_URL => $db_url,
     ]);
     $response = curl_exec($curl);
-    $this->assertContains('"total_rows":' . $docs_number, $response, 'The request returned the correct number of docs.');
+    preg_match('~"total_rows":([/\d+/]*)~', $response, $output);
+    $this->assertEquals($docs_number, $output[1], 'The request returned the correct number of docs.');
     curl_close($curl);
   }
 
