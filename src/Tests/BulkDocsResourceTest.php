@@ -17,7 +17,6 @@ use Drupal\Component\Serialization\Json;
 class BulkDocsResourceTest extends ResourceTestBase {
 
   public function testPostCreate() {
-    $db = $this->workspace->id();
     $this->enableService('relaxed:bulk_docs', 'POST');
 
     $entity_types = ['entity_test_rev'];
@@ -33,7 +32,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
         $data['docs'][] = $this->container->get('relaxed.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
       }
 
-      $response = $this->httpRequest("$db/_bulk_docs", 'POST', Json::encode($data));
+      $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($data));
       $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
       $this->assertTrue(is_array($data), 'Data format is correct.');
@@ -45,7 +44,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
   }
 
   public function testPostUpdate() {
-    $db = $this->workspace->id();
     $this->enableService('relaxed:bulk_docs', 'POST');
     /** @var \Symfony\Component\Serializer\SerializerInterface $serializer */
     $serializer = $this->container->get('serializer');
@@ -77,7 +75,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $input['docs'][] = $this->container->get('relaxed.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
     }
 
-    $response = $this->httpRequest("$db/_bulk_docs", 'POST', Json::encode($input));
+    $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $output = Json::decode($response);
     $this->assertTrue(is_array($output), 'Data format is correct.');
@@ -124,7 +122,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     $patched_entities['new_edits'] = FALSE;
     $serialized = $serializer->serialize($patched_entities, $this->defaultFormat);
-    $response = $this->httpRequest("$db/_bulk_docs", 'POST', $serialized);
+    $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', $serialized);
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response);
     $this->assertTrue(is_array($data), 'Data format is correct.');

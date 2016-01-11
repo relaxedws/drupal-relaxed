@@ -27,12 +27,18 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         continue;
       }
 
+      // Allow pull or push permissions depending on the method.
+      $permissions = 'perform push replication';
+      if ($method === 'GET') {
+        $permissions .= '+perform pull replication';
+      }
+
       $method_lower = strtolower($method);
       $route = new Route($api_root . $definition['uri_paths']['canonical'], array(
         '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
         '_plugin' => $this->pluginId,
       ), array(
-        '_permission' => "restful " . $method_lower . " $this->pluginId" . "+perform content replication",
+        '_permission' => "restful " . $method_lower . " $this->pluginId" . "+$permissions",
       ),
         array(
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,

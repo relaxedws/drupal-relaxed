@@ -160,7 +160,7 @@ class AttachmentResource extends ResourceBase {
       return new ResourceResponse($data, 200, array('X-Relaxed-ETag'), $rev);
     }
     catch (\Exception $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage());
     }
   }
 

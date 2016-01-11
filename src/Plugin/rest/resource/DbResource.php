@@ -4,12 +4,10 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
-use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -66,29 +64,23 @@ class DbResource extends ResourceBase {
   }
 
   /**
-   * @param $name
+   * @param $entity
    *
    * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
-  public function put($name) {
-    // If the name parameter was upcasted to an entity it means it an entity
-    // already exists.
-    if ($name instanceof WorkspaceInterface) {
-      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
+  public function put($entity) {
+    if (!$entity instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
     }
-    elseif (!is_string($name)) {
-      throw new BadRequestHttpException(t('Database name is missing'));
+    elseif (!$entity->isNew()) {
+      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
     }
 
     try {
-      // @todo {@link https://www.drupal.org/node/2599930 Use the container injected in parent::create()}
-      $entity = \Drupal::service('entity.manager')
-        ->getStorage('workspace')
-        ->create(array('id' => $name))
-        ->save();
+      $entity->save();
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, t('Internal server error'), $e);
@@ -119,15 +111,6 @@ class DbResource extends ResourceBase {
     elseif (empty($entity)) {
       throw new BadRequestHttpException(t('No content received'));
     }
-    $uuid = $entity->uuid();
-
-    // Check for conflicts.
-    /*if ($uuid) {
-      $entry = \Drupal::service('entity.index.uuid')->get($uuid);
-      if (!empty($entry)) {
-        throw new ConflictHttpException();
-      }
-    }*/
 
     // Check entity and field level access.
     if (!$entity->access('create')) {
@@ -143,47 +126,20 @@ class DbResource extends ResourceBase {
       elseif (!$field->access('create')) {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
-
-      // Save the files for file and image fields.
-      if ($field instanceof FileFieldItemList) {
-        foreach ($field as $delta => $item) {
-          if (isset($item->entity_to_save)) {
-            $file = $item->entity_to_save;
-            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
-            $file->save();
-            $file_info = array('target_id' => $file->id());
-
-            $field_definitions = $entity->getFieldDefinitions();
-            $field_type = $field_definitions[$field_name]->getType();
-            // Add alternative text for image type fields.
-            if ($field_type == 'image') {
-              $file_info['alt'] = $file->getFilename();
-            }
-            $entity->{$field_name}[$delta] = $file_info;
-
-            unset($entity->{$field_name}[$delta]->entity_to_save);
-          }
-        }
-      }
     }
-
-    // This will save stub entities in case the entity has entity reference
-    // fields and a referenced entity does not exist or will update stub
-    // entities with the correct values.
-    \Drupal::service('relaxed.stub_entity_processor')->processEntity($entity);
 
     // Validate the received data before saving.
     $this->validate($entity);
     try {
       $entity->save();
       $rev = $entity->_rev->value;
-      $response = new ResourceResponse(array('ok' => TRUE, 'id' => $uuid, 'rev' => $rev), 201, array('ETag' => $rev));
+      $response = new ResourceResponse(['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev], 201, ['ETag' => $rev]);
       $response->addCacheableDependency($entity);
 
       return $response;
     }
     catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage());
     }
   }
 

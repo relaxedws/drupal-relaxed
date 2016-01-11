@@ -14,9 +14,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RevisionDiff implements RevisionDiffInterface {
 
   /**
-   * @var array
+   * @var \Drupal\multiversion\Entity\Index\RevisionIndexInterface
    */
-  protected $revisionIds = array();
+  protected $revIndex = array();
+
+  /**
+   * @var string[]
+   */
+  protected $revs;
 
   /**
    * {@inheritdoc}
@@ -33,15 +38,15 @@ class RevisionDiff implements RevisionDiffInterface {
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    */
   public function __construct(RevisionIndexInterface $rev_index, WorkspaceInterface $workspace) {
-    $this->revisionIndex = $rev_index;
+    $this->revIndex = $rev_index;
     $this->workspaceId = $workspace->id();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRevisionIds(array $revision_ids) {
-    $this->revisionIds = $revision_ids;
+  public function setRevisionIds(array $revs) {
+    $this->revs = $revs;
     return $this;
   }
 
@@ -49,7 +54,7 @@ class RevisionDiff implements RevisionDiffInterface {
    * {@inheritdoc}
    */
   public function getRevisionIds() {
-    return $this->revisionIds;
+    return $this->revs;
   }
 
   /**
@@ -60,11 +65,15 @@ class RevisionDiff implements RevisionDiffInterface {
    */
   public function getMissing() {
     $missing = array();
-    foreach ($this->getRevisionIds() as $uuid => $revision_ids) {
-      $existing = $this->revisionIndex->getMultiple($revision_ids);
-      foreach ($revision_ids as $revision_id) {
-        if (!isset($existing[$revision_id])) {
-          $missing[$uuid]['missing'][] = $revision_id;
+    foreach ($this->getRevisionIds() as $uuid => $revs) {
+      $keys = [];
+      foreach ($revs as $rev) {
+        $keys[] = "$uuid:$rev";
+      }
+      $existing = $this->revIndex->getMultiple($keys);
+      foreach ($revs as $rev) {
+        if (!isset($existing["$uuid:$rev"])) {
+          $missing[$uuid]['missing'][] = $rev;
         }
       }
     }

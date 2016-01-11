@@ -1,0 +1,11 @@
+{
+  "name": "pouchdb-replication",
+  "version": "1.0.0",
+  "dependencies": {
+    "mocha-phantomjs": "^4.0.1",
+    "chai": "^3.4.1",
+    "es5-shim": "^4.3.1",
+    "mocha": "^2.3.4",
+    "pouchdb": "^5.1.0"
+  }
+}

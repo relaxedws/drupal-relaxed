@@ -9,7 +9,7 @@ services:
       - { name: encoder, format: base64_stream }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.replication_log:
@@ -33,7 +33,7 @@ services:
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     tags:
-      - { name: normalizer, priority: 10 }
+      - { name: normalizer, priority: 20 }
     arguments: ['@entity.manager']
   relaxed.normalizer.deleted_flag_item_list:
     class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
@@ -60,8 +60,10 @@ services:
     class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
     tags:
       - { name: normalizer, priority: 10 }
-  relaxed.stub_entity_processor:
-      class: Drupal\relaxed\StubEntityProcessor\StubEntityProcessor
+  relaxed.normalizer.comment_item:
+    class: Drupal\relaxed\Normalizer\CommentItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
@@ -69,7 +71,7 @@ services:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
     class: Drupal\relaxed\ParamConverter\DbConverter
-    arguments: ['@entity.manager']
+    arguments: ['@workspace.manager']
     tags:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
@@ -86,3 +88,9 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
+  plugin.manager.endpoint:
+    class: Drupal\relaxed\Plugin\EndpointManager
+    parent: default_plugin_manager
+  plugin.manager.endpoint_check:
+    class: Drupal\relaxed\Plugin\EndpointCheckManager
+    parent: default_plugin_manager

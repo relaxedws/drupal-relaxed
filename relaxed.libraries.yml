@@ -1,0 +1,5 @@
+drupal.relaxed.admin:
+  version: VERSION
+  css:
+    theme:
+      css/relaxed.admin.css: {}

@@ -2,9 +2,13 @@
 
 namespace Drupal\relaxed\BulkDocs;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\multiversion\Entity\Index\RevisionIndexInterface;
+use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
-use Drupal\relaxed\StubEntityProcessor\StubEntityProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
@@ -20,6 +24,31 @@ class BulkDocs implements BulkDocsInterface {
    * @var \Drupal\multiversion\Entity\WorkspaceInterface
    */
   protected $workspace;
+
+  /**
+   * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
+   */
+  protected $uuidIndex;
+
+  /**
+   * @var \Drupal\multiversion\Entity\Index\RevisionIndexInterface
+   */
+  protected $revIndex;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Lock\LockBackendInterface
+   */
+  protected $lock;
+
+  /**
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected $logger;
 
   /**
    * @var \Drupal\Core\Entity\ContentEntityInterface[]
@@ -43,19 +72,33 @@ class BulkDocs implements BulkDocsInterface {
     return new static(
       $workspace_manager,
       $workspace,
-      $container->get('relaxed.stub_entity_processor')
+      $container->get('entity.index.uuid'),
+      $container->get('entity.index.rev'),
+      $container->get('entity_type.manager'),
+      $container->get('lock'),
+      $container->get('logger.factory')
     );
   }
 
+
   /**
+   * Constructor.
+   *
    * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\relaxed\StubEntityProcessor\StubEntityProcessorInterface $stub_entity_processor
+   * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
+   * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
+   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    */
-  public function __construct(WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace, StubEntityProcessorInterface $stub_entity_processor) {
+  public function __construct(WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, EntityTypeManagerInterface $entity_type_manager, LockBackendInterface $lock, LoggerChannelFactoryInterface $logger_factory) {
     $this->workspaceManager = $workspace_manager;
     $this->workspace = $workspace;
-    $this->stubEntityProcessor = $stub_entity_processor;
+    $this->uuidIndex = $uuid_index;
+    $this->revIndex = $rev_index;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->lock = $lock;
+    $this->logger = $logger_factory->get('relaxed');
   }
 
   /**
@@ -85,18 +128,54 @@ class BulkDocs implements BulkDocsInterface {
    * {@inheritdoc}
    */
   public function save() {
+    // Writing a bulk of documents can potentially take a lot of time, so we
+    // aquire a lock to ensure the integrity of the operation.
+    do {
+      // Check if the operation may be available.
+      if ($this->lock->lockMayBeAvailable('bulk_docs')) {
+        // The operation may be available, so break the wait and continue if we
+        // successfully can acquire a lock.
+        if ($this->lock->acquire('bulk_docs')) {
+          break;
+        }
+      }
+      $this->logger->critical('Lock exists on bulk operation. Waiting.');
+    } while ($this->lock->wait('bulk_docs'));
+
     $inital_workspace = $this->workspaceManager->getActiveWorkspace();
     $this->workspaceManager->setActiveWorkspace($this->workspace);
 
     foreach ($this->entities as $entity) {
+      $uuid = $entity->uuid();
+      $rev = $entity->_rev->value;
+
       try {
+        // Check if the revision being posted already exists.
+        if ($record = $this->revIndex->get("$uuid:$rev")) {
+          if (!$this->newEdits && !$record['is_stub']) {
+            $this->result[] = array(
+              'error' => 'conflict',
+              'reason' => 'Document update conflict',
+              'id' => $uuid,
+              'rev' => $rev,
+            );
+            continue;
+          }
+        }
+
+        // In cases where a stub was created earlier in the same bulk operation
+        // it may already exists. This means we need to ensure the local ID
+        // mapping is correct.
+        if ($record = $this->uuidIndex->get($entity->uuid())) {
+          $id_key = $this->entityTypeManager
+            ->getDefinition($entity->getEntityTypeId())
+            ->getKey('id');
+
+          $entity->{$id_key}->value = $record['entity_id'];
+          $entity->enforceIsNew(FALSE);
+        }
+
         $entity->_rev->new_edit = $this->newEdits;
-
-        // This will save stub entities in case the entity has entity reference
-        // fields and a referenced entity does not exist or will update stub
-        // entities with the correct values.
-        $entity = $this->stubEntityProcessor->processEntity($entity);
-
         $entity->save();
 
         $this->result[] = array(
@@ -106,20 +185,21 @@ class BulkDocs implements BulkDocsInterface {
         );
       }
       catch (\Exception $e) {
+        $message = $e->getMessage();
         $this->result[] = array(
-          'error' => $e->getMessage(),
+          'error' => $message,
           'reason' => 'exception',
           'id' => $entity->uuid(),
           'rev' => $entity->_rev->value,
         );
-        // @todo {@link https://www.drupal.org/node/2599902 Inject logger or use \Drupal::logger().}
-        watchdog_exception('relaxed', $e);
+        $this->logger->critical($message);
       }
     }
 
     // Switch back to the initial workspace.
     $this->workspaceManager->setActiveWorkspace($inital_workspace);
 
+    $this->lock->release('bulk_docs');
     return $this;
   }
 

@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Workspace;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Workspace\WorkspaceNegotiatorBase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,7 +33,9 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
       // If we have more than one part, and the second part is not an internal
       // resource, then it means the second part is the workspace ID.
       if (count($paths) > 1 && substr($paths[1], 0, 1) != '_') {
-        return TRUE;
+        if ($this->workspaceManager->loadByMachineName($paths[1])) {
+          return TRUE;
+        }
       }
     }
   }
@@ -43,7 +46,12 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
   public function getWorkspaceId(Request $request) {
     $path_info = trim($request->getPathInfo(), '/');
     $paths = explode('/', $path_info);
-    return $paths[1];
+
+    $workspace = $this->workspaceManager->loadByMachineName($paths[1]);
+    if (!$workspace) {
+      throw new NotFoundHttpException();
+    }
+    return $workspace->id();
   }
 
 }

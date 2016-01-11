@@ -23,5 +23,6 @@ class RevisionInfoItemListNormalizer extends ListNormalizer {
     if (!empty($context['query']['revs_info'])) {
       return parent::normalize($field, $format, $context);
     }
+    return [];
   }
 }

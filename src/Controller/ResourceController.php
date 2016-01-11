@@ -131,7 +131,7 @@ class ResourceController implements ContainerAwareInterface {
       $data = array('error' => $error, 'reason' => $reason);
       $content = $this->serializer()->serialize($data, $format);
     }
-    watchdog_exception('multiversion', $e);
+    watchdog_exception('Relaxed', $e);
     return new Response($content, $status, $headers);
   }
 
@@ -150,6 +150,7 @@ class ResourceController implements ContainerAwareInterface {
     $content = $this->request->getContent();
     $parameters = $this->getParameters();
     $serializer = $this->serializer();
+    $render_contexts = [];
 
     // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
     $query = $this->request->query->all();
@@ -216,8 +217,14 @@ class ResourceController implements ContainerAwareInterface {
     }
 
     try {
+      $render_context = new RenderContext();
       /** @var \Drupal\rest\ResourceResponse $response */
-      $response = call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $this->request)));
+      $response = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($resource, $method, $parameters, $entity, $request) {
+        return call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $request)));
+      });
+      if (!$render_context->isEmpty()) {
+        $render_contexts[] = $render_context->pop();
+      }
     }
     catch (\Exception $e) {
       return $this->errorResponse($e);
@@ -228,6 +235,7 @@ class ResourceController implements ContainerAwareInterface {
       : 'json';
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
+
     foreach ($responses as $response_part) {
       try {
         if ($response_data = $response_part->getResponseData()) {
@@ -236,20 +244,11 @@ class ResourceController implements ContainerAwareInterface {
           $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
             return $serializer->serialize($response_data, $response_format, $context);
           });
-          $response_part->setContent($response_output);
           if (!$render_context->isEmpty()) {
-            $response_part->addCacheableDependency($render_context->pop());
+            $render_contexts[] = $render_context->pop();
           }
+          $response_part->setContent($response_output);
         }
-        // Add cache tags for each parameter
-        foreach ($parameters as $parameter) {
-          $response_part->addCacheableDependency($parameter);
-        }
-        // Add relaxed settings config's cache tags.
-        $response_part->addCacheableDependency($this->container->get('config.factory')->get('relaxed.settings'));
-        // Add query args as a cache context.
-        $cacheable_metadata = new CacheableMetadata();
-        $response_part->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
       }
       catch (\Exception $e) {
         return $this->errorResponse($e);
@@ -258,6 +257,23 @@ class ResourceController implements ContainerAwareInterface {
         $response_part->headers->set('Content-Type', $this->request->getMimeType($response_format));
       }
     }
+
+    foreach ($render_contexts as $render_context) {
+      $response->addCacheableDependency($render_context);
+    }
+    foreach ($parameters as $parameter) {
+      if (is_array($parameter)) {
+        foreach ($parameter as $item) {
+          $response->addCacheableDependency($item);
+        }
+      }
+      else {
+        $response->addCacheableDependency($parameter);
+      }
+    }
+    $response->addCacheableDependency($this->container->get('config.factory')->get('rest.settings'));
+    $cacheable_metadata = new CacheableMetadata();
+    $response->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
 
     return $response;
   }

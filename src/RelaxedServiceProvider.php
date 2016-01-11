@@ -26,17 +26,6 @@ class RelaxedServiceProvider implements ServiceModifierInterface {
       // Adds mixed as known format.
       $negotiation->addMethodCall('registerFormat', ['mixed', ['multipart/mixed']]);
     }
-
-    // Override the access_check.rest.csrf class with a new class.
-    // @todo {@link https://www.drupal.org/node/2470691 Revisit this before beta
-    // release.}
-    try {
-      $definition = $container->getDefinition('access_check.rest.csrf');
-      $definition->setClass('Drupal\relaxed\Access\CSRFAccessCheck');
-    }
-    catch (\InvalidArgumentException $e) {
-      // Do nothing, rest module is not installed.
-    }
   }
 
 }

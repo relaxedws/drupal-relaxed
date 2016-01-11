@@ -2,9 +2,7 @@
 
 namespace Drupal\relaxed\AllDocs;
 
-use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\multiversion\MultiversionManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 interface AllDocsInterface {

@@ -90,7 +90,8 @@ class AllDocs implements AllDocsInterface {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    * @param \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\multiversion\Entity\Index\EntityIndexInterface $entity_index
+   * @param \Drupal\multiversion\Entity\Index\EntityIndexInterface
+   * @param \Symfony\Component\Serializer\SerializerInterface
    */
   public function __construct(EntityManagerInterface $entity_manager, MultiversionManagerInterface $multiversion_manager, WorkspaceInterface $workspace, EntityIndexInterface $entity_index, SerializerInterface $serializer) {
     $this->entityManager = $entity_manager;
@@ -185,7 +186,7 @@ class AllDocs implements AllDocsInterface {
         if ($this->includeDocs) {
           $entities = $this->entityManager->getStorage($entity_type_id)->loadMultiple($ids);
           foreach ($entities as $entity) {
-            if (strpos($entity->_rev->value, '1-101010101010101010101010') !== FALSE) {
+            if ($entity->_rev->is_stub) {
               continue;
             }
             $rows[$entity->uuid()]['doc'] = $this->serializer->normalize($entity, 'json');

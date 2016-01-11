@@ -1,4 +1,8 @@
-perform content replication:
-  title: 'Perform content replication'
-  description: 'Perform content replication regardless of permission restrictions.'
+perform push replication:
+  title: 'Perform push replication'
+  description: 'Perform push replication regardless of permission restrictions. User will be able to both read and write operations.'
+  restrict access: true
+perform pull replication:
+  title: 'Perform pull replication'
+  description: 'Perform pull replication regardless of permission restrictions. User will only be able to read content in order to replicate the content somewhere else.'
   restrict access: true

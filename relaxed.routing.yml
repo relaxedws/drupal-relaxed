@@ -1,0 +1,40 @@
+# Endpoint routing definition
+entity.endpoint.collection:
+  path: '/admin/config/services/relaxed'
+  defaults:
+    _entity_list: 'endpoint'
+    _title: 'Endpoint'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
+entity.endpoint.add_form:
+  path: '/admin/config/services/relaxed/add/{plugin_id}'
+  defaults:
+    _entity_form: 'endpoint.add'
+    _title: 'Add Endpoint'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
+entity.endpoint.edit_form:
+  path: '/admin/config/services/relaxed/{endpoint}'
+  defaults:
+    _entity_form: 'endpoint.edit'
+    _title: 'Edit Endpoint'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
+entity.endpoint.delete_form:
+  path: '/admin/config/services/relaxed/{endpoint}/delete'
+  defaults:
+    _entity_form: 'endpoint.delete'
+    _title: 'Delete Endpoint'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE

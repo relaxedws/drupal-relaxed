@@ -17,8 +17,8 @@ class MultipartResponse extends Response
   public function setBody(StreamInterface $body = null)
   {
     if (null === $body) {
-      $this->removeHeader('Content-Length');
-      $this->removeHeader('Transfer-Encoding');
+      $this->headers->remove('Content-Length');
+      $this->headers->remove('Transfer-Encoding');
     } else {
       foreach (self::parseMultipartBody($body) as $parts) {
         $this->bodies[] = Psr7\stream_for($parts['body']);

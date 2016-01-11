@@ -6,7 +6,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
-use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,10 +86,7 @@ class DocResource extends ResourceBase {
       $parts = array();
       $request = Request::createFromGlobals();
       // If not a JSON request then it's a request for multiple revisions.
-      if (
-        strpos($request->headers->get('Accept'), 'application/json') === FALSE &&
-        strpos($request->headers->get('Content-Type'), 'application/json') === FALSE
-      ) {
+      if (strpos($request->headers->get('Accept'), 'multipart/mixed')  !== false) {
         foreach ($revisions as $revision) {
           $parts[] = new ResourceResponse($revision, 200);
         }
@@ -120,7 +116,7 @@ class DocResource extends ResourceBase {
    *
    * @return \Drupal\rest\ResourceResponse
    */
-  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity) {
+  public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (is_string($workspace)) {
       throw new NotFoundHttpException();
     }
@@ -134,44 +130,21 @@ class DocResource extends ResourceBase {
       if (!$field->access('create') && $field_name != 'pass') {
         throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
       }
-
-      // Save the files for file and image fields.
-      if ($field instanceof FileFieldItemList) {
-        foreach ($field as $delta => $item) {
-          if (isset($item->entity_to_save)) {
-            $file = $item->entity_to_save;
-            \Drupal::cache('discovery')->delete('image_toolkit_plugins');
-            $file->save();
-            $file_info = array('target_id' => $file->id());
-
-            $field_definitions = $received_entity->getFieldDefinitions();
-            $field_type = $field_definitions[$field_name]->getType();
-            // Add alternative text for image type fields.
-            if ($field_type == 'image') {
-              $file_info['alt'] = $file->getFilename();
-            }
-            $received_entity->{$field_name}[$delta] = $file_info;
-            unset($received_entity->{$field_name}[$delta]->entity_to_save);
-          }
-        }
-      }
     }
 
     // @todo {@link https://www.drupal.org/node/2600440 Ensure $received_entity
     // is saved with UUID from $existing_entity}
 
-    // Validate the received data before saving.
-    $this->validate($received_entity);
-
     if (!is_string($existing_entity) && $received_entity->_rev->value != $existing_entity->_rev->value) {
       throw new ConflictHttpException();
     }
 
-    // This will save stub entities in case the entity has entity reference
-    // fields and a referenced entity does not exist or will update stub
-    // entities with the correct values.
-    if ($received_entity->getEntityTypeId() != 'replication_log') {
-      \Drupal::service('relaxed.stub_entity_processor')->processEntity($received_entity);
+    // Validate the received data before saving.
+    $this->validate($received_entity);
+
+    // Check if a requester wan't a new edit or not.
+    if ($request->get('new_edits') == 'false') {
+      $received_entity->_rev->new_edit = FALSE;
     }
 
     try {
@@ -181,7 +154,7 @@ class DocResource extends ResourceBase {
       return new ResourceResponse($data, 201, array('X-Relaxed-ETag' => $rev));
     }
     catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage());
     }
   }
 
@@ -222,7 +195,6 @@ class DocResource extends ResourceBase {
    * @param \Drupal\file\FileInterface $file
    */
   public function putAttachment(FileInterface $file) {
-    \Drupal::service('plugin.manager.image.effect')->clearCachedDefinitions();
     Cache::invalidateTags(array('file_list'));
     try {
       $file->save();

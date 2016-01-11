@@ -2,28 +2,29 @@
 
 namespace Drupal\relaxed\ParamConverter;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\multiversion\Entity\Workspace;
+use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Symfony\Component\Routing\Route;
 
 class DbConverter implements ParamConverterInterface {
 
   /**
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
    */
-  protected $entityManager;
+  protected $workspaceManager;
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->entityManager = $entity_manager;
+  public function __construct(WorkspaceManagerInterface $workspace_manager) {
+    $this->workspaceManager = $workspace_manager;
   }
 
   /**
-   * Converts a UUID into an existing entity.
+   * Converts a machine name into an existing workspace entity.
    *
-   * @param int $entity_id
+   * @param string $machine_name
    *   The raw value.
    * @param mixed $definition
    *   The parameter definition provided in the route options.
@@ -32,12 +33,18 @@ class DbConverter implements ParamConverterInterface {
    * @param array $defaults
    *   The route defaults array.
    *
-   * @return string | \Drupal\Core\Entity\EntityInterface
-   *   The entity if it exists in the database or else the original UUID string.
-   * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
+   * @return \Drupal\Core\Entity\EntityInterface
    */
-  public function convert($entity_id, $definition, $name, array $defaults) {
-    return $this->entityManager->getStorage('workspace')->load($entity_id) ?: $entity_id;
+  public function convert($machine_name, $definition, $name, array $defaults) {
+    $workspace = $this->workspaceManager->loadByMachineName($machine_name);
+    if (!$workspace) {
+      $workspace = $machine_name;
+      $methods = $defaults['_route_object']->getMethods();
+      if (in_array('PUT', $methods) && $defaults['_plugin'] == 'relaxed:db') {
+        $workspace = Workspace::create(['machine_name' => $machine_name, 'label' => ucfirst($machine_name)]);
+      }
+    }
+    return $workspace;
   }
 
   /**

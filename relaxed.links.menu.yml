@@ -1,0 +1,5 @@
+relaxed.endpoint:
+  title: Relaxed Endpoints
+  route_name: entity.endpoint.collection
+  description: 'Endpoint configuration for RELAXed Web Services.'
+  parent: system.admin_config_services

@@ -18,6 +18,7 @@ interface ChangesInterface {
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @param \Drupal\multiversion\Entity\Index\SequenceIndexInterface $sequence_index
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface
    * @return \Drupal\relaxed\Changes\ChangesInterface
    */
   static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace);

@@ -117,8 +117,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testHead() {
-    $db = $this->workspace->id();
-
     // HEAD and GET is handled by the same resource.
     $this->enableService('relaxed:attachment', 'GET');
     // Create a user with the correct permissions.
@@ -131,7 +129,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
-    $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['1']->getSize());
@@ -142,7 +140,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
-    $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['2']->getSize());
@@ -153,7 +151,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
-    $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->files['3']->getMimeType());
     $this->assertHeader('content-length', $this->files['3']->getSize());
@@ -162,7 +160,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testGet() {
-    $db = $this->workspace->id();
     $this->enableService('relaxed:attachment', 'GET');
 
     // Create a user with the correct permissions.
@@ -175,7 +172,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
-    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertEqual($response, $file_contents);
@@ -187,7 +184,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
-    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertEqual($response, $file_contents);
@@ -199,7 +196,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
-    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->files['3']->getMimeType());
     $this->assertEqual($response, $file_contents);
@@ -209,7 +206,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $db = $this->workspace->id();
     $this->enableService('relaxed:attachment', 'PUT');
     $serializer = $this->container->get('serializer');
 
@@ -226,7 +222,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $field_name = 'field_test_file';
     $attachment_info = $field_name . '/0/' . $file_stub->uuid() . '/public/' . $file_stub->getFileName();
-    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
     $this->assertResponse('200', 'HTTP response code is correct');
     $data = Json::decode($response);
     $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
@@ -242,7 +238,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testDelete() {
-    $db = $this->workspace->id();
     $this->enableService('relaxed:attachment', 'DELETE');
 
     // Create a user with the correct permissions.
@@ -253,7 +248,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $field_name = 'field_test_file';
     $attachment_info = $field_name . '/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
-    $response = $this->httpRequest("$db/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');

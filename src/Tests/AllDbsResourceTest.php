@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\multiversion\Entity\Workspace;
 
 /**
  * Tests the /_all_dbs resource.
@@ -25,14 +26,15 @@ class AllDbsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $workspace_storage = \Drupal::entityManager()->getStorage('workspace');
-    $workspaces_entities = $workspace_storage->loadMultiple(NULL);
-    $workspaces = array_keys($workspaces_entities);
+    $workspaces = [];
+    foreach (Workspace::loadMultiple() as $workspace) {
+      $workspaces[] = $workspace->getMachineName();
+    }
     for ($i = 0; $i < 3; $i++) {
-      $id = $this->randomMachineName();
-      $entity = $workspace_storage->create(['id' => $id]);
+      $machine_name = $this->randomMachineName();
+      $entity = Workspace::create(['machine_name' => $machine_name]);
       $entity->save();
-      $workspaces[] = $id;
+      $workspaces[] = $machine_name;
     }
 
     $response = $this->httpRequest('_all_dbs', 'GET');

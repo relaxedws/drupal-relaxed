@@ -1,15 +1,38 @@
 <?php
 
+use Drupal\user\Entity\Role;
+
 /**
  * Implements hook_install().
  */
 function relaxed_install() {
+  // Demonstrate best security practice and create a separate role with the
+  // only permissions needed to perform content replication.
+  Role::create([
+    'id' => 'replicator',
+    'label' => 'Replicator',
+    'weight' => 0,
+    'is_admin' => 0,
+    'permissions' => [
+      'perform push replication',
+      'administer users'
+    ],
+  ])->save();
+
+  $module_handler = \Drupal::moduleHandler();
   // Merge 'resource' settings from relaxed module with 'resource' settings from rest module,
   // these settings are not loaded if added to /config/install/rest.settings.yml.
   // @todo {@link https://www.drupal.org/node/2599862 Figure out a better way to do this.}
   $relaxed_resource_config = \Drupal::config('relaxed.settings')->get('resources');
   $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
   $rest_resource_config = $rest_config->get('resources');
+  // The rest module define settings for the node entity type but doesn't
+  // declare a dependency on node. This is causing trouble in some of our tests
+  // for some reason. So we remove those settings if the node modules is not
+  // enabled.
+  if (!$module_handler->moduleExists('node')) {
+    unset($rest_resource_config['entity:node']);
+  }
   $rest_config->set('resources', array_merge($rest_resource_config, $relaxed_resource_config))->save();
 }
 
