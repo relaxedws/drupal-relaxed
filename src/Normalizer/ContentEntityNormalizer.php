@@ -518,6 +518,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
     }
 
+    return $translation;
   }
 
 }
