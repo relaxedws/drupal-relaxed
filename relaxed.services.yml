@@ -46,7 +46,7 @@ services:
   relaxed.normalizer.revs_diff:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     tags:
-      - { name: normalizer, priority: 20 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.attachment:
     class: Drupal\relaxed\Normalizer\AttachmentNormalizer
     arguments: ['@entity.manager']
