@@ -226,6 +226,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+    $this->entity_type_id = NULL;
+    $this->entity_uuid = NULL;
+    $this->entity_id = NULL;
+
     $default_langcode = $data['@context']['@language'];
     $site_languages = $this->languageManager->getLanguages();
 
