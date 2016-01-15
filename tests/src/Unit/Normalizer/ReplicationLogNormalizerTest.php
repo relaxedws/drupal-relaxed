@@ -73,6 +73,16 @@ class ReplicationLogNormalizerTest extends NormalizerTestBase {
 
     $this->assertTrue(!empty($denormalized->session_id->value), 'session_id denormalized correctly.');
     $this->assertTrue(!empty($denormalized->source_last_seq->value), 'source_last_seq denormalized correctly.');
+
+    // Test denormalize.
+    unset($normalized['@context']);
+    unset($normalized['@type']);
+    $denormalized = $this->serializer->denormalize($normalized, 'Drupal\Core\Entity\ContentEntityInterface', 'json');
+    $this->assertTrue($denormalized instanceof $this->entityClass, 'Denormalized entity is an instance of ' . $this->entityClass);
+    $this->assertSame($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');
+
+    $this->assertTrue(!empty($denormalized->session_id->value), 'session_id denormalized correctly.');
+    $this->assertTrue(!empty($denormalized->source_last_seq->value), 'source_last_seq denormalized correctly.');
   }
 
 }

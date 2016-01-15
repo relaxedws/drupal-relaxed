@@ -89,8 +89,8 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   }
 
   public function supportsDenormalization($data, $type, $format = NULL) {
-    if ($type === 'Drupal\Core\Entity\ContentEntityInterface') {
-      if (!isset($data['@type'])) {
+    if (in_array($type, ['Drupal\Core\Entity\ContentEntityInterface', 'Drupal\relaxed\Entity\ReplicationLog'], true)) {
+      if (!isset($data['@type']) || $data['@type'] === 'replication_log') {
         return true;
       }
     }

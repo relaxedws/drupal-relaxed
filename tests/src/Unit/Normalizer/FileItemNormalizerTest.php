@@ -169,12 +169,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         '@context' => [
           '@language' => 'en',
         ],
-        'id' => [
-          ['value' => $this->entity->id()],
-        ],
-        'uuid' => [
-          ['value' => $this->entity->uuid()],
-        ],
         'langcode' => [
           ['value' => 'en'],
         ],
@@ -192,15 +186,6 @@ class FileItemNormalizerTest extends NormalizerTestBase{
         ],
         'user_id' => [
           ['target_id' => $this->values['user_id']],
-        ],
-        'revision_id' => [
-          ['value' => $this->entity->getRevisionId()],
-        ],
-        'workspace' => [
-          [
-            'entity_type_id' => $this->entity->get('workspace')->entity->getEntityTypeId(),
-            'target_uuid' => $this->entity->get('workspace')->entity->uuid(),
-          ]
         ],
         '_rev' => [
           ['value' => $this->entity->_rev->value],
