@@ -57,6 +57,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * @var string
    */
+  protected $entity_uuid = null;
+
+  /**
+   * @var string
+   */
   protected $id_key = '';
 
   /**
@@ -121,7 +126,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $revision_key = $this->entity_type->getKey('revision');
     $uuid_key = $this->entity_type->getKey('uuid');
 
-    $entity_uuid = $entity->uuid();
+    $this->entity_uuid = $entity->uuid();
     $entity_default_language = $entity->language();
     $entity_languages = $entity->getTranslationLanguages();
 
@@ -132,7 +137,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
         '@language' => $entity_default_language->getId(),
       ),
       '@type' => $this->entity_type_id,
-      '_id' => $entity_uuid,
+      '_id' => $this->entity_uuid,
     );
 
     // New or mocked entities might not have a rev yet.
@@ -185,7 +190,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
     if (!empty($context['query']['revs']) || !empty($context['query']['revs_info'])) {
-      $default_branch = $this->revTree->getDefaultBranch($entity_uuid);
+      $default_branch = $this->revTree->getDefaultBranch($this->entity_uuid);
 
       $i = 0;
       foreach (array_reverse($default_branch) as $rev => $status) {
@@ -205,7 +210,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     if (!empty($context['query']['conflicts'])) {
-      $conflicts = $this->revTree->getConflicts($entity_uuid);
+      $conflicts = $this->revTree->getConflicts($this->entity_uuid);
       foreach ($conflicts as $rev => $status) {
         $data['_conflicts'][] = $rev;
       }
@@ -221,13 +226,12 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
-    $entity_uuid = NULL;
     $default_langcode = $data['@context']['@language'];
     $site_languages = $this->languageManager->getLanguages();
 
     // Resolve the UUID.
-    if (empty($entity_uuid) && !empty($data['_id'])) {
-      $entity_uuid = $data['_id'];
+    if (empty($this->entity_uuid) && !empty($data['_id'])) {
+      $this->entity_uuid = $data['_id'];
     }
     else {
       throw new UnexpectedValueException('The entity_type value is missing.');
@@ -243,8 +247,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Map data from the UUID index.
     // @todo: {@link https://www.drupal.org/node/2599938 Needs test.}
-    if (!empty($entity_uuid)) {
-      if ($record = $this->uuidIndex->get($entity_uuid)) {
+    if (!empty($this->entity_uuid)) {
+      if ($record = $this->uuidIndex->get($this->entity_uuid)) {
         $this->entity_id = $record['entity_id'];
         if (empty($this->entity_type_id)) {
           $this->entity_type_id = $record['entity_type_id'];
@@ -391,6 +395,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
     if (isset($this->revisions['start']) && isset($this->revisions['ids'])) {
       $translation['_rev'][0]['revisions'] = $this->revisions['ids'];
+    }
+    if (isset($this->entity_uuid)) {
+      $translation['uuid'][0]['value'] = $this->entity_uuid;
     }
 
     // We need to nest the data for the _deleted field in its Drupal-specific
