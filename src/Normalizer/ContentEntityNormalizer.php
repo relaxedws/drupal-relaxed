@@ -218,6 +218,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Finally we remove certain fields that are "local" to this host.
     unset($data['workspace'], $data[$id_key], $data[$revision_key], $data[$uuid_key]);
+    foreach ($entity_languages as $entity_language) {
+      $langcode = $entity_language->getId();
+      unset($data[$langcode]['workspace'], $data[$langcode][$id_key], $data[$langcode][$revision_key], $data[$langcode][$uuid_key]);
+    }
 
     return $data;
   }
