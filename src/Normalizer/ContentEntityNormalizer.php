@@ -130,6 +130,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $entity_default_language = $entity->language();
     $entity_languages = $entity->getTranslationLanguages();
 
+    // Create the basic data array with JSON-LD data.
     $data = array(
       '@context' => array(
         '_id' => '@id',
@@ -145,9 +146,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $data['_rev'] = $entity->_rev->value;
     }
 
+    // Loop through each language of the entity
     $field_definitions = $entity->getFieldDefinitions();
     foreach ($entity_languages as $entity_language) {
       $translation = $entity->getTranslation($entity_language->getId());
+      // Add the default language
       $data[$entity_language->getId()] =
         [
           '@context' => [
@@ -155,6 +158,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
           ]
         ];
       foreach ($translation as $name => $field) {
+        // Add data for each field (through the field's normalizer.
         $field_type = $field_definitions[$name]->getType();
         $items = $this->serializer->normalize($field, $format, $context);
         // Add file and image field types into _attachments key.
@@ -230,11 +234,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+    // Make sure these values start as NULL
     $this->entity_type_id = NULL;
     $this->entity_uuid = NULL;
     $this->entity_id = NULL;
 
+    // Get the default language of the entity
     $default_langcode = $data['@context']['@language'];
+    // Get all of the configured languages of the site
     $site_languages = $this->languageManager->getLanguages();
 
     // Resolve the UUID.
@@ -242,7 +249,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $this->entity_uuid = $data['_id'];
     }
     else {
-      throw new UnexpectedValueException('The entity_type value is missing.');
+      throw new UnexpectedValueException('The uuid value is missing.');
     }
 
     // Resolve the entity type ID.
@@ -396,6 +403,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     return $entity;
   }
 
+  /**
+   * @param $translation
+   * @return mixed
+   */
   private function denormalizeTranslation($translation) {
     // Add the _rev field to the $translation array.
     if (isset($this->rev)) {

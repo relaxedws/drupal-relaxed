@@ -62,6 +62,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
+    // Strictly format the entity how CouchDB expects it, plus out JSON-LD data.
     $data = [
       '@context' => [
         '_id' => '@id',
@@ -84,12 +85,22 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
    * @inheritDoc
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
-    $entity = ReplicationLog::create($data);
-    return $entity;
+    // Simply create the replication log entity.
+    try {
+      $entity = ReplicationLog::create($data);
+      return $entity;
+    }
+    catch(Exception $e) {
+      watchdog_exception('Relaxed', $e);
+    }
   }
 
   public function supportsDenormalization($data, $type, $format = NULL) {
+    // We need to accept both ReplicationLog and ContentEntityInterface classes.
+    // LocalDocResource entities are treated as standard documents (content entities)
     if (in_array($type, ['Drupal\Core\Entity\ContentEntityInterface', 'Drupal\relaxed\Entity\ReplicationLog'], true)) {
+      // If a document doesn't have a type set, we assume it's a replication log.
+      // We also support documents specifically specified as replication logs.
       if (!isset($data['@type']) || $data['@type'] === 'replication_log') {
         return true;
       }
