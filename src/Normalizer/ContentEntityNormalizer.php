@@ -462,71 +462,70 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Denormalize entity reference fields.
-      foreach ($translation as $field_name => $field_info) {
-        if (!is_array($field_info)) {
-          continue;
-        }
-        foreach ($field_info as $delta => $item) {
-          if (isset($item['target_uuid'])) {
-            $fields = $this->entityManager->getFieldDefinitions($this->entity_type_id, $bundle_id);
-            // Figure out what bundle we should use when creating the stub.
-            $settings = $fields[$field_name]->getSettings();
+    foreach ($translation as $field_name => $field_info) {
+      if (!is_array($field_info)) {
+        continue;
+      }
+      foreach ($field_info as $delta => $item) {
+        if (isset($item['target_uuid'])) {
+          $fields = $this->entityManager->getFieldDefinitions($this->entity_type_id, $bundle_id);
+          // Figure out what bundle we should use when creating the stub.
+          $settings = $fields[$field_name]->getSettings();
 
-            // Find the target entity type and target bundle IDs and figure out if
-            // the referenced entity exists or not.
-            $target_entity_uuid = $item['target_uuid'];
-            $target_entity_type_id = $settings['target_type'];
+          // Find the target entity type and target bundle IDs and figure out if
+          // the referenced entity exists or not.
+          $target_entity_uuid = $item['target_uuid'];
+          $target_entity_type_id = $settings['target_type'];
 
-            if (isset($settings['handler_settings']['target_bundles'])) {
-              $target_bundle_id = reset($settings['handler_settings']['target_bundles']);
-            }
-            else {
-              // @todo: Update when {@link https://www.drupal.org/node/2412569
-              // this setting is configurable}.
-              $bundles = $this->entityManager->getBundleInfo($target_entity_type_id);
-              $target_bundle_id = key($bundles);
-            }
-            $target_storage = $this->entityManager->getStorage($target_entity_type_id);
-            $target_entity = $target_storage->loadByProperties(['uuid' => $target_entity_uuid]);
-            $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
+          if (isset($settings['handler_settings']['target_bundles'])) {
+            $target_bundle_id = reset($settings['handler_settings']['target_bundles']);
+          }
+          else {
+            // @todo: Update when {@link https://www.drupal.org/node/2412569
+            // this setting is configurable}.
+            $bundles = $this->entityManager->getBundleInfo($target_entity_type_id);
+            $target_bundle_id = key($bundles);
+          }
+          $target_storage = $this->entityManager->getStorage($target_entity_type_id);
+          $target_entity = $target_storage->loadByProperties(['uuid' => $target_entity_uuid]);
+          $target_entity = !empty($target_entity) ? reset($target_entity) : NULL;
 
-            if ($target_entity) {
-              $translation[$field_name][$delta] = array(
-                'target_id' => $target_entity->id(),
-              );
-            }
-            // If the target entity doesn't exist we need to create a stub entity
-            // in its place to ensure that the replication continues to work.
-            // The stub entity will be updated when it's full entity comes around
-            // later in the replication.
-            else {
-              $options = [
-                'target_type' => $target_entity_type_id,
-                'handler_settings' => $settings['handler_settings'],
-              ];
-              /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $selection_instance */
-              $selection_instance = $this->selectionManager->getInstance($options);
-              // We use a temporary label and entity owner ID as this will be
-              // backfilled later anyhow, when the real entity comes around.
-              $target_entity = $selection_instance
-                ->createNewEntity($target_entity_type_id, $target_bundle_id, rand(), 1);
+          if ($target_entity) {
+            $translation[$field_name][$delta] = array(
+              'target_id' => $target_entity->id(),
+            );
+          }
+          // If the target entity doesn't exist we need to create a stub entity
+          // in its place to ensure that the replication continues to work.
+          // The stub entity will be updated when it's full entity comes around
+          // later in the replication.
+          else {
+            $options = [
+              'target_type' => $target_entity_type_id,
+              'handler_settings' => $settings['handler_settings'],
+            ];
+            /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $selection_instance */
+            $selection_instance = $this->selectionManager->getInstance($options);
+            // We use a temporary label and entity owner ID as this will be
+            // backfilled later anyhow, when the real entity comes around.
+            $target_entity = $selection_instance
+              ->createNewEntity($target_entity_type_id, $target_bundle_id, rand(), 1);
 
-              // Set the UUID to what we received to ensure it gets updated when
-              // the full entity comes around later.
-              $target_entity->uuid->value = $target_entity_uuid;
-              // Indicate that this revision is a stub.
-              $target_entity->_rev->is_stub = TRUE;
+            // Set the UUID to what we received to ensure it gets updated when
+            // the full entity comes around later.
+            $target_entity->uuid->value = $target_entity_uuid;
+            // Indicate that this revision is a stub.
+            $target_entity->_rev->is_stub = TRUE;
 
-              // Populate the data field.
-              $translation[$field_name][$delta] = array(
-                'target_id' => NULL,
-                'entity' => $target_entity,
-              );
-            }
+            // Populate the data field.
+            $translation[$field_name][$delta] = array(
+              'target_id' => NULL,
+              'entity' => $target_entity,
+            );
           }
         }
       }
-
+    }
 
     // Exclude "name" field (the user name) for comment entity type because
     // we'll change it during replication if it's a duplicate.
