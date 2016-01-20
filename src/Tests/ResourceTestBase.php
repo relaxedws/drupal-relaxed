@@ -266,7 +266,7 @@ abstract class ResourceTestBase extends RESTTestBase {
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    return workspace::create(['machine_name' => $name]);
+    return workspace::create(['machine_name' => $name, 'label' => ucfirst($name)]);
   }
 
 }
