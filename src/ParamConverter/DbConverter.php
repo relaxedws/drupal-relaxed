@@ -44,9 +44,7 @@ class DbConverter implements ParamConverterInterface {
       }
     }
 
-    if ($workspace->validate()->count() === 0) {
-      return $workspace;
-    }
+    return $workspace;
   }
 
   /**
