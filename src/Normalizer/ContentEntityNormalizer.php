@@ -292,13 +292,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
       // When language is configured or undefined go ahead with denormalization.
       elseif (isset($site_languages[$key]) || $key === 'und') {
-        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, array $files, $rev, $revisions, $existing_users_names) ;
+        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $files, $rev, $revisions, $existing_users_names);
       }
       // Configure then language then do denormalization.
       else {
         $language = ConfigurableLanguage::createFromLangcode($key);
         $language->save();
-        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, array $files, $rev, $revisions, $existing_users_names) ;
+        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $files, $rev, $revisions, $existing_users_names);
       }
     }
 
@@ -366,7 +366,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param $existing_users_names
    * @return mixed
    */
-  private function denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, array $files, $rev, $revisions, $existing_users_names) {
+  private function denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, array $files = [], $rev = null, array $revisions = [], array $existing_users_names = []) {
     // Add the _rev field to the $translation array.
     if (isset($rev)) {
       $translation['_rev'] = array(array('value' => $rev));
