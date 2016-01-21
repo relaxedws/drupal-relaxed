@@ -7,7 +7,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\file\Entity\File;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
@@ -232,6 +231,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     if (isset($data['_rev'])) {
       $rev = $data['_rev'];
     }
+    $revisions = [];
     if (isset($data['_revisions']['start']) && isset($data['_revisions']['ids'])) {
       $revisions = $data['_revisions'];
     }
@@ -242,6 +242,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $bundle_key = $entity_type->getKey('bundle');
 
     // Denormalize File and Image field types.
+    $files = [];
     if (isset($data['_attachments'])) {
       foreach ($data['_attachments'] as $key => $value) {
         list($field_name, $delta, $file_uuid, $scheme, $filename) = explode('/', $key);
@@ -276,6 +277,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // For the user entity type set a random name if an user with the same name
     // already exists in the database.
+    $existing_users_names = [];
     if ($entity_type_id == 'user') {
       $query = db_select('users', 'u');
       $query->fields('u', ['uuid']);
@@ -292,13 +294,13 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       }
       // When language is configured or undefined go ahead with denormalization.
       elseif (isset($site_languages[$key]) || $key === 'und') {
-        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $files, $rev, $revisions, $existing_users_names);
+        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $id_key, $files, $rev, $revisions, $existing_users_names);
       }
       // Configure then language then do denormalization.
       else {
         $language = ConfigurableLanguage::createFromLangcode($key);
         $language->save();
-        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $files, $rev, $revisions, $existing_users_names);
+        $translations[$key] = $this->denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $id_key,  $files, $rev, $revisions, $existing_users_names);
       }
     }
 
@@ -360,13 +362,14 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param string $entity_type_id
    * @param $bundle_key
    * @param $entity_type
+   * @param $id_key
    * @param array $files
    * @param $rev
-   * @param $revisions
-   * @param $existing_users_names
+   * @param array $revisions
+   * @param array $existing_users_names
    * @return mixed
    */
-  private function denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, array $files = [], $rev = null, array $revisions = [], array $existing_users_names = []) {
+  private function denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $id_key, array $files = [], $rev = null, array $revisions = [], array $existing_users_names = []) {
     // Add the _rev field to the $translation array.
     if (isset($rev)) {
       $translation['_rev'] = array(array('value' => $rev));
