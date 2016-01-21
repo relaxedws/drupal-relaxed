@@ -93,13 +93,18 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $machine_name = $this->randomMachineName();
+    // Test using an invalid machine name
+    $machine_name = 'A!"£%^&*{}#~@?';
+    $response = $this->httpRequest($machine_name, 'PUT', NULL);
+    $this->assertResponse('404', 'HTTP response code is correct for invalid database');
+
+    $machine_name = strtolower($this->randomMachineName());
     $response = $this->httpRequest($machine_name, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
 
-    $id = $this->randomMachineName();
+    $id = strtolower($this->randomMachineName());
     $entity = $this->createWorkspace($id);
     $entity->save();
 
@@ -110,7 +115,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->assertTrue(!empty($data['error']), 'PUT request returned error.');
 
     // Create a new ID.
-    $id = $this->randomMachineName();
+    $id = strtolower($this->randomMachineName());
 
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 403.

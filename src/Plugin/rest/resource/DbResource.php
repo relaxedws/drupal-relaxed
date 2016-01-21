@@ -78,6 +78,9 @@ class DbResource extends ResourceBase {
     elseif (!$entity->isNew()) {
       throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
     }
+    elseif ($entity->validate()->count() != 0) {
+      throw new NotFoundHttpException(t('Invalid database'));
+    }
 
     try {
       $entity->save();
