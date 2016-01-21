@@ -51,17 +51,25 @@ class StubTest extends WebTestBase {
     $entity_type_manager = \Drupal::service('entity_type.manager');
 
     $normalized = [
+      '@context' => [
+        '@language' => 'en',
+      ],
       '@type' => $entity_type_id,
       '_id' => 'fe36b529-e2d7-4625-9b07-7ee8f84928b2',
-      'name' => [],
-      'type' => [['value' => $entity_type_id]],
-      'created' => [['value' => 1447877434]],
-      'user_id' => [['target_id' => 1]],
-      'default_langcode' => [['value' => TRUE]],
-      'field_ref' => [[
-        'entity_type_id' => $entity_type_id,
-        'target_uuid' => '0aec21a0-8e36-11e5-8994-feff819cdc9f'
-      ]],
+      'en' => [
+        '@context' => [
+          '@language' => 'en',
+        ],
+        'name' => [],
+        'type' => [['value' => $entity_type_id]],
+        'created' => [['value' => 1447877434]],
+        'user_id' => [['target_id' => 1]],
+        'default_langcode' => [['value' => TRUE]],
+        'field_ref' => [[
+          'entity_type_id' => $entity_type_id,
+          'target_uuid' => '0aec21a0-8e36-11e5-8994-feff819cdc9f'
+        ]],
+      ],
     ];
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */

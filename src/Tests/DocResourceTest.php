@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -331,16 +332,22 @@ class DocResourceTest extends ResourceTestBase {
       $reference_uuid = '0aec21a0-8e36-11e5-8994-feff819cdc9f';
 
       $normalized = [
+        '@context' => [
+          '@id' => '_id',
+          '@language' => 'en'
+        ],
         '@type' => $entity_type_id,
         '_id' => $entity_uuid,
-        'name' => [],
-        'type' => [['value' => $entity_type_id]],
-        'created' => [['value' => 1447877434]],
-        'user_id' => [[
-          'entity_type_id' => 'user',
-          'target_uuid' => $reference_uuid,
-        ]],
-        'default_langcode' => [['value' => TRUE]],
+        'en' => [
+          'name' => [],
+          'type' => [['value' => $entity_type_id]],
+          'created' => [['value' => 1447877434]],
+          'user_id' => [[
+            'entity_type_id' => 'user',
+            'target_uuid' => $reference_uuid,
+          ]],
+          'default_langcode' => [['value' => TRUE]],
+        ],
       ];
 
       $response = $this->httpRequest("$this->dbname/" . $entity_uuid, 'PUT', Json::encode($normalized));

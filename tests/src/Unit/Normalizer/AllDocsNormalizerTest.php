@@ -101,7 +101,7 @@ class AllDocsNormalizerTest extends NormalizerTestBase {
         'key' => $entity->uuid(),
         'value' => [
           'rev' => $entity->_rev->value,
-          'doc' => $serializer->normalize($entity),
+          'doc' => $serializer->normalize($entity, 'json'),
         ],
       ];
     }

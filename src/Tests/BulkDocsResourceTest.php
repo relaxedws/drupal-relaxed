@@ -94,7 +94,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       else {
         $this->assertEqual(
           $entity->get('field_test_text')->value,
-          $input['docs'][$key]['field_test_text'][0]['value'],
+          $input['docs'][$key]['en']['field_test_text'][0]['value'],
           "Correct value for 'field_test_text' for entity number $entity_number."
         );
         list($count) = explode('-', $entity->_rev->value);
