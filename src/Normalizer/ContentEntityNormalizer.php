@@ -228,6 +228,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Add the _rev field to the $data array.
+    $rev = null;
     if (isset($data['_rev'])) {
       $rev = $data['_rev'];
     }
