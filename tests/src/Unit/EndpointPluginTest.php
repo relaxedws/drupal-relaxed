@@ -23,7 +23,7 @@ class EndpointPluginTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['serialization', 'system', 'rest', 'key_value', 'multiversion', 'relaxed'];
+  public static $modules = ['serialization', 'system', 'user', 'rest', 'key_value', 'multiversion', 'relaxed'];
 
   /**
    * {@inheritdoc}
@@ -34,7 +34,7 @@ class EndpointPluginTest extends KernelTestBase {
     $this->installEntitySchema('workspace');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
-    Workspace::create(['machine_name' => 'default'])->save();
+    Workspace::create(['machine_name' => 'default', 'type' => 'basic'])->save();
   }
 
   /**

@@ -70,7 +70,7 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    return Workspace::create(['machine_name' => $name]);
+    return Workspace::create(['machine_name' => $name, 'type' => 'basic']);
   }
 
 }

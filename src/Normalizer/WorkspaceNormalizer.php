@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\multiversion\Entity\WorkspaceType;
 use Drupal\serialization\Normalizer\EntityNormalizer;
 
 /**
@@ -52,6 +53,9 @@ class WorkspaceNormalizer extends EntityNormalizer {
       $data['created'] = $data['instance_start_time'];
       unset($data['instance_start_time']);
     }
+    $workspace_types = WorkspaceType::loadMultiple();
+    $workspace_type = reset($workspace_types);
+    $data['type'] = $workspace_type;
     return $this->entityManager->getStorage('workspace')->create($data);
   }
 }
