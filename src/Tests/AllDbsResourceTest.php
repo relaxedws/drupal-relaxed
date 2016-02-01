@@ -32,7 +32,7 @@ class AllDbsResourceTest extends ResourceTestBase {
     }
     for ($i = 0; $i < 3; $i++) {
       $machine_name = $this->randomMachineName();
-      $entity = Workspace::create(['machine_name' => $machine_name]);
+      $entity = Workspace::create(['machine_name' => $machine_name, 'type' => 'basic']);
       $entity->save();
       $workspaces[] = $machine_name;
     }

@@ -55,7 +55,7 @@ class WorkspaceNormalizer extends EntityNormalizer {
     }
     $workspace_types = WorkspaceType::loadMultiple();
     $workspace_type = reset($workspace_types);
-    $data['type'] = $workspace_type;
+    $data['type'] = $workspace_type->id();
     return $this->entityManager->getStorage('workspace')->create($data);
   }
 }

@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\multiversion\Entity\Workspace;
+use Drupal\multiversion\Entity\WorkspaceType;
 use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Symfony\Component\Routing\Route;
@@ -45,7 +46,7 @@ class DbConverter implements ParamConverterInterface {
         $workspace = Workspace::create([
           'machine_name' => $machine_name,
           'label' => ucfirst($machine_name),
-          'type' => $workspace_type,
+          'type' => $workspace_type->id(),
         ]);
       }
     }
