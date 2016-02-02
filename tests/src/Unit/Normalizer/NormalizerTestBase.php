@@ -11,6 +11,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\multiversion\Entity\Workspace;
+use Drupal\multiversion\Entity\WorkspaceType;
 
 abstract class NormalizerTestBase extends KernelTestBase {
 
@@ -39,7 +40,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
     $this->installEntitySchema('entity_test_mulrev');
     $this->installEntitySchema('user');
     $this->installSchema('system', ['url_alias', 'router']);
-    $this->installConfig(['field']);
+    $this->installConfig(['field', 'multiversion']);
     \Drupal::service('router.builder')->rebuild();
     \Drupal::moduleHandler()->invoke('rest', 'install');
 

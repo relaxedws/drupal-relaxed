@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\multiversion\Entity\WorkspaceType;
+use Drupal\multiversion\Entity\WorkspaceTypeInterface;
 use Drupal\serialization\Normalizer\EntityNormalizer;
 
 /**
@@ -55,6 +56,9 @@ class WorkspaceNormalizer extends EntityNormalizer {
     }
     $workspace_types = WorkspaceType::loadMultiple();
     $workspace_type = reset($workspace_types);
+    if (!($workspace_type instanceof WorkspaceTypeInterface)) {
+      throw new \Exception('Invalid workspace type.');
+    }
     $data['type'] = $workspace_type->id();
     return $this->entityManager->getStorage('workspace')->create($data);
   }
