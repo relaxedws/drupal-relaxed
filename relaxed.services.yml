@@ -7,10 +7,10 @@ services:
     class: Drupal\relaxed\Encoder\StreamEncoder
     tags:
       - { name: encoder, format: base64_stream }
-  relaxed.normalizer.complex_data:
-    class: Drupal\relaxed\Normalizer\ComplexDataNormalizer
+  relaxed.normalizer.text_item:
+    class: Drupal\relaxed\Normalizer\TextItemNormalizer
     tags:
-      - { name: normalizer, priority: 30 }
+      - { name: normalizer, priority: 5 }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
     arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
