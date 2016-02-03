@@ -32,13 +32,9 @@ class ComplexDataNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($object, $format = NULL, array $context = array()) {
-    $attributes = array();
-    foreach ($object as $name => $field) {
-      if ($field instanceof StringData) {
-        $value = $field->getValue();
-        $attributes['computed_' . $name] = $this->serializer->normalize($value, $format, $context);
-      }
+  public function normalize($object, $format = NULL, array $context = []) {
+    $attributes = [];
+    foreach ($object->getProperties(TRUE) as $name => $field) {
       $attributes[$name] = $this->serializer->normalize($field, $format, $context);
     }
     return $attributes;
