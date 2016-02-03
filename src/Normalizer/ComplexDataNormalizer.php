@@ -7,7 +7,6 @@
 
 namespace Drupal\relaxed\Normalizer;
 
-use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\serialization\Normalizer\NormalizerBase;
 
 /**
