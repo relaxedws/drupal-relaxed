@@ -1,14 +1,38 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Plugin\rest\resource\ResourceBase.
+ */
+
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
+use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceInterface {
+
+  /**
+   * @param $workspace
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   */
+  public function options($workspace) {
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
+    $response = new ResourceResponse(NULL, 204);
+    $response->addCacheableDependency($workspace);
+
+    return $response;
+  }
 
   /**
    * {@inheritdoc}

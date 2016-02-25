@@ -34,22 +34,6 @@ class ChangesResource extends ResourceBase {
    * @return ResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
-  public function options($workspace) {
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
-    $response = new ResourceResponse(NULL, 204);
-    $response->addCacheableDependency($workspace);
-
-    return $response;
-  }
-
-  /**
-   * @param $workspace
-   *
-   * @return ResourceResponse
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   */
   public function get($workspace) {
     if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
