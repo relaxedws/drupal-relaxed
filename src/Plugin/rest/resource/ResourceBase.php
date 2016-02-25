@@ -13,6 +13,21 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
   /**
    * {@inheritdoc}
    */
+  public function availableMethods() {
+    $methods = parent::availableMethods();
+
+    // Indiscriminately patch in OPTIONS as an accepted method, to facilitate
+    // CORS for all RELAXed endpoints.
+    if (!in_array('OPTIONS', $methods)) {
+      $methods[] = 'OPTIONS';
+    }
+
+    return $methods;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function routes() {
     $this->serializerFormats = array_merge($this->serializerFormats, array('mixed', 'related'));
     $collection = new RouteCollection();
@@ -29,7 +44,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
       // Allow pull or push permissions depending on the method.
       $permissions = 'perform push replication';
-      if ($method === 'GET') {
+      if (in_array($method, ['GET', 'OPTIONS'])) {
         $permissions .= '+perform pull replication';
       }
 
@@ -81,6 +96,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           break;
 
         case 'GET':
+        case 'OPTIONS':
           $collection->add("$route_name.$method", $route);
           break;
 
