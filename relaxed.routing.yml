@@ -1,39 +1,19 @@
-# Endpoint routing definition
-entity.endpoint.collection:
+# Remote routing definition
+entity.remote.collection:
   path: '/admin/config/services/relaxed'
   defaults:
-    _entity_list: 'endpoint'
-    _title: 'Endpoint'
+    _entity_list: 'remote'
+    _title: 'Remote'
   requirements:
     _permission: 'administer site configuration'
   options:
     _admin_route: TRUE
 
-entity.endpoint.add_form:
-  path: '/admin/config/services/relaxed/add/{plugin_id}'
+entity.remote.add_form:
+  path: '/admin/config/services/relaxed/add'
   defaults:
-    _entity_form: 'endpoint.add'
-    _title: 'Add Endpoint'
-  requirements:
-    _permission: 'administer site configuration'
-  options:
-    _admin_route: TRUE
-
-entity.endpoint.edit_form:
-  path: '/admin/config/services/relaxed/{endpoint}'
-  defaults:
-    _entity_form: 'endpoint.edit'
-    _title: 'Edit Endpoint'
-  requirements:
-    _permission: 'administer site configuration'
-  options:
-    _admin_route: TRUE
-
-entity.endpoint.delete_form:
-  path: '/admin/config/services/relaxed/{endpoint}/delete'
-  defaults:
-    _entity_form: 'endpoint.delete'
-    _title: 'Delete Endpoint'
+    _entity_form: 'remote.add'
+    _title: 'Add Remote'
   requirements:
     _permission: 'administer site configuration'
   options:

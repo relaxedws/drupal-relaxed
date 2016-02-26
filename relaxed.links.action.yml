@@ -1,0 +1,5 @@
+entity.remote.add_form:
+  route_name: entity.remote.add_form
+  title: 'Add new remote'
+  appears_on:
+    - entity.remote.collection

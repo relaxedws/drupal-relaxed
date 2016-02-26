@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\EndpointCheckBase.
+ * Contains \Drupal\relaxed\Plugin\RemoteCheckBase.
  */
 
 namespace Drupal\relaxed\Plugin;
@@ -10,9 +10,9 @@ namespace Drupal\relaxed\Plugin;
 use Drupal\Component\Plugin\PluginBase;
 
 /**
- * Base class for Endpoint check plugins.
+ * Base class for Remote check plugins.
  */
-abstract class EndpointCheckBase extends PluginBase implements EndpointCheckInterface {
+abstract class RemoteCheckBase extends PluginBase implements RemoteCheckInterface {
 
   /**
    * @var bool

@@ -6,6 +6,5 @@ version: VERSION
 core: 8.x
 dependencies:
   - rest
-  - serialization
-  - multiversion
   - basic_auth
+  - multiversion

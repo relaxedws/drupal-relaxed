@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Annotation\Endpoint.
+ * Contains \Drupal\relaxed\Annotation\RemoteCheck.
  */
 
 namespace Drupal\relaxed\Annotation;
@@ -10,14 +10,14 @@ namespace Drupal\relaxed\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines a Endpoint item annotation object.
+ * Defines a Remote check item annotation object.
  *
- * @see \Drupal\relaxed\Plugin\EndpointManager
+ * @see \Drupal\relaxed\Plugin\RemoteCheckManager
  * @see plugin_api
  *
  * @Annotation
  */
-class Endpoint extends Plugin {
+class RemoteCheck extends Plugin {
 
   /**
    * The plugin ID.

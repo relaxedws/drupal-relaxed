@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Form\EndpointDeleteForm.
+ * Contains \Drupal\relaxed\Form\RemoteDeleteForm.
  */
 
 namespace Drupal\relaxed\Form;
@@ -12,9 +12,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
- * Builds the form to delete Endpoint entities.
+ * Builds the form to delete Remote entities.
  */
-class EndpointDeleteForm extends EntityConfirmFormBase {
+class RemoteDeleteForm extends EntityConfirmFormBase {
 
   /**
    * {@inheritdoc}
@@ -27,7 +27,7 @@ class EndpointDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('entity.endpoint.collection');
+    return new Url('entity.remote.collection');
   }
 
   /**

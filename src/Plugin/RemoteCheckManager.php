@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relaxed\Plugin\EndpointCheckManager.
+ * Contains \Drupal\relaxed\Plugin\RemoteCheckManager.
  */
 
 namespace Drupal\relaxed\Plugin;
@@ -10,16 +10,16 @@ namespace Drupal\relaxed\Plugin;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\relaxed\Entity\Endpoint;
-use Drupal\relaxed\Entity\EndpointInterface;
+use Drupal\relaxed\Entity\Remote;
+use Drupal\relaxed\Entity\RemoteInterface;
 
 /**
- * Provides the Endpoint check plugin manager.
+ * Provides the Remote check plugin manager.
  */
-class EndpointCheckManager extends DefaultPluginManager {
+class RemoteCheckManager extends DefaultPluginManager {
 
   /**
-   * Constructor for EndpointCheckManager objects.
+   * Constructor for RemoteCheckManager objects.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
@@ -30,39 +30,39 @@ class EndpointCheckManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/EndpointCheck', $namespaces, $module_handler, 'Drupal\relaxed\Plugin\EndpointCheckInterface', 'Drupal\relaxed\Annotation\EndpointCheck');
+    parent::__construct('Plugin/RemoteCheck', $namespaces, $module_handler, 'Drupal\relaxed\Plugin\RemoteCheckInterface', 'Drupal\relaxed\Annotation\RemoteCheck');
 
-    $this->alterInfo('relaxed_endpoint_check_info');
-    $this->setCacheBackend($cache_backend, 'relaxed_endpoint_check_plugins');
+    $this->alterInfo('relaxed_remote_check_info');
+    $this->setCacheBackend($cache_backend, 'relaxed_remote_check_plugins');
   }
 
   /**
-   * Runs a checks for all Endpoints.
+   * Runs a checks for all Remotes.
    *
    * @return array
    */
   public function runAll() {
     $results = [];
-    $endpoints = Endpoint::loadMultiple();
-    foreach ($endpoints as $endpoint) {
-      $results[$endpoint->id()] = $this->run($endpoint);
+    $remotes = Remote::loadMultiple();
+    foreach ($remotes as $remote) {
+      $results[$remote->id()] = $this->run($remote);
     }
 
     return $results;
   }
 
   /**
-   * Runs checks on given Endpoint.
+   * Runs checks on given Remote.
    *
-   * @param \Drupal\relaxed\Entity\EndpointInterface $endpoint
+   * @param \Drupal\relaxed\Entity\RemoteInterface $remote
    * @return array
    */
-  public function run(EndpointInterface $endpoint) {
+  public function run(RemoteInterface $remote) {
     $results = [];
     $checks = $this->getDefinitions();
     foreach ($checks as $check) {
       $checker = $this->createInstance($check['id']);
-      $checker->execute($endpoint);
+      $checker->execute($remote);
       $results[$check['id']] = [
         'result' => $checker->getResult(),
         'message' => $checker->getMessage(),

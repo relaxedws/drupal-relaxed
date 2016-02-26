@@ -5,7 +5,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\relaxed\Entity\Endpoint;
+use Drupal\relaxed\Entity\Remote;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -73,10 +73,10 @@ function relaxed_entity_access(EntityInterface $entity, $operation, AccountInter
     else {
       return AccessResult::allowedIfHasPermission($account, 'perform push replication');
     }
-  }
-
   // No opinion.
-  return AccessResult::neutral();
+}
+
+return AccessResult::neutral();
 }
 
 /**
@@ -118,9 +118,9 @@ function relaxed_entity_field_access($operation, FieldDefinitionInterface $field
 function relaxed_requirements($phase) {
   if ($phase === 'runtime') {
     $requirements = [];
-    $endpoint_checks = \Drupal::service('plugin.manager.endpoint_check')->runAll();
-    foreach ($endpoint_checks as $endpoint_id => $checks) {
-      $endpoint = Endpoint::load($endpoint_id);
+    $remote_checks = \Drupal::service('plugin.manager.remote_check')->runAll();
+    foreach ($remote_checks as $remote_id => $checks) {
+      $remote = Remote::load($remote_id);
       $severity = true;
       $messages = [];
       foreach ($checks as $check_id => $check) {
@@ -132,8 +132,8 @@ function relaxed_requirements($phase) {
         '#items' => $messages,
       ];
       $description = \Drupal::service('renderer')->render($build);
-      $requirements[$endpoint_id] = [
-        'title' => t('Relaxed Endpoint: @endpoint', ['@endpoint' => $endpoint->label()]),
+      $requirements[$remote_id] = [
+        'title' => t('Relaxed Remote: @remote', ['@remote' => $remote->label()]),
         'description' => $description,
         'severity' => $severity ? REQUIREMENT_OK : REQUIREMENT_ERROR,
       ];
@@ -141,4 +141,8 @@ function relaxed_requirements($phase) {
 
     return $requirements;
   }
+}
+
+function relaxed_cron() {
+  \Drupal::service('relaxed.remote_pointer')->addAllPointers();
 }

@@ -2,21 +2,21 @@
 
 /**
  * @file
- * contains \Drupal\relaxed\Plugin\Endpoint\WorkspaceEndpoint
+ * contains \Drupal\relaxed\Plugin\Remote\WorkspaceRemote
  */
 
-namespace Drupal\relaxed\Plugin\EndpointCheck;
+namespace Drupal\relaxed\Plugin\RemoteCheck;
 
-use Drupal\relaxed\Entity\EndpointInterface;
-use Drupal\relaxed\Plugin\EndpointCheckBase;
+use Drupal\relaxed\Entity\RemoteInterface;
+use Drupal\relaxed\Plugin\RemoteCheckBase;
 
 /**
- * @EndpointCheck(
+ * @RemoteCheck(
  *   id = "ping",
- *   label = "Ping endpoint"
+ *   label = "Ping remote"
  * )
  */
-Class Ping extends EndpointCheckBase {
+Class Ping extends RemoteCheckBase {
 
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -25,17 +25,17 @@ Class Ping extends EndpointCheckBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(EndpointInterface $endpoint) {
-    $url = (string) $endpoint->getPlugin();
+  public function execute(RemoteInterface $remote) {
+    $url = (string) $remote->uri();
     $client = \Drupal::httpClient();
     try {
       $response = $client->request('HEAD', $url);
       if ($response->getStatusCode() === 200) {
         $this->result = true;
-        $this->message = t('Endpoint is reachable.');
+        $this->message = t('Remote is reachable.');
       }
       else {
-        $this->message = t('Endpoint returns status code @status.', ['@status' => $response->getStatusCode()]);
+        $this->message = t('Remote returns status code @status.', ['@status' => $response->getStatusCode()]);
       }
     }
     catch (\Exception $e) {
