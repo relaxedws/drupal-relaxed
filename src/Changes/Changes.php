@@ -50,22 +50,22 @@ class Changes implements ChangesInterface {
   /**
    * {@inheritdoc}
    */
-  static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace) {
+  static public function createInstance(ContainerInterface $container, WorkspaceInterface $workspace) {
     return new static(
-      $sequence_index,
       $workspace,
+      $container->get('entity.index.sequence'),
       $container->get('entity.manager'),
       $container->get('serializer')
     );
   }
 
   /**
-   * @param \Drupal\multiversion\Entity\Index\SequenceIndex $sequenceIndex
    * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param \Drupal\multiversion\Entity\Index\SequenceIndex $sequenceIndex
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    */
-  public function __construct(SequenceIndex $sequenceIndex, WorkspaceInterface $workspace, EntityManagerInterface $entity_manager, SerializerInterface $serializer) {
+  public function __construct(WorkspaceInterface $workspace, SequenceIndex $sequenceIndex, EntityManagerInterface $entity_manager, SerializerInterface $serializer) {
     $this->sequenceIndex = $sequenceIndex;
     $this->workspaceId = $workspace->id();
     $this->entityManager = $entity_manager;
@@ -90,10 +90,10 @@ class Changes implements ChangesInterface {
   /**
    * {@inheritdoc}
    */
-  public function getNormal() {
+  public function getChanges() {
     $sequences = $this->sequenceIndex
       ->useWorkspace($this->workspaceId)
-      ->getRange($this->lastSeq, NULL);
+      ->getRange($this->lastSeq, NULL, FALSE);
 
     // Format the result array.
     $changes = array();
@@ -134,15 +134,10 @@ class Changes implements ChangesInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLongpoll() {
-    $no_change = TRUE;
-    do {
-      $change = $this->sequenceIndex
-        ->useWorkspace($this->workspaceId)
-        ->getRange($this->lastSeq, NULL);
-      $no_change = empty($change) ? TRUE : FALSE;
-    } while ($no_change);
-    return $change;
+  public function hasChanged($seq) {
+    return (bool) $this->sequenceIndex
+      ->useWorkspace($this->workspaceId)
+      ->getRange($this->lastSeq, NULL, FALSE);
   }
 
 }

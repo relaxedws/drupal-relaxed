@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -238,7 +239,7 @@ class ResourceController implements ContainerAwareInterface {
 
     foreach ($responses as $response_part) {
       try {
-        if ($response_data = $response_part->getResponseData()) {
+        if (!$response instanceof StreamedResponse && $response_data = $response_part->getResponseData()) {
           // Collect bubbleable metadata in a render context.
           $render_context = new RenderContext();
           $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
@@ -258,9 +259,11 @@ class ResourceController implements ContainerAwareInterface {
       }
     }
 
-    foreach ($render_contexts as $render_context) {
-      $response->addCacheableDependency($render_context);
+    // Don't add cache dependencies if we're streaming the response.
+    if ($response instanceof StreamedResponse) {
+      return $response;
     }
+
     foreach ($parameters as $parameter) {
       if (is_array($parameter)) {
         foreach ($parameter as $item) {

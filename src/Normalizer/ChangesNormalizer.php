@@ -23,7 +23,7 @@ class ChangesNormalizer extends NormalizerBase {
    */
   public function normalize($changes, $format = NULL, array $context = array()) {
     /** @var \Drupal\relaxed\Changes\ChangesInterface $changes */
-    $results = $changes->getNormal();
+    $results = $changes->getChanges();
     $last_result = end($results);
     $last_seq = isset($last_result['seq']) ? $last_result['seq'] : 0;
 

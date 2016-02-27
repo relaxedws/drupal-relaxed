@@ -17,11 +17,10 @@ interface ChangesInterface {
    * Factory method.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   * @param \Drupal\multiversion\Entity\Index\SequenceIndexInterface $sequence_index
    * @param \Drupal\multiversion\Entity\WorkspaceInterface
    * @return \Drupal\relaxed\Changes\ChangesInterface
    */
-  static public function createInstance(ContainerInterface $container, SequenceIndexInterface $sequence_index, WorkspaceInterface $workspace);
+  static public function createInstance(ContainerInterface $container, WorkspaceInterface $workspace);
 
   /**
    * @param boolean $include_docs
@@ -40,15 +39,16 @@ interface ChangesInterface {
   /**
    * Return the changes in a 'normal' way.
    */
-  public function getNormal();
+  public function getChanges();
 
   /**
-   * Return the changes with a 'longpoll'.
+   * Whether or not there's a change since the given sequence number.
    *
-   * We can implement this method later.
+   * @param int $timeout
+   * @return boolean
    *
    * @see https://www.drupal.org/node/2282295
    */
-  public function getLongpoll();
+  public function hasChanged($timeout);
 
 }
