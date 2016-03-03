@@ -20,7 +20,9 @@ class AttachmentNormalizer extends ContentEntityNormalizer implements Denormaliz
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {
-    if (!empty($context['new_revision'])) {
+    // If the 'new_revision_id' context is TRUE then normalize file entity as a
+    // content entity not stream.
+    if (!empty($context['new_revision_id'])) {
       return parent::normalize($data, $format, $context);
     }
     /** @var \Drupal\file\FileInterface $data */
