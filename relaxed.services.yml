@@ -53,7 +53,7 @@ services:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.attachment:
     class: Drupal\relaxed\Normalizer\AttachmentNormalizer
-    arguments: ['@entity.manager']
+    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.file_item:
