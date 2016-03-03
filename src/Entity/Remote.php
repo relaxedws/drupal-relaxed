@@ -9,7 +9,6 @@ namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use GuzzleHttp\Psr7\Uri;
-use Psr\Http\Message\UriInterface;
 
 /**
  * Defines the Remote entity.
@@ -73,6 +72,7 @@ class Remote extends ConfigEntityBase implements RemoteInterface {
 
   /**
    * @var string
+   *   Base64 encoded uri string
    */
   protected $uri;
 
