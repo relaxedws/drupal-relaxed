@@ -45,7 +45,7 @@ class RemoteConfigurationTest extends WebTestBase {
     $label = $this->randomMachineName();
     $edit['label'] = $label;
     $edit['id'] = strtolower($label);
-    $edit['uri'] = 'http://example.com/relaxed/default';
+    $edit['uri'] = 'http://example.com/relaxed';
     $edit['username'] = 'user';
     $edit['password'] = 'pass';
     $this->drupalPostForm('admin/config/services/relaxed/add/', $edit, t('Save'));
