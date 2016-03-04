@@ -97,3 +97,7 @@ services:
     parent: default_plugin_manager
   relaxed.remote_pointer:
     class: Drupal\relaxed\RemotePointer
+  relaxed.couchdb_replicator:
+    class: Drupal\relaxed\CouchdbReplicator
+    tags:
+      - {name: workspace_replicator, priority: 10}

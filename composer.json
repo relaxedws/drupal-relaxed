@@ -2,5 +2,8 @@
   "name":"drupal/relaxed",
   "description":"Provides a RESTful API that exposes all content entities over UUID endpoints.",
   "type": "drupal-module",
-  "license": "GPL-2.0+"
+  "license": "GPL-2.0+",
+  "require": {
+    "relaxedws/replicator": "dev-master"
+  }
 }

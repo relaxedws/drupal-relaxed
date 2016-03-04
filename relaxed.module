@@ -143,6 +143,9 @@ function relaxed_requirements($phase) {
   }
 }
 
+/**
+ * Implements hook_cron().
+ */
 function relaxed_cron() {
   \Drupal::service('relaxed.remote_pointer')->addAllPointers();
 }

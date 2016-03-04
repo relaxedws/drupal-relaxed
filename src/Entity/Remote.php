@@ -8,6 +8,7 @@
 namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use GuzzleHttp\Psr7\Uri;
 
 /**
@@ -87,5 +88,10 @@ class Remote extends ConfigEntityBase implements RemoteInterface {
   public function username() {
     $user_info = explode(':', $this->uri()->getUserInfo());
     return $user_info[0];
+  }
+
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    \Drupal::service('relaxed.remote_pointer')->addPointers($this);
+    parent::postSave($storage, $update);
   }
 }

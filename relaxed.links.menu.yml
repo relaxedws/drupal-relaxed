@@ -3,3 +3,10 @@ relaxed.remote:
   route_name: entity.remote.collection
   description: 'Remote configuration for RELAXed Web Services.'
   parent: system.admin_config_services
+relaxed.settings_form:
+  title: 'Relaxed settings'
+  route_name: relaxed.settings_form
+  description: 'General settings for RELAXed Web Services'
+  parent: system.admin_config_services
+  weight: 99
+
