@@ -13,7 +13,7 @@ use Drupal\workspace\PointerInterface;
 use Drupal\workspace\ReplicatorInterface;
 use GuzzleHttp\Psr7\Uri;
 use Relaxed\Replicator\ReplicationTask;
-use Relaxed\Replicator\Replication;
+use Relaxed\Replicator\Replicator;
 
 
 class CouchdbReplicator implements ReplicatorInterface{
@@ -31,28 +31,18 @@ class CouchdbReplicator implements ReplicatorInterface{
    * @inheritDoc
    */
   public function replicate(PointerInterface $source, PointerInterface $target) {
-    $source_db = $this->setupEndpoint($source);
-    $target_db = $this->setupEndpoint($target);
+     $source_db = $this->setupEndpoint($source);
+     $target_db = $this->setupEndpoint($target);
+
     try {
-      // Create the replication task.
       $task = new ReplicationTask();
-      // Create the replication.
-      $replication = new Replication($source_db, $target_db, $task);
-      // Generate and set a replication ID.
-      $replication->task->setRepId($replication->generateReplicationId());
-      // Filter by document IDs if set.
-      if (!empty($this->docIds)) {
-        $replication->task->setDocIds($this->docIds);
-      }
-      // Start the replication.
-      $replicationResult = $replication->start();
+      $replicator = new Replicator($source_db, $target_db, $task);
+      return $replicator->startReplication();
     }
     catch (\Exception $e) {
-      \Drupal::logger('Deploy')->info($e->getMessage() . ': ' . $e->getTraceAsString());
+      watchdog_exception('Relaxed', $e);
       return ['error' => $e->getMessage()];
     }
-    // Return the response.
-    return $replicationResult;
   }
 
   protected function setupEndpoint(PointerInterface $pointer) {
@@ -82,7 +72,8 @@ class CouchdbReplicator implements ReplicatorInterface{
       $port = $uri->getPort() ?: 80;
       return CouchDBClient::create([
         'url' => (string) $uri,
-        'port' => $port
+        'port' => $port,
+        'timeout' => 10
       ]);
     }
   }
