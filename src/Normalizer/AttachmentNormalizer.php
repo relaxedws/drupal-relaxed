@@ -2,14 +2,9 @@
 
 namespace Drupal\relaxed\Normalizer;
 
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-/**
- * @todo {@link https://www.drupal.org/node/2599920 Don't extend EntityNormalizer.}
- */
-class AttachmentNormalizer extends NormalizerBase implements DenormalizerInterface {
+class AttachmentNormalizer extends ContentEntityNormalizer implements DenormalizerInterface {
 
   /**
    * @var string[]
@@ -22,16 +17,14 @@ class AttachmentNormalizer extends NormalizerBase implements DenormalizerInterfa
   protected $format = array('stream', 'base64_stream');
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->entityManager = $entity_manager;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function normalize($data, $format = NULL, array $context = array()) {
+    // If the 'new_revision_id' context is TRUE then normalize file entity as a
+    // content entity not stream.
+    if (!empty($context['new_revision_id'])) {
+      return parent::normalize($data, $format, $context);
+    }
     /** @var \Drupal\file\FileInterface $data */
     $stream = fopen($data->getFileUri(), 'r');
     return $stream;
