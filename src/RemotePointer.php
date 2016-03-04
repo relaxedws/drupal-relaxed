@@ -20,14 +20,11 @@ class RemotePointer implements RemotePointerInterface {
       if ($response->getStatusCode() === 200) {
         return json_decode($response->getBody());
       }
-      else {
-        return [];
-      }
     }
     catch (\Exception $e) {
-      $this->message = $e->getMessage();
       watchdog_exception('relaxed', $e);
     }
+    return [];
   }
 
   /**
