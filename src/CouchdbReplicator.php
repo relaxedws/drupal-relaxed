@@ -18,6 +18,12 @@ use Relaxed\Replicator\Replicator;
 
 class CouchdbReplicator implements ReplicatorInterface{
 
+  protected $relaxedSettings;
+
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->relaxedSettings = $config_factory->get('relaxed.settings');
+  }
+
   /**
    * @inheritDoc
    */
@@ -47,17 +53,18 @@ class CouchdbReplicator implements ReplicatorInterface{
 
   protected function setupEndpoint(PointerInterface $pointer) {
     if (!empty($pointer->data()['workspace'])) {
-      /** @var ConfigFactoryInterface $config */
-      $config = \Drupal::config('relaxed.settings');
       /** @var string $api_root */
-      $api_root = trim($config->get('api_root'), '/');
+      $api_root = trim($this->relaxedSettings->get('api_root'), '/');
       /** @var WorkspaceInterface $workspace */
       $workspace = Workspace::load($pointer->data()['workspace']);
       $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), [])
         ->setAbsolute()
         ->toString();
       $uri = new Uri($url);
-      $uri = $uri->withUserInfo($config->get('username'), base64_decode($config->get('password')));
+      $uri = $uri->withUserInfo(
+        $this->relaxedSettings->get('username'),
+        base64_decode($this->relaxedSettings->get('password'))
+      );
     }
 
     if (!empty($pointer->data()['remote'])) {
