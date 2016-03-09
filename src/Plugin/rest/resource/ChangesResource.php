@@ -7,7 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\relaxed\Changes\Changes;
+use Drupal\replication\Changes\Changes;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "relaxed:changes",
  *   label = "Changes",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\Changes\Changes",
+ *     "canonical" = "Drupal\replication\Changes\Changes",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_changes",

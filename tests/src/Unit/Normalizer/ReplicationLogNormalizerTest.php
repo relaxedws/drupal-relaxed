@@ -7,7 +7,7 @@
 
 namespace Drupal\Tests\relaxed\Unit\Normalizer;
 
-use Drupal\relaxed\Entity\ReplicationLog;
+use Drupal\replication\Entity\ReplicationLog;
 
 /**
  * Tests the replication_log serialization format.
@@ -26,11 +26,12 @@ class ReplicationLogNormalizerTest extends NormalizerTestBase {
     'user',
     'key_value',
     'multiversion',
+    'replication',
     'rest',
     'relaxed'
   ];
 
-  protected $entityClass = 'Drupal\relaxed\Entity\ReplicationLog';
+  protected $entityClass = 'Drupal\replication\Entity\ReplicationLog';
 
   protected function setUp() {
     parent::setUp();

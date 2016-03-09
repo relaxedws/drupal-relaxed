@@ -11,7 +11,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = array('Drupal\relaxed\RevisionDiff\RevisionDiffInterface');
+  protected $supportedInterfaceOrClass = array('Drupal\replication\RevisionDiff\RevisionDiffInterface');
 
   /**
    * @var string[]
@@ -22,7 +22,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
    * {@inheritdoc}
    */
   public function normalize($rev_diff, $format = NULL, array $context = array()) {
-    /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
+    /** @var \Drupal\replication\RevisionDiff\RevisionDiffInterface $rev_diff */
     $missing = $rev_diff->getMissing();
     return $missing ?: new \stdClass();
   }
@@ -36,7 +36,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
     }
 
     // @todo {@link https://www.drupal.org/node/2599930 Use injected container.}
-    /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
+    /** @var \Drupal\replication\RevisionDiff\RevisionDiffInterface $rev_diff */
     $revs_diff = $class::createInstance(
       \Drupal::getContainer(),
       \Drupal::service('entity.index.rev'),

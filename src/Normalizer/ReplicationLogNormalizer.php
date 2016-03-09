@@ -16,7 +16,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = array('Drupal\relaxed\Entity\ReplicationLogInterface');
+  protected $supportedInterfaceOrClass = array('Drupal\replication\Entity\ReplicationLog');
 
   /**
    * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
