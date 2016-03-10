@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
-use Drupal\relaxed\Entity\ReplicationLog;
+use Drupal\replication\Entity\ReplicationLog;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -90,7 +90,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
       $entity = ReplicationLog::create($data);
       return $entity;
     }
-    catch(Exception $e) {
+    catch(\Exception $e) {
       watchdog_exception('Relaxed', $e);
     }
   }
@@ -98,7 +98,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   public function supportsDenormalization($data, $type, $format = NULL) {
     // We need to accept both ReplicationLog and ContentEntityInterface classes.
     // LocalDocResource entities are treated as standard documents (content entities)
-    if (in_array($type, ['Drupal\Core\Entity\ContentEntityInterface', 'Drupal\relaxed\Entity\ReplicationLog'], true)) {
+    if (in_array($type, ['Drupal\Core\Entity\ContentEntityInterface', 'Drupal\replication\Entity\ReplicationLog'], true)) {
       // If a document doesn't have a type set, we assume it's a replication log.
       // We also support documents specifically specified as replication logs.
       if (!isset($data['@type']) || $data['@type'] === 'replication_log') {
