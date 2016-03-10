@@ -49,6 +49,7 @@ services:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.revs_diff:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
+    arguments: ['@replication.revisiondiff_factory']
     tags:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.attachment:
