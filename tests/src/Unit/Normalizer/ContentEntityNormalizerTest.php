@@ -28,7 +28,8 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
     'key_value',
     'multiversion',
     'rest',
-    'relaxed'
+    'relaxed',
+    'replication'
   ];
 
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
