@@ -1,14 +1,53 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\relaxed\Plugin\rest\resource\ResourceBase.
+ */
+
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
+use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceInterface {
+
+  /**
+   * @param $workspace
+   *
+   * @return ResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   */
+  public function options($workspace) {
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
+    $response = new ResourceResponse(NULL, 204);
+    $response->addCacheableDependency($workspace);
+
+    return $response;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function availableMethods() {
+    $methods = parent::availableMethods();
+
+    // Indiscriminately patch in OPTIONS as an accepted method, to facilitate
+    // CORS for all RELAXed endpoints.
+    if (!in_array('OPTIONS', $methods)) {
+      $methods[] = 'OPTIONS';
+    }
+
+    return $methods;
+  }
 
   /**
    * {@inheritdoc}
@@ -29,7 +68,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
       // Allow pull or push permissions depending on the method.
       $permissions = 'perform push replication';
-      if ($method === 'GET') {
+      if (in_array($method, ['GET', 'OPTIONS'])) {
         $permissions .= '+perform pull replication';
       }
 
@@ -81,6 +120,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           break;
 
         case 'GET':
+        case 'OPTIONS':
           $collection->add("$route_name.$method", $route);
           break;
 

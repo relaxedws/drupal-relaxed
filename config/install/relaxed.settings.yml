@@ -14,6 +14,12 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
     POST:
       supported_formats:
         - json
@@ -45,6 +51,12 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
     PUT:
       supported_formats:
         - json
@@ -64,8 +76,20 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
   relaxed:changes:
     GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    OPTIONS:
       supported_formats:
         - json
       supported_auth:
@@ -82,6 +106,12 @@ resources:
       supported_formats:
         - json
         - mixed
+      supported_auth:
+        - cookie
+        - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
       supported_auth:
         - cookie
         - basic_auth
@@ -105,6 +135,12 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
   relaxed:local:doc:
     HEAD:
       supported_formats:
@@ -113,6 +149,12 @@ resources:
         - cookie
         - basic_auth
     GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    OPTIONS:
       supported_formats:
         - json
       supported_auth:
@@ -131,8 +173,20 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
   relaxed:session:
     GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    OPTIONS:
       supported_formats:
         - json
       supported_auth:
@@ -145,6 +199,12 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
   relaxed:all_dbs:
     GET:
       supported_formats:
@@ -152,8 +212,20 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+    OPTIONS:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
   relaxed:all_docs:
     GET:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
+    OPTIONS:
       supported_formats:
         - json
       supported_auth:

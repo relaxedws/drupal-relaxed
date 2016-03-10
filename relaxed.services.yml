@@ -102,3 +102,8 @@ services:
     arguments: ['@config.factory']
     tags:
       - {name: workspace_replicator, priority: 10}
+  relaxed.options_request_listener:
+    class: Drupal\relaxed\EventSubscriber\OptionsRequestSubscriber
+    arguments: ['@router.route_provider']
+    tags:
+      - { name: event_subscriber }
