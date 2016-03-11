@@ -25,7 +25,8 @@ class AttachmentNormalizerTest extends NormalizerTestBase {
     'relaxed',
     'key_value',
     'multiversion',
-    'rest'
+    'rest',
+    'replication'
   ];
 
   /**

@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   id = "relaxed:revs_diff",
  *   label = "Revisions diff",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\RevisionDiff\RevisionDiff",
+ *     "canonical" = "Drupal\replication\RevisionDiff\RevisionDiff",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_revs_diff",
@@ -27,7 +27,7 @@ class RevsDiffResource extends ResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $revs_diff
+   * @param \Drupal\replication\RevisionDiff\RevisionDiffInterface $revs_diff
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $revs_diff) {

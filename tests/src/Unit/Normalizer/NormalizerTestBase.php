@@ -25,6 +25,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
     'system',
     'field',
     'entity_test',
+    'replication',
     'text',
     'filter',
     'user'

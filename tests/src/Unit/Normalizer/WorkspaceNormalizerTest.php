@@ -28,7 +28,8 @@ class WorkspaceNormalizerTest extends NormalizerTestBase {
     'key_value',
     'multiversion',
     'rest',
-    'relaxed'
+    'relaxed',
+    'replication'
   ];
 
   protected $entityClass = 'Drupal\multiversion\Entity\Workspace';

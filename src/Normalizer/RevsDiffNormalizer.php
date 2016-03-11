@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\replication\RevisionDiffFactoryInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -11,18 +12,25 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = array('Drupal\relaxed\RevisionDiff\RevisionDiffInterface');
+  protected $supportedInterfaceOrClass = array('Drupal\replication\RevisionDiff\RevisionDiffInterface');
 
   /**
    * @var string[]
    */
   protected $format = array('json');
 
+  /** @var  \Drupal\replication\RevisionDiffFactoryInterface */
+  protected $revisionDiffFactory;
+
+  public function __construct(RevisionDiffFactoryInterface $revisiondiff_factory) {
+    $this->revisionDiffFactory = $revisiondiff_factory;
+  }
+
   /**
    * {@inheritdoc}
    */
   public function normalize($rev_diff, $format = NULL, array $context = array()) {
-    /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
+    /** @var \Drupal\replication\RevisionDiff\RevisionDiffInterface $rev_diff */
     $missing = $rev_diff->getMissing();
     return $missing ?: new \stdClass();
   }
@@ -35,16 +43,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
       throw new LogicException('A \'workspace\' context is required to denormalize revision diff data.');
     }
 
-    // @todo {@link https://www.drupal.org/node/2599930 Use injected container.}
-    /** @var \Drupal\relaxed\RevisionDiff\RevisionDiffInterface $rev_diff */
-    $revs_diff = $class::createInstance(
-      \Drupal::getContainer(),
-      \Drupal::service('entity.index.rev'),
-      $context['workspace']
-    );
-
-    $revs_diff->setRevisionIds($data);
-    return $revs_diff;
+    return $this->revisionDiffFactory->get($context['workspace'])->setRevisionIds($data);
   }
 
 }
