@@ -2,11 +2,10 @@
 
 namespace Drupal\relaxed\Normalizer;
 
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
-use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\replication\Entity\ReplicationLog;
+use Drupal\replication\Entity\ReplicationLogInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -24,19 +23,9 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   protected $uuidIndex;
 
   /**
-   * @var \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface
-   */
-  protected $revTree;
-
-  /**
    * @var \Drupal\rest\LinkManager\LinkManagerInterface
    */
   protected $linkManager;
-
-  /**
-   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
-   */
-  protected $selectionManager;
 
   /**
    * @var string[]
@@ -44,18 +33,14 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   protected $format = array('json');
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
-   * @param \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface $rev_tree
    * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionTreeIndexInterface $rev_tree, LinkManagerInterface $link_manager, SelectionPluginManagerInterface $selection_manager = NULL) {
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, UuidIndexInterface $uuid_index, LinkManagerInterface $link_manager) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->uuidIndex = $uuid_index;
-    $this->revTree = $rev_tree;
     $this->linkManager = $link_manager;
-    $this->selectionManager = $selection_manager;
   }
 
   /**
@@ -85,8 +70,21 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
    * @inheritDoc
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
-    // Simply create the replication log entity.
+    $data['_id'] = str_replace('_local/', '', $data['_id']);
+    $record = $this->uuidIndex->get($data['_id']);
+    if (!empty($record['entity_type_id']) && !empty($record['entity_id'])) {
+      $storage = $this->entityTypeManager->getStorage($record['entity_type_id']);
+      $entity = $storage->loadRevision($record['entity_id']);
+      if ($entity instanceof ReplicationLogInterface) {
+        foreach ($data as $name => $value) {
+          $entity->{$name} = $value;
+        }
+        return $entity;
+      }
+    }
+
     try {
+      $data['uuid'][0]['value'] = $data['_id'];
       $entity = ReplicationLog::create($data);
       return $entity;
     }
