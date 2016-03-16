@@ -59,7 +59,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
       '@type' => 'replication_log',
       '_id' => $entity->uuid(),
       '_rev' => $entity->_rev->value,
-      'history' => [],
+      'history' => $entity->get('history'),
       'session_id' => $entity->getSessionId(),
       'source_last_seq' => $entity->getSourceLastSeq(),
     ];
@@ -74,7 +74,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
     $record = $this->uuidIndex->get($data['_id']);
     if (!empty($record['entity_type_id']) && !empty($record['entity_id'])) {
       $storage = $this->entityTypeManager->getStorage($record['entity_type_id']);
-      $entity = $storage->loadRevision($record['entity_id']);
+      $entity = $storage->load($record['entity_id']);
       if ($entity instanceof ReplicationLogInterface) {
         foreach ($data as $name => $value) {
           $entity->{$name} = $value;
