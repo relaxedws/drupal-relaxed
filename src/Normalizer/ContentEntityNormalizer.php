@@ -246,8 +246,9 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $files = [];
     if (isset($data['_attachments'])) {
       foreach ($data['_attachments'] as $key => $value) {
-        list($field_name, $delta, $file_uuid, $scheme, $filename) = explode('/', $key);
-        $uri = "$scheme://$filename";
+        list($field_name, $delta, $file_uuid, $scheme, $target) = explode(':', $key);
+        $uri = "$scheme://$target";
+        multiversion_prepare_file_destination($uri, \Drupal::service('stream_wrapper.' . $scheme));
         // Check if exists a file with this uuid.
         $file = $this->entityManager->loadEntityByUuid('file', $file_uuid);
         if (!$file) {
@@ -421,7 +422,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     if (!empty($files)) {
-      array_merge($translation, $files);
+      $translation = array_merge($translation, $files);
     }
 
     // Denormalize entity reference fields.

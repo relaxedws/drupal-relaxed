@@ -39,8 +39,12 @@ class FileItemNormalizer extends NormalizerBase implements DenormalizerInterface
       $scheme = file_uri_scheme($uri);
       $field_name = $definition->getName();
 
-      // Create the attachment key, the format is: field_name/delta/uuid/scheme/filename.
-      $key = $field_name . '/' . $data->getName() . '/' . $file->uuid() . '/' . $scheme . '/' . $file->getFileName();
+      if (!$target = file_uri_target($uri)) {
+        $target = $file->getFileName();
+      }
+
+      // Create the attachment key, the format is: field_name:delta:uuid:scheme:target_uri.
+      $key = $field_name . ':' . $data->getName() . ':' . $file->uuid() . ':' . $scheme . ':' . $target;
 
       // @todo {@link https://www.drupal.org/node/2600354 Align file data normalization with attachment normalization.}
       $file_contents = file_get_contents($uri);
