@@ -49,7 +49,7 @@ class ReplicationLogNormalizerTest extends NormalizerTestBase {
         ),
       ],
       '@type' => 'replication_log',
-      '_id' => $this->entity->uuid(),
+      '_id' => '_local/' . $this->entity->uuid(),
       '_rev' => '0-00000000000000000000000000000000',
       'history' => [],
       'session_id' => $this->entity->getSessionId(),
