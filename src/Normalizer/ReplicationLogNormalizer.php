@@ -47,7 +47,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    // Strictly format the entity how CouchDB expects it, plus out JSON-LD data.
+    // Strictly format the entity how CouchDB expects it, plus our JSON-LD data.
     $data = [
       '@context' => [
         '_id' => '@id',
@@ -57,9 +57,9 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
         ),
       ],
       '@type' => 'replication_log',
-      '_id' => $entity->uuid(),
+      '_id' => '_local/'. $entity->uuid(),
       '_rev' => $entity->_rev->value,
-      'history' => $entity->get('history'),
+      'history' => $this->serializer->normalize($entity->get('history'), $format, $context),
       'session_id' => $entity->getSessionId(),
       'source_last_seq' => $entity->getSourceLastSeq(),
     ];
