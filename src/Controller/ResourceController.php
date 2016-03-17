@@ -190,8 +190,6 @@ class ResourceController implements ContainerAwareInterface {
                     if (count($existing_files)) {
                       $uri = file_destination($uri, FILE_EXISTS_RENAME);
                     }
-                  }
-                  if (!$file) {
                     $file_context = array(
                       'uri' => $uri,
                       'uuid' => $file_uuid,

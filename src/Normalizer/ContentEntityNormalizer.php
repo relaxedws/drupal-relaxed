@@ -244,27 +244,47 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     // Denormalize File and Image field types.
     $files = [];
+    $current_user_id = \Drupal::currentUser()->id();
     if (isset($data['_attachments'])) {
       foreach ($data['_attachments'] as $key => $value) {
         list($field_name, $delta, $file_uuid, $scheme, $target) = explode(':', $key);
         $uri = "$scheme://$target";
         $stream_wrapper_name = 'stream_wrapper.' . $scheme;
         multiversion_prepare_file_destination($uri, \Drupal::service($stream_wrapper_name));
-        // Check if exists a file with this uuid.
+        // Check if exists a file entity with this uuid.
         $file = $this->entityManager->loadEntityByUuid('file', $file_uuid);
-        if (!$file) {
-          // Check if exists a file with this $uri, if it exists then
-          // change the URI and save the new file.
-          $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
-          if (count($existing_files)) {
-            $uri = file_destination($uri, FILE_EXISTS_RENAME);
-          }
-          $file_context = array(
+        if ($file && is_file($file->getFileUri())) {
+          $files[$field_name][$delta]['target_id'] = $file->id();
+        }
+        // If the file entity exists but the file is missing then run the
+        // deserializer to create the file.
+        elseif ($file && !is_file($file->getFileUri())) {
+          $file_context = [
             'uri' => $uri,
             'uuid' => $file_uuid,
             'status' => FILE_STATUS_PERMANENT,
-            'uid' => \Drupal::currentUser()->id(),
-          );
+            'uid' => $current_user_id,
+          ];
+          \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
+          $files[$field_name][$delta] = [
+            'target_id' => $file->id(),
+            'entity' => $file,
+          ];
+        }
+        // Create the new entity file and the file itself.
+        else {
+          // Check if exists a file with this $uri, if it exists then rename
+          // the file.
+          $existing_files = entity_load_multiple_by_properties('file', ['uri' => $uri]);
+          if (count($existing_files)) {
+            $uri = file_destination($uri, FILE_EXISTS_RENAME);
+          }
+          $file_context = [
+            'uri' => $uri,
+            'uuid' => $file_uuid,
+            'status' => FILE_STATUS_PERMANENT,
+            'uid' => $current_user_id,
+          ];
           $file = \Drupal::getContainer()->get('serializer')->deserialize($value['data'], '\Drupal\file\FileInterface', 'base64_stream', $file_context);
           if ($file instanceof FileInterface) {
             $files[$field_name][$delta] = [
@@ -272,9 +292,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
               'entity' => $file,
             ];
           }
-          continue;
         }
-        $files[$field_name][$delta]['target_id'] = $file->id();
       }
     }
 
@@ -343,6 +361,17 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
       $entity_types_to_create = ['user'];
       if (!empty($bundle_key) && !empty($translations[$default_langcode][$bundle_key]) || in_array($entity_type_id, $entity_types_to_create)) {
         unset($translations[$default_langcode][$id_key], $translations[$default_langcode][$revision_key]);
+        $entity = $storage->create($translations[$default_langcode]);
+      }
+      elseif ($entity_type_id === 'file' && !empty($translations[$default_langcode])) {
+        if (isset($translations[$default_langcode][$id_key])) {
+          unset($translations[$default_langcode][$id_key]);
+        }
+        if (isset($translations[$default_langcode][$revision_key])) {
+          unset($translations[$default_langcode][$revision_key]);
+        }
+        $translations[$default_langcode]['status'][0]['value'] = FILE_STATUS_PERMANENT;
+        $translations[$default_langcode]['uid'][0]['target_id'] = $current_user_id;
         $entity = $storage->create($translations[$default_langcode]);
       }
     }

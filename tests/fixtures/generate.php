@@ -119,6 +119,21 @@ $docs = [
       'user_id' => [],
     ],
   ],
+  // File entity. The file will be created after the entity as attachment to the
+  // next entity.
+  [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en',
+    ],
+    '@type' => 'file',
+    '_id' => '6f9e1f07-e713-4840-bf95-8326c8317800',
+    'en' => [
+      'filename' => ['value' => 'file1.txt'],
+      'uri' => ['value' => 'public://file1.txt'],
+      'filemime' => ['value' => 'text/plain'],
+    ]
+  ],
   // Entity with attachment.
   [
     '@context' => [
@@ -132,7 +147,7 @@ $docs = [
       'user_id' => [],
     ],
     '_attachments' => [
-      'files/0/effb530e-5529-46ed-bec4-1b8f05c274d6/public/file1.txt' => _file_info(FILE1),
+      'files:0:6f9e1f07-e713-4840-bf95-8326c8317800:public:file1.txt' => _file_info(FILE1),
     ],
   ],
 ];
