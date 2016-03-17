@@ -2,6 +2,8 @@
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -141,6 +143,32 @@ function relaxed_requirements($phase) {
 
     return $requirements;
   }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() != 'workspace_pointer') {
+    return [];
+  }
+
+  $fields['remote_pointer'] = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Remote'))
+    ->setDescription(t('A reference to the remote'))
+    ->setSetting('target_type', 'remote')
+    ->setRevisionable(TRUE);
+
+  $fields['remote_database'] = BaseFieldDefinition::create('string')
+    ->setLabel(t('Remote database'))
+    ->setDescription(t('The remote database name.'))
+    ->setSettings(array(
+      'max_length' => 50,
+      'text_processing' => 0,
+    ))
+    ->setRevisionable(TRUE);
+
+  return $fields;
 }
 
 /**

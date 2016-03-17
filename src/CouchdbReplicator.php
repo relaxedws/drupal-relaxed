@@ -5,12 +5,11 @@ namespace Drupal\relaxed;
 use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
-use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;
-use Drupal\workspace\PointerInterface;
 use Drupal\workspace\ReplicatorInterface;
+use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
 use Relaxed\Replicator\ReplicationTask;
 use Relaxed\Replicator\Replicator;
@@ -27,7 +26,7 @@ class CouchdbReplicator implements ReplicatorInterface{
   /**
    * @inheritDoc
    */
-  public function applies(PointerInterface $source, PointerInterface $target) {
+  public function applies(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
     if ($this->setupEndpoint($source) && $this->setupEndpoint($target)) {
       return TRUE;
     }
@@ -36,7 +35,7 @@ class CouchdbReplicator implements ReplicatorInterface{
   /**
    * @inheritDoc
    */
-  public function replicate(PointerInterface $source, PointerInterface $target) {
+  public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
      $source_db = $this->setupEndpoint($source);
      $target_db = $this->setupEndpoint($target);
 
@@ -51,12 +50,12 @@ class CouchdbReplicator implements ReplicatorInterface{
     }
   }
 
-  protected function setupEndpoint(PointerInterface $pointer) {
-    if (!empty($pointer->data()['workspace'])) {
+  protected function setupEndpoint(WorkspacePointerInterface $pointer) {
+    if (!empty($pointer->getWorkspaceId())) {
       /** @var string $api_root */
       $api_root = trim($this->relaxedSettings->get('api_root'), '/');
       /** @var WorkspaceInterface $workspace */
-      $workspace = Workspace::load($pointer->data()['workspace']);
+      $workspace = $pointer->getWorkspace();
       $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), [])
         ->setAbsolute()
         ->toString();
@@ -67,12 +66,12 @@ class CouchdbReplicator implements ReplicatorInterface{
       );
     }
 
-    if (!empty($pointer->data()['remote'])) {
+    if (!empty($pointer->get('remote_pointer')->target_id) && !empty($pointer->get('remote_database')->value)) {
       /** @var RemoteInterface $remote */
-      $remote = Remote::load($pointer->data()['remote']);
+      $remote = $pointer->get('remote_pointer')->entity;
       /** @var Uri $uri */
       $uri = $remote->uri();
-      $uri = $uri->withPath($uri->getPath() . '/' . $pointer->data()['database']);
+      $uri = $uri->withPath($uri->getPath() . '/' . $pointer->get('remote_database')->value);
     }
 
     if ($uri instanceof Uri) {

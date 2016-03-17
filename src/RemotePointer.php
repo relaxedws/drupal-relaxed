@@ -5,6 +5,7 @@ namespace Drupal\relaxed;
 
 use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;
+use Drupal\workspace\Entity\WorkspacePointer;
 use Drupal\workspace\Pointer;
 
 class RemotePointer implements RemotePointerInterface {
@@ -33,15 +34,11 @@ class RemotePointer implements RemotePointerInterface {
   public function addPointers(RemoteInterface $remote) {
     $databases = $this->getRemoteDatabases($remote);
     foreach ($databases as $database) {
-      $pointer = new Pointer(
-        'remote:' . $remote->id() . ':' . $database,
-        $remote->label() . ': ' . $database,
-        [
-          'remote' => $remote->id(),
-          'database' => $database
-        ]
-      );
-      \Drupal::service('workspace.pointer')->add($pointer);
+      WorkspacePointer::create([
+        'name' => $remote->label() . ': ' . $database,
+        'remote_pointer' => $remote->id(),
+        'remote_database' => $database,
+      ])->save();
     }
   }
 
