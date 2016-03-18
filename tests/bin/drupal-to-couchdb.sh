@@ -27,6 +27,5 @@ curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=3
-FILES=1
-COUNT=$(($COUNT + $USERS + $FILES));
+COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
