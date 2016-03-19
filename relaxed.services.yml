@@ -13,7 +13,7 @@ services:
       - { name: normalizer, priority: 5 }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.replication_log:
@@ -54,7 +54,7 @@ services:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.attachment:
     class: Drupal\relaxed\Normalizer\AttachmentNormalizer
-    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.file_item:
@@ -71,7 +71,7 @@ services:
       - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@entity.index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
