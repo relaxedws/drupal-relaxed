@@ -71,7 +71,7 @@ services:
       - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@entity.index.rev.tree']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
