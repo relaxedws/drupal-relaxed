@@ -72,8 +72,8 @@ class BulkDocs implements BulkDocsInterface {
     return new static(
       $workspace_manager,
       $workspace,
-      $container->get('entity.index.uuid'),
-      $container->get('entity.index.rev'),
+      $container->get('multiversion.entity_index.uuid'),
+      $container->get('multiversion.entity_index.rev'),
       $container->get('entity_type.manager'),
       $container->get('lock'),
       $container->get('logger.factory')

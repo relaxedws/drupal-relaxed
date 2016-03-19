@@ -173,7 +173,7 @@ class DocResource extends ResourceBase {
       throw new AccessDeniedHttpException();
     }
 
-    $record = \Drupal::service('entity.index.uuid')->get($entity->uuid());
+    $record = \Drupal::service('multiversion.entity_index.uuid')->get($entity->uuid());
     $last_rev = $record['rev'];
     if ($last_rev != $entity->_rev->value) {
       throw new ConflictHttpException();

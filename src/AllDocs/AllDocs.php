@@ -81,7 +81,7 @@ class AllDocs implements AllDocsInterface {
       $container->get('entity.manager'),
       $container->get('multiversion.manager'),
       $workspace,
-      $container->get('entity.index.id'),
+      $container->get('multiversion.entity_index.id'),
       $container->get('serializer')
     );
   }

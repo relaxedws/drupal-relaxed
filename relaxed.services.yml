@@ -13,12 +13,12 @@ services:
       - { name: normalizer, priority: 5 }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.replication_log:
     class: Drupal\relaxed\Normalizer\ReplicationLogNormalizer
-    arguments: ['@entity_type.manager', '@entity.index.uuid', '@rest.link_manager']
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.uuid', '@rest.link_manager']
     tags:
       - { name: normalizer, priority: 20 }
   relaxed.normalizer.bulk_docs:
@@ -27,7 +27,7 @@ services:
       - { name: normalizer, priority: 20 }
   relaxed.normalizer.all_docs:
     class: Drupal\relaxed\Normalizer\AllDocsNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.changes:
@@ -54,7 +54,7 @@ services:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.attachment:
     class: Drupal\relaxed\Normalizer\AttachmentNormalizer
-    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@entity.index.rev.tree', '@rest.link_manager', '@language_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.file_item:
@@ -71,7 +71,7 @@ services:
       - { name: normalizer, priority: 10 }
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@entity.index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@entity.index.rev', '@entity.index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
@@ -81,7 +81,7 @@ services:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@entity.index.uuid']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: paramconverter, priority: 20 }
   workspace.negotiator.relaxed:
