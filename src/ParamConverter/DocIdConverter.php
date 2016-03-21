@@ -93,8 +93,8 @@ class DocIdConverter implements ParamConverterInterface {
     }
 
     $storage = $this->entityManager->getStorage($entity_type_id);
-    if ($open_revs_query && in_array($request->getMethod(), array('GET', 'HEAD'))) {
-      $open_revs = array();
+    if ($open_revs_query && in_array($request->getMethod(), ['GET', 'HEAD'])) {
+      $open_revs = [];
       if ($open_revs_query == 'all') {
         $open_revs[] = array_keys($this->revTree->getOpenRevisions($uuid));
       }
@@ -102,13 +102,13 @@ class DocIdConverter implements ParamConverterInterface {
         $open_revs = $open_revs_query;
       }
 
-      $revision_ids = array();
+      $revision_ids = [];
       foreach ($open_revs as $open_rev) {
         if ($item = $this->revIndex->get("$uuid:$open_rev")) {
           $revision_ids[] = $item['revision_id'];
         }
       }
-      $revisions = array();
+      $revisions = [];
       foreach ($revision_ids as $revision_id) {
         if ($revision = $storage->loadRevision($revision_id)) {
           $revisions[] = $revision;

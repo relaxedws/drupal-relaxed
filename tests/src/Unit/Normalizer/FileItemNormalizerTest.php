@@ -135,9 +135,9 @@ class FileItemNormalizerTest extends NormalizerTestBase{
 
     // Test normalize.
     $entity = EntityTestMulRev::load($this->entity->id());
-    $attachments_keys['1'] = 'field_test_file/0/' . $file1->uuid() . '/public/' . $file1->getFileName();
-    $attachments_keys['2'] = 'field_test_file/1/' . $file2->uuid() . '/public/' . $file2->getFileName();
-    $attachments_keys['3'] = 'field_test_image/0/' . $file3->uuid() . '/public/' . $file3->getFileName();
+    $attachments_keys['1'] = 'field_test_file:0:' . $file1->uuid() . ':public:example1.txt';
+    $attachments_keys['2'] = 'field_test_file:1:' . $file2->uuid() . ':public:example2.txt';
+    $attachments_keys['3'] = 'field_test_image:0:' . $file3->uuid() . ':public:example.jpg';
     $expected_attachments = [];
     $files_number = 1;
     while ($files_number <= 3) {

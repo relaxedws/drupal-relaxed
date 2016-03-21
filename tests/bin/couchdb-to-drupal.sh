@@ -28,6 +28,5 @@ curl -X GET http://admin:admin@localhost:8080/relaxed/default/_all_docs | tee /t
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=3
-FILES=1
-COUNT=$(($COUNT + $USERS + $FILES));
+COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
