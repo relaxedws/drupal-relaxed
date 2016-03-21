@@ -178,9 +178,11 @@ class ResourceController implements ContainerAwareInterface {
             if ($key > 1 && isset($part['headers']['content-disposition'])) {
               $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
               if ($file_info_found) {
-                list(, , $file_uuid, $scheme, $filename) = explode('/', $file_info[1]);
-                if ($file_uuid && $scheme && $filename) {
-                  $uri = "$scheme://$filename";
+                list(, , $file_uuid, $scheme, $target) = explode(':', $file_info[1]);
+                if ($file_uuid && $scheme && $target) {
+                  $uri = "$scheme://$target";
+                  $stream_wrapper_name = 'stream_wrapper.' . $scheme;
+                  multiversion_prepare_file_destination($uri, \Drupal::service($stream_wrapper_name));
                   // Check if exists a file with this uuid.
                   $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
                   if (!$file) {
