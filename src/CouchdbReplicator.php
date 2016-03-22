@@ -8,6 +8,7 @@ use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;
+use Drupal\replication\Entity\ReplicationLog;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
@@ -42,11 +43,20 @@ class CouchdbReplicator implements ReplicatorInterface{
     try {
       $task = new ReplicationTask();
       $replicator = new Replicator($source_db, $target_db, $task);
-      return $replicator->startReplication();
+      $result = $replicator->startReplication();
+      if (isset($result['session_id'])) {
+        $replication_logs = \Drupal::entityTypeManager()
+          ->getStorage('replication_log')
+          ->loadByProperties(['session_id' => $result['session_id']]);
+        return reset($replication_logs);
+      }
+      else {
+        return $this->errorReplicationLog($source, $target);
+      }
     }
     catch (\Exception $e) {
       watchdog_exception('Relaxed', $e);
-      return ['error' => $e->getMessage()];
+      return $this->errorReplicationLog($source, $target);
     }
   }
 
@@ -83,4 +93,24 @@ class CouchdbReplicator implements ReplicatorInterface{
       ]);
     }
   }
+
+  protected function errorReplicationLog(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
+    $time = new \DateTime();
+    $history = [
+      'start_time' => $time->format('D, d M Y H:i:s e'),
+      'end_time' => $time->format('D, d M Y H:i:s e'),
+      'session_id' => \md5((\microtime(true) * 1000000)),
+      'start_last_seq' => $source->getWorkspace()->getUpdateSeq(),
+    ];
+    $replication_log_id = $source->generateReplicationId($target);
+    /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
+    $replication_log = ReplicationLog::loadOrCreate($replication_log_id);
+    $replication_log->set('ok', FALSE);
+    $replication_log->setSourceLastSeq($source->getWorkspace()->getUpdateSeq());
+    $replication_log->setSessionId($history['session_id']);
+    $replication_log->setHistory($history);
+    $replication_log->save();
+    return $replication_log;
+  }
+
 }
