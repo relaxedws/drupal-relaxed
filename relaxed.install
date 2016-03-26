@@ -52,3 +52,38 @@ function relaxed_uninstall() {
   }
   $rest_config->set('resources', $rest_resource_config)->save();
 }
+
+/**
+ * Implements  hook_requirements().
+ *
+ * @param $phase
+ * @return array
+ */
+function relaxed_requirements($phase) {
+  $requirements = [];
+
+  if ($phase === 'runtime') {
+    $replicator_exists = class_exists('Relaxed\Replicator\Replicator');
+    $couchdbclient_exists = class_exists('Doctrine\CouchDB\CouchDBClient');
+
+    if (!$replicator_exists) {
+      $requirements['replicator'] = [
+        'title' => t('relaxedws/replicator'),
+        'value' => t('Not found'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('The <a href=":replicator_url">relaxedws/replicator</a> library is not available. This library is required by RELAXed Web Services.', [':replicator_url' => 'https://packagist.org/packages/relaxedws/replicator'])
+      ];
+    }
+
+    if (!$couchdbclient_exists) {
+      $requirements['couchdb'] = [
+        'title' => t('doctrine/couchdb'),
+        'value' => t('Not found'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('The <a href=":couchdb_url">doctrine/couchdb</a> library is not available. This library is required by RELAXed Web Services.', [':couchdb_url' => 'https://packagist.org/packages/doctrine/couchdb'])
+      ];
+    }
+  }
+
+  return $requirements;
+}
