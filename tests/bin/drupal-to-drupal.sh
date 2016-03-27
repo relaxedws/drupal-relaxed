@@ -16,13 +16,13 @@ do
   curl -X POST \
        -H "Content-Type: application/json" \
        -d "$document" \
-       admin:admin@localhost:8080/relaxed/default;
+       admin:admin@localhost:8080/relaxed/live;
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 
 php ~/drush.phar cache-rebuild
 
 # Run the replication.
-nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@localhost:8080/relaxed/default", "target": "http://admin:admin@localhost:8081/relaxed/default"}' http://localhost:5984/_replicate &
+nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@localhost:8080/relaxed/live", "target": "http://admin:admin@localhost:8081/relaxed/live"}' http://localhost:5984/_replicate &
 sleep 120
 
 curl -X GET http://admin:admin@localhost:8081/relaxed/default/_all_docs | tee /tmp/all_docs.txt

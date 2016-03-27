@@ -32,21 +32,21 @@ done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 curl -X GET http://localhost:5984/source/_all_docs
 
 # Run the replication from CouchDB to localhost:8080.
-php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"dbname": "source"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}}';
 sleep 60
 
 # Get all docs from localhost:8080 for debugging.
 curl -X GET http://admin:admin@localhost:8080/relaxed/default/_all_docs
 
 # Run the replication from localhost:8080 to localhost:8081.
-php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}}';
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}}';
 sleep 60
 
 # Get all docs from localhost:8080 for debugging.
 curl -X GET http://admin:admin@localhost:8081/relaxed/default/_all_docs
 
 # Run the replication from localhost:8081 to CouchDB.
-php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "default", "timeout": 10}, "target": {"dbname": "target"}}';
+php $TRAVIS_BUILD_DIR/php-client/replicate.php '{"source": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}, "target": {"dbname": "target"}}';
 sleep 60
 
 # Get all docs from target to check replication worked.

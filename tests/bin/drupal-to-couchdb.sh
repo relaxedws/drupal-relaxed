@@ -13,14 +13,14 @@ do
   curl -X POST \
        -H "Content-Type: application/json" \
        -d "$document" \
-       admin:admin@localhost:8080/relaxed/default;
+       admin:admin@localhost:8080/relaxed/live;
 done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 
 # Create a target database and do the replication.
 curl -X PUT localhost:5984/target
 
 # Run the replication.
-nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://replicator:replicator@localhost:8080/relaxed/default", "target": "http://localhost:5984/target", "worker_processes": 1}' http://localhost:5984/_replicate &
+nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://replicator:replicator@localhost:8080/relaxed/live", "target": "http://localhost:5984/target", "worker_processes": 1}' http://localhost:5984/_replicate &
 sleep 60
 
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt

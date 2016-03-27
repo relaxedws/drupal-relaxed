@@ -26,7 +26,7 @@ var getFixtures = function(url, successHandler, errorHandler) {
 describe('Test replication', function () {
   it('Test basic push replication', function (done) {
     var db = new PouchDB('pouch_to_drupal');
-    var remote = new PouchDB(baseUrl + '/relaxed/default');
+    var remote = new PouchDB(baseUrl + '/relaxed/live');
     getFixtures(baseUrl + '/documents.txt', function(docs) {
       db.bulkDocs({ docs: docs }, {}, function (err, results) {
         db.replicate.to(remote, function (err, result) {
@@ -41,7 +41,7 @@ describe('Test replication', function () {
 
   it('Test basic pull replication', function (done) {
     var db = new PouchDB('drupal_to_pouch');
-    var remote = new PouchDB(baseUrl + '/relaxed/default');
+    var remote = new PouchDB(baseUrl + '/relaxed/live');
     getFixtures(baseUrl + '/documents.txt', function(docs) {
       db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
