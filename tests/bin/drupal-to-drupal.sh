@@ -25,7 +25,7 @@ php ~/drush.phar cache-rebuild
 nohup curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://admin:admin@localhost:8080/relaxed/live", "target": "http://admin:admin@localhost:8081/relaxed/live"}' http://localhost:5984/_replicate &
 sleep 120
 
-curl -X GET http://admin:admin@localhost:8081/relaxed/default/_all_docs | tee /tmp/all_docs.txt
+curl -X GET http://admin:admin@localhost:8081/relaxed/live/_all_docs | tee /tmp/all_docs.txt
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=6

@@ -24,7 +24,7 @@ curl -X GET http://localhost:5984/source/_all_docs
 
 # Run the replication.
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": "http://localhost:5984/source", "target": "http://replicator:replicator@localhost:8080/relaxed/live", "worker_processes": 1}' http://localhost:5984/_replicate
-curl -X GET http://admin:admin@localhost:8080/relaxed/default/_all_docs | tee /tmp/all_docs.txt
+curl -X GET http://admin:admin@localhost:8080/relaxed/live/_all_docs | tee /tmp/all_docs.txt
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
 USERS=3
