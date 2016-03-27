@@ -8,14 +8,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface {
 
-  protected $supportedInterfaceOrClass = array('Drupal\relaxed\BulkDocs\BulkDocsInterface');
+  protected $supportedInterfaceOrClass = array('Drupal\replication\BulkDocs\BulkDocsInterface');
 
   /**
    * {@inheritdoc}
    */
   public function normalize($bulk_docs, $format = NULL, array $context = array()) {
     $data = array();
-    /** @var \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs */
+    /** @var \Drupal\replication\BulkDocs\BulkDocsInterface $bulk_docs */
     foreach ($bulk_docs->getResult() as $result) {
       $data[] = $result;
     }
@@ -30,13 +30,8 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
       throw new LogicException('A \'workspace\' context is required to denormalize revision diff data.');
     }
 
-    // @todo {@link https://www.drupal.org/node/2599930 Use injected container.}
-    /** @var \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs */
-    $bulk_docs = $class::createInstance(
-      \Drupal::getContainer(),
-      \Drupal::service('workspace.manager'),
-      $context['workspace']
-    );
+    /** @var \Drupal\replication\BulkDocs\BulkDocsInterface $bulk_docs */
+    $bulk_docs = \Drupal::service('replication.bulkdocs_factory')->get($context['workspace']);
 
     if (
       (isset($data['new_edits']) && ($data['new_edits']) === FALSE) ||

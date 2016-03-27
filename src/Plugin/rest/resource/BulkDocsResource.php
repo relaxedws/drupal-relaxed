@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "relaxed:bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\BulkDocs\BulkDocs",
+ *     "canonical" = "Drupal\replication\BulkDocs\BulkDocs",
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/_bulk_docs",
@@ -26,7 +26,7 @@ class BulkDocsResource extends ResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs
+   * @param \Drupal\replication\BulkDocs\BulkDocsInterface $bulk_docs
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $bulk_docs) {
