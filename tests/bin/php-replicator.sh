@@ -5,7 +5,6 @@ set -ev
 # Enable dependencies.
 mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
-mv ~/www/modules/relaxed/tests/php-client $TRAVIS_BUILD_DIR/
 
 php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal1 standard
 
