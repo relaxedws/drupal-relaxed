@@ -38,6 +38,7 @@ cache:
   - $HOME/.drush/cache/download
 
 before_install:
+  - composer self-update
   - mysql -uroot < $TRAVIS_BUILD_DIR/.travis/mysql.sql
   - cp $TRAVIS_BUILD_DIR/.travis/php.ini ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/
   - cp $TRAVIS_BUILD_DIR/.travis/php-fpm.conf ~/.phpenv/versions/$(phpenv version-name)/etc/
@@ -45,10 +46,11 @@ before_install:
   - nginx -c $TRAVIS_BUILD_DIR/.travis/nginx.conf
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/drupal.make.yml $HOME/www
-  - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
+  - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
+  - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
 
 script:
   - cd ~/www && bash $SCRIPT

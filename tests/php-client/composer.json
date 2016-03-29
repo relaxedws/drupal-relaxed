@@ -1,9 +1,0 @@
-{
-  "name": "relaxed/php-client",
-  "description": "Test php client for replication",
-  "minimum-stability": "dev",
-  "prefer-stable": true,
-  "require": {
-    "relaxedws/replicator": "dev-master"
-  }
-}

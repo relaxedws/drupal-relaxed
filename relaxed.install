@@ -15,7 +15,8 @@ function relaxed_install() {
     'is_admin' => 0,
     'permissions' => [
       'perform push replication',
-      'administer users'
+      'administer users',
+      'administer workspaces'
     ],
   ])->save();
 
