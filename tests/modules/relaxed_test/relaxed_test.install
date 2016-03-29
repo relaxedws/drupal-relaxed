@@ -10,7 +10,7 @@ use Drupal\user\Entity\User;
 function relaxed_test_install() {
   User::create([
     'name' => 'replicator',
-    'mail' => 'foo@bar.baz',
+    'mail' => 'replicator@example.com',
     'pass' => 'replicator',
     'status' => 1,
     'roles' => ['replicator'],
