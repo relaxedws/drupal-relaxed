@@ -98,6 +98,7 @@ services:
     parent: default_plugin_manager
   relaxed.remote_pointer:
     class: Drupal\relaxed\RemotePointer
+    arguments: ['@entity_type.manager', '@http_client']
   relaxed.couchdb_replicator:
     class: Drupal\relaxed\CouchdbReplicator
     arguments: ['@config.factory']
