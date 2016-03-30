@@ -15,6 +15,20 @@ use GuzzleHttp\Psr7\Uri;
  * Class RemoteForm.
  */
 class RemoteForm extends EntityForm {
+  /**
+   * @inheritDoc
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $username = $this->configFactory()->get('relaxed.settings')->get('username');
+    $password = $this->configFactory()->get('relaxed.settings')->get('password');
+
+    if (empty($username) || empty($password)) {
+      drupal_set_message('You must set a username and password before adding a remote.', 'error');
+      return $this->redirect('relaxed.settings_form');
+    }
+
+    return parent::buildForm($form, $form_state);
+  }
 
   /**
    * {@inheritdoc}
