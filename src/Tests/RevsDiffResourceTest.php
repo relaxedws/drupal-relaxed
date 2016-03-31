@@ -25,6 +25,8 @@ class RevsDiffResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
+    // We set this here just to test creation and saving
+    // (with 'relaxed:revs_diff') the entity on the same workspace.
     $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
     $entity_types = ['entity_test_rev'];

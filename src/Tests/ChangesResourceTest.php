@@ -26,6 +26,10 @@ class ChangesResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
+    // We set this here just to test creation, saving and then getting
+    // (with 'relaxed:changes') changes on the same workspace.
+    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
     $expected_with_docs = $expected_without_docs = ['last_seq' => NULL, 'results' => []];
 
     // Add info for the new created user.
