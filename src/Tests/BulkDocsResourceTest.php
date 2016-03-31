@@ -56,6 +56,10 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
+    // We set this here just to test creation and saving
+    // (with 'relaxed:bulk_docs') the entity on the same workspace.
+    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
     $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {

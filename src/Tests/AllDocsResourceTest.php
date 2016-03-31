@@ -27,6 +27,10 @@ class AllDocsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
+    // We set this here just to test creation, saving and then getting
+    // (with 'relaxed:all_docs') entities on the same workspace.
+    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
     $entities = [];
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
