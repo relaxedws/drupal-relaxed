@@ -3,9 +3,9 @@
 namespace Drupal\relaxed\Workspace;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Workspace\WorkspaceNegotiatorBase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
 
