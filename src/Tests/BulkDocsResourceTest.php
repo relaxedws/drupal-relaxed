@@ -56,8 +56,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
-
     $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {

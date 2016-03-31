@@ -25,8 +25,6 @@ class RevsDiffResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
-
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a new test entity.
