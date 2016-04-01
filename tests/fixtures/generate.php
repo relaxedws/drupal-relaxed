@@ -147,7 +147,7 @@ $docs = [
       'user_id' => [],
     ],
     '_attachments' => [
-      'files:0:6f9e1f07-e713-4840-bf95-8326c8317800:public:file1.txt' => _file_info(FILE1),
+      'files/0/6f9e1f07-e713-4840-bf95-8326c8317800/public/file1.txt' => _file_info(FILE1),
     ],
   ],
 ];

@@ -178,17 +178,18 @@ class ResourceController implements ContainerAwareInterface {
             if ($key > 1 && isset($part['headers']['content-disposition'])) {
               $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
               if ($file_info_found) {
-                list(, , $file_uuid, $scheme, $target) = explode(':', $file_info[1]);
+                list(, , $file_uuid, $scheme, $target) = explode('/', $file_info[1], 5);
                 if ($file_uuid && $scheme && $target) {
                   $uri = "$scheme://$target";
                   $stream_wrapper_name = 'stream_wrapper.' . $scheme;
                   multiversion_prepare_file_destination($uri, \Drupal::service($stream_wrapper_name));
                   // Check if exists a file with this uuid.
-                  $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
+                  $file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $file_uuid);
                   if (!$file) {
                     // Check if exists a file with this $uri, if it exists then
                     // change the URI and save the new file.
-                    $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
+                    $file_storage = \Drupal::entityTypeManager()->getStorage('file');
+                    $existing_files = $file_storage->loadByProperties(['uri' => $uri]);
                     if (count($existing_files)) {
                       $uri = file_destination($uri, FILE_EXISTS_RENAME);
                     }
