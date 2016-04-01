@@ -37,11 +37,8 @@ class AllDocsResource extends ResourceBase {
     if (is_string($workspace)) {
       throw new NotFoundHttpException();
     }
-    // @todo: {@link https://www.drupal.org/node/2599930 Use injected container instead.}
-    $all_docs = AllDocs::createInstance(
-      \Drupal::getContainer(),
-      $workspace
-    );
+
+    $all_docs = \Drupal::service('replication.alldocs_factory')->get($workspace);
 
     $request = Request::createFromGlobals();
     if ($request->query->get('include_docs') == 'true') {
