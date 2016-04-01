@@ -29,7 +29,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
       $data = array('docs' => []);
       foreach ($this->createTestEntities($entity_type) as $entity) {
-        $data['docs'][] = $this->container->get('relaxed.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+        $data['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
       }
 
       $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($data));
@@ -76,7 +76,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
         // Delete an entity.
         $entity->delete();
       }
-      $input['docs'][] = $this->container->get('relaxed.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+      $input['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
