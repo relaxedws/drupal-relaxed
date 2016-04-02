@@ -206,7 +206,8 @@ class DocResource extends ResourceBase {
       if ($key > 1 && isset($part['headers']['content-disposition'])) {
         $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
         if ($file_info_found) {
-          $file = replication_process_file_attachment($part['body'], $file_info[1], 'stream');
+          $file = \Drupal::service('replication.process_file_attachment')
+            ->process($part['body'], $file_info[1], 'stream');
           if ($file instanceof FileInterface) {
             $this->putAttachment($file);
           }
