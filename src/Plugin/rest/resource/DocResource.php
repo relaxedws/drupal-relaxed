@@ -13,6 +13,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseParser;
+use GuzzleHttp\Psr7;
 
 /**
  * @RestResource(
@@ -113,6 +115,7 @@ class DocResource extends ResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *
    * @return \Drupal\rest\ResourceResponse
    */
@@ -187,6 +190,32 @@ class DocResource extends ResourceBase {
     }
 
     return new ResourceResponse(array('ok' => TRUE), 200);
+  }
+
+  /**
+   * Handles a multipart/related PUT request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *
+   * @return resource|string
+   */
+  public function putMultipartRequest(Request $request) {
+    $stream = Psr7\stream_for($request);
+    $parts = MultipartResponseParser::parseMultipartBody($stream);
+    foreach ($parts as $key => $part) {
+      if ($key > 1 && isset($part['headers']['content-disposition'])) {
+        $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
+        if ($file_info_found) {
+          $file = \Drupal::service('replication.process_file_attachment')
+            ->process($part['body'], $file_info[1], 'stream');
+          if ($file instanceof FileInterface) {
+            $this->putAttachment($file);
+          }
+        }
+      }
+    }
+
+    return (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $request->getContent();
   }
 
   /**

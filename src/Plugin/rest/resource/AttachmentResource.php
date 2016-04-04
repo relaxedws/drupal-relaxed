@@ -88,7 +88,7 @@ class AttachmentResource extends ResourceBase {
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
    *
-   * @return Drupal\rest\ResourceResponse
+   * @return ResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
     if (is_string($workspace) || is_string($entity)) {

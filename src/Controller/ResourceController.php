@@ -4,12 +4,8 @@ namespace Drupal\relaxed\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\RenderContext;
-use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
-use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseParser;
-use Drupal\rest\ResourceResponse;
-use GuzzleHttp\Psr7;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -169,44 +165,9 @@ class ResourceController implements ContainerAwareInterface {
           }
         }
 
-        // @todo: {@link https://www.drupal.org/node/2600504 Move this elsewhere.}
-        if ($method == 'put' && !$this->isValidJson($content)) {
-          $stream = Psr7\stream_for($request);
-          $parts = MultipartResponseParser::parseMultipartBody($stream);
-          $content = (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $content;
-          foreach ($parts as $key => $part) {
-            if ($key > 1 && isset($part['headers']['content-disposition'])) {
-              $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
-              if ($file_info_found) {
-                list(, , $file_uuid, $scheme, $target) = explode(':', $file_info[1]);
-                if ($file_uuid && $scheme && $target) {
-                  $uri = "$scheme://$target";
-                  $stream_wrapper_name = 'stream_wrapper.' . $scheme;
-                  multiversion_prepare_file_destination($uri, \Drupal::service($stream_wrapper_name));
-                  // Check if exists a file with this uuid.
-                  $file = \Drupal::entityManager()->loadEntityByUuid('file', $file_uuid);
-                  if (!$file) {
-                    // Check if exists a file with this $uri, if it exists then
-                    // change the URI and save the new file.
-                    $existing_files = entity_load_multiple_by_properties('file', array('uri' => $uri));
-                    if (count($existing_files)) {
-                      $uri = file_destination($uri, FILE_EXISTS_RENAME);
-                    }
-                    $file_context = array(
-                      'uri' => $uri,
-                      'uuid' => $file_uuid,
-                      'status' => FILE_STATUS_PERMANENT,
-                      'uid' => \Drupal::currentUser()->id(),
-                    );
-                    $file = $this->serializer()->deserialize($part['body'], '\Drupal\file\FileInterface', 'stream', $file_context);
-                  }
-                  if ($file instanceof FileInterface) {
-                    $resource->putAttachment($file);
-                  }
-                }
-              }
-            }
-          }
+        // Process a multipart/related PUT request.
+        if ($method == 'put' && !$this->isValidJson($content) && !$resource->isAttachment()) {
+          $content = $resource->putMultipartRequest($request);
         }
 
         $entity = $this->serializer()->deserialize($content, $class, $format, $context);
