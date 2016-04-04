@@ -37,8 +37,15 @@ class RemoteConfigurationTest extends WebTestBase {
    */
   function testRemoteConfiguration() {
     // Create a user with permission to view the Remote administration pages.
-    $user = $this->drupalCreateUser(array('administer site configuration'));
+    $user = $this->drupalCreateUser(['administer site configuration', 'administer workspaces', 'access administration pages']);
     $this->drupalLogin($user);
+
+    // Set default replicator credentials
+    $edit = [];
+    $edit['username'] = 'user';
+    $edit['password'] = 'pass';
+    $this->drupalPostForm('admin/config/relaxed/settings/', $edit, t('Save configuration'));
+    $this->assertResponse(200);
 
     // Make a POST request to the individual Remote configuration page.
     $edit = array();
