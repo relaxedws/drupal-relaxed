@@ -23,6 +23,7 @@ class AllDocsResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('workspace', 'view');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful get relaxed:all_docs';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);

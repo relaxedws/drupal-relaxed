@@ -121,6 +121,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->enableService('relaxed:attachment', 'GET');
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('entity_test_rev', 'view');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful get relaxed:attachment';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
@@ -164,6 +165,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('entity_test_rev', 'view');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful get relaxed:attachment';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
@@ -211,6 +213,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('entity_test_rev', 'create');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful put relaxed:attachment';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
@@ -242,6 +245,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('entity_test_rev', 'delete');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful delete relaxed:attachment';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
