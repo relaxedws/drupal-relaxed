@@ -21,6 +21,7 @@ class LocalDocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful get relaxed:local:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -46,6 +47,7 @@ class LocalDocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful get relaxed:local:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -71,6 +73,7 @@ class LocalDocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful put relaxed:local:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);

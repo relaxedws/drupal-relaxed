@@ -21,6 +21,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions('workspace', 'view');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful post relaxed:revs_diff';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);

@@ -29,6 +29,7 @@ class DocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful get relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -86,6 +87,7 @@ class DocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful get relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -152,6 +154,7 @@ class DocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful get relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -218,6 +221,7 @@ class DocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful put relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -265,6 +269,7 @@ class DocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'delete');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful delete relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -323,6 +328,7 @@ class DocResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type_id) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type_id, 'create');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful put relaxed:doc';
       $permissions[] = 'administer users';
       $account = $this->drupalCreateUser($permissions);

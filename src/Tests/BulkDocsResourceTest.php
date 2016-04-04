@@ -23,6 +23,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
+      $permissions[] = 'administer workspaces';
       $permissions[] = 'restful post relaxed:bulk_docs';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
@@ -52,6 +53,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions($entity_type, 'update');
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'restful post relaxed:bulk_docs';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
