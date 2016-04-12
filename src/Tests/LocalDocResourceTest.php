@@ -26,6 +26,9 @@ class LocalDocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
       $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
@@ -52,6 +55,9 @@ class LocalDocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
       $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
@@ -77,6 +83,9 @@ class LocalDocResourceTest extends ResourceTestBase {
       $permissions[] = 'restful put relaxed:local:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
+
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
