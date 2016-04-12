@@ -40,6 +40,21 @@ class AttachmentResourceTest extends ResourceTestBase {
   protected function setUp() {
     parent::setUp();
 
+    // Create a user with the correct permissions.
+    $permissions = $this->entityPermissions('entity_test_rev', 'view');
+    $permissions = array_merge($permissions, $this->entityPermissions('entity_test_rev', 'create'));
+    $permissions = array_merge($permissions, $this->entityPermissions('entity_test_rev', 'delete'));
+    $permissions[] = 'administer workspaces';
+    $permissions[] = 'restful get relaxed:attachment';
+    $permissions[] = 'restful put relaxed:attachment';
+    $permissions[] = 'restful delete relaxed:attachment';
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    // We set this here just to test creation, saving and then getting
+    // (with 'relaxed:attachment') entities on the same workspace.
+    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
     // Create a File field for testing.
     FieldStorageConfig::create([
         'field_name' => 'field_test_file',
@@ -117,14 +132,7 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testHead() {
-    // HEAD and GET is handled by the same resource.
     $this->enableService('relaxed:attachment', 'GET');
-    // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_rev', 'view');
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:attachment';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
 
     $file_contents = file_get_contents($this->files['1']->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
@@ -162,13 +170,6 @@ class AttachmentResourceTest extends ResourceTestBase {
 
   public function testGet() {
     $this->enableService('relaxed:attachment', 'GET');
-
-    // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_rev', 'view');
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:attachment';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
 
     $file_contents = file_get_contents($this->files['1']->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
@@ -209,15 +210,8 @@ class AttachmentResourceTest extends ResourceTestBase {
 
   public function testPut() {
     $this->enableService('relaxed:attachment', 'PUT');
+
     $serializer = $this->container->get('serializer');
-
-    // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_rev', 'create');
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful put relaxed:attachment';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
-
     $file_uri = 'public://new_example.txt';
     file_put_contents($file_uri, $this->randomMachineName());
     $file_stub = File::create(['uri' => $file_uri]);
@@ -242,13 +236,6 @@ class AttachmentResourceTest extends ResourceTestBase {
 
   public function testDelete() {
     $this->enableService('relaxed:attachment', 'DELETE');
-
-    // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_rev', 'delete');
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful delete relaxed:attachment';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
 
     $field_name = 'field_test_file';
     $attachment_info = $field_name . '/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
