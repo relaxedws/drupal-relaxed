@@ -52,18 +52,10 @@ class AllDocsResourceTest extends ResourceTestBase {
         ),
       );
     }
-    // Add the info about the new created user.
-    $rows[] = array(
-      'id' => $account->uuid(),
-      'key' => $account->uuid(),
-      'value' => array(
-        'rev' => $account->_rev->value,
-      ),
-    );
     $expected = [
       'offset' => 0,
       'rows' => $rows,
-      'total_rows' => 3,
+      'total_rows' => 2,
     ];
 
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET');
@@ -86,18 +78,8 @@ class AllDocsResourceTest extends ResourceTestBase {
         ),
       );
     }
-    // Add the info about the new created user.
-    $account = User::load($account->id());
-    $rows[] = array(
-      'id' => $account->uuid(),
-      'key' => $account->uuid(),
-      'value' => array(
-        'rev' => $account->_rev->value,
-        'doc' => $serializer->normalize($account),
-      ),
-    );
     $expected = [
-      'total_rows' => 3,
+      'total_rows' => 2,
       'offset' => 0,
       'rows' => $rows,
     ];
