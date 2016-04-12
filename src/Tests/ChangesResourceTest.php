@@ -33,21 +33,6 @@ class ChangesResourceTest extends ResourceTestBase {
 
     $expected_with_docs = $expected_without_docs = ['last_seq' => NULL, 'results' => []];
 
-    // Add info for the new created user.
-    $account = $this->entityTypeManager->getStorage('user')->load($account->id());
-    $account_first_seq = $this->multiversionManager->lastSequenceId();
-    $expected_without_docs['results'][] = [
-      'changes' => [['rev' => $account->_rev->value]],
-      'id' => $account->uuid(),
-      'seq' => $account_first_seq,
-    ];
-    $expected_with_docs['results'][] = [
-      'changes' => [['rev' => $account->_rev->value]],
-      'id' => $account->uuid(),
-      'seq' => $account_first_seq,
-      'doc' => $serializer->normalize($account)
-    ];
-
     $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
     $entity->save();
     // Update the field_test_text field.
@@ -128,9 +113,8 @@ class ChangesResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
-    // Unset first and second values from results, it shouldn't be returned when since == 3.
+    // Unset first value from results, it shouldn't be returned when since == $first_seq.
     unset($expected_without_docs['results'][0]);
-    unset($expected_without_docs['results'][1]);
     // Reset the keys of the results array.
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
