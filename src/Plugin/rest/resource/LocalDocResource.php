@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class LocalDocResource extends DocResource {
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
@@ -43,7 +43,7 @@ class LocalDocResource extends DocResource {
   }
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
@@ -63,7 +63,7 @@ class LocalDocResource extends DocResource {
   }
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request

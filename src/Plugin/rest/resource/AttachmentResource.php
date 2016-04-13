@@ -39,7 +39,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AttachmentResource extends ResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    * @param string $field_name
    * @param integer $delta
@@ -62,7 +62,7 @@ class AttachmentResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
@@ -85,7 +85,7 @@ class AttachmentResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
@@ -134,7 +134,7 @@ class AttachmentResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\Workspace $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta

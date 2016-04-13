@@ -34,14 +34,13 @@ use GuzzleHttp\Psr7;
 class DocResource extends ResourceBase {
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$existing instanceof ContentEntityInterface) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -58,14 +57,13 @@ class DocResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$existing instanceof ContentEntityInterface) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
