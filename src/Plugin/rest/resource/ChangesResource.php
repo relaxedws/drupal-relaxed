@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\replication\Changes\ChangesInterface;
 use Drupal\replication\ChangesFactoryInterface;
 use Drupal\rest\ResourceResponse;
@@ -69,7 +70,7 @@ class ChangesResource extends ResourceBase {
   }
 
   public function get($workspace) {
-    if (is_string($workspace)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
 

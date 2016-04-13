@@ -40,8 +40,8 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $existing) {
-    if (!($workspace instanceof WorkspaceInterface)
-      || !($existing instanceof ContentEntityInterface)) {
+    if (!$workspace instanceof WorkspaceInterface
+      || !$existing instanceof ContentEntityInterface) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -64,8 +64,8 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $existing) {
-    if (!($workspace instanceof WorkspaceInterface)
-      || !($existing instanceof ContentEntityInterface)) {
+    if (!$workspace instanceof WorkspaceInterface
+      || !$existing instanceof ContentEntityInterface) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */

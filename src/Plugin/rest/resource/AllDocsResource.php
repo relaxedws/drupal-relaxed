@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\AllDocs\AllDocs;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +35,7 @@ class AllDocsResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($workspace) {
-    if (is_string($workspace)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
 

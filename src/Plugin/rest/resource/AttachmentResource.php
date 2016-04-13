@@ -7,8 +7,10 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -47,7 +49,9 @@ class AttachmentResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (is_string($workspace) || is_string($entity) || is_string($file)) {
+    if (!$workspace instanceof WorkspaceInterface
+      || !$entity instanceof ContentEntityInterface
+      || !$file instanceof FileInterface) {
       throw new NotFoundHttpException();
     }
 
@@ -68,7 +72,9 @@ class AttachmentResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (is_string($workspace) || is_string($entity) || is_string($file)) {
+    if (!$workspace instanceof WorkspaceInterface
+      || !$entity instanceof ContentEntityInterface
+      || !$file instanceof FileInterface) {
       throw new NotFoundHttpException();
     }
 
@@ -91,7 +97,8 @@ class AttachmentResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
-    if (is_string($workspace) || is_string($entity)) {
+    if (!$workspace instanceof WorkspaceInterface
+      || !$entity instanceof ContentEntityInterface) {
       throw new NotFoundHttpException();
     }
 
@@ -135,10 +142,12 @@ class AttachmentResource extends ResourceBase {
    * @param string $scheme
    * @param string $filename
    *
-   * @return Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (is_string($workspace) || is_string($entity) || is_string($file)) {
+    if (!$workspace instanceof WorkspaceInterface
+      || !$entity instanceof ContentEntityInterface
+      || !$file instanceof FileInterface) {
       throw new NotFoundHttpException();
     }
 
