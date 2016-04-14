@@ -10,8 +10,6 @@ namespace Drupal\relaxed\Tests;
 use Drupal\Component\Serialization\Json;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
-use Drupal\user\Entity\User;
-use Drupal\user\UserInterface;
 use GuzzleHttp\Psr7;
 
 /**
@@ -33,6 +31,9 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = 'restful get relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
+
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
       $this->httpRequest("$this->dbname/bogus", 'HEAD', NULL);
       $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
@@ -91,6 +92,9 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = 'restful get relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
+
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
       $this->httpRequest("$this->dbname/bogus", 'GET', NULL);
       $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
@@ -159,6 +163,9 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
 
@@ -226,6 +233,9 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
       $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
@@ -273,6 +283,9 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = 'restful delete relaxed:doc';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
+
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
@@ -334,6 +347,9 @@ class DocResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
+      // We set this here just for testing.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+
       $entity_uuid = 'fe36b529-e2d7-4625-9b07-7ee8f84928b2';
       $reference_uuid = '0aec21a0-8e36-11e5-8994-feff819cdc9f';
 
@@ -383,4 +399,5 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertEqual($new_name, $referenced_user->name->value, 'The name was updated successfully.');
     }
   }
+
 }
