@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -22,13 +23,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class LocalDocResource extends DocResource {
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $existing) {
-    if (is_string($workspace) || is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -42,13 +43,13 @@ class LocalDocResource extends DocResource {
   }
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $existing) {
-    if (is_string($workspace) || is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -62,9 +63,10 @@ class LocalDocResource extends DocResource {
   }
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *
    * @return \Drupal\rest\ResourceResponse
    */

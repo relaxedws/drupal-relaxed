@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -31,7 +32,7 @@ class RevsDiffResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $revs_diff) {
-    if (is_string($workspace)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
     if (empty($revs_diff)) {

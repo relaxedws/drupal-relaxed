@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,13 +34,13 @@ use GuzzleHttp\Psr7;
 class DocResource extends ResourceBase {
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $existing) {
-    if (is_string($workspace) || is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -56,13 +57,13 @@ class DocResource extends ResourceBase {
   }
 
   /**
-   * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
+   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $existing) {
-    if (is_string($workspace) || is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -120,7 +121,7 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
-    if (is_string($workspace)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
 
@@ -168,7 +169,8 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function delete($workspace, $entity) {
-    if (is_string($workspace) || is_string($entity)) {
+    if (!($workspace instanceof WorkspaceInterface)
+      || !($entity instanceof ContentEntityInterface)) {
       throw new NotFoundHttpException();
     }
 

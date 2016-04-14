@@ -7,6 +7,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -29,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class EnsureFullCommitResource extends ResourceBase {
 
   public function post($workspace) {
-    if (is_string($workspace)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
 
