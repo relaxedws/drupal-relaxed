@@ -8,17 +8,21 @@ use Drupal\user\Entity\Role;
 function relaxed_install() {
   // Demonstrate best security practice and create a separate role with the
   // only permissions needed to perform content replication.
-  Role::create([
-    'id' => 'replicator',
-    'label' => 'Replicator',
-    'weight' => 0,
-    'is_admin' => 0,
-    'permissions' => [
-      'perform push replication',
-      'administer users',
-      'administer workspaces'
-    ],
-  ])->save();
+  $rid = 'replicator';
+  $replicator_role = Role::load($rid);
+  if (empty($replicator_role)) {
+    Role::create([
+      'id' => $rid,
+      'label' => 'Replicator',
+      'weight' => 0,
+      'is_admin' => 0,
+      'permissions' => [
+        'perform push replication',
+        'administer users',
+        'administer workspaces'
+      ],
+    ])->save();
+  }
 
   $module_handler = \Drupal::moduleHandler();
   // Merge 'resource' settings from relaxed module with 'resource' settings from rest module,
