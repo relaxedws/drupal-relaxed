@@ -25,7 +25,7 @@ Class Ping extends RemoteCheckBase {
     $url = (string) $remote->uri();
     $client = \Drupal::httpClient();
     try {
-      $response = $client->request('HEAD', $url);
+      $response = $client->request('GET', $url);
       if ($response->getStatusCode() === 200) {
         $this->result = true;
         $this->message = t('Remote is reachable.');
