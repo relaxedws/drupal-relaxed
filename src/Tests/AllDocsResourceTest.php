@@ -42,6 +42,10 @@ class AllDocsResourceTest extends ResourceTestBase {
       $entities[1]->save();
     }
 
+    $users = $this->entityTypeManager->getStorage('user')->loadMultiple();
+
+    $entities = array_merge($entities, $users);
+
     // Test without including docs.
     foreach ($entities as $entity) {
       $rows[] = array(
@@ -55,7 +59,7 @@ class AllDocsResourceTest extends ResourceTestBase {
     $expected = [
       'offset' => 0,
       'rows' => $rows,
-      'total_rows' => 2,
+      'total_rows' => 6,
     ];
 
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET');
@@ -83,7 +87,7 @@ class AllDocsResourceTest extends ResourceTestBase {
       );
     }
     $expected = [
-      'total_rows' => 2,
+      'total_rows' => 6,
       'offset' => 0,
       'rows' => $rows,
     ];
