@@ -62,8 +62,12 @@ class AllDocsResourceTest extends ResourceTestBase {
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
-    foreach (array_keys($data) as $key) {
-      $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key when not including docs.");
+    $this->assertEqual($expected['offset'], $data['offset'], "Correct value for offset key when not including docs.");
+    $this->assertEqual($expected['total_rows'], $data['total_rows'], "Correct value for total_rows key when not including docs.");
+    $this->assertEqual(count($expected['rows']), count($data['rows']), "Correct number of rows when not including docs.");
+
+    foreach (array_keys($data['rows']) as $key) {
+      $this->assertEqual($expected['rows'][$key], $data['rows'][$key], "Correct value for $key key when not including docs.");
     }
 
     // Test with including docs.
@@ -88,8 +92,12 @@ class AllDocsResourceTest extends ResourceTestBase {
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
-    foreach (array_keys($data) as $key) {
-      $this->assertEqual($expected[$key], $data[$key], "Correct value for $key key when including docs.");
+    $this->assertEqual($expected['offset'], $data['offset'], "Correct value for offset key when including docs.");
+    $this->assertEqual($expected['total_rows'], $data['total_rows'], "Correct value for total_rows key when including docs.");
+    $this->assertEqual(count($expected['rows']), count($data['rows']), "Correct number of rows when including docs.");
+
+    foreach (array_keys($data['rows']) as $key) {
+      $this->assertEqual($expected['rows'][$key], $data['rows'][$key], "Correct value for $key key when including docs.");
     }
   }
 
