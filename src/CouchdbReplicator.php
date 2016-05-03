@@ -85,7 +85,12 @@ class CouchdbReplicator implements ReplicatorInterface{
     }
 
     if ($uri instanceof Uri) {
-      $port = $uri->getPort() ?: 80;
+      $port = $uri->getPort();
+
+      if (empty($port)) {
+        $port = ($uri->getScheme() == 'https') ? 443 : 80;
+      }
+
       return CouchDBClient::create([
         'url' => (string) $uri,
         'port' => $port,
