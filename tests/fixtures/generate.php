@@ -23,7 +23,20 @@ function _file_info($filename) {
 }
 
 $docs = [
-  // Entity without user reference.
+  // Taxonomy term entity.
+  [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
+    '@type' => 'taxonomy_term',
+    '_id' => '95615828-70db-v26b-9057-f6cc905dcn6h',
+    'en' => [
+      'name' => [['value' => 'foo']],
+      'vid' => [['value' => 'tags']],
+    ],
+  ],
+  // Entity without user reference, with existing taxonomy_term reference.
   [
     '@context' => [
       '_id' => '@id',
@@ -34,12 +47,13 @@ $docs = [
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [],
+      'tags_list' => [['target_uuid' => '95615828-70db-v26b-9057-f6cc905dcn6h']],
     ],
   ],
-  // Entity with existing user reference. Referenced user entities are not
-  // handled as multiversionable entities, the referenced user entity will be
-  // the one mapped in multiversion.settings config object whatever is the field
-  // value.
+  // Entity with existing user reference and with non-existing taxonomy_term
+  // reference. Referenced user entities are not handled as multiversionable
+  // entities, the referenced user entity will be the one mapped in multiversion.
+  // settings config object whatever is the field value.
   [
     '@context' => [
       '_id' => '@id',
@@ -50,12 +64,13 @@ $docs = [
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [['target_uuid' => '43155828-70db-486b-9057-f6cc905d8470']],
+      'tags_list' => [['target_uuid' => '77545828-70db-95gb-9057-f6553218dcn6']],
     ]
   ],
-  // Entity with non-existing user reference. Referenced user entities are not
-  // handled as multiversionable entities, the referenced user entity will be
-  // the one mapped in multiversion.settings config object whatever is the field
-  // value.
+  // Entity with non-existing user reference and without taxonomy_term reference.
+  // Referenced user entities are not handled as multiversionable entities, the
+  // referenced user entity will be the one mapped in multiversion.settings
+  // config object whatever is the field value.
   [
     '@context' => [
       '_id' => '@id',
@@ -66,9 +81,11 @@ $docs = [
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+      'tags_list' => [],
     ],
   ],
-  // Another entity with the same non-existing user reference as previous.
+  // Another entity with the same non-existing user reference and non-existent
+  // taxonomy_term reference as previous.
   // Referenced user entities are not handled as multiversionable entities, the
   // referenced user entity will be the one mapped in multiversion.settings
   // config object whatever is the field value.
@@ -82,6 +99,20 @@ $docs = [
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
+      'tags_list' => [['target_uuid' => '77545828-70db-95gb-9057-f6553218dcn6']],
+    ],
+  ],
+  // Taxonomy term entity, this taxonomy_term will update the stub entity.
+  [
+    '@context' => [
+      '_id' => '@id',
+      '@language' => 'en'
+    ],
+    '@type' => 'taxonomy_term',
+    '_id' => '77545828-70db-95gb-9057-f6553218dcn6',
+    'en' => [
+      'name' => [['value' => 'bar']],
+      'vid' => [['value' => 'tags']],
     ],
   ],
   // Entity with existing revision.

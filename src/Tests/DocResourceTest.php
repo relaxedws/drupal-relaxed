@@ -344,6 +344,7 @@ class DocResourceTest extends ResourceTestBase {
       $permissions[] = 'administer workspaces';
       $permissions[] = 'restful put relaxed:doc';
       $permissions[] = 'administer users';
+      $permissions[] = 'administer taxonomy';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -364,8 +365,9 @@ class DocResourceTest extends ResourceTestBase {
           'name' => [],
           'type' => [['value' => $entity_type_id]],
           'created' => [['value' => 1447877434]],
-          'user_id' => [[
-            'entity_type_id' => 'user',
+          'user_id' => [],
+          'tags_list' => [[
+            'entity_type_id' => 'taxonomy_term',
             'target_uuid' => $reference_uuid,
           ]],
           'default_langcode' => [['value' => TRUE]],
@@ -377,26 +379,26 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertResponse('201', 'HTTP response code is correct');
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $storage = $this->entityManager->getStorage('user');
-      $referenced_users = $storage->loadByProperties(['uuid' => $reference_uuid]);
-      /** @var \Drupal\user\UserInterface $referenced_user */
-      $referenced_user = reset($referenced_users);
+      $storage = $this->entityManager->getStorage('taxonomy_term');
+      $referenced_terms = $storage->loadByProperties(['uuid' => $reference_uuid]);
+      /** @var \Drupal\taxonomy\TermInterface $referenced_term */
+      $referenced_term = reset($referenced_terms);
 
-      $this->assertTrue(!empty($referenced_user), 'Referenced user way created.');
-      $this->assertTrue($referenced_user->_rev->is_stub, 'References user was saved as stub.');
+      $this->assertTrue(!empty($referenced_term), 'Referenced term way created.');
+      $this->assertTrue($referenced_term->_rev->is_stub, 'References term was saved as stub.');
 
       $new_name = $this->randomMachineName();
-      $referenced_user->name->value = $new_name;
-      $serialized = $serializer->serialize($referenced_user, $this->defaultFormat);
+      $referenced_term->name->value = $new_name;
+      $serialized = $serializer->serialize($referenced_term, $this->defaultFormat);
       $response = $this->httpRequest("$this->dbname/" . $reference_uuid, 'PUT', $serialized);
       $data = Json::decode($response);
       $this->assertResponse('201', 'HTTP response code is correct');
       $this->assertNotEqual('0-00000000000000000000000000000000', $data['rev'], 'PUT request returned a revision hash.');
 
-      $referenced_users = $storage->loadByProperties(['uuid' => $reference_uuid]);
-      /** @var \Drupal\user\UserInterface $referenced_user */
-      $referenced_user = reset($referenced_users);
-      $this->assertEqual($new_name, $referenced_user->name->value, 'The name was updated successfully.');
+      $referenced_terms = $storage->loadByProperties(['uuid' => $reference_uuid]);
+      /** @var \Drupal\taxonomy\TermInterface $referenced_term */
+      $referenced_term = reset($referenced_terms);
+      $this->assertEqual($new_name, $referenced_term->name->value, 'The name was updated successfully.');
     }
   }
 
