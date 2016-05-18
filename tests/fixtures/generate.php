@@ -23,21 +23,6 @@ function _file_info($filename) {
 }
 
 $docs = [
-  // User entity.
-  [
-    '@context' => [
-      '_id' => '@id',
-      '@language' => 'en'
-    ],
-    '@type' => 'user',
-    '_id' => '43155828-70db-486b-9057-f6cc905d8470',
-    'en' => [
-      'name' => [['value' => 'a']],
-      'mail' => [['value' => 'a@foo.bar']],
-      'pass' => [['value' => 'a']],
-      'status' => [['value' => 1]],
-    ],
-  ],
   // Entity without user reference.
   [
     '@context' => [
@@ -51,7 +36,10 @@ $docs = [
       'user_id' => [],
     ],
   ],
-  // Entity with existing user reference.
+  // Entity with existing user reference. Referenced user entities are not
+  // handled as multiversionable entities, the referenced user entity will be
+  // the one mapped in multiversion.settings config object whatever is the field
+  // value.
   [
     '@context' => [
       '_id' => '@id',
@@ -64,7 +52,10 @@ $docs = [
       'user_id' => [['target_uuid' => '43155828-70db-486b-9057-f6cc905d8470']],
     ]
   ],
-  // Entity with non-existing user reference (will be created as stub).
+  // Entity with non-existing user reference. Referenced user entities are not
+  // handled as multiversionable entities, the referenced user entity will be
+  // the one mapped in multiversion.settings config object whatever is the field
+  // value.
   [
     '@context' => [
       '_id' => '@id',
@@ -78,6 +69,9 @@ $docs = [
     ],
   ],
   // Another entity with the same non-existing user reference as previous.
+  // Referenced user entities are not handled as multiversionable entities, the
+  // referenced user entity will be the one mapped in multiversion.settings
+  // config object whatever is the field value.
   [
     '@context' => [
       '_id' => '@id',
@@ -88,21 +82,6 @@ $docs = [
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [['target_uuid' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b']],
-    ],
-  ],
-  // User entity that will update first stub.
-  [
-    '@context' => [
-      '_id' => '@id',
-      '@language' => 'en'
-    ],
-    '@type' => 'user',
-    '_id' => '84eaf36e-e3c3-4d36-83a0-c3aa5baeb21b',
-    'en' => [
-      'name' => [['value' => 'b']],
-      'mail' => [['value' => 'b@foo.bar']],
-      'pass' => [['value' => 'b']],
-      'status' => [['value' => 1]],
     ],
   ],
   // Entity with existing revision.

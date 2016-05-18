@@ -57,7 +57,7 @@ class AllDocsResourceTest extends ResourceTestBase {
     $expected = [
       'offset' => 0,
       'rows' => $rows,
-      'total_rows' => 6,
+      'total_rows' => 2,
     ];
 
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET');
@@ -91,7 +91,7 @@ class AllDocsResourceTest extends ResourceTestBase {
       return ($a['id'] > $b['id']) ? +1 : -1;
     });
     $expected = [
-      'total_rows' => 6,
+      'total_rows' => 2,
       'offset' => 0,
       'rows' => $rows,
     ];
