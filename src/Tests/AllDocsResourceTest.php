@@ -8,7 +8,6 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\user\Entity\User;
 
 /**
  * Tests the /db/_all_docs resource.
@@ -42,10 +41,6 @@ class AllDocsResourceTest extends ResourceTestBase {
       $entities[1]->save();
     }
 
-    $users = $this->entityTypeManager->getStorage('user')->loadMultiple();
-
-    $entities = array_merge($entities, $users);
-
     // Test without including docs.
     foreach ($entities as $entity) {
       $rows[] = array(
@@ -62,7 +57,7 @@ class AllDocsResourceTest extends ResourceTestBase {
     $expected = [
       'offset' => 0,
       'rows' => $rows,
-      'total_rows' => 6,
+      'total_rows' => 2,
     ];
 
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET');
@@ -96,7 +91,7 @@ class AllDocsResourceTest extends ResourceTestBase {
       return ($a['id'] > $b['id']) ? +1 : -1;
     });
     $expected = [
-      'total_rows' => 6,
+      'total_rows' => 2,
       'offset' => 0,
       'rows' => $rows,
     ];

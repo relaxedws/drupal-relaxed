@@ -6,7 +6,7 @@ set -ev
 mv ~/www/core/modules/system/tests/modules/entity_test ~/www/modules/entity_test
 mv ~/www/modules/relaxed/tests/modules/relaxed_test ~/www/modules/relaxed_test
 
-php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal1 standard
+php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8081.localhost --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal1 testing
 
 php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxed_test || true
 php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxed_test || true
@@ -49,7 +49,5 @@ sleep 60
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
-USERS=6
-COUNT=$(($COUNT + $USERS));
 echo $COUNT
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)

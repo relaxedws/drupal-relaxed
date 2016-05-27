@@ -1,1 +1,28 @@
 <?php
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+
+/**
+ * Implements hook_entity_base_field_info().
+ *
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @return \Drupal\Core\Field\BaseFieldDefinition[]
+ */
+function relaxed_test_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $entity_type_id = $entity_type->id();
+  if ($entity_type_id === 'entity_test_rev' || $entity_type_id === 'entity_test_mulrev') {
+    $fields = array();
+
+    $fields['tags_list'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Tags list.'))
+      ->setDescription(t('A list of tags.'))
+      ->setSetting('target_type', 'taxonomy_term')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE);
+
+    return $fields;
+  }
+}

@@ -27,6 +27,4 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 curl -X GET http://admin:admin@localhost:8080/relaxed/live/_all_docs | tee /tmp/all_docs.txt
 
 COUNT=$(wc -l < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt)
-USERS=3
-COUNT=$(($COUNT + $USERS));
 test 1 -eq $(egrep -c "(\"total_rows\"\:$COUNT)" /tmp/all_docs.txt)
