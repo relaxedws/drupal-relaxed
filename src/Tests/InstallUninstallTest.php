@@ -50,6 +50,7 @@ class InstallUninstallTest extends ModuleTestBase {
     'relaxed:ensure_full_commit',
     'relaxed:all_dbs',
     'relaxed:all_docs',
+    'relaxed:replicate',
   ];
 
   public function setUp() {
