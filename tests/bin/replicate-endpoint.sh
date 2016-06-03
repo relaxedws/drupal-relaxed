@@ -28,19 +28,19 @@ done < $TRAVIS_BUILD_DIR/tests/fixtures/documents.txt
 curl -X GET http://localhost:5984/source/_all_docs
 
 # Run the replication from CouchDB to localhost:8080.
-php $HOME/www/vendor/bin/replicator '{"source": {"dbname": "source"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}}';
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": {"dbname": "source"}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}}' http://replicator:replicator@localhost:8080/relaxed/_replicate
 
 # Get all docs from localhost:8080 for debugging.
 curl -X GET http://admin:admin@localhost:8080/relaxed/live/_all_docs
 
 # Run the replication from localhost:8080 to localhost:8081.
-php $HOME/www/vendor/bin/replicator '{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}}';
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}, "target": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}}' http://replicator:replicator@localhost:8080/relaxed/_replicate
 
 # Get all docs from localhost:8080 for debugging.
 curl -X GET http://admin:admin@localhost:8081/relaxed/live/_all_docs
 
 # Run the replication from localhost:8081 to CouchDB.
-php $HOME/www/vendor/bin/replicator '{"source": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}, "target": {"dbname": "target"}}';
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"source": {"host": "localhost", "path": "relaxed", "port": 8081, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 10}, "target": {"dbname": "target"}}' http://replicator:replicator@localhost:8080/relaxed/_replicate
 
 # Get all docs from target to check replication worked.
 curl -X GET http://localhost:5984/target/_all_docs | tee /tmp/all_docs.txt
