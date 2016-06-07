@@ -1,5 +1,5 @@
 var baseUrl = 'http://replicator:replicator@localhost:8080';
-//PouchDB.debug.enable('*');
+PouchDB.debug.enable('*');
 
 var getFixtures = function(url, successHandler, errorHandler) {
   var xhr = new XMLHttpRequest();
@@ -46,8 +46,7 @@ describe('Test replication', function () {
       db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
         result.doc_write_failures.should.equal(0);
-        // Add the 3 users that already exist in the Drupal site.
-        result.docs_written.should.equal(docs.length + 3);
+        result.docs_written.should.equal(docs.length);
         done();
       });
     });
