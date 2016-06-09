@@ -1,5 +1,5 @@
 var baseUrl = 'http://replicator:replicator@localhost:8080';
-PouchDB.debug.enable('*');
+// PouchDB.debug.enable('*');
 
 var getFixtures = function(url, successHandler, errorHandler) {
   var xhr = new XMLHttpRequest();
