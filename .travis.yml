@@ -21,11 +21,11 @@ addons:
 
 env:
   matrix:
-#    - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
-#    - SCRIPT='modules/relaxed/tests/bin/php-replicator.sh'
-#    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
-#    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
-#    - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/php-replicator.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-couchdb.sh'
+    - SCRIPT='modules/relaxed/tests/bin/couchdb-to-drupal.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal-to-drupal.sh'
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
 
 notifications:

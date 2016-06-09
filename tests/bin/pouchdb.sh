@@ -18,3 +18,5 @@ mv ~/www/modules/relaxed/tests/fixtures/documents.txt ~/www/documents.txt
 php ~/drush.phar en --yes entity_test, relaxed_test || true
 
 mocha-phantomjs -s localToRemoteUrlAccessEnabled=true -s webSecurityEnabled=false test.html | tee /tmp/output.txt
+
+test 1 -eq $(egrep -c "(2 passing)" /tmp/output.txt)
