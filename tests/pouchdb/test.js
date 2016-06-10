@@ -28,8 +28,8 @@ describe('Test replication', function () {
     var db = new PouchDB('pouch_to_drupal');
     var remote = new PouchDB(baseUrl + '/relaxed/live');
     getFixtures(baseUrl + '/documents.txt', function(docs) {
-      // Starting with PouchDB version 5.* to put a new doc with _rev we should set new_edits = false.
-      // And we can't do bulkDocs() with if we have both docs with _rev and without _rev.
+      // Starting with PouchDB version 5.* to put a new doc with _rev we should set new_edits = false for each doc.
+      // And we can't do bulkDocs() if we have both docs with _rev and without _rev.
       for (var i in docs) {
         var new_edits = true;
         if (docs[i]._rev) {
