@@ -1,5 +1,5 @@
 var baseUrl = 'http://replicator:replicator@localhost:8080';
-//PouchDB.debug.enable('*');
+// PouchDB.debug.enable('*');
 
 var getFixtures = function(url, successHandler, errorHandler) {
   var xhr = new XMLHttpRequest();
@@ -28,14 +28,23 @@ describe('Test replication', function () {
     var db = new PouchDB('pouch_to_drupal');
     var remote = new PouchDB(baseUrl + '/relaxed/live');
     getFixtures(baseUrl + '/documents.txt', function(docs) {
-      db.bulkDocs({ docs: docs }, {}, function (err, results) {
-        db.replicate.to(remote, function (err, result) {
-          result.ok.should.equal(true);
-          result.doc_write_failures.should.equal(0);
-          result.docs_written.should.equal(docs.length);
-          done();
-        });
+      // Starting with PouchDB version 5.* to put a new doc with _rev we should set new_edits = false for each doc.
+      // And we can't do bulkDocs() if we have both docs with _rev and without _rev.
+      for (var i in docs) {
+        var new_edits = true;
+        if (docs[i]._rev) {
+          new_edits = false;
+        }
+        db.put(docs[i], {}, {}, {new_edits: new_edits})
+      }
+      //db.bulkDocs({ docs: docs }, {}, function (err, results) {
+      db.replicate.to(remote, function (err, result) {
+        result.ok.should.equal(true);
+        result.doc_write_failures.should.equal(0);
+        result.docs_written.should.equal(docs.length);
+        done();
       });
+      //});
     });
   });
 
@@ -46,8 +55,7 @@ describe('Test replication', function () {
       db.replicate.from(remote, {}, function (err, result) {
         result.ok.should.equal(true);
         result.doc_write_failures.should.equal(0);
-        // Add the 3 users that already exist in the Drupal site.
-        result.docs_written.should.equal(docs.length + 3);
+        result.docs_written.should.equal(docs.length);
         done();
       });
     });
