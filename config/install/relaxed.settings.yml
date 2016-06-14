@@ -159,3 +159,10 @@ resources:
       supported_auth:
         - cookie
         - basic_auth
+  relaxed:replicate:
+    POST:
+      supported_formats:
+        - json
+      supported_auth:
+        - cookie
+        - basic_auth
