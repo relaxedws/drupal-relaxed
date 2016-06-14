@@ -2,16 +2,14 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @RestResource(
  *   id = "relaxed:replicate",
  *   label = "Replicate",
  *   serialization_class = {
- *     "canonical" = "Drupal\replication\Replicate\Replicate",
+ *     "canonical" = "Drupal\relaxed\Replicate\Replicate",
  *   },
  *   uri_paths = {
  *     "canonical" = "/_replicate",
@@ -21,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class ReplicateResource extends ResourceBase {
 
   /**
-   * @param \Drupal\replication\Replicate\Replicate $replicate
+   * @param \Drupal\relaxed\Replicate\Replicate $replicate
    *
    * @return \Drupal\rest\ResourceResponse
    */
