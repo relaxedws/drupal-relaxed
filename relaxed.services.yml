@@ -34,3 +34,10 @@ services:
     arguments: ['@config.factory']
     tags:
       - {name: workspace_replicator, priority: 20}
+  relaxed.replicate:
+    class: Drupal\relaxed\Replicate\Replicate
+  relaxed.normalizer.replicate:
+    class: Drupal\relaxed\Normalizer\ReplicateNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+    arguments: ['@relaxed.replicate']
