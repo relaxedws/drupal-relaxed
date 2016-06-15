@@ -12,8 +12,9 @@ use Drupal\replication\Entity\ReplicationLog;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
-use Relaxed\Replicator\ReplicationTask;
+use Relaxed\Replicator\ReplicationTask as RelaxedReplicationTask;
 use Relaxed\Replicator\Replicator;
+use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
 
 
 class CouchdbReplicator implements ReplicatorInterface{
@@ -36,12 +37,12 @@ class CouchdbReplicator implements ReplicatorInterface{
   /**
    * @inheritDoc
    */
-  public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
+  public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target, ReplicationTaskInterface $task = NULL) {
      $source_db = $this->setupEndpoint($source);
      $target_db = $this->setupEndpoint($target);
 
     try {
-      $task = new ReplicationTask();
+      $task = new RelaxedReplicationTask();
       $replicator = new Replicator($source_db, $target_db, $task);
       $result = $replicator->startReplication();
       if (isset($result['session_id'])) {
