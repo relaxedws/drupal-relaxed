@@ -19,7 +19,7 @@ class RestResourceConfig extends CoreRestResourceConfig {
       return $normalised_method;
     } 
     else {
-      parent::normalizeRestMethod($method);
+      return parent::normalizeRestMethod($method);
     }
   }
 
