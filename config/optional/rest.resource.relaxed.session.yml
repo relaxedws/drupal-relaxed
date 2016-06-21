@@ -1,0 +1,13 @@
+id: relaxed.session
+plugin_id: 'relaxed:session'
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+dependencies:
+  module:
+    - basic_auth

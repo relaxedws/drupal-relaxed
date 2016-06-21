@@ -24,6 +24,9 @@ function relaxed_install() {
     ])->save();
   }
 
+
+  // Keep this just for compatibility with Drupal 8.1.x.
+  // @todo Remove this starting with 8.2.x.
   $module_handler = \Drupal::moduleHandler();
   // Merge 'resource' settings from relaxed module with 'resource' settings from rest module,
   // these settings are not loaded if added to /config/install/rest.settings.yml.
@@ -38,7 +41,9 @@ function relaxed_install() {
   if (!$module_handler->moduleExists('node')) {
     unset($rest_resource_config['entity:node']);
   }
-  $rest_config->set('resources', array_merge($rest_resource_config, $relaxed_resource_config))->save();
+  if (is_array($rest_resource_config)) {
+    $rest_config->set('resources', array_merge($rest_resource_config, $relaxed_resource_config))->save();
+  }
 }
 
 /**

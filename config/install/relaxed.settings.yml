@@ -1,5 +1,8 @@
 api_root: "/relaxed"
 
+# Keep this just for compatibility with Drupal 8.1.x. We use it
+# just for Drupal 8.1.x starting with Drupal 8.2.x these settings
+# are config entities.
 resources:
   relaxed:db:
     HEAD:

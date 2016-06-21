@@ -1,0 +1,13 @@
+id: relaxed.replicate
+plugin_id: 'relaxed:replicate'
+granularity: method
+configuration:
+  POST:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+dependencies:
+  module:
+    - basic_auth
