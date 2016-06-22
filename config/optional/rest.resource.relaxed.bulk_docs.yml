@@ -1,0 +1,13 @@
+id: relaxed.bulk_docs
+plugin_id: 'relaxed:bulk_docs'
+granularity: method
+configuration:
+  POST:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+dependencies:
+  module:
+    - basic_auth

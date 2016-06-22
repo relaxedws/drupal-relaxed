@@ -1,0 +1,32 @@
+id: relaxed.attachment
+plugin_id: 'relaxed:attachment'
+granularity: method
+configuration:
+  HEAD:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+  GET:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+  PUT:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+  DELETE:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+dependencies:
+  module:
+    - basic_auth
+    - file

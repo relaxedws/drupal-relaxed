@@ -1,0 +1,13 @@
+id: relaxed.revs_diff
+plugin_id: 'relaxed:revs_diff'
+granularity: method
+configuration:
+  POST:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+dependencies:
+  module:
+    - basic_auth

@@ -195,3 +195,10 @@ function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
 function relaxed_cron() {
   \Drupal::service('relaxed.remote_pointer')->addAllPointers();
 }
+
+function relaxed_entity_type_alter(array &$entity_types) {
+  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  if (isset($entity_types['rest_resource_config'])) {
+    $entity_types['rest_resource_config']->setClass('Drupal\relaxed\Entity\RestResourceConfig');
+  }
+}

@@ -1,0 +1,13 @@
+id: relaxed.all_docs
+plugin_id: 'relaxed:all_docs'
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - basic_auth
+dependencies:
+  module:
+    - basic_auth
