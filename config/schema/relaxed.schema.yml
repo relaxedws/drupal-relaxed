@@ -1,3 +1,4 @@
+# @todo Remove when we decide to not support Drupal 8.1.x.
 relaxed.settings:
   type: config_object
   label: 'Relaxed API settings'
@@ -12,6 +13,7 @@ relaxed.settings:
         type: relaxed_resource
         label: 'Resource'
 
+# @todo Remove when we decide to not support Drupal 8.1.x.
 relaxed_resource:
   type: mapping
   mapping:
