@@ -1,17 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\relaxed\Unit\RemoteTest;
- */
-
 namespace Drupal\Tests\relaxed\Unit;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\multiversion\Entity\Workspace;
 use Drupal\relaxed\Entity\Remote;
 use GuzzleHttp\Psr7\Uri;
-
 
 /**
  * @group relaxed

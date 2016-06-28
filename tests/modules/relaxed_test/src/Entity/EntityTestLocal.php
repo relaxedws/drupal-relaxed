@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed_test\Entity\EntityTestLocal.
- */
-
 namespace Drupal\relaxed_test\Entity;
 
 use Drupal\entity_test\Entity\EntityTestRev;
