@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\RemoteCheckBase.
- */
-
 namespace Drupal\relaxed\Plugin;
 
 use Drupal\Component\Plugin\PluginBase;

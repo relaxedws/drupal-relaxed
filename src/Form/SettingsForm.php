@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\relaxed\Form\SettingsForm.
- */
-
 namespace Drupal\relaxed\Form;
 
 use Drupal\Core\Form\ConfigFormBase;

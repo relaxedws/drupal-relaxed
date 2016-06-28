@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\BulkDocsResource.
- */
-
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;

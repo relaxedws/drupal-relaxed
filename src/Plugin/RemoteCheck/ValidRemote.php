@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * contains \Drupal\relaxed\Plugin\Remote\WorkspaceRemote
- */
-
 namespace Drupal\relaxed\Plugin\RemoteCheck;
 
 use Drupal\relaxed\Entity\RemoteInterface;

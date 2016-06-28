@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Entity\RemoteListBuilder.
- */
-
 namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

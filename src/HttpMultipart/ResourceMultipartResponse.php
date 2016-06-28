@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\relaxed\ResourceMultipartResponse.
- */
-
 namespace Drupal\relaxed\HttpMultipart;
 
 use Drupal\Core\Cache\CacheableResponseInterface;

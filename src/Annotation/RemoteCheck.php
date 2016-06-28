@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Annotation\RemoteCheck.
- */
-
 namespace Drupal\relaxed\Annotation;
 
 use Drupal\Component\Annotation\Plugin;

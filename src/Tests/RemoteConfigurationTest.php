@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Tests\RemoteConfigurationTest.
- */
-
 namespace Drupal\relaxed\Tests;
 
 use Drupal\simpletest\WebTestBase;

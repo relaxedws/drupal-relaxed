@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\AttachmentResource.
- */
-
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;

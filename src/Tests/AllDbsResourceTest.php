@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Tests\AllDbsResourceTest.
- */
-
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;

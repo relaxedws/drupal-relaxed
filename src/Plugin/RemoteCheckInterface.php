@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\RemoteCheckInterface.
- */
-
 namespace Drupal\relaxed\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;

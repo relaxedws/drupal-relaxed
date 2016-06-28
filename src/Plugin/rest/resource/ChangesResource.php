@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\ChangesResource.
- */
-
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;

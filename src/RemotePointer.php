@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed;
 
-
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;

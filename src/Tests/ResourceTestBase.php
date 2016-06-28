@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Tests\ResourceTestBase.
- */
-
 namespace Drupal\relaxed\Tests;
 
 use Drupal\multiversion\Entity\Workspace;

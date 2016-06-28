@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\SessionResource.
- */
-
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\rest\ResourceResponse;

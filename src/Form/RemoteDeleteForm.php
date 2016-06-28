@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Form\RemoteDeleteForm.
- */
-
 namespace Drupal\relaxed\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;

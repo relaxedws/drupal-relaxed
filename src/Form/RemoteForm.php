@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Form\RemoteForm.
- */
-
 namespace Drupal\relaxed\Form;
 
 use Drupal\Core\Entity\EntityForm;

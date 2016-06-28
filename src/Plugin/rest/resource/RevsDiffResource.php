@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\rest\resource\RevsDiffResource.
- */
-
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;

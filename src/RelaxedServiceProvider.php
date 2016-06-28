@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\RelaxedServiceProvider.
- */
-
 namespace Drupal\relaxed;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;

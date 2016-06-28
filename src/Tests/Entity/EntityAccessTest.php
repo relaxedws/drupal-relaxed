@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Tests\Entity\EntityAccessTest.
- */
-
 namespace Drupal\relaxed\Tests\Entity;
 
 use Drupal\Core\Session\AccountInterface;

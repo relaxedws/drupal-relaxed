@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Entity\Remote.
- */
-
 namespace Drupal\relaxed\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\RemoteCheckManager.
- */
-
 namespace Drupal\relaxed\Plugin;
 
 use Drupal\Core\Plugin\DefaultPluginManager;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relaxed\Plugin\EntityReferenceSelection\UserSelection.
- */
-
 namespace Drupal\relaxed\Plugin\EntityReferenceSelection;
 
 use Drupal\user\Plugin\EntityReferenceSelection\UserSelection as CoreUserSelection;
