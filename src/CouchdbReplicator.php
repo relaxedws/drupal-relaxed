@@ -6,7 +6,6 @@ use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\replication\Entity\ReplicationLog;
 use Drupal\workspace\ReplicatorInterface;
@@ -42,7 +41,9 @@ class CouchdbReplicator implements ReplicatorInterface{
      $target_db = $this->setupEndpoint($target);
 
     try {
-      $task = new RelaxedReplicationTask();
+      if ($task === NULL) {
+        $task = new RelaxedReplicationTask();
+      }
       $replicator = new Replicator($source_db, $target_db, $task);
       $result = $replicator->startReplication();
       if (isset($result['session_id'])) {
