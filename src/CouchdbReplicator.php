@@ -47,9 +47,18 @@ class CouchdbReplicator implements ReplicatorInterface{
       $replicator = new Replicator($source_db, $target_db, $task);
       $result = $replicator->startReplication();
       if (isset($result['session_id'])) {
-        $replication_logs = \Drupal::entityTypeManager()
-          ->getStorage('replication_log')
-          ->loadByProperties(['session_id' => $result['session_id']]);
+        $workspace_id = $source->getWorkspaceId() ?: $target->getWorkspaceId();
+        if (!empty($workspace_id)) {
+          $replication_logs = \Drupal::entityTypeManager()
+            ->getStorage('replication_log')
+            ->useWorkspace($workspace_id)
+            ->loadByProperties(['session_id' => $result['session_id']]);
+        }
+        else {
+          $replication_logs = \Drupal::entityTypeManager()
+            ->getStorage('replication_log')
+            ->loadByProperties(['session_id' => $result['session_id']]);
+        }
         return reset($replication_logs);
       }
       else {
