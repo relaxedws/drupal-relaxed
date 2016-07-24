@@ -77,7 +77,7 @@ class ChangesResource extends ResourceBase {
       $changes->includeDocs(TRUE);
     }
 
-    return new ResourceResponse($changes, 200);
+    return new ResourceResponse($changes, 200, ['Content-Length' => strlen(\Drupal::service('serializer')->serialize($changes, 'json'))]);
   }
 
 }
