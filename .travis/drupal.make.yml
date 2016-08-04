@@ -23,3 +23,9 @@ projects:
       type: git
       branch: 8.x-1.x
       url: "https://github.com/relaxedws/drupal-replication.git"
+  workspace:
+    type: module
+    download:
+      type: git
+      branch: 8.x-1.x
+      url: "https://github.com/timmillwood/drupal-workspace.git"

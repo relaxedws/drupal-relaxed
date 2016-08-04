@@ -8,6 +8,7 @@ use Drupal\simpletest\WebTestBase;
  * Tests Remote configuration by adding, editing, and deleting an Remote.
  *
  * @group relaxed
+ * @dependencies workspace
  */
 class RemoteConfigurationTest extends WebTestBase {
 
@@ -41,6 +42,17 @@ class RemoteConfigurationTest extends WebTestBase {
     $edit['password'] = 'pass';
     $this->drupalPostForm('admin/config/relaxed/settings/', $edit, t('Save configuration'));
     $this->assertResponse(200);
+
+    if (!\Drupal::moduleHandler()->moduleExists('workspace')) {
+      $this->drupalGet('admin/config/services/relaxed/add');
+      $this->assertResponse(200);
+      $this->assertText('You have to install the Workspace module prior to setting up new workspaces.');
+      \Drupal::service('module_installer')->install(['workspace']);
+    }
+
+    $this->drupalGet('admin/config/services/relaxed/add');
+    $this->assertResponse(200);
+    $this->assertNoText('You have to install the Workspace module prior to setting up new workspaces.');
 
     // Make a POST request to the individual Remote configuration page.
     $edit = array();
