@@ -9,3 +9,4 @@ dependencies:
   - basic_auth
   - multiversion
   - replication
+  - workspace
