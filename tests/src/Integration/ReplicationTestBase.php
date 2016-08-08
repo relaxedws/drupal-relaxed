@@ -55,8 +55,10 @@ abstract class ReplicationTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig(['multiversion', 'relaxed']);
+    $this->installConfig(['multiversion', 'workspace', 'replication', 'relaxed']);
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_pointer');
+    $this->installEntitySchema('user');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
     Workspace::create(['machine_name' => 'live', 'label' => 'Live', 'type' => 'basic'])->save();
