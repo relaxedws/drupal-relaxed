@@ -47,6 +47,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     'workspace',
     'replication',
     'entity_test',
+    'user',
   ];
 
   /**
