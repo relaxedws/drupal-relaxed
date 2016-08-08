@@ -59,7 +59,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $this->installEntitySchema('workspace');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
-    Workspace::create(['machine_name' => 'default'])->save();
+    Workspace::create(['machine_name' => 'live', 'label' => 'Live', 'type' => 'basic'])->save();
 
     $this->source_db = 'source';
     $this->target_db = 'target';
