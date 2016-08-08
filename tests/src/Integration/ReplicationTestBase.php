@@ -44,6 +44,8 @@ abstract class ReplicationTestBase extends KernelTestBase {
     'key_value',
     'multiversion',
     'relaxed',
+    'workspace',
+    'replication',
     'entity_test',
   ];
 
