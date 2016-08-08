@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\relaxed\Integration\ReplicationTestBase.
- */
-
 namespace Drupal\Tests\relaxed\Integration;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -174,6 +169,27 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $replicator = new Replicator($source, $target, $task);
 
     return $replicator->startReplication();
+  }
+
+  /**
+   * Replicates content from source and target using the /_replicate endpoint.
+   */
+  protected function endpointReplicate($data, $endpoint) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+      CURLOPT_HTTPGET => FALSE,
+      CURLOPT_POST => TRUE,
+      CURLOPT_POSTFIELDS => $data,
+      CURLOPT_URL => $endpoint,
+      CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'Accept: application/json',
+      ],
+    ]);
+    $response = curl_exec($curl);
+    curl_close($curl);
+
+    return $response;
   }
 
   /**

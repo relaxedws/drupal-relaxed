@@ -11,9 +11,4 @@ php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8
 php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxed_test || true
 php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxed_test || true
 
-composer self-update
-composer config repositories.couchdb-client git https://github.com/jeqq/couchdb-client
-composer config repositories.replicator git https://github.com/jeqq/couchdb-replicator
-composer require relaxedws/replicator:dev-test-multipart-streams-with-size --prefer-source
-
 vendor/phpunit/phpunit/phpunit --verbose --debug --configuration ~/www/phpunit.travis.xml --bootstrap ~/www/core/tests/bootstrap.php
