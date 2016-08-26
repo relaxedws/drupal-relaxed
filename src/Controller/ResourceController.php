@@ -236,6 +236,10 @@ class ResourceController implements ContainerAwareInterface {
     $cacheable_metadata = new CacheableMetadata();
     $response->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
 
+    if ($request->getMethod() !== 'HEAD') {
+      $response->headers->set('Content-Length', strlen($response->getContent()));
+    }
+
     return $response;
   }
 
