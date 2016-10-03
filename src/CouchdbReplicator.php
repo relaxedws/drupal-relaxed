@@ -8,13 +8,13 @@ use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\replication\Entity\ReplicationLog;
+use Drupal\replication\ReplicationTask\ReplicationTask;
+use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
 use Relaxed\Replicator\ReplicationTask as RelaxedReplicationTask;
 use Relaxed\Replicator\Replicator;
-use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
-
 
 class CouchdbReplicator implements ReplicatorInterface{
 
@@ -42,9 +42,15 @@ class CouchdbReplicator implements ReplicatorInterface{
 
     try {
       if ($task === NULL) {
-        $task = new RelaxedReplicationTask();
+        $task = new ReplicationTask();
       }
-      $replicator = new Replicator($source_db, $target_db, $task);
+
+      // Map from Drupal's ReplicationTask to PHP's CouchDB task.
+      $couchdb_task = new RelaxedReplicationTask();
+      // @todo Write code here to map from Drupal's filters, docIds, and other
+      // config to the CouchDB task version.
+
+      $replicator = new Replicator($source_db, $target_db, $couchdb_task);
       $result = $replicator->startReplication();
       if (isset($result['session_id'])) {
         $workspace_id = $source->getWorkspaceId() ?: $target->getWorkspaceId();
