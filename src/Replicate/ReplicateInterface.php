@@ -62,5 +62,42 @@ interface ReplicateInterface {
    * @return \Drupal\relaxed\Replicate\ReplicateInterface
    */
   public function setDocIds(array $doc_ids);
+
+  /**
+   * Set the ID of the filter plugin to use during replication.
+   *
+   * @param string $filter
+   *   The plugin ID of a ReplicationFilterInterface.
+   *
+   * @return \Drupal\relaxed\Replicate\ReplicateInterface
+   *   Returns $this.
+   */
+  public function setFilter($filter = NULL);
+
+  /**
+   * Set the parameters for the filter plugin.
+   *
+   * @param array|NULL $parameters
+   *   An associative array of name-value parameters.
+   *
+   * @return \Drupal\relaxed\Replicate\ReplicateInterface
+   *   Returns $this.
+   */
+  public function setParameters(array $parameters = NULL);
+
+  /**
+   * Set a parameter for the filter plugin.
+   *
+   * If no parameter bag yet exists, an empty parameter bag will be created.
+   *
+   * @param string $name
+   *   The parameter name to set.
+   * @param string $value
+   *   The value for the parameter.
+   *
+   * @return \Drupal\relaxed\Replicate\ReplicateInterface
+   *   Returns $this.
+   */
+  public function setParameter($name, $value);
   
 }

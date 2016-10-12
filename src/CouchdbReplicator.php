@@ -15,6 +15,7 @@ use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
 use Relaxed\Replicator\ReplicationTask as RelaxedReplicationTask;
 use Relaxed\Replicator\Replicator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class CouchdbReplicator implements ReplicatorInterface{
 
@@ -25,7 +26,7 @@ class CouchdbReplicator implements ReplicatorInterface{
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
     if ($this->setupEndpoint($source) && $this->setupEndpoint($target)) {
@@ -34,21 +35,29 @@ class CouchdbReplicator implements ReplicatorInterface{
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
-  public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target, ReplicationTaskInterface $task = NULL) {
-     $source_db = $this->setupEndpoint($source);
-     $target_db = $this->setupEndpoint($target);
+  public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target, $task = NULL) {
+    if ($task !== NULL && !$task instanceof ReplicationTaskInterface && !$task instanceof RelaxedReplicationTask) {
+      throw new UnexpectedTypeException($task, 'Drupal\replication\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
+    }
+    
+    $source_db = $this->setupEndpoint($source);
+    $target_db = $this->setupEndpoint($target);
 
     try {
       if ($task === NULL) {
-        $task = new ReplicationTask();
+        $couchdb_task = new RelaxedReplicationTask();
       }
-
-      // Map from Drupal's ReplicationTask to PHP's CouchDB task.
-      $couchdb_task = new RelaxedReplicationTask();
-      // @todo Write code here to map from Drupal's filters, docIds, and other
-      // config to the CouchDB task version.
+      elseif ($task instanceof ReplicationTaskInterface) {
+        $couchdb_task = new RelaxedReplicationTask();
+      }
+      else {
+        $couchdb_task = clone $task;
+      }
+      
+      $couchdb_task->setFilter($task->getFilter());
+      $couchdb_task->setParameters($task->getParameters());
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
       $result = $replicator->startReplication();

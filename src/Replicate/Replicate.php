@@ -39,6 +39,11 @@ class Replicate implements ReplicateInterface {
   protected $filter = NULL;
 
   /**
+   * @var array
+   */
+  protected $parameters = [];
+
+  /**
    * @var bool
    */
   protected $createTarget = FALSE;
@@ -124,11 +129,49 @@ class Replicate implements ReplicateInterface {
   /**
    * {@inheritdoc}
    */
+  public function setFilter($filter = NULL) {
+    $this->filter = $filter;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setParameters(array $parameters = NULL) {
+    if ($parameters == NULL) {
+      $parameters = [];
+    }
+    $this->parameters = $parameters;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setParameter($name, $value) {
+    if (!is_array($this->parameters)) {
+      $this->setParameters([]);
+    }
+    $this->parameters[$name] = $value;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResult() {
+    return $this->result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function doReplication() {
     $task = new ReplicationTask(
       $this->repId,
       $this->continuous,
       $this->filter,
+      $this->parameters,
       $this->createTarget,
       $this->docIds,
       $this->heartbeat,
@@ -139,13 +182,6 @@ class Replicate implements ReplicateInterface {
     );
     $replicator = new Replicator($this->source, $this->target, $task);
     $this->result = $replicator->startReplication();
-    return $this->result;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getResult() {
     return $this->result;
   }
 
