@@ -56,6 +56,14 @@ class ReplicateNormalizer extends NormalizerBase implements DenormalizerInterfac
     if (is_array($data['doc_ids'])) {
       $this->replicate->setDocIds($data['doc_ids']);
     }
+
+    if (isset($data['filter'])) {
+      $this->replicate->setFilter($data['filter']);
+    }
+
+    if (!empty($data['parameters'])) {
+      $this->replicate->setParameters($data['parameters']);
+    }
     
     return $this->replicate;
   }
