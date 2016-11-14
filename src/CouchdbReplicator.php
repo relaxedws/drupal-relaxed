@@ -55,9 +55,11 @@ class CouchdbReplicator implements ReplicatorInterface{
       else {
         $couchdb_task = clone $task;
       }
-      
-      $couchdb_task->setFilter($task->getFilter());
-      $couchdb_task->setParameters($task->getParameters());
+
+      if ($task !== NULL) {
+        $couchdb_task->setFilter($task->getFilter());
+        $couchdb_task->setParameters($task->getParameters());
+      }
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
       $result = $replicator->startReplication();
