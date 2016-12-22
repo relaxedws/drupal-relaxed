@@ -3,10 +3,10 @@
 namespace Drupal\relaxed\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
-use Drupal\rest\ResourceResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -267,10 +267,10 @@ class ResourceController implements ContainerAwareInterface {
   /**
    * Adds cacheable dependencies.
    *
-   * @param \Drupal\rest\ResourceResponse $response
+   * @param \Drupal\Core\Cache\CacheableResponseInterface
    * @param $parameters
    */
-  protected function addCacheableDependency(ResourceResponse $response, $parameters) {
+  protected function addCacheableDependency(CacheableResponseInterface $response, $parameters) {
     if (is_array($parameters)) {
       foreach ($parameters as $parameter) {
         $response->addCacheableDependency($parameter);
