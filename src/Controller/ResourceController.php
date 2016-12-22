@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\RenderContext;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
+use Drupal\rest\ResourceResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -219,27 +220,25 @@ class ResourceController implements ContainerAwareInterface {
       }
     }
 
+    $cacheable_dependencies = [];
     foreach ($render_contexts as $render_context) {
-      $response->addCacheableDependency($render_context);
+      $cacheable_dependencies[] = $render_context;
     }
     foreach ($parameters as $parameter) {
       if (is_array($parameter)) {
-        foreach ($parameter as $item) {
-          $response->addCacheableDependency($item);
-        }
+        array_merge($cacheable_dependencies, $parameter);
       }
       else {
-        $response->addCacheableDependency($parameter);
+        $cacheable_dependencies[] = $parameter;
       }
     }
-    $response->addCacheableDependency($this->container->get('config.factory')->get('rest.settings'));
+    $cacheable_dependencies[] = $this->container->get('config.factory')->get('rest.settings');
     $cacheable_metadata = new CacheableMetadata();
-    $response->addCacheableDependency($cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']));
-
+    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']);
+    $this->addCacheableDependency($response, $cacheable_dependencies);
     if ($request->getMethod() !== 'HEAD') {
       $response->headers->set('Content-Length', strlen($response->getContent()));
     }
-
     return $response;
   }
 
@@ -263,6 +262,23 @@ class ResourceController implements ContainerAwareInterface {
   protected function isValidJson($string) {
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
+  }
+
+  /**
+   * Adds cacheable dependencies.
+   *
+   * @param \Drupal\rest\ResourceResponse $response
+   * @param $parameters
+   */
+  protected function addCacheableDependency(ResourceResponse $response, $parameters) {
+    if (is_array($parameters)) {
+      foreach ($parameters as $parameter) {
+        $response->addCacheableDependency($parameter);
+      }
+    }
+    else {
+      $response->addCacheableDependency($parameters);
+    }
   }
 
 }
