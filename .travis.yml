@@ -30,7 +30,9 @@ env:
 
 matrix:
   allow_failures:
-    - env: MAKE_FILE=drupal-8.3.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.3.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.3.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml
   fast_finish: true
 
 notifications:
