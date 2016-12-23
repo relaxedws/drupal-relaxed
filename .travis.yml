@@ -21,9 +21,17 @@ addons:
 
 env:
   matrix:
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh'
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh'
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh'
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.2.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.2.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.3.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.3.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml
+
+matrix:
+  allow_failures:
+    - env: MAKE_FILE=drupal-8.3.x.make.yml
+  fast_finish: true
 
 notifications:
   slack: det:YiOiwfzUBtt9aTnWvocK8uDI
