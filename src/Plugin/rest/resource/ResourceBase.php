@@ -21,15 +21,9 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
     $route_name = strtr($this->pluginId, ':', '.');
 
     foreach ($this->availableMethods() as $method) {
-      // HEAD and GET are equivalent as per RFC and handled by the same route.
-      // @see \Symfony\Component\Routing\Matcher::matchCollection()
-      if ($method == 'HEAD') {
-        continue;
-      }
-
       // Allow pull or push permissions depending on the method.
       $permissions = 'perform push replication';
-      if ($method === 'GET') {
+      if ($method === 'GET' || $method === 'HEAD') {
         $permissions .= '+perform pull replication';
       }
 
@@ -80,8 +74,15 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           $collection->add("$route_name.$method", $route);
           break;
 
+        case 'HEAD':
         case 'GET':
-          $collection->add("$route_name.$method", $route);
+          // Restrict GET and HEAD requests to the media type specified in the
+          // HTTP Accept headers.
+          foreach ($this->serializerFormats as $format) {
+            $format_route = clone $route;
+            $format_route->addRequirements(array('_format' => $format));
+            $collection->add("$route_name.$method.$format", $format_route);
+          }
           break;
 
         case 'DELETE':
