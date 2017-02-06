@@ -80,7 +80,7 @@ class RemoteListBuilder extends ConfigEntityListBuilder {
     // Indicate to the user that there is a problem with one of the endpoints.
     if ($this->hasError) {
       drupal_set_message(
-        $this->t('One or more problems were detected with your remotes. Check the the <a href=":status">status report</a> for more information.', [':status' => $this->url('system.status')]),
+        $this->t('One or more problems were detected with your remotes. Check the <a href=":status">status report</a> for more information.', [':status' => $this->url('system.status')]),
         'error'
       );
     }
