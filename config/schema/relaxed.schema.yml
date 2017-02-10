@@ -1,4 +1,3 @@
-# @todo Remove when we decide to not support Drupal 8.1.x.
 relaxed.settings:
   type: config_object
   label: 'Relaxed API settings'
@@ -6,51 +5,6 @@ relaxed.settings:
     api_root:
       type: string
       label: 'Absolute base path to the API root, without trailing slash.'
-    resources:
-      type: sequence
-      label: 'Resources'
-      sequence:
-        type: relaxed_resource
-        label: 'Resource'
-
-# @todo Remove when we decide to not support Drupal 8.1.x.
-relaxed_resource:
-  type: mapping
-  mapping:
-    GET:
-      type: rest_request
-      label: 'GET method settings'
-    POST:
-      type: rest_request
-      label: 'POST method settings'
-    PATCH:
-      type: rest_request
-      label: 'PATCH method settings'
-    DELETE:
-      type: rest_request
-      label: 'DELETE method settings'
-    HEAD:
-      type: rest_request
-      label: 'HEAD method settings'
-    PUT:
-      type: rest_request
-      label: 'PUT method settings'
-
-rest_request:
-  type: mapping
-  mapping:
-    supported_formats:
-      type: sequence
-      label: 'Supported format'
-      sequence:
-        type: string
-        label: 'Format'
-    supported_auth:
-      type: sequence
-      label: 'Supported authentication'
-      sequence:
-        type: string
-        label: 'Authentication'
 
 relaxed.endpoint.*:
   type: config_entity
