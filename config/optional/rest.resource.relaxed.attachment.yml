@@ -5,12 +5,16 @@ configuration:
   HEAD:
     supported_formats:
       - json
+      - stream
+      - base64_stream
     supported_auth:
       - cookie
       - basic_auth
   GET:
     supported_formats:
       - json
+      - stream
+      - base64_stream
     supported_auth:
       - cookie
       - basic_auth
