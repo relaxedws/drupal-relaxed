@@ -50,8 +50,33 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         $route->addOptions(['parameters' => $parameters]);
       }
 
-      if ($method === 'PUT' && !$this->isAttachment()) {
-        $route->addRequirements(['_content_type_format' => implode('|', $this->serializerFormats)]);
+      switch ($method) {
+        case 'POST':
+        case 'PUT':
+          // Restrict on the Content-Type header.
+          if (!$this->isAttachment()) {
+            $route->addRequirements(array('_content_type_format' => implode('|', $this->serializerFormats)));
+          }
+          $collection->add("$route_name.$method", $route);
+          break;
+
+        case 'GET':
+          // Restrict GET and HEAD requests to the media type specified in the
+          // _format query parameter.
+          foreach ($this->serializerFormats as $format) {
+            $format_route = clone $route;
+            $format_route->addRequirements(array('_format' => $format));
+            $collection->add("$route_name.$method.$format", $format_route);
+          }
+          break;
+
+        case 'DELETE':
+          foreach ($this->serializerFormats as $format) {
+            $format_route = clone $route;
+            $format_route->addRequirements(array('_format' => $format));
+            $collection->add("$route_name.$method.$format", $format_route);
+          }
+          break;
       }
 
       // Note that '_format' and '_content_type_format' route requirements are
