@@ -46,13 +46,3 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@serializer', '@renderer', '@current_route_match']
-  relaxed.sensitive_data.transformer:
-    class: Drupal\relaxed\SensitiveDataTransformer
-    arguments: ['@config.factory']
-  relaxed.http_middleware.request_format_setter:
-    class: Drupal\relaxed\StackMiddleware\RequestFormatSetter
-    arguments: ['@config.factory']
-    tags:
-      # Set priority to 201 so it happens right before the page cache
-      # middleware (priority 200)has the opportunity to respond.
-      - { name: http_middleware, priority: 201 }
