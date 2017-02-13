@@ -2,14 +2,16 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -19,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-class ResourceController implements ContainerAwareInterface {
+class ResourceController implements ContainerAwareInterface, ContainerInjectionInterface {
 
   use ContainerAwareTrait;
 
@@ -32,6 +34,30 @@ class ResourceController implements ContainerAwareInterface {
    * @var \Symfony\Component\HttpFoundation\Request $request
    */
   protected $request;
+
+  /**
+   * The resource configuration storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $resourceStorage;
+
+  /**
+   * Creates a new RequestHandler instance.
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
+   *   The resource configuration storage.
+   */
+  public function __construct(EntityStorageInterface $entity_storage) {
+    $this->resourceStorage = $entity_storage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static($container->get('entity_type.manager')->getStorage('rest_resource_config'));
+  }
 
   /**
    * @return \Symfony\Component\DependencyInjection\ContainerInterface
@@ -78,11 +104,13 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *
    * @return array
    */
-  protected function getParameters() {
+  protected function getParameters(RouteMatchInterface $route_match) {
     $parameters = array();
-    foreach ($this->request->attributes->get('_route_params') as $key => $parameter) {
+    foreach ($route_match->getParameters() as $key => $parameter) {
       // We don't want private parameters.
       if ($key{0} !== '_') {
         $parameters[] = $parameter;
@@ -133,11 +161,12 @@ class ResourceController implements ContainerAwareInterface {
   }
 
   /**
+   * @param \Drupal\Core\Routing\RouteMatchInterface  $route_match
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
    * @return \Symfony\Component\HttpFoundation\Response
    */
-  public function handle(Request $request) {
+  public function handle(RouteMatchInterface $route_match, Request $request) {
     $this->request = $request;
 
     $method = $this->getMethod();
@@ -145,13 +174,13 @@ class ResourceController implements ContainerAwareInterface {
     $resource = $this->getResource();
 
     $content = $this->request->getContent();
-    $parameters = $this->getParameters();
-    $serializer = $this->serializer();
+    $parameters = $this->getParameters($route_match);
     $render_contexts = [];
 
     // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
     $query = $this->request->query->all();
-    $context = array('query' => $query, 'resource_id' => $resource->getPluginId());
+    $resource_config_id = $route_match->getRouteObject()->getDefault('_rest_resource_config');
+    $context = array('query' => $query, 'resource_id' => $resource_config_id);
     $entity = NULL;
     $definition = $resource->getPluginDefinition();
     if (!empty($content)) {
@@ -192,53 +221,13 @@ class ResourceController implements ContainerAwareInterface {
       return $this->errorResponse($e);
     }
 
-    $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
-      ? 'stream'
-      : 'json';
-
-    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
-
-    foreach ($responses as $response_part) {
-      try {
-        if ($response_data = $response_part->getResponseData()) {
-          // Collect bubbleable metadata in a render context.
-          $render_context = new RenderContext();
-          $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
-            return $serializer->serialize($response_data, $response_format, $context);
-          });
-          if (!$render_context->isEmpty()) {
-            $render_contexts[] = $render_context->pop();
-          }
-          $response_part->setContent($response_output);
-        }
-      }
-      catch (\Exception $e) {
-        return $this->errorResponse($e);
-      }
-      if (!$response_part->headers->get('Content-Type')) {
-        $response_part->headers->set('Content-Type', $this->request->getMimeType($response_format));
-      }
+    /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
+    $resource_config = $this->resourceStorage->load($resource_config_id);
+    if ($response instanceof CacheableResponseInterface) {
+      // Add rest config's cache tags.
+      $response->addCacheableDependency($resource_config);
     }
 
-    $cacheable_dependencies = [];
-    foreach ($render_contexts as $render_context) {
-      $cacheable_dependencies[] = $render_context;
-    }
-    foreach ($parameters as $parameter) {
-      if (is_array($parameter)) {
-        array_merge($cacheable_dependencies, $parameter);
-      }
-      else {
-        $cacheable_dependencies[] = $parameter;
-      }
-    }
-    $cacheable_dependencies[] = $this->container->get('config.factory')->get('rest.settings');
-    $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']);
-    $this->addCacheableDependency($response, $cacheable_dependencies);
-    if ($request->getMethod() !== 'HEAD') {
-      $response->headers->set('Content-Length', strlen($response->getContent()));
-    }
     return $response;
   }
 
@@ -262,23 +251,6 @@ class ResourceController implements ContainerAwareInterface {
   protected function isValidJson($string) {
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
-  }
-
-  /**
-   * Adds cacheable dependencies.
-   *
-   * @param \Drupal\Core\Cache\CacheableResponseInterface
-   * @param $parameters
-   */
-  protected function addCacheableDependency(CacheableResponseInterface $response, $parameters) {
-    if (is_array($parameters)) {
-      foreach ($parameters as $parameter) {
-        $response->addCacheableDependency($parameter);
-      }
-    }
-    else {
-      $response->addCacheableDependency($parameters);
-    }
   }
 
 }
