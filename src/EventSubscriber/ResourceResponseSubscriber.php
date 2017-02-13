@@ -2,8 +2,6 @@
 
 namespace Drupal\relaxed\EventSubscriber;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Drupal\Core\Render\RenderContext;
 use Drupal\rest\ResourceResponseInterface;
@@ -30,9 +28,8 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
 
     $request = $event->getRequest();
     if ($this->isRelaxedRoute()) {
-      if (!$format = $this->getResponseFormat($this->routeMatch, $request)) {
-        $format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream') ? 'stream' : 'json';
-      }
+      $format = $this->getResponseFormat($this->routeMatch, $request);
+      $format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format === 'stream') ? 'stream' : 'json';
       $this->renderResponseBody($request, $response, $this->serializer, $format);
       $event->setResponse($this->flattenResponse($response));
     }
