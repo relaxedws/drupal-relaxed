@@ -27,8 +27,9 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
 
     $request = $event->getRequest();
     if ($this->isRelaxedRoute()) {
-      $format = $this->getResponseFormat($this->routeMatch, $request);
-      $format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format === 'stream') ? 'stream' : 'json';
+      // @todo Review/refactor format negotiation.
+      // @see \Drupal\rest\EventSubscriber\ResourceResponseSubscriber::getResponseFormat().
+      $format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $this->isAttachment()) ? 'stream' : 'json';
       $this->renderResponseBody($request, $response, $this->serializer, $format);
       $event->setResponse($this->flattenResponse($response));
     }
@@ -69,6 +70,10 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
 
   protected function isRelaxedRoute() {
     return (substr($this->routeMatch->getRouteObject()->getDefault('_rest_resource_config'), 0, strlen('relaxed')) === 'relaxed');
+  }
+
+  protected function isAttachment() {
+    return (substr($this->routeMatch->getRouteObject()->getDefault('_rest_resource_config'), -strlen('attachment')) === 'attachment');
   }
 
   /**
