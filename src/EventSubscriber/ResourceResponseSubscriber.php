@@ -49,62 +49,24 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
 
     $render_contexts = [];
     foreach ($responses as $response_part) {
-      try {
-        if ($response_data = $response_part->getResponseData()) {
-          // Collect bubbleable metadata in a render context.
-          $render_context = new RenderContext();
-          $response_output = $this->renderer->executeInRenderContext($render_context, function() use ($serializer, $response_data, $format, $context) {
-            return $serializer->serialize($response_data, $format, $context);
-          });
-          if (!$render_context->isEmpty()) {
-            $render_contexts[] = $render_context->pop();
-          }
-          $response_part->setContent($response_output);
+      if ($response_data = $response_part->getResponseData()) {
+        // Collect bubbleable metadata in a render context.
+        $render_context = new RenderContext();
+        $response_output = $this->renderer->executeInRenderContext($render_context, function() use ($serializer, $response_data, $format, $context) {
+          return $serializer->serialize($response_data, $format, $context);
+        });
+        if (!$render_context->isEmpty()) {
+          $render_contexts[] = $render_context->pop();
         }
-      }
-      catch (\Exception $e) {
-        return $this->errorResponse($e);
+        $response_part->setContent($response_output);
       }
       if (!$response_part->headers->get('Content-Type')) {
         $response_part->headers->set('Content-Type', $request->getMimeType($format));
       }
     }
 
-    $cacheable_dependencies = [];
-    foreach ($render_contexts as $render_context) {
-      $cacheable_dependencies[] = $render_context;
-    }
-    $parameters = $this->getParameters($request);
-    foreach ($parameters as $parameter) {
-      if (is_array($parameter)) {
-        array_merge($cacheable_dependencies, $parameter);
-      }
-      else {
-        $cacheable_dependencies[] = $parameter;
-      }
-    }
-    $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']);
-    $this->addCacheableDependency($response, $cacheable_dependencies);
     if ($request->getMethod() !== 'HEAD') {
       $response->headers->set('Content-Length', strlen($response->getContent()));
-    }
-  }
-
-  /**
-   * Adds cacheable dependencies.
-   *
-   * @param \Drupal\Core\Cache\CacheableResponseInterface
-   * @param $parameters
-   */
-  protected function addCacheableDependency(CacheableResponseInterface $response, $parameters) {
-    if (is_array($parameters)) {
-      foreach ($parameters as $parameter) {
-        $response->addCacheableDependency($parameter);
-      }
-    }
-    else {
-      $response->addCacheableDependency($parameters);
     }
   }
 
