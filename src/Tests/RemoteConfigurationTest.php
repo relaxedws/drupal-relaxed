@@ -19,7 +19,6 @@ class RemoteConfigurationTest extends WebTestBase {
    */
   public static $modules = array(
     'file',
-    'entity_test',
     'multiversion',
     'rest',
     'relaxed',
@@ -98,7 +97,8 @@ class RemoteConfigurationTest extends WebTestBase {
     $this->assertResponse(200);
     $this->assertNoText($new_label, "Make sure the Remote label does not appear on the overview page after we've deleted the Remote.");
 
-    $remote = entity_load('remote', $aid);
+    $remote = \Drupal::entityTypeManager()->getStorage('remote')->load($aid);
     $this->assertFalse($remote, 'Make sure the Remote is gone after being deleted.');
   }
+
 }
