@@ -61,8 +61,6 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
           break;
 
         case 'GET':
-          // Restrict GET and HEAD requests to the media type specified in the
-          // _format query parameter.
           $collection->add("$route_name.$method", $route);
           break;
 

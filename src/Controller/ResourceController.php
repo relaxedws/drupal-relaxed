@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -220,6 +221,22 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       $response->addCacheableDependency($resource_config);
     }
 
+    $cacheable_dependencies = [];
+    foreach ($render_contexts as $render_context) {
+      $cacheable_dependencies[] = $render_context;
+    }
+    foreach ($parameters as $parameter) {
+      if (is_array($parameter)) {
+        array_merge($cacheable_dependencies, $parameter);
+      }
+      else {
+        $cacheable_dependencies[] = $parameter;
+      }
+    }
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']);
+    $this->addCacheableDependency($response, $cacheable_dependencies);
+
     return $response;
   }
 
@@ -243,6 +260,23 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   protected function isValidJson($string) {
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
+  }
+
+  /**
+   * Adds cacheable dependencies.
+   *
+   * @param \Drupal\Core\Cache\CacheableResponseInterface
+   * @param $parameters
+   */
+  protected function addCacheableDependency(CacheableResponseInterface $response, $parameters) {
+    if (is_array($parameters)) {
+      foreach ($parameters as $parameter) {
+        $response->addCacheableDependency($parameter);
+      }
+    }
+    else {
+      $response->addCacheableDependency($parameters);
+    }
   }
 
 }
