@@ -2,14 +2,12 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -215,56 +213,11 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       return $this->errorResponse($e);
     }
 
-    $response_format = (in_array($request->getMethod(), ['GET', 'HEAD']) && $format == 'stream')
-      ? 'stream'
-      : 'json';
-
-    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
-
-    $render_contexts = [];
-    $serializer = $this->serializer();
-    foreach ($responses as $response_part) {
-      if ($response_data = $response_part->getResponseData()) {
-        // Collect bubbleable metadata in a render context.
-        $render_context = new RenderContext();
-        $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
-          return $serializer->serialize($response_data, $response_format, $context);
-        });
-        if (!$render_context->isEmpty()) {
-          $render_contexts[] = $render_context->pop();
-        }
-        $response_part->setContent($response_output);
-      }
-      if (!$response_part->headers->get('Content-Type')) {
-        $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
-      }
-    }
-
-    if ($request->getMethod() !== 'HEAD') {
-      $response->headers->set('Content-Length', strlen($response->getContent()));
-    }
-
+    /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
+    $resource_config = $this->resourceStorage->load($resource_config_id);
     if ($response instanceof CacheableResponseInterface) {
-      /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
-      $resource_config = $this->resourceStorage->load($resource_config_id);
       // Add rest config's cache tags.
       $response->addCacheableDependency($resource_config);
-
-      $cacheable_dependencies = [];
-      foreach ($render_contexts as $render_context) {
-        $cacheable_dependencies[] = $render_context;
-      }
-      foreach ($parameters as $parameter) {
-        if (is_array($parameter)) {
-          array_merge($cacheable_dependencies, $parameter);
-        }
-        else {
-          $cacheable_dependencies[] = $parameter;
-        }
-      }
-      $cacheable_metadata = new CacheableMetadata();
-      $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
-      $this->addCacheableDependency($response, $cacheable_dependencies);
     }
 
     return $response;
@@ -290,23 +243,6 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   protected function isValidJson($string) {
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
-  }
-
-  /**
-   * Adds cacheable dependencies.
-   *
-   * @param \Drupal\Core\Cache\CacheableResponseInterface
-   * @param $parameters
-   */
-  protected function addCacheableDependency(CacheableResponseInterface $response, $parameters) {
-    if (is_array($parameters)) {
-      foreach ($parameters as $parameter) {
-        $response->addCacheableDependency($parameter);
-      }
-    }
-    else {
-      $response->addCacheableDependency($parameters);
-    }
   }
 
 }
