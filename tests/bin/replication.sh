@@ -11,6 +11,9 @@ php ~/drush.phar --yes --uri=http://localhost:8081 site-install --sites-subdir=8
 php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxed_test || true
 php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxed_test || true
 
+composer update
+
+# Check if CouchDB is running.
 curl http://127.0.0.1:5984
 
 vendor/phpunit/phpunit/phpunit --verbose --debug --configuration ~/www/phpunit.travis.xml --bootstrap ~/www/core/tests/bootstrap.php
