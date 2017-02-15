@@ -8,5 +8,6 @@ dependencies:
   - basic_auth
   - multiversion
   - replication
+  - system (>=8.3.x)
 test_dependencies:
   - workspace
