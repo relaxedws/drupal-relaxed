@@ -58,7 +58,7 @@ class ChangesResource extends ResourceBase {
       $plugin_definition,
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
-      $container->get('replication.changes_factory')
+      $container->get('workspace.changes_factory')
     );
   }
 
