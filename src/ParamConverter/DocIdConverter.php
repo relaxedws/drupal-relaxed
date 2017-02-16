@@ -4,9 +4,9 @@ namespace Drupal\relaxed\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
-use Drupal\multiversion\Entity\Index\RevisionIndexInterface;
-use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
-use Drupal\multiversion\Entity\Index\UuidIndexInterface;
+use Drupal\relaxed\Entity\Index\RevisionIndexInterface;
+use Drupal\relaxed\Entity\Index\RevisionTreeIndexInterface;
+use Drupal\relaxed\Entity\Index\UuidIndexInterface;
 use Symfony\Component\Routing\Route;
 
 class DocIdConverter implements ParamConverterInterface {
@@ -17,19 +17,16 @@ class DocIdConverter implements ParamConverterInterface {
   protected $entityManager;
 
   /**
-   * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
+   * @var \Drupal\relaxed\Entity\Index\UuidIndexInterface
    */
   protected $uuidIndex;
 
   /**
-   * @var \Drupal\multiversion\Entity\Index\RevisionIndexInterface
+   * @var \Drupal\relaxed\Entity\Index\RevisionIndexInterface
    */
   protected $revIndex;
 
-  /**
-   * @var \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface
-   */
-  protected $revTree;
+
 
   /**
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -37,11 +34,10 @@ class DocIdConverter implements ParamConverterInterface {
    * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
    * @param \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface $rev_tree
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, RevisionTreeIndexInterface $rev_tree) {
+  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index) {
     $this->entityManager = $entity_manager;
     $this->uuidIndex = $uuid_index;
     $this->revIndex = $rev_index;
-    $this->revTree = $rev_tree;
   }
 
   /**

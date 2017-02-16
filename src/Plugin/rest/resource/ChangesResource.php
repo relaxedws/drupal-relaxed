@@ -3,8 +3,8 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\replication\Changes\ChangesInterface;
-use Drupal\replication\ChangesFactoryInterface;
+use Drupal\workspace\Changes\ChangesInterface;
+use Drupal\workspace\Changes\ChangesFactoryInterface;
 use Drupal\rest\ResourceResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -60,7 +60,7 @@ class ChangesResource extends ResourceBase {
       $plugin_definition,
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
-      $container->get('replication.changes_factory')
+      $container->get('workspace.changes_factory')
     );
   }
 
