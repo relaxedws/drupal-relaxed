@@ -77,7 +77,9 @@ class Remote extends ConfigEntityBase implements RemoteInterface {
   }
 
   public function withoutUserInfo() {
-    return $this->uri()->withUserInfo(null);
+    $user_info = $this->uri()->getUserInfo();
+    $uri = (string) $this->uri();
+    return str_replace($user_info . '@', '', $uri);
   }
 
   public function username() {

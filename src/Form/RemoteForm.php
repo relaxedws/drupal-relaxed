@@ -58,7 +58,7 @@ class RemoteForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => t('Full URL'),
       '#required' => TRUE,
-      '#default_value' => (string) $remote->withoutUserInfo(),
+      '#default_value' => $remote->withoutUserInfo(),
     ];
 
     $form['username'] = [
