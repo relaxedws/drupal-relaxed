@@ -6,9 +6,9 @@
  https://www.drupal.org/node/2116263 for details.
 -->
 <phpunit bootstrap="./core/tests/bootstrap.php" colors="true"
-         beStrictAboutTestsThatDoNotTestAnything="true"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutOutputDuringTests="false"
+         beStrictAboutChangesToGlobalState="false"
          checkForUnintentionallyCoveredCode="false">
   <php>
     <!-- Set error reporting to E_ALL. -->
@@ -18,7 +18,7 @@
     <!-- Example SIMPLETEST_BASE_URL value: http://localhost -->
     <env name="SIMPLETEST_BASE_URL" value="http://localhost:8080"/>
     <!-- Example SIMPLETEST_DB value: mysql://username:password@localhost/databasename#table_prefix -->
-    <env name="SIMPLETEST_DB" value="mysql://root:@localhost/drupal0"/>
+    <env name="SIMPLETEST_DB" value="mysql://root@localhost/drupal0"/>
     <!-- Example BROWSERTEST_OUTPUT_DIRECTORY value: /path/to/webroot/sites/simpletest/browser_output -->
     <env name="BROWSERTEST_OUTPUT_DIRECTORY" value=""/>
   </php>

@@ -16,10 +16,10 @@ class IntegrationTestSuite extends TestSuiteBase {
    *   The test suite.
    */
   public static function suite() {
-    $root = dirname(dirname(dirname(__DIR__)));
+    $path = dirname(__DIR__);
 
     $suite = new static('integration');
-    $suite->addTestsBySuiteNamespace($root, 'Integration');
+    $suite->addTestsBySuiteNamespace($path, 'Integration');
 
     return $suite;
   }
