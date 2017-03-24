@@ -18,12 +18,13 @@ abstract class TestSuiteBase extends CoreTestSuiteBase {
    * {@inheritdoc}
    */
   protected function addTestsBySuiteNamespace($root, $suite_namespace) {
-    if ($suite_namespace == 'Integration') {
-      $this->addTestFiles(TestDiscovery::scanDirectory("Drupal\\Tests\\", "$root/tests/src/$suite_namespace"));
-
-      $test_path = "$root/tests/src/$suite_namespace";
+    foreach ($this->findExtensionDirectories($root) as $extension_name => $dir) {
+      if ($extension_name !== 'relaxed' || $suite_namespace !== 'Integration') {
+        continue;
+      }
+      $test_path = "$dir/tests/src/$suite_namespace";
       if (is_dir($test_path)) {
-        $this->addTestFiles(TestDiscovery::scanDirectory("Drupal\\Tests\\relaxed\\$suite_namespace\\", $test_path));
+        $this->addTestFiles(TestDiscovery::scanDirectory("Drupal\\Tests\\$extension_name\\$suite_namespace\\", $test_path));
       }
     }
   }
