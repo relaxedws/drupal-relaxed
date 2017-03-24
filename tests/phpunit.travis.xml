@@ -15,7 +15,7 @@
     <!-- Example SIMPLETEST_BASE_URL value: http://localhost -->
     <env name="SIMPLETEST_BASE_URL" value=""/>
     <!-- Example SIMPLETEST_DB value: mysql://username:password@localhost/databasename#table_prefix -->
-    <env name="SIMPLETEST_DB" value="mysql://root@localhost/drupal0"/>
+    <env name="SIMPLETEST_DB" value="mysql://root:@localhost/drupal0"/>
   </php>
   <testsuites>
     <testsuite name="integration">
