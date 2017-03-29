@@ -25,46 +25,8 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
       return;
     }
 
-    $request = $event->getRequest();
     if ($this->isRelaxedRoute()) {
-      // @todo Review/refactor format negotiation.
-      // @see \Drupal\rest\EventSubscriber\ResourceResponseSubscriber::getResponseFormat().
-      $format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $this->isAttachment()) ? 'stream' : 'json';
-      $this->renderResponseBody($request, $response, $this->serializer, $format);
       $event->setResponse($this->flattenResponse($response));
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function renderResponseBody(Request $request, ResourceResponseInterface $response, SerializerInterface $serializer, $format) {
-    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
-    // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
-    $query = $request->query->all();
-    $resource_config_id = $this->routeMatch->getRouteObject()->getDefault('_rest_resource_config');
-    $context = array('query' => $query, 'resource_id' => $resource_config_id);
-
-    $render_contexts = [];
-    foreach ($responses as $response_part) {
-      if ($response_data = $response_part->getResponseData()) {
-        // Collect bubbleable metadata in a render context.
-        $render_context = new RenderContext();
-        $response_output = $this->renderer->executeInRenderContext($render_context, function() use ($serializer, $response_data, $format, $context) {
-          return $serializer->serialize($response_data, $format, $context);
-        });
-        if (!$render_context->isEmpty()) {
-          $render_contexts[] = $render_context->pop();
-        }
-        $response_part->setContent($response_output);
-      }
-      if (!$response_part->headers->get('Content-Type')) {
-        $response_part->headers->set('Content-Type', $request->getMimeType($format));
-      }
-    }
-
-    if ($request->getMethod() !== 'HEAD') {
-      $response->headers->set('Content-Length', strlen($response->getContent()));
     }
   }
 

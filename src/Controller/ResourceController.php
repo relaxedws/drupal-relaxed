@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -222,6 +223,35 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       return $this->errorResponse($e);
     }
 
+    $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
+      ? 'stream'
+      : 'json';
+
+    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
+
+    $render_contexts = [];
+    $serializer = $this->serializer();
+    foreach ($responses as $response_part) {
+      if ($response_data = $response_part->getResponseData()) {
+        // Collect bubbleable metadata in a render context.
+        $render_context = new RenderContext();
+        $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
+          return $serializer->serialize($response_data, $response_format, $context);
+        });
+        if (!$render_context->isEmpty()) {
+          $render_contexts[] = $render_context->pop();
+        }
+        $response_part->setContent($response_output);
+      }
+      if (!$response_part->headers->get('Content-Type')) {
+        $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
+      }
+    }
+
+    if ($request->getMethod() !== 'HEAD') {
+      $response->headers->set('Content-Length', strlen($response->getContent()));
+    }
+
     /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
     $resource_config = $this->resourceStorage->load($resource_config_id);
     if ($response instanceof CacheableResponseInterface) {
@@ -242,7 +272,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       }
     }
     $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']);
+    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match']);
     $this->addCacheableDependency($response, $cacheable_dependencies);
 
     return $response;
