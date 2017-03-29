@@ -56,7 +56,10 @@ before_install:
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
   - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
+  - php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable dblog || true
 
 script:
-  - cd ~/www
-  - travis_wait 15 bash $SCRIPT
+  - cd ~/www && bash $SCRIPT
+
+after_failure:
+  - php ~/drush.phar --uri=http://localhost:8080 watchdog-show

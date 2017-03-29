@@ -3,10 +3,10 @@
 namespace Drupal\Tests\relaxed\TestSuites;
 
 // If relaxed module is in modules/contrib directory.
-require_once __DIR__ . '/../../../../../../core/tests/TestSuites/TestSuiteBase.php';
+//require_once __DIR__ . '/../../../../../../core/tests/TestSuites/TestSuiteBase.php';
 
 // For TravisCI.
-//require_once __DIR__ . '/../../../../../../www/core/tests/TestSuites/TestSuiteBase.php';
+require_once __DIR__ . '/../../../../../../www/core/tests/TestSuites/TestSuiteBase.php';
 
 use Drupal\simpletest\TestDiscovery;
 use Drupal\Tests\TestSuites\TestSuiteBase as CoreTestSuiteBase;
