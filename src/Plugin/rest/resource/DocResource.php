@@ -89,9 +89,10 @@ class DocResource extends ResourceBase {
       $parts = array();
       $request = Request::createFromGlobals();
       // If not a JSON request then it's a request for multiple revisions.
-      if (strpos($request->headers->get('Accept'), 'multipart/mixed')  !== false) {
+      if ($request->headers->get('Accept') === 'multipart/mixed'
+        || ($request->headers->get('Accept') === '*/*' && $request->headers->get('multipart') === 'mixed')) {
         foreach ($revisions as $revision) {
-          $parts[] = new ResourceResponse($revision, 200);
+          $parts[] = new ResourceResponse($revision, 200, ['Content-Type' => 'application/json']);
         }
         return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
       }

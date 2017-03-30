@@ -23,44 +23,14 @@ function relaxed_install() {
       ],
     ])->save();
   }
-
-  // Keep this just for compatibility with Drupal 8.1.x.
-  // @todo Remove when we decide to not support Drupal 8.1.x.
-  $module_handler = \Drupal::moduleHandler();
-  // Merge 'resource' settings from relaxed module with 'resource' settings from rest module,
-  // these settings are not loaded if added to /config/install/rest.settings.yml.
-  // @todo {@link https://www.drupal.org/node/2599862 Figure out a better way to do this.}
-  $relaxed_resource_config = \Drupal::config('relaxed.settings')->get('resources');
-  $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
-  $rest_resource_config = $rest_config->get('resources');
-  // The rest module define settings for the node entity type but doesn't
-  // declare a dependency on node. This is causing trouble in some of our tests
-  // for some reason. So we remove those settings if the node modules is not
-  // enabled.
-  if (!$module_handler->moduleExists('node')) {
-    unset($rest_resource_config['entity:node']);
-  }
-  if (is_array($rest_resource_config)) {
-    $rest_config->set('resources', array_merge($rest_resource_config, $relaxed_resource_config))->save();
-  }
 }
 
 /**
- * Implements hook_uninstall().
+ * Load new rest configuration for RESTful Web Services module.
  */
-function relaxed_uninstall() {
-  // Keep this just for compatibility with Drupal 8.1.x.
-  // @todo Remove when we decide to not support Drupal 8.1.x.
-
-  // Remove 'resource' settings defined by RELAXed Web Services module from
-  // 'resource' settings defined by RESTful Web Services module.
-  $relaxed_resource_config = \Drupal::config('relaxed.settings')->get('resources');
-  $rest_config = \Drupal::configFactory()->getEditable('rest.settings');
-  $rest_resource_config = $rest_config->get('resources');
-  foreach ($relaxed_resource_config as $key => $item) {
-    if (isset($rest_resource_config[$key])) {
-      unset($rest_resource_config[$key]);
-    }
-  }
-  $rest_config->set('resources', $rest_resource_config)->save();
+function relaxed_update_8301() {
+  \Drupal::state()->set('relaxed_update_8301_resources', \Drupal::config('rest.settings')->get('resources'));
+  \Drupal::configFactory()->getEditable('rest.settings')
+    ->clear('resources')
+    ->save();
 }

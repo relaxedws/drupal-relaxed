@@ -121,7 +121,7 @@ abstract class ResourceTestBase extends RESTTestBase {
       $mime_type = $this->defaultMimeType;
     }
     if ($mime_type === $this->defaultMimeType && !isset($query['_format'])) {
-      $query[] = ['_format' => $this->defaultFormat];
+      $query['_format'] = $this->defaultFormat;
     }
     if (!in_array($method, array('GET', 'HEAD', 'OPTIONS', 'TRACE'))) {
       // GET the CSRF token first for writing requests.

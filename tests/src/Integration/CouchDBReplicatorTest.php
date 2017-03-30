@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\relaxed\Integration;
 
+require_once __DIR__ . '/ReplicationTestBase.php';
+
 /**
  * @group relaxed
  */
@@ -21,15 +23,13 @@ class CouchDBReplicatorTest extends ReplicationTestBase {
 
     // Run Drupal to CouchDB replication.
     $this->couchDbReplicate('http://replicator:replicator@localhost:8081/relaxed/live', $this->couchdb_url . "/$this->target_db");
-    $this->assertAllDocsNumber($this->couchdb_url . "/$this->target_db/_all_docs", 9);
+    $this->assertAllDocsNumber($this->couchdb_url . '/' . $this->target_db . '/_all_docs', 9);
 
     // Delete source database.
-    $response_code = $this->deleteDb($this->source_db);
-    $this->assertEquals(200, $response_code);
+    $this->deleteDb($this->source_db);
 
     // Delete target database.
-    $response_code = $this->deleteDb($this->target_db);
-    $this->assertEquals(200, $response_code);
+    $this->deleteDb($this->target_db);
   }
 
 }
