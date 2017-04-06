@@ -34,7 +34,7 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('relaxed.settings');
 
-    $form['api_root'] = array(
+    $form['api_root'] = [
       '#type' => 'textfield',
       '#title' => t('API root'),
       '#description' => t('Relaxed API root path, in the format "/relaxed".'),
@@ -42,27 +42,27 @@ class SettingsForm extends ConfigFormBase {
       '#size' => 60,
       '#maxlength' => 128,
       '#required' => TRUE,
-    );
+    ];
 
-    $form['creds'] = array(
+    $form['creds'] = [
       '#type' => 'fieldset',
       '#title' => t('Default replicator credentials'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
-    );
-    $form['creds']['username'] = array(
+    ];
+    $form['creds']['username'] = [
       '#type' => 'textfield',
       '#title' => t('username'),
       '#default_value' => $config->get('username'),
       '#size' => 60,
       '#maxlength' => 128,
-    );
-    $form['creds']['password'] = array(
+    ];
+    $form['creds']['password'] = [
       '#type' => 'password',
       '#title' => t('password'),
       '#size' => 60,
       '#maxlength' => 128,
-    );
+    ];
 
     return parent::buildForm($form, $form_state);
   }

@@ -25,7 +25,7 @@ class MultipartResponse extends Response
   /**
    * Constructor.
    */
-  public function __construct(array $parts = null, $status = 200, $headers = array(), $subtype = null)
+  public function __construct(array $parts = null, $status = 200, $headers = [], $subtype = null)
   {
     parent::__construct(null, $status, $headers);
 

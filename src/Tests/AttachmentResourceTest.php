@@ -220,7 +220,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
     /** @var \Drupal\file\FileInterface $file */
-    $files = \Drupal::entityManager()->getStorage('file')->loadByProperties(array('uri' => $file_uri));
+    $files = \Drupal::entityManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
     $file = reset($files);
     $this->assertTrue(!empty($file), 'File was saved.');
     $this->assertEqual($file->getFileUri(), $file_uri, 'File was saved with the correct URI.');

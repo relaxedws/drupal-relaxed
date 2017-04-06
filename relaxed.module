@@ -180,10 +180,10 @@ function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
   $fields['remote_database'] = BaseFieldDefinition::create('string')
     ->setLabel(t('Remote database'))
     ->setDescription(t('The remote database name.'))
-    ->setSettings(array(
+    ->setSettings([
       'max_length' => 50,
       'text_processing' => 0,
-    ))
+    ])
     ->setRevisionable(TRUE);
 
   return $fields;

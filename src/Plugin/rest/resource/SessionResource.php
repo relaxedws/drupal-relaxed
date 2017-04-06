@@ -33,14 +33,14 @@ class SessionResource extends ResourceBase {
     }
 
     $response = new ResourceResponse(
-      array(
-        'info' => array(),
+      [
+        'info' => [],
         'ok' => TRUE,
-        'userCtx' => array(
+        'userCtx' => [
           'user' => $account->getAccountName(),
           'roles' => $roles,
-        ),
-      ),
+        ],
+      ],
       200
     );
 

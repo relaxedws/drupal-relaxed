@@ -24,15 +24,15 @@ class RootResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
 
-    $expected = array(
+    $expected = [
       'couchdb' => 'Welcome',
       'uuid' => \Drupal::config('system.site')->get('uuid'),
-      'vendor' => array(
+      'vendor' => [
         'name' => 'Drupal',
         'version' => \Drupal::VERSION,
-      ),
+      ],
       'version' => \Drupal::VERSION,
-    );
+    ];
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
   }
 

@@ -53,7 +53,7 @@ class AttachmentResource extends ResourceBase {
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    return new ResourceResponse(NULL, 200, $this->responseHeaders($file, array('Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag')));
+    return new ResourceResponse(NULL, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
   }
 
   /**
@@ -76,7 +76,7 @@ class AttachmentResource extends ResourceBase {
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    return new ResourceResponse($file, 200, $this->responseHeaders($file, array('Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag')));
+    return new ResourceResponse($file, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
   }
 
   /**
@@ -118,8 +118,8 @@ class AttachmentResource extends ResourceBase {
       $entity->{$field_name}->get($delta)->target_id = $file->id();
       $entity->save();
 
-      $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value);
-      return new ResourceResponse($data, 200, $this->responseHeaders($file, array('Content-MD5', 'X-Relaxed-ETag')));
+      $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value];
+      return new ResourceResponse($data, 200, $this->responseHeaders($file, ['Content-MD5', 'X-Relaxed-ETag']));
     }
     // @todo {@link https://www.drupal.org/node/2599912 Catch more generic
     // exceptions here and on other places.}
@@ -160,8 +160,8 @@ class AttachmentResource extends ResourceBase {
       unset($entity->{$field_name}[$delta]);
       $entity->save();
       $rev = $entity->_rev->value;
-      $data = array('ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev);
-      return new ResourceResponse($data, 200, array('X-Relaxed-ETag'), $rev);
+      $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev];
+      return new ResourceResponse($data, 200, ['X-Relaxed-ETag'], $rev);
     }
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage());
@@ -176,18 +176,18 @@ class AttachmentResource extends ResourceBase {
    * @param int $rev
    * @return array
    */
-  protected function responseHeaders(FileInterface $file, $headers_to_include = array(), $rev = NULL) {
+  protected function responseHeaders(FileInterface $file, $headers_to_include = [], $rev = NULL) {
     $file_contents = file_get_contents($file->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
 
-    $all_headers = array(
+    $all_headers = [
       'Content-Type' => $file->getMimeType(),
       'X-Relaxed-ETag' => $rev ?: $encoded_digest,
       'Content-Length' => $file->getSize(),
       'Content-MD5' => $encoded_digest,
-    );
+    ];
 
-    $return = array();
+    $return = [];
     foreach ($headers_to_include as $header) {
       $return[$header] = $all_headers[$header];
     }

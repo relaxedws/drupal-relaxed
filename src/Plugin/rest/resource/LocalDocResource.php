@@ -33,7 +33,7 @@ class LocalDocResource extends DocResource {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
-    $revisions = is_array($existing) ? $existing : array($existing);
+    $revisions = is_array($existing) ? $existing : [$existing];
 
     if ($revisions[0] instanceof ContentEntityInterface && !$revisions[0]->getEntityType()->get('local')) {
       throw new BadRequestHttpException('This endpoint only support local entity types.');
@@ -53,7 +53,7 @@ class LocalDocResource extends DocResource {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
-    $revisions = is_array($existing) ? $existing : array($existing);
+    $revisions = is_array($existing) ? $existing : [$existing];
 
     if ($revisions[0] instanceof ContentEntityInterface && !$revisions[0]->getEntityType()->get('local')) {
       throw new BadRequestHttpException('This endpoint only support local entity types.');

@@ -36,23 +36,23 @@ class RemoteForm extends EntityForm {
     $form = parent::form($form, $form_state);
 
     $remote = $this->entity;
-    $form['label'] = array(
+    $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $remote->label(),
       '#description' => $this->t("Label for the Remote."),
       '#required' => TRUE,
-    );
+    ];
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $remote->id(),
-      '#machine_name' => array(
+      '#machine_name' => [
         'exists' => '\Drupal\relaxed\Entity\Remote::load',
-      ),
+      ],
       '#disabled' => !$remote->isNew(),
-    );
+    ];
 
     $form['uri'] = [
       '#type' => 'textfield',

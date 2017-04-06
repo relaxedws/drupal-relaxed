@@ -44,7 +44,7 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
    * @return array
    */
   protected function getParameters(Request $request) {
-    $parameters = array();
+    $parameters = [];
     foreach ($request->attributes->get('_route_params') as $key => $parameter) {
       // We don't want private parameters.
       if ($key{0} !== '_') {

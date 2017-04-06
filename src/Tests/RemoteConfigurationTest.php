@@ -17,13 +17,13 @@ class RemoteConfigurationTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array(
+  public static $modules = [
     'file',
     'multiversion',
     'rest',
     'relaxed',
     'relaxed_test'
-  );
+  ];
 
   protected $strictConfigSchema = FALSE;
 
@@ -54,7 +54,7 @@ class RemoteConfigurationTest extends WebTestBase {
     $this->assertNoText('You have to install the Workspace module prior to setting up new workspaces.');
 
     // Make a POST request to the individual Remote configuration page.
-    $edit = array();
+    $edit = [];
     $label = $this->randomMachineName();
     $edit['label'] = $label;
     $edit['id'] = strtolower($label);
@@ -70,7 +70,7 @@ class RemoteConfigurationTest extends WebTestBase {
     $this->clickLink(t('Edit'));
     preg_match('|admin/config/services/relaxed/(.+)/edit|', $this->getUrl(), $matches);
     $aid = $matches[1];
-    $edit = array();
+    $edit = [];
     $new_label = $this->randomMachineName();
     $edit['label'] = $new_label;
     $edit['username'] = 'user';
@@ -88,7 +88,7 @@ class RemoteConfigurationTest extends WebTestBase {
     $this->drupalGet('admin/config/services/relaxed');
     $this->clickLink(t('Delete'));
     $this->assertResponse(200);
-    $edit = array();
+    $edit = [];
     $this->drupalPostForm("admin/config/services/relaxed/$aid/delete", $edit, t('Delete'));
     $this->assertResponse(200);
 

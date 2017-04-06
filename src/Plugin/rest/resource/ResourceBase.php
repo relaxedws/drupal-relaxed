@@ -14,7 +14,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
    * {@inheritdoc}
    */
   public function routes() {
-    $this->serializerFormats = array_merge($this->serializerFormats, array('mixed', 'related'));
+    $this->serializerFormats = array_merge($this->serializerFormats, ['mixed', 'related']);
     $collection = new RouteCollection();
     $definition = $this->getPluginDefinition();
     $api_root = trim(\Drupal::config('relaxed.settings')->get('api_root'), '/');
@@ -34,19 +34,19 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       }
 
       $method_lower = strtolower($method);
-      $route = new Route($api_root . $definition['uri_paths']['canonical'], array(
+      $route = new Route($api_root . $definition['uri_paths']['canonical'], [
         '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
         '_plugin' => $this->pluginId,
-      ), array(
+      ], [
         '_permission' => "restful " . $method_lower . " $this->pluginId" . "+$permissions",
-      ),
-        array(
+      ],
+        [
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
-        ),
+        ],
         '',
-        array(),
+        [],
         // The HTTP method is a requirement for this route.
-        array($method)
+        [$method]
       );
 
       if (isset($definition['uri_paths'][$method_lower])) {
@@ -55,19 +55,19 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
       // logic to a generic route enhancer instead.}
-      $parameters = array();
-      foreach (array('db', 'docid') as $parameter) {
+      $parameters = [];
+      foreach (['db', 'docid'] as $parameter) {
         if (strpos($route->getPath(), '{' . $parameter . '}')) {
-          $parameters[$parameter] = array('type' => 'relaxed:' . $parameter);
+          $parameters[$parameter] = ['type' => 'relaxed:' . $parameter];
         }
       }
       if (!empty($definition['uri_parameters']['canonical'])) {
         foreach ($definition['uri_parameters']['canonical'] as $parameter => $type) {
-          $parameters[$parameter] = array('type' => $type);
+          $parameters[$parameter] = ['type' => $type];
         }
       }
       if ($parameters) {
-        $route->addOptions(array('parameters' => $parameters));
+        $route->addOptions(['parameters' => $parameters]);
       }
 
       switch ($method) {
@@ -75,7 +75,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         case 'PUT':
           // Restrict on the Content-Type header.
           if (!$this->isAttachment()) {
-            $route->addRequirements(array('_content_type_format' => implode('|', $this->serializerFormats)));
+            $route->addRequirements(['_content_type_format' => implode('|', $this->serializerFormats)]);
           }
           $collection->add("$route_name.$method", $route);
           break;
@@ -87,7 +87,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         case 'DELETE':
           foreach ($this->serializerFormats as $format) {
             $format_route = clone $route;
-            $format_route->addRequirements(array('_format' => $format));
+            $format_route->addRequirements(['_format' => $format]);
             $collection->add("$route_name.$method.$format", $format_route);
           }
           break;
@@ -108,7 +108,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
     $violations->filterByFieldAccess();
 
     if (count($violations) > 0) {
-      $messages = array();
+      $messages = [];
       foreach ($violations as $violation) {
         $messages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
       }

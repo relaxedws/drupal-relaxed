@@ -7,14 +7,14 @@ use Drupal\rest\Tests\RESTTestBase;
 
 abstract class ResourceTestBase extends RESTTestBase {
 
-  public static $modules = array(
+  public static $modules = [
     'entity_test',
     'file',
     'multiversion',
     'rest',
     'relaxed',
     'relaxed_test'
-  );
+  ];
 
   protected $strictConfigSchema = FALSE;
 
@@ -67,7 +67,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     parent::setUp();
     $this->defaultFormat = 'json';
     $this->defaultMimeType = 'application/json';
-    $this->defaultAuth = array('cookie');
+    $this->defaultAuth = ['cookie'];
     $this->apiRoot = \Drupal::config('relaxed.settings')->get('api_root');
 
     $this->multiversionManager = $this->container->get('multiversion.manager');
@@ -92,14 +92,14 @@ abstract class ResourceTestBase extends RESTTestBase {
 
     // Extending with further entity types.
     if (!$return) {
-      if (in_array($entity_type, array('entity_test_rev', 'entity_test_local'))) {
+      if (in_array($entity_type, ['entity_test_rev', 'entity_test_local'])) {
         switch ($operation) {
           case 'view':
-            return array('view test entity');
+            return ['view test entity'];
           case 'create':
           case 'update':
           case 'delete':
-            return array('administer entity_test content');
+            return ['administer entity_test content'];
         }
       }
     }
@@ -123,11 +123,11 @@ abstract class ResourceTestBase extends RESTTestBase {
     if ($mime_type === $this->defaultMimeType && !isset($query['_format'])) {
       $query['_format'] = $this->defaultFormat;
     }
-    if (!in_array($method, array('GET', 'HEAD', 'OPTIONS', 'TRACE'))) {
+    if (!in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'])) {
       // GET the CSRF token first for writing requests.
       $token = $this->drupalGet('rest/session/token');
     }
-    $additional_headers = array();
+    $additional_headers = [];
     if (is_array($headers)) {
       foreach ($headers as $name => $value) {
         $name = mb_convert_case($name, MB_CASE_TITLE);
@@ -135,109 +135,109 @@ abstract class ResourceTestBase extends RESTTestBase {
       }
     }
     // Set query if there are additional parameters.
-    $options = isset($query) ? array('absolute' => TRUE, 'query' => $query) : array('absolute' => TRUE);
-    $curl_options = array();
+    $options = isset($query) ? ['absolute' => TRUE, 'query' => $query] : ['absolute' => TRUE];
+    $curl_options = [];
     switch ($method) {
       case 'GET':
         $get_headers = array_merge(
-          array(
+          [
             'Accept: ' . $mime_type,
-          ),
+          ],
           $additional_headers
         );
-        $curl_options = array(
+        $curl_options = [
           CURLOPT_HTTPGET => TRUE,
           CURLOPT_CUSTOMREQUEST => 'GET',
           CURLOPT_URL => $this->buildUrl($url, $options),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $get_headers,
-        );
+        ];
         break;
 
       case 'HEAD':
         $head_headers = array_merge(
-          array(
+          [
             'Accept: ' . $mime_type,
-          ),
+          ],
           $additional_headers
         );
-        $curl_options = array(
+        $curl_options = [
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'HEAD',
           CURLOPT_URL => $this->buildUrl($url, $options),
           CURLOPT_NOBODY => TRUE,
           CURLOPT_HTTPHEADER => $head_headers,
-        );
+        ];
         break;
 
       case 'POST':
         $post_headers = array_merge(
-          array(
+          [
             'Content-Type: ' . $mime_type,
             'X-CSRF-Token: ' . $token,
-          ),
+          ],
           $additional_headers
         );
-        $curl_options = array(
+        $curl_options = [
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_POST => TRUE,
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => $this->buildUrl($url, array('absolute' => TRUE)),
+          CURLOPT_URL => $this->buildUrl($url, ['absolute' => TRUE]),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $post_headers,
-        );
+        ];
         break;
 
       case 'PUT':
         $put_headers = array_merge(
-          array(
+          [
             'Content-Type: ' . $mime_type,
             'X-CSRF-Token: ' . $token,
-          ),
+          ],
           $additional_headers
         );
-        $curl_options = array(
+        $curl_options = [
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PUT',
           CURLOPT_POSTFIELDS => $body,
           CURLOPT_URL => $this->buildUrl($url, $options),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $put_headers,
-        );
+        ];
         break;
 
       case 'PATCH':
         $patch_headers = array_merge(
-          array(
+          [
             'Content-Type: ' . $mime_type,
             'X-CSRF-Token: ' . $token,
-          ),
+          ],
           $additional_headers
         );
-        $curl_options = array(
+        $curl_options = [
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'PATCH',
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => $this->buildUrl($url, array('absolute' => TRUE)),
+          CURLOPT_URL => $this->buildUrl($url, ['absolute' => TRUE]),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $patch_headers,
-        );
+        ];
         break;
 
       case 'DELETE':
         $delete_headers = array_merge(
-          array(
+          [
             'X-CSRF-Token: ' . $token,
-          ),
+          ],
           $additional_headers
         );
-        $curl_options = array(
+        $curl_options = [
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_CUSTOMREQUEST => 'DELETE',
           CURLOPT_URL => $this->buildUrl($url, $options),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $delete_headers,
-        );
+        ];
         break;
     }
 

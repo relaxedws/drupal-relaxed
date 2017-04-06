@@ -44,7 +44,7 @@ class DocResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
-    $revisions = is_array($existing) ? $existing : array($existing);
+    $revisions = is_array($existing) ? $existing : [$existing];
 
     foreach ($revisions as $revision) {
       if (!$revision->access('view')) {
@@ -53,7 +53,7 @@ class DocResource extends ResourceBase {
     }
 
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse(NULL, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
+    return new ResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
   }
 
   /**
@@ -67,7 +67,7 @@ class DocResource extends ResourceBase {
       throw new NotFoundHttpException();
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
-    $revisions = is_array($existing) ? $existing : array($existing);
+    $revisions = is_array($existing) ? $existing : [$existing];
 
     foreach ($revisions as $revision) {
       $entity_type_id = $revision->getEntityTypeId();
@@ -86,7 +86,7 @@ class DocResource extends ResourceBase {
     $result = $revisions[0];
 
     if (is_array($existing)) {
-      $parts = array();
+      $parts = [];
       $request = Request::createFromGlobals();
       // If not a JSON request then it's a request for multiple revisions.
       if ($request->headers->get('Accept') === 'multipart/mixed'
@@ -94,12 +94,12 @@ class DocResource extends ResourceBase {
         foreach ($revisions as $revision) {
           $parts[] = new ResourceResponse($revision, 200, ['Content-Type' => 'application/json']);
         }
-        return new ResourceMultipartResponse($parts, 200, array('Content-Type' => 'multipart/mixed'));
+        return new ResourceMultipartResponse($parts, 200, ['Content-Type' => 'multipart/mixed']);
       }
       else {
-        $result = array();
+        $result = [];
         foreach ($revisions as $revision) {
-          $result[] = array('ok' => $revision);
+          $result[] = ['ok' => $revision];
         }
       }
     }
@@ -110,7 +110,7 @@ class DocResource extends ResourceBase {
       $result = $revisions[0];
     }
 
-    return new ResourceResponse($result, 200, array('X-Relaxed-ETag' => $revisions[0]->_rev->value));
+    return new ResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
   }
 
   /**
@@ -133,7 +133,7 @@ class DocResource extends ResourceBase {
     foreach ($received_entity as $field_name => $field) {
       // @todo {@link https://www.drupal.org/node/2600438 Sanity check this.}
       if (!$field->access('create') && $field_name != 'pass') {
-        throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+        throw new AccessDeniedHttpException(t('Access denied on creating field @field.', ['@field' => $field_name]));
       }
     }
 
@@ -155,8 +155,8 @@ class DocResource extends ResourceBase {
     try {
       $received_entity->save();
       $rev = $received_entity->_rev->value;
-      $data = array('ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev);
-      return new ResourceResponse($data, 201, array('X-Relaxed-ETag' => $rev));
+      $data = ['ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev];
+      return new ResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, $e->getMessage());
@@ -192,7 +192,7 @@ class DocResource extends ResourceBase {
       throw new HttpException(500, NULL, $e);
     }
 
-    return new ResourceResponse(array('ok' => TRUE), 200);
+    return new ResourceResponse(['ok' => TRUE], 200);
   }
 
   /**
@@ -227,7 +227,7 @@ class DocResource extends ResourceBase {
    * @param \Drupal\file\FileInterface $file
    */
   public function putAttachment(FileInterface $file) {
-    Cache::invalidateTags(array('file_list'));
+    Cache::invalidateTags(['file_list']);
     try {
       $file->save();
     }

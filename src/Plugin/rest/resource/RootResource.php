@@ -20,15 +20,15 @@ class RootResource extends ResourceBase {
    */
   public function get() {
     return new ResourceResponse(
-      array(
+      [
         'couchdb' => t('Welcome'),
         'uuid' => \Drupal::config('system.site')->get('uuid'),
-        'vendor' => array(
+        'vendor' => [
           'name' => 'Drupal',
           'version' => \Drupal::VERSION,
-        ),
+        ],
         'version' => \Drupal::VERSION,
-      ),
+      ],
       200
     );
   }

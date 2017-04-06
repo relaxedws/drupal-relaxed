@@ -23,7 +23,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
-      $data = array('docs' => []);
+      $data = ['docs' => []];
       foreach ($this->createTestEntities($entity_type) as $entity) {
         $data['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
       }

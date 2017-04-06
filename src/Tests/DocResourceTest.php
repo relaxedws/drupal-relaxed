@@ -69,7 +69,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertHeader('x-relaxed-etag', $second_rev);
 
       // Test the response for a fake revision using if-none-match header.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, array('if-none-match' => '11112222333344445555'));
+      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => '11112222333344445555']);
       $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }

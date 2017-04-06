@@ -102,7 +102,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     $plugin_id = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getDefault('_plugin');
     return $this->container()
       ->get('plugin.manager.rest')
-      ->getInstance(array('id' => $plugin_id));
+      ->getInstance(['id' => $plugin_id]);
   }
 
   /**
@@ -111,7 +111,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    * @return array
    */
   protected function getParameters(RouteMatchInterface $route_match) {
-    $parameters = array();
+    $parameters = [];
     foreach ($route_match->getParameters() as $key => $parameter) {
       // We don't want private parameters.
       if ($key{0} !== '_') {
@@ -150,12 +150,12 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     }
 
     $content = '';
-    $headers = array();
+    $headers = [];
     // We shouldn't respond with content for HEAD requests.
     if ($this->request->getMethod() != 'HEAD') {
       $format = $this->getFormat();
-      $headers = array('Content-Type' => $this->request->getMimeType($format));
-      $data = array('error' => $error, 'reason' => $reason);
+      $headers = ['Content-Type' => $this->request->getMimeType($format)];
+      $data = ['error' => $error, 'reason' => $reason];
       $content = $this->serializer()->serialize($data, $format);
     }
     watchdog_exception('Relaxed', $e);
@@ -182,7 +182,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
     $query = $this->request->query->all();
     $resource_config_id = $route_match->getRouteObject()->getDefault('_rest_resource_config');
-    $context = array('query' => $query, 'resource_id' => $resource_config_id);
+    $context = ['query' => $query, 'resource_id' => $resource_config_id];
     $entity = NULL;
     $definition = $resource->getPluginDefinition();
     if (!empty($content)) {
@@ -213,7 +213,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       $render_context = new RenderContext();
       /** @var \Drupal\rest\ResourceResponse $response */
       $response = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($resource, $method, $parameters, $entity, $request) {
-        return call_user_func_array(array($resource, $method), array_merge($parameters, array($entity, $request)));
+        return call_user_func_array([$resource, $method], array_merge($parameters, [$entity, $request]));
       });
       if (!$render_context->isEmpty()) {
         $render_contexts[] = $render_context->pop();
@@ -223,11 +223,11 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       return $this->errorResponse($e);
     }
 
-    $response_format = (in_array($request->getMethod(), array('GET', 'HEAD')) && $format == 'stream')
+    $response_format = (in_array($request->getMethod(), ['GET', 'HEAD']) && $format == 'stream')
       ? 'stream'
       : 'json';
 
-    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : array($response);
+    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
 
     $render_contexts = [];
     $serializer = $this->serializer();
@@ -285,7 +285,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    *   The response object.
    */
   public function csrfToken() {
-    return new Response(\Drupal::csrfToken()->get('rest'), 200, array('Content-Type' => 'text/plain'));
+    return new Response(\Drupal::csrfToken()->get('rest'), 200, ['Content-Type' => 'text/plain']);
   }
 
   /**

@@ -15,7 +15,7 @@ class SessionResourceTest extends ResourceTestBase {
     $this->enableService('relaxed:session', 'GET');
 
     // Create a user with the correct permissions and admin role.
-    $permissions = array('restful get relaxed:session', 'administer permissions', 'administer users');
+    $permissions = ['restful get relaxed:session', 'administer permissions', 'administer users'];
     $account = $this->drupalCreateUser($permissions, 'test_admin_user');
     $roles = $account->getRoles();
     $this->drupalLogin($account);
@@ -26,26 +26,26 @@ class SessionResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
 
-    $roles = array(
+    $roles = [
       'authenticated',
       $roles[1],
       '_admin',
-    );
-    $expected = array(
-      'info' => array(),
+    ];
+    $expected = [
+      'info' => [],
       'ok' => TRUE,
-      'userCtx' => array(
+      'userCtx' => [
         'user' => 'test_admin_user',
         'roles' => $roles,
-      ),
-    );
+      ],
+    ];
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
 
     // Logout the test_admin_user user.
     $this->drupalLogout();
 
     // Create a simple user with the correct permissions (no admin role).
-    $permissions = array('restful get relaxed:session');
+    $permissions = ['restful get relaxed:session'];
     $account = $this->drupalCreateUser($permissions, 'test_user');
     $roles = $account->getRoles();
     $this->drupalLogin($account);
@@ -55,14 +55,14 @@ class SessionResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
 
-    $expected = array(
-      'info' => array(),
+    $expected = [
+      'info' => [],
       'ok' => TRUE,
-      'userCtx' => array(
+      'userCtx' => [
         'user' => 'test_user',
         'roles' => $roles,
-      ),
-    );
+      ],
+    ];
     $this->assertIdentical($expected, $data, ('Correct values in response.'));
 
     // Create a user with the 'perform pull replication' permission and test the

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class MultipartResponse extends Response
 {
   /** @var StreamInterface[] */
-  private $bodies = array();
+  private $bodies = [];
 
   /**
    * {@inheritdoc}

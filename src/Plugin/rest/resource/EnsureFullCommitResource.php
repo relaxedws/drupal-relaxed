@@ -29,10 +29,10 @@ class EnsureFullCommitResource extends ResourceBase {
       throw new BadRequestHttpException(t('Database does not exist'));
     }
 
-    $response_data = array(
+    $response_data = [
       'ok' => TRUE,
       'instance_start_time' => (string) $workspace->getStartTime(),
-    );
+    ];
 
     return new ResourceResponse($response_data, 201);
   }

@@ -88,7 +88,7 @@ class DbResource extends ResourceBase {
     catch (EntityStorageException $e) {
       throw new HttpException(500, t('Internal server error'), $e);
     }
-    $response = new ResourceResponse(array('ok' => TRUE), 201);
+    $response = new ResourceResponse(['ok' => TRUE], 201);
     $response->addCacheableDependency($entity);
 
     return $response;
@@ -123,11 +123,11 @@ class DbResource extends ResourceBase {
       if ($entity instanceof UserInterface) {
         // For user fields we need to check 'edit' permissions.
         if (!$field->access('edit')) {
-          throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+          throw new AccessDeniedHttpException(t('Access denied on creating field @field.', ['@field' => $field_name]));
         }
       }
       elseif (!$field->access('create')) {
-        throw new AccessDeniedHttpException(t('Access denied on creating field @field.', array('@field' => $field_name)));
+        throw new AccessDeniedHttpException(t('Access denied on creating field @field.', ['@field' => $field_name]));
       }
     }
 
@@ -160,7 +160,7 @@ class DbResource extends ResourceBase {
     catch (\Exception $e) {
       throw new HttpException(500, NULL, $e);
     }
-    $response = new ResourceResponse(array('ok' => TRUE), 200);
+    $response = new ResourceResponse(['ok' => TRUE], 200);
     $response->addCacheableDependency($entity);
 
     return $response;
