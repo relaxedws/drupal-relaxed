@@ -61,10 +61,18 @@ before_install:
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
   - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
-  - php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable dblog || true
 
 script:
   - cd ~/www && bash $SCRIPT
 
 after_script:
-  - if [ $COUCHDB_VERSION ]; then cat /var/log/couchdb/couch.log; fi
+  # -----------------------
+  - cat /tmp/error.log
+  # -----------------------
+  - cat /tmp/access8080.log
+  # -----------------------
+  - cat /tmp/error8080.log
+  # -----------------------
+  - cat /tmp/access8081.log
+  # -----------------------
+  - cat /tmp/error8081.log
