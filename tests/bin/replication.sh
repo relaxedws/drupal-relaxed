@@ -13,4 +13,7 @@ php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxe
 
 composer update
 
+# Check CouchDB installation.
+curl http://localhost:5984
+
 vendor/phpunit/phpunit/phpunit --verbose --debug --configuration phpunit.travis.xml --bootstrap core/tests/bootstrap.php

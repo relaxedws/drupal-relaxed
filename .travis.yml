@@ -12,7 +12,7 @@ matrix:
 
 services:
   - mysql
-  - couchdb
+  - docker
 
 addons:
   apt:
@@ -23,16 +23,19 @@ env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.2.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.3.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.3.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml COUCHDB_VERSION=1.6.1
 
 matrix:
   allow_failures:
     - env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.2.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml COUCHDB_VERSION=2.0-dev
+    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml COUCHDB_VERSION=1.6.1
   fast_finish: true
 
 notifications:
@@ -52,6 +55,8 @@ before_install:
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
+  # Install CouchDB.
+  - if [ $COUCHDB_VERSION ]; then docker run -d -p 5984:5984 klaemo/couchdb:$COUCHDB_VERSION; fi
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
