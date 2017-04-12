@@ -66,5 +66,5 @@ install:
 script:
   - cd ~/www && bash $SCRIPT
 
-after_failure:
-  - php ~/drush.phar --uri=http://localhost:8080 watchdog-show
+after_script:
+  - if [ $COUCHDB_VERSION ]; then cat /var/log/couchdb/couch.log; fi
