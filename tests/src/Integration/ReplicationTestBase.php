@@ -14,6 +14,13 @@ abstract class ReplicationTestBase extends KernelTestBase {
   protected $strictConfigSchema = FALSE;
 
   /**
+   * CouchDB port.
+   *
+   * @var int
+   */
+  protected $port;
+
+  /**
    * CouchDB source database name.
    *
    * @var string
@@ -66,7 +73,8 @@ abstract class ReplicationTestBase extends KernelTestBase {
 
     $this->source_db = 'source';
     $this->target_db = 'target';
-    $this->couchdb_url = 'http://localhost:5984';
+    $this->port = getenv('COUCH_PORT') ?: 5984;
+    $this->couchdb_url = 'http://localhost:' . $this->port;
 
     // Create a source database.
     $response_code = $this->createDb($this->source_db);

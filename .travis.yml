@@ -56,7 +56,7 @@ before_install:
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
-  - if [ $COUCHDB_VERSION ]; then docker run -d -p 5984:5984 klaemo/couchdb:$COUCHDB_VERSION; fi
+  - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
