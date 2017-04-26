@@ -96,6 +96,10 @@ class SettingsForm extends ConfigFormBase {
     if (!preg_match('/\A\/[^\/]*\z/', $api_root)) {
       $form_state->setErrorByName('api_root', 'API root must start, but not end with a slash.');
     }
+    
+    if ($form_state->getValue('set_custom_url') && $form_state->getValue('custom_url') == '') {
+      $form_state->setErrorByName('custom_url', 'Custom URL field can\'t be empty when Set custom URL is true.');
+    }
 
     $config = $this->config('relaxed.settings');
     $username = $form_state->getValue('username');
