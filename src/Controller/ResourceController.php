@@ -201,7 +201,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
         }
       }
       $this->logger->critical('Lock exists on relaxed request. Waiting.');
-    } while ($this->lock->wait('relaxed_request', 200000));
+    } while ($this->lock->wait('relaxed_request', 120000));
 
     $this->request = $request;
 
