@@ -4,6 +4,7 @@ namespace Drupal\relaxed\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\link\LinkItemInterface;
 
 /**
  * Class SettingsForm.
@@ -42,6 +43,24 @@ class SettingsForm extends ConfigFormBase {
       '#size' => 60,
       '#maxlength' => 128,
       '#required' => TRUE,
+    ];
+
+    $form['set_custom_url'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $config->get('set_custom_url'),
+      '#title' => $this->t('Set custom URL'),
+    ];
+
+    $form['custom_url'] = [
+      '#type' => 'url',
+      '#title' => $this->t('Custom URL'),
+      '#default_value' => $config->get('custom_url'),
+      '#description' => t('This URL will be used instead of the base site URL. Don\'t add the api_root to the URL. Example: https://www.example.com.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="set_custom_url"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $form['creds'] = [
@@ -100,6 +119,8 @@ class SettingsForm extends ConfigFormBase {
 
     $config
       ->set('api_root', $form_state->getValue('api_root'))
+      ->set('set_custom_url', $form_state->getValue('set_custom_url'))
+      ->set('custom_url', $form_state->getValue('custom_url'))
       ->set('username', $form_state->getValue('username'))
       ->set('password', base64_encode($password))
       ->save();

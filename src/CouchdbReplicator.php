@@ -94,9 +94,16 @@ class CouchdbReplicator implements ReplicatorInterface{
       $api_root = trim($this->relaxedSettings->get('api_root'), '/');
       /** @var WorkspaceInterface $workspace */
       $workspace = $pointer->getWorkspace();
-      $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), [])
-        ->setAbsolute()
-        ->toString();
+      if ($this->relaxedSettings->get('set_custom_url')) {
+        $url = preg_replace('{/$}', '', $this->relaxedSettings->get('custom_url'));
+        $url = Url::fromUri($url . '/' . $api_root . '/' . $workspace->getMachineName(), [])
+          ->toString();
+      }
+      else {
+        $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), [])
+          ->setAbsolute()
+          ->toString();
+      }
       $uri = new Uri($url);
       $uri = $uri->withUserInfo(
         $this->relaxedSettings->get('username'),
