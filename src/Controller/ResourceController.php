@@ -6,6 +6,8 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
@@ -45,20 +47,38 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   protected $resourceStorage;
 
   /**
+   * @var \Drupal\Core\Lock\LockBackendInterface
+   */
+  protected $lock;
+
+  /**
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  private $logger;
+
+  /**
    * Creates a new RequestHandler instance.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
    *   The resource configuration storage.
+   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    */
-  public function __construct(EntityStorageInterface $entity_storage) {
+  public function __construct(EntityStorageInterface $entity_storage, LockBackendInterface $lock, LoggerChannelInterface $logger) {
     $this->resourceStorage = $entity_storage;
+    $this->lock = $lock;
+    $this->logger = $logger;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('entity_type.manager')->getStorage('rest_resource_config'));
+    return new static(
+      $container->get('entity_type.manager')->getStorage('rest_resource_config'),
+      $container->get('lock'),
+      $container->get('logger.factory')->get('relaxed')
+    );
   }
 
   /**
@@ -169,6 +189,20 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    * @return \Symfony\Component\HttpFoundation\Response
    */
   public function handle(RouteMatchInterface $route_match, Request $request) {
+    // Writing a bulk of documents can potentially take a lot of time, so we
+    // aquire a lock to ensure the integrity of the operation.
+    do {
+      // Check if the operation may be available.
+      if ($this->lock->lockMayBeAvailable('relaxed_request')) {
+        // The operation may be available, so break the wait and continue if we
+        // successfully can acquire a lock.
+        if ($this->lock->acquire('relaxed_request')) {
+          break;
+        }
+      }
+      $this->logger->critical('Lock exists on relaxed request. Waiting.');
+    } while ($this->lock->wait('relaxed_request', 200000));
+
     $this->request = $request;
 
     $method = $this->getMethod();
@@ -274,6 +308,8 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     $cacheable_metadata = new CacheableMetadata();
     $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match']);
     $this->addCacheableDependency($response, $cacheable_dependencies);
+
+    $this->lock->release('relaxed_request');
 
     return $response;
   }
