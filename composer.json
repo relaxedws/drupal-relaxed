@@ -3,7 +3,9 @@
   "description":"Provides a RESTful API that exposes all content entities over UUID endpoints.",
   "type": "drupal-module",
   "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
-    "relaxedws/replicator": "dev-master"
+    "relaxedws/replicator": "dev-experimental"
   }
 }
