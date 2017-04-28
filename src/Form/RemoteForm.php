@@ -57,6 +57,7 @@ class RemoteForm extends EntityForm {
     $form['uri'] = [
       '#type' => 'textfield',
       '#title' => t('Full URL'),
+      '#description' => $this->t("The full path to the remote endpoint. E.g. https://www.example.com/relaxed"),
       '#required' => TRUE,
       '#default_value' => $remote->withoutUserInfo(),
     ];
