@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\rest\ResourceResponse;
 use Drupal\multiversion\Entity\Workspace;
 
@@ -29,11 +30,16 @@ class AllDbsResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get() {
-    $workspaces = [];
+    $workspace_machine_names = [];
+    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
     foreach (Workspace::loadMultiple() as $workspace) {
-      $workspaces[] = $workspace->getMachineName();
+      $workspace_machine_names[] = $workspace->getMachineName();
     }
 
-    return new ResourceResponse($workspaces, 200);
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_metadata->addCacheTags(\Drupal::entityTypeManager()->getDefinition('workspace')->getListCacheTags());
+    $response = new ResourceResponse($workspace_machine_names, 200);
+    $response->addCacheableDependency($cacheable_metadata);
+    return $response;
   }
 }
