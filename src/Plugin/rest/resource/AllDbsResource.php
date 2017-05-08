@@ -30,16 +30,23 @@ class AllDbsResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get() {
+    /** @var \Drupal\multiversion\Entity\WorkspaceInterface[] $workspaces */
+    $workspaces = Workspace::loadMultiple();
+
     $workspace_machine_names = [];
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
-    foreach (Workspace::loadMultiple() as $workspace) {
+    foreach ($workspaces as $workspace) {
       $workspace_machine_names[] = $workspace->getMachineName();
     }
 
-    $cacheable_metadata = new CacheableMetadata();
-    $cacheable_metadata->addCacheTags(\Drupal::entityTypeManager()->getDefinition('workspace')->getListCacheTags());
     $response = new ResourceResponse($workspace_machine_names, 200);
-    $response->addCacheableDependency($cacheable_metadata);
+    foreach ($workspaces as $workspace) {
+      $response->addCacheableDependency($workspace);
+    }
+    $workspace_entity_type = \Drupal::entityTypeManager()->getDefinition('workspace');
+    $response->addCacheableDependency((new CacheableMetadata())
+      ->addCacheTags($workspace_entity_type->getListCacheTags())
+      ->addCacheContexts($workspace_entity_type->getListCacheContexts()));
+
     return $response;
   }
 }

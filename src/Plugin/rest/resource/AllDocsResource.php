@@ -40,12 +40,11 @@ class AllDocsResource extends ResourceBase {
     if ($request->query->get('include_docs') == 'true') {
       $all_docs->includeDocs(TRUE);
     }
-    $cacheable_metadata = new CacheableMetadata();
-    foreach (\Drupal::service('multiversion.manager')->getSupportedEntityTypes() as $entity_type) {
-      $cacheable_metadata->addCacheTags($entity_type->getListCacheTags());
-    }
+
     $response = new ResourceResponse($all_docs, 200);
-    $response->addCacheableDependency($cacheable_metadata);
+    foreach (\Drupal::service('multiversion.manager')->getSupportedEntityTypes() as $entity_type) {
+      $response->addCacheableDependency($entity_type);
+    }
     return $response;
   }
 
