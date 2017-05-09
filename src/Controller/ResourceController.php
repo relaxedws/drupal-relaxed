@@ -272,7 +272,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       }
     }
     $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match']);
+    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
     $this->addCacheableDependency($response, $cacheable_dependencies);
 
     return $response;

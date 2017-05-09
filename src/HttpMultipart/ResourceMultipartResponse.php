@@ -2,23 +2,18 @@
 
 namespace Drupal\relaxed\HttpMultipart;
 
-use Drupal\Core\Cache\CacheableResponseInterface;
-use Drupal\Core\Cache\CacheableResponseTrait;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Contains data for serialization before sending the response.
  */
-class ResourceMultipartResponse extends MultipartResponse implements CacheableResponseInterface {
-
-  use CacheableResponseTrait;
+class ResourceMultipartResponse extends MultipartResponse {
 
   /**
    * {@inheritdoc}
    */
-  public function prepare(Request $request)
-  {
+  public function prepare(Request $request) {
     // Fix the timeout error on replication.
     $this->headers->set('Connection', 'close');
 
@@ -27,8 +22,6 @@ class ResourceMultipartResponse extends MultipartResponse implements CacheableRe
 
   /**
    * Sends content for the current web response.
-   *
-   * @return Response
    */
   public function sendContent() {
     // This fixes the "Malformed encoding found in chunked-encoding"
