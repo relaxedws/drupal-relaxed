@@ -2,11 +2,11 @@
 
 namespace Drupal\relaxed\HttpMultipart\HttpFoundation;
 
+use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MultipartResponse extends Response
-{
+class MultipartResponse extends ResourceResponse {
   /**
    * @var string
    */
@@ -25,23 +25,31 @@ class MultipartResponse extends Response
   /**
    * Constructor.
    */
-  public function __construct(array $parts = null, $status = 200, $headers = [], $subtype = null)
-  {
-    parent::__construct(null, $status, $headers);
+  public function __construct(array $parts = NULL, $status = 200, $headers = [], $subtype = NULL) {
+    parent::__construct(NULL, $status, $headers);
 
     $this->subtype = $subtype ?: 'mixed';
     $this->boundary = md5(microtime());
 
-    if (null !== $parts) {
+    if (NULL !== $parts) {
       $this->setParts($parts);
+      $content = '';
+      foreach ($this->getParts() as $part) {
+        $content .= "--{$this->boundary}\r\n";
+        $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
+        $content .= \Drupal::service('serializer')
+          ->serialize($part->getResponseData(), 'json');
+        $content .= "\r\n";
+      }
+      $content .= "--{$this->boundary}--";
+      $this->setContent($content);
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function prepare(Request $request)
-  {
+  public function prepare(Request $request) {
     $this->headers->set('Content-Type', "multipart/{$this->subtype}; boundary=\"{$this->boundary}\"");
     $this->headers->set('Transfer-Encoding', 'chunked');
 
@@ -55,8 +63,7 @@ class MultipartResponse extends Response
    *
    * @return MultipartResponse
    */
-  public function setPart(Response $part)
-  {
+  public function setPart(Response $part) {
     $this->parts[] = $part;
 
     return $this;
@@ -69,8 +76,7 @@ class MultipartResponse extends Response
    *
    * @return MultipartResponse
    */
-  public function setParts(array $parts)
-  {
+  public function setParts(array $parts) {
     foreach ($parts as $part) {
       $this->setPart($part);
     }
@@ -86,43 +92,4 @@ class MultipartResponse extends Response
     return $this->parts;
   }
 
-  /**
-   * Sends content for the current web response.
-   *
-   * @return Response
-   */
-  public function sendContent()
-  {
-    foreach ($this->parts as $part) {
-      echo "--{$this->boundary}\r\n";
-      echo "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
-      $part->sendContent();
-      echo "\r\n";
-    }
-    echo "--{$this->boundary}--";
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @throws \LogicException when the content is not null
-   */
-  public function setContent($content)
-  {
-    if (null !== $content) {
-      throw new \LogicException('The content cannot be set on a MultipartResponse instance.');
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @return false
-   */
-  public function getContent()
-  {
-    return false;
-  }
 }
