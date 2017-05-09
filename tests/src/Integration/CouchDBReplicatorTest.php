@@ -14,7 +14,7 @@ class CouchDBReplicatorTest extends ReplicationTestBase {
    */
   public function testCouchdbReplicator() {
     // Run CouchDB to Drupal replication.
-    $this->couchDbReplicate($this->couchdb_url . "/$this->source_db", 'http://replicator:replicator@localhost:8080/relaxed/live');
+    $this->couchDbReplicate($this->couchdbUrl . '/' . $this->sourceDb, 'http://replicator:replicator@localhost:8080/relaxed/live');
     $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/live/_all_docs', 9);
 
     // Run Drupal to Drupal replication.
@@ -22,14 +22,8 @@ class CouchDBReplicatorTest extends ReplicationTestBase {
     $this->assertAllDocsNumber('http://replicator:replicator@localhost:8081/relaxed/live/_all_docs', 9);
 
     // Run Drupal to CouchDB replication.
-    $this->couchDbReplicate('http://replicator:replicator@localhost:8081/relaxed/live', $this->couchdb_url . "/$this->target_db");
-    $this->assertAllDocsNumber($this->couchdb_url . '/' . $this->target_db . '/_all_docs', 9);
-
-    // Delete source database.
-    $this->deleteDb($this->source_db);
-
-    // Delete target database.
-    $this->deleteDb($this->target_db);
+    $this->couchDbReplicate('http://replicator:replicator@localhost:8081/relaxed/live', $this->couchdbUrl . '/' . $this->targetDb);
+    $this->assertAllDocsNumber($this->couchdbUrl . '/' . $this->targetDb . '/_all_docs', 9);
   }
 
 }
