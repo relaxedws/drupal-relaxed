@@ -12,7 +12,6 @@ php ~/drush.phar --yes --uri=http://localhost:8080 pm-enable entity_test, relaxe
 php ~/drush.phar --yes --uri=http://localhost:8081 pm-enable entity_test, relaxed_test || true
 
 # Check CouchDB installation.
-docker logs couchdb klaemo/couchdb
 curl http://localhost:${COUCH_PORT}
 
 vendor/phpunit/phpunit/phpunit --verbose --debug --configuration phpunit.travis.xml --bootstrap core/tests/bootstrap.php
