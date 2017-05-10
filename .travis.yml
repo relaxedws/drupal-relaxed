@@ -66,8 +66,6 @@ script:
 
 after_script:
   # -----------------------
-  - cat /usr/local/var/log/couchdb/couch.log
-  # -----------------------
   - cat /tmp/error.log
   # -----------------------
   - cat /tmp/access8080.log
