@@ -65,6 +65,7 @@ script:
   - cd ~/www && bash $SCRIPT
 
 after_script:
+  - docker logs couchdb
   # -----------------------
   - cat /tmp/error.log
   # -----------------------

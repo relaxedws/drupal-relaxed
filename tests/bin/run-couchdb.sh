@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -ev
+
 if [ $COUCHDB_VERSION = "2.0-dev" ]; then
   docker run -d -p 3001:5984 klaemo/couchdb:$COUCHDB_VERSION --with-haproxy --with-admin-party-please -n 1
   export COUCH_PORT=3001
@@ -11,6 +13,8 @@ else
 fi
 
 # Wait for couchdb to start, add CORS.
+npm -g install npm@latest
+npm config set strict-ssl false
 npm install add-cors-to-couchdb
 while [ '200' != $(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:${COUCH_PORT}) ]; do
   echo waiting for couch to load... ;
