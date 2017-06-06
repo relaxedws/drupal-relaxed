@@ -19,7 +19,8 @@ function relaxed_install() {
       'permissions' => [
         'perform push replication',
         'administer users',
-        'administer workspaces'
+        'administer workspaces',
+        'bypass node access',
       ],
     ])->save();
   }
