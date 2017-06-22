@@ -60,6 +60,7 @@ class CouchdbReplicator implements ReplicatorInterface{
         $couchdb_task->setFilter($task->getFilter());
         $couchdb_task->setParameters($task->getParameters());
         $couchdb_task->setLimit($task->getLimit());
+        $couchdb_task->setBulkDocsLimit($task->getBulkDocsLimit());
       }
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
