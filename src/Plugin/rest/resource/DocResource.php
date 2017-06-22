@@ -195,19 +195,4 @@ class DocResource extends ResourceBase {
     return new ResourceResponse(['ok' => TRUE], 200);
   }
 
-  /**
-   * Saves a file.
-   *
-   * @param \Drupal\file\FileInterface $file
-   */
-  public function putAttachment(FileInterface $file) {
-    Cache::invalidateTags(['file_list']);
-    try {
-      $file->save();
-    }
-    catch (\Exception $e) {
-      throw new HttpException(500, NULL, $e);
-    }
-  }
-
 }
