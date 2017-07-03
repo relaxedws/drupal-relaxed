@@ -235,7 +235,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $source = CouchDBClient::create($json['source']);
     $target = CouchDBClient::create($json['target']);
 
-    $task = new ReplicationTask();
+    $task = new ReplicationTask(null, false, null, null, false, null, 10000, 10000, false, "all_docs", 0, 2, 2);
     $replicator = new Replicator($source, $target, $task);
 
     return $replicator->startReplication();
