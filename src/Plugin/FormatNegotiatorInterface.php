@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\relaxed\Plugin\FormatNegotiatorInterface.
+ */
+
+namespace Drupal\relaxed\Plugin;
+
+use \Symfony\Component\HttpFoundation\Request;
+
+/**
+ * Contract for format negotiator plugins.
+ */
+interface FormatNegotiatorInterface {
+
+  /**
+   * Use this applies method OR the in the annotation. This was is
+   * potentially more expensive at runtime, but is way more flexible.
+   *
+   * @param string $format
+   * @param string $method
+   *
+   * @return bool
+   *   TRUE if this negotiator applies, FALSE otherwise.
+   */
+  public function applies($format, $method);
+
+  /**
+   * This would return a serializer instance, pretty much every time would be
+   * injected into the plugin and just returned.
+   *
+   * @return \Symfony\Component\Serializer\Serializer
+   */
+  public function serializer();
+
+}

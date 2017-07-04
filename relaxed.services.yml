@@ -23,6 +23,9 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
+  plugin.manager.format_negotiator:
+    class: Drupal\relaxed\Plugin\FormatNegotiatorManager
+    parent: default_plugin_manager
   plugin.manager.remote_check:
     class: Drupal\relaxed\Plugin\RemoteCheckManager
     parent: default_plugin_manager
