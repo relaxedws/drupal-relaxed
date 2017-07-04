@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Serializer;
  * @FormatNegotiator(
  *   id = "json",
  *   label = "JSON (default)",
- *   formats = {"json"}
+ *   formats = {"json","mixed","related"}
  * )
  */
 class JsonNegotiator extends NegotiatorBase implements ContainerFactoryPluginInterface {
