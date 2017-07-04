@@ -22,4 +22,11 @@ interface FormatNegotiatorManagerInterface {
    */
   public function select($format, $method);
 
+  /**
+   * Return a list of all available formats.
+   *
+   * @return array
+   */
+  public function availableFormats();
+
 }
