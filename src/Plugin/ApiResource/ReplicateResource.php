@@ -1,19 +1,17 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\rest\ModifiedResourceResponse;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:replicate",
  *   label = "Replicate",
  *   serialization_class = {
  *     "canonical" = "Drupal\relaxed\Replicate\Replicate",
  *   },
- *   uri_paths = {
- *     "canonical" = "/_replicate",
- *   }
+ *   path = "/_replicate"
  * )
  */
 class ReplicateResource extends ResourceBase {

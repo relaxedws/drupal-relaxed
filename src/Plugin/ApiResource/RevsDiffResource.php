@@ -1,21 +1,19 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ModifiedResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:revs_diff",
  *   label = "Revisions diff",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\RevisionDiff\RevisionDiff",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_revs_diff",
- *   },
+ *   path = "/{db}/_revs_diff",
  *   no_cache = TRUE
  * )
  */

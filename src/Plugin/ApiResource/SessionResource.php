@@ -1,18 +1,16 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Drupal\Core\Cache\CacheableMetadata;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:session",
  *   label = "Session",
- *   uri_paths = {
- *     "canonical" = "/_session",
- *   }
+ *   path = "/_session"
  * )
  */
 class SessionResource extends ResourceBase {

@@ -12,7 +12,8 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * @FormatNegotiator(
  *   id = "default",
- *   label = "JSON (default)"
+ *   label = "JSON (default)",
+ *   formats = {"json"}
  * )
  */
 class DefaultNegotiator implements FormatNegotiatorInterface, ContainerFactoryPluginInterface {

@@ -1,20 +1,18 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:all_docs",
  *   label = "All Docs",
  *   serialization_class = {
  *     "canonical" = "Drupal\relaxed\AllDocs\AllDocs",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_all_docs",
- *   }
+ *   path = "/{db}/_all_docs"
  * )
  */
 class AllDocsResource extends ResourceBase {

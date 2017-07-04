@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\rest\ResourceResponse;
@@ -11,15 +11,13 @@ use Drupal\multiversion\Entity\Workspace;
  */
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:all_dbs",
  *   label = "All Workspaces",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\Workspace",
  *   },
- *   uri_paths = {
- *     "canonical" = "/_all_dbs",
- *   }
+ *   path = "/_all_dbs"
  * )
  */
 class AllDbsResource extends ResourceBase {

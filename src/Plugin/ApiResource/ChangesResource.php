@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\replication\Changes\ChangesInterface;
 use Drupal\replication\ChangesFactoryInterface;
@@ -10,15 +10,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:changes",
  *   label = "Changes",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\Changes\Changes",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_changes",
- *   },
+ *   path = "/{db}/_changes",
  *   no_cache = TRUE
  * )
  */

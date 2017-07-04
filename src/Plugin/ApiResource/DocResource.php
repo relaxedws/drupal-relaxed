@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -14,16 +14,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:doc",
  *   label = "Document",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/{docid}",
- *   },
- *   no_cache = TRUE
+ *   path = "/{db}/{docid}"
  * )
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}

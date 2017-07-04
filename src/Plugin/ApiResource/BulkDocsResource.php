@@ -1,19 +1,17 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\rest\ModifiedResourceResponse;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\BulkDocs\BulkDocs",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_bulk_docs",
- *   }
+ *   path = "/{db}/_bulk_docs"
  * )
  */
 class BulkDocsResource extends ResourceBase {

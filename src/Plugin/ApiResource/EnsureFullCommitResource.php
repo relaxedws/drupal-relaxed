@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ModifiedResourceResponse;
@@ -11,15 +11,13 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * of transactions across multiple requests. This resource only exists to comply
  * with the replication protocol.
  *
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:ensure_full_commit",
  *   label = "Ensure Full Commit",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_ensure_full_commit",
- *   }
+ *   path = "/{db}/_ensure_full_commit",
  * )
  */
 class EnsureFullCommitResource extends ResourceBase {
