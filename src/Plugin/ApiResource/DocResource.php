@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -18,15 +18,13 @@ use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseP
 use GuzzleHttp\Psr7;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:doc",
  *   label = "Document",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/{docid}",
- *   }
+ *   path = "/{db}/{docid}"
  * )
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}

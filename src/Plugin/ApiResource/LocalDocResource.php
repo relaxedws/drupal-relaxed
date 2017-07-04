@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
@@ -9,15 +9,13 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:local:doc",
  *   label = "Local document",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_local/{docid}",
- *   }
+ *   path = "/{db}/_local/{docid}"
  * )
  */
 class LocalDocResource extends DocResource {

@@ -1,16 +1,14 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\rest\ResourceResponse;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:root",
  *   label = "Root",
- *   uri_paths = {
- *     "canonical" = "",
- *   }
+ *   path = ""
  * )
  */
 class RootResource extends ResourceBase {

@@ -31,11 +31,29 @@ class FormatNegotiatorManager extends DefaultPluginManager implements FormatNego
   }
 
   /**
+   * Returns an array of all available formats from all plugins.
+   *
+   * @return array
+   */
+  public function availableFormats() {
+    $available = [];
+    $formats = array_map(function ($definition) {
+      return $definition['formats'];
+    }, $this->getDefinitions());
+
+    foreach ($formats as $formats) {
+      $available = array_merge($available, $formats);
+    }
+
+    return array_unique($available);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function select($format, $method) {
     foreach ($this->getDefinitions() as $definition) {
-      $plugin = $this->createInstance($definition['id']);
+      $plugin = $this->createInstance($definition['id'], $definition);
 
       if ($plugin->applies($format, $method)) {
         return $plugin;

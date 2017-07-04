@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -15,16 +15,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:db",
  *   label = "Workspace",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}",
- *   },
+ *   path = "/{db}",
  *   no_cache = TRUE
  * )
  */
@@ -109,7 +107,7 @@ class DbResource extends ResourceBase {
     // If the workspace parameter is a string it means it could not be upcasted
     // to an entity because none existed.
     if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException(t('Database does not exist')); 
+      throw new NotFoundHttpException(t('Database does not exist'));
     }
     elseif (empty($entity)) {
       throw new BadRequestHttpException(t('No content received'));

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\replication\Changes\ChangesInterface;
@@ -12,15 +12,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:changes",
  *   label = "Changes",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\Changes\Changes",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_changes",
- *   },
+ *   path = "/{db}/_changes",
  *   no_cache = TRUE
  * )
  */

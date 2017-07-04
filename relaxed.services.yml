@@ -1,4 +1,7 @@
 services:
+  logger.channel.relaxed:
+    parent: logger.channel_base
+    arguments: ['relaxed']
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
@@ -23,6 +26,9 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
+  plugin.manager.api_resource:
+    class: Drupal\relaxed\Plugin\ApiResourceManager
+    parent: default_plugin_manager
   plugin.manager.format_negotiator:
     class: Drupal\relaxed\Plugin\FormatNegotiatorManager
     parent: default_plugin_manager
@@ -44,6 +50,11 @@ services:
     tags:
       - { name: normalizer, priority: 10 }
     arguments: ['@relaxed.replicate']
+  rest.resource_routes:
+    class: Drupal\rest\Routing\ResourceRoutes
+    arguments: ['@plugin.manager.rest', '@logger.channel.relaxed']
+    tags:
+      - { name: 'event_subscriber' }
   relaxed.resource_response.subscriber:
     class: Drupal\relaxed\EventSubscriber\ResourceResponseSubscriber
     tags:

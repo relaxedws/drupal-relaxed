@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\rest\Plugin\ResourceInterface;
 

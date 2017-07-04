@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -13,15 +13,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:attachment",
  *   label = "Attachment",
  *   serialization_class = {
  *     "canonical" = "Drupal\file\Entity\File",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/{docid}/{field_name}/{delta}/{file_uuid}/{scheme}/{filename}",
- *   },
+ *   path = "/{db}/{docid}/{field_name}/{delta}/{file_uuid}/{scheme}/{filename}",
  *   uri_parameters = {
  *     "canonical" = {
  *       "file_uuid" = "entity_uuid:file",

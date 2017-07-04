@@ -2,7 +2,11 @@
 
 namespace Drupal\relaxed\Plugin;
 
+use Drupal\Component\Plugin\PluginInspectionInterface;
 
-interface ApiResourceInterface {
+/**
+ * Contract for API resource plugins.
+ */
+interface ApiResourceInterface extends PluginInspectionInterface {
 
 }

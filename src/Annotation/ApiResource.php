@@ -30,4 +30,11 @@ class ApiResource extends Plugin {
    */
   public $label;
 
+  /**
+   * The path for the resource.
+   *
+   * @var string
+   */
+  public $path;
+
 }

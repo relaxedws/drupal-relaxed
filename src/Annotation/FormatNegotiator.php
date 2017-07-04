@@ -31,6 +31,13 @@ class FormatNegotiator extends Plugin {
   public $label;
 
   /**
+   * The formats this negotiator supports.
+   *
+   * @var array
+   */
+  public $formats = [];
+
+  /**
    * The priority of the negotiator.
    *
    * @var int

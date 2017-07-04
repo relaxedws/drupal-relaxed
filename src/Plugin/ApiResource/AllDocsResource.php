@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Plugin\rest\resource;
+namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\multiversion\Entity\WorkspaceInterface;
@@ -9,15 +9,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @RestResource(
+ * @ApiResource(
  *   id = "relaxed:all_docs",
  *   label = "All Docs",
  *   serialization_class = {
  *     "canonical" = "Drupal\relaxed\AllDocs\AllDocs",
  *   },
- *   uri_paths = {
- *     "canonical" = "/{db}/_all_docs",
- *   }
+ *   path = "/{db}/_all_docs"
  * )
  */
 class AllDocsResource extends ResourceBase {
