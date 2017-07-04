@@ -2,8 +2,10 @@
 
 namespace Drupal\relaxed\Plugin;
 
-
-class ApiResourceRouteGenerator {
+/**
+ * API resource route generator.
+ */
+class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
 
   /**
    * The plugin manager for API resource plugins.
@@ -13,6 +15,10 @@ class ApiResourceRouteGenerator {
   protected $manager;
 
   /**
+   * Allowed request methods.
+   *
+   * CouchDB only supports these methods.
+   *
    * @var array
    */
   protected $requestMethods = [
@@ -52,73 +58,10 @@ class ApiResourceRouteGenerator {
   }
 
   /**
-   * Provides all routes for a given REST resource config.
-   *
-   * This method determines where a resource is reachable, what path
-   * replacements are used, the required HTTP method for the operation etc.
-   *
-   * @param \Drupal\rest\RestResourceConfigInterface $rest_resource_config
-   *   The rest resource config.
-   *
-   * @return \Symfony\Component\Routing\RouteCollection
-   *   The route collection.
-   */
-  protected function getRoutesForResourceConfig(RestResourceConfigInterface $rest_resource_config) {
-    $plugin = $rest_resource_config->getResourcePlugin();
-    $collection = new RouteCollection();
-
-    foreach ($plugin->routes() as $name => $route) {
-      /** @var \Symfony\Component\Routing\Route $route */
-      // @todo: Are multiple methods possible here?
-      $methods = $route->getMethods();
-      // Only expose routes where the method is enabled in the configuration.
-      if ($methods && ($method = $methods[0]) && $supported_formats = $rest_resource_config->getFormats($method)) {
-        $route->setRequirement('_csrf_request_header_token', 'TRUE');
-
-        // Check that authentication providers are defined.
-        if (empty($rest_resource_config->getAuthenticationProviders($method))) {
-          $this->logger->error('At least one authentication provider must be defined for resource @id', [':id' => $rest_resource_config->id()]);
-          continue;
-        }
-
-        // Check that formats are defined.
-        if (empty($rest_resource_config->getFormats($method))) {
-          $this->logger->error('At least one format must be defined for resource @id', [':id' => $rest_resource_config->id()]);
-          continue;
-        }
-
-        // If the route has a format requirement, then verify that the
-        // resource has it.
-        $format_requirement = $route->getRequirement('_format');
-        if ($format_requirement && !in_array($format_requirement, $rest_resource_config->getFormats($method))) {
-          continue;
-        }
-
-        // The configuration has been validated, so we update the route to:
-        // - set the allowed request body content types/formats for methods that
-        //   allow request bodies to be sent
-        // - set the allowed authentication providers
-        if (in_array($method, ['POST', 'PATCH', 'PUT'], TRUE)) {
-          // Restrict the incoming HTTP Content-type header to the allowed
-          // formats.
-          $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats())]);
-        }
-        $route->setOption('_auth', $rest_resource_config->getAuthenticationProviders($method));
-        $route->setDefault('_rest_resource_config', $rest_resource_config->id());
-        $collection->add("rest.$name", $route);
-      }
-
-    }
-    return $collection;
-  }
-
-  /**
    * @param ApiResourceInterface $api_resource
    * @return RouteCollection
    */
   public function routes(ApiResourceInterface $api_resource) {
-    // @todo !! Add a format negotiator plugin for these formats only !!
-    $this->serializerFormats = array_merge($this->serializerFormats, ['mixed', 'related']);
     $collection = new RouteCollection();
     $definition = $api_resource->getPluginDefinition();
     $plugin_id = $api_resource->getPluginId();
@@ -133,6 +76,7 @@ class ApiResourceRouteGenerator {
 
       // Allow pull or push permissions depending on the method.
       $permissions = 'perform push replication';
+
       if ($method === 'GET') {
         $permissions .= '+perform pull replication';
       }
@@ -140,9 +84,10 @@ class ApiResourceRouteGenerator {
       $method_lower = strtolower($method);
       $route = new Route($this->apiRoot . $definition['path'], [
         '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
-        '_plugin' => $plugin_id,
+        '_api_resource' => $plugin_id,
       ], [
         '_permission' => $permissions,
+        '_csrf_request_header_token' => 'TRUE'
       ],
         [
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
@@ -152,6 +97,15 @@ class ApiResourceRouteGenerator {
         // The HTTP method is a requirement for this route.
         [$method]
       );
+
+      // Check that authentication providers are defined.
+      // @todo !! I think we want this to be configured globally for relaxed. !!
+      if (empty($api_resource->getAuthenticationProviders($method))) {
+        $this->logger->error('At least one authentication provider must be defined for resource @id', [':id' => $rest_resource_config->id()]);
+        continue;
+      }
+
+      $route->setOption('_auth', $api_resource->getAuthenticationProviders($method));
 
       if (isset($definition['uri_paths'][$method_lower])) {
         $route->setPath($definition['uri_paths'][$method_lower]);
@@ -210,7 +164,6 @@ class ApiResourceRouteGenerator {
    *   The list of allowed HTTP request method strings.
    */
   protected function requestMethods() {
-    // CouchDB only supports these methods.
     return $this->requestMethods;
   }
 
@@ -220,12 +173,14 @@ class ApiResourceRouteGenerator {
   protected function availableMethods(ApiResourceInterface $api_resource) {
     $methods = $this->requestMethods();
     $available = [];
+
     foreach ($methods as $method) {
       // Only expose methods where the HTTP request method exists on the plugin.
       if (method_exists($api_resource, strtolower($method))) {
         $available[] = $method;
       }
     }
+
     return $available;
   }
 
