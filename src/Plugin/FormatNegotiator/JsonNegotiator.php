@@ -4,31 +4,27 @@ namespace Drupal\relaxed\Plugin\FormatNegotiator;
 
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\relaxed\Plugin\FormatNegotiatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Serializer;
 
 /**
  * @FormatNegotiator(
- *   id = "default",
+ *   id = "json",
  *   label = "JSON (default)",
  *   formats = {"json"}
  * )
  */
-class DefaultNegotiator implements FormatNegotiatorInterface, ContainerFactoryPluginInterface {
+class JsonNegotiator extends NegotiatorBase implements ContainerFactoryPluginInterface {
 
   /**
-   * @var \Symfony\Component\Serializer\Serializer
-   */
-  protected $serializer;
-
-  /**
-   * DefaultNegotiator constructor.
+   * JsonNegotiator constructor.
    *
    * @param \Symfony\Component\Serializer\Serializer $serializer
    */
-  public function __construct(Serializer $serializer) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Serializer $serializer) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
     $this->serializer = $serializer;
   }
 
@@ -37,6 +33,9 @@ class DefaultNegotiator implements FormatNegotiatorInterface, ContainerFactoryPl
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
       $container->get('replication.serializer')
     );
   }
@@ -46,13 +45,6 @@ class DefaultNegotiator implements FormatNegotiatorInterface, ContainerFactoryPl
    */
   public function applies($format, $method) {
     return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function serializer() {
-    return $this->serializer;
   }
 
 }

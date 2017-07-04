@@ -13,6 +13,19 @@ class ApiResourceRouteGenerator {
   protected $manager;
 
   /**
+   * @var array
+   */
+  protected $requestMethods = [
+    'HEAD',
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    // This is a non-standard HTTP method implemented by CouchDB.
+    'COPY',
+  ];
+
+  /**
    * @var string
    */
   protected $apiRoot;
@@ -104,6 +117,7 @@ class ApiResourceRouteGenerator {
    * @return RouteCollection
    */
   public function routes(ApiResourceInterface $api_resource) {
+    // @todo !! Add a format negotiator plugin for these formats only !!
     $this->serializerFormats = array_merge($this->serializerFormats, ['mixed', 'related']);
     $collection = new RouteCollection();
     $definition = $api_resource->getPluginDefinition();
@@ -175,7 +189,7 @@ class ApiResourceRouteGenerator {
           break;
 
         case 'DELETE':
-          foreach ($this->serializerFormats as $format) {
+          foreach ($this->availableFormats() as $format) {
             $format_route = clone $route;
             $format_route->addRequirements(['_format' => $format]);
             $collection->add("$route_name.$method.$format", $format_route);
@@ -197,15 +211,7 @@ class ApiResourceRouteGenerator {
    */
   protected function requestMethods() {
     // CouchDB only supports these methods.
-    return [
-      'HEAD',
-      'GET',
-      'POST',
-      'PUT',
-      'DELETE',
-      // This is a non-standard HTTP method implemented by CouchDB.
-      'COPY',
-    ];
+    return $this->requestMethods;
   }
 
   /**
