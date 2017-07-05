@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @ApiResource(
- *   id = "relaxed:attachment",
+ *   id = "attachment",
  *   label = "Attachment",
  *   serialization_class = {
  *     "canonical" = "Drupal\file\Entity\File",

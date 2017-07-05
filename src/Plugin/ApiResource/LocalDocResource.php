@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @ApiResource(
- *   id = "relaxed:local:doc",
+ *   id = "local:doc",
  *   label = "Local document",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",

@@ -12,7 +12,7 @@ use Drupal\multiversion\Entity\Workspace;
 
 /**
  * @ApiResource(
- *   id = "relaxed:all_dbs",
+ *   id = "all_dbs",
  *   label = "All Workspaces",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\Workspace",

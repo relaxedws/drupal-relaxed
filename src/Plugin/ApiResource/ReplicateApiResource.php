@@ -6,7 +6,7 @@ use Drupal\rest\ResourceResponse;
 
 /**
  * @ApiResource(
- *   id = "relaxed:replicate",
+ *   id = "replicate",
  *   label = "Replicate",
  *   serialization_class = {
  *     "canonical" = "Drupal\relaxed\Replicate\Replicate",

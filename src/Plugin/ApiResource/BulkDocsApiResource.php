@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @ApiResource(
- *   id = "relaxed:bulk_docs",
+ *   id = "bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\BulkDocs\BulkDocs",

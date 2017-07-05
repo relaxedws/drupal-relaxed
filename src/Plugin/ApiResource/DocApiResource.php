@@ -19,7 +19,7 @@ use GuzzleHttp\Psr7;
 
 /**
  * @ApiResource(
- *   id = "relaxed:doc",
+ *   id = "doc",
  *   label = "Document",
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",

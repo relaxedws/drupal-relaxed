@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @ApiResource(
- *   id = "relaxed:revs_diff",
+ *   id = "revs_diff",
  *   label = "Revisions diff",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\RevisionDiff\RevisionDiff",

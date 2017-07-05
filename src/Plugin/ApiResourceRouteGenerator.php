@@ -88,7 +88,8 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
     $collection = new RouteCollection();
     $definition = $api_resource->getPluginDefinition();
     $plugin_id = $api_resource->getPluginId();
-    $route_name = strtr($plugin_id, ':', '.');
+    // Prefix all routes with 'relaxed.'.
+    $route_name = sprintf('relaxed.%s', strtr($plugin_id, ':', '.'));
 
     foreach ($this->availableMethods($api_resource) as $method) {
       // HEAD and GET are equivalent as per RFC and handled by the same route.
