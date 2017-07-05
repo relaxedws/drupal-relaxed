@@ -11,51 +11,6 @@ use Drupal\relaxed\Entity\Remote;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Implements hook_entity_insert().
- */
-function relaxed_entity_insert(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'workspace') {
-    // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
-    try {
-      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
-    } catch (InvalidArgumentException $e) {
-      watchdog_exception('relaxed', $e);
-    }
-  }
-}
-
-/**
- * Implements hook_entity_update().
- */
-function relaxed_entity_update(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'workspace') {
-    // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
-    try {
-      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
-    } catch (InvalidArgumentException $e) {
-      watchdog_exception('relaxed', $e);
-    }
-  }
-}
-
-/**
- * Implements hook_entity_delete().
- */
-function relaxed_entity_delete(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'workspace') {
-    // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
-    try {
-      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
-    } catch (InvalidArgumentException $e) {
-      watchdog_exception('relaxed', $e);
-    }
-  }
-}
-
-/**
  * Implements hook_entity_access().
  */
 function relaxed_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
@@ -194,11 +149,4 @@ function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
  */
 function relaxed_cron() {
   \Drupal::service('relaxed.remote_pointer')->addAllPointers();
-}
-
-function relaxed_entity_type_alter(array &$entity_types) {
-  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
-  if (isset($entity_types['rest_resource_config'])) {
-    $entity_types['rest_resource_config']->setClass('Drupal\relaxed\Entity\RestResourceConfig');
-  }
 }

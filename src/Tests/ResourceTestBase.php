@@ -4,19 +4,17 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\multiversion\Entity\Workspace;
 use Drupal\rest\Tests\RESTTestBase;
+use Drupal\simpletest\WebTestBase;
 
-abstract class ResourceTestBase extends RESTTestBase {
+abstract class ResourceTestBase extends WebTestBase {
 
   public static $modules = [
     'entity_test',
     'file',
     'multiversion',
-    'rest',
     'relaxed',
     'relaxed_test'
   ];
-
-  protected $strictConfigSchema = FALSE;
 
   /**
    * @var string
@@ -82,28 +80,6 @@ abstract class ResourceTestBase extends RESTTestBase {
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->entityRepository = $this->container->get('entity.repository');
     $this->revTree = $this->container->get('multiversion.entity_index.rev.tree');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function entityPermissions($entity_type, $operation) {
-    $return = parent::entityPermissions($entity_type, $operation);
-
-    // Extending with further entity types.
-    if (!$return) {
-      if (in_array($entity_type, ['entity_test_rev', 'entity_test_local'])) {
-        switch ($operation) {
-          case 'view':
-            return ['view test entity'];
-          case 'create':
-          case 'update':
-          case 'delete':
-            return ['administer entity_test content'];
-        }
-      }
-    }
-    return $return;
   }
 
   /**

@@ -1,1 +1,4 @@
 api_root: "/relaxed"
+authentication:
+  - cookie
+  - basic_auth
