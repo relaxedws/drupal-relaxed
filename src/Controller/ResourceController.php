@@ -5,11 +5,12 @@ namespace Drupal\relaxed\Controller;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
+use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
+use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Routing\Route;
 
 class ResourceController implements ContainerAwareInterface, ContainerInjectionInterface {
 
@@ -40,57 +42,169 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   /**
    * The resource configuration storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
    */
-  protected $resourceStorage;
+  protected $resourceManager;
+
+  /**
+   * @var \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface
+   */
+  protected $negotiatorManager;
 
   /**
    * Creates a new RequestHandler instance.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
-   *   The resource configuration storage.
+   * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $resource_manager
+   *   The API resource manager.
    */
-  public function __construct(EntityStorageInterface $entity_storage) {
-    $this->resourceStorage = $entity_storage;
+  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager) {
+    $this->resourceManager = $resource_manager;
+    $this->negotiatorManager = $negotiator_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('entity_type.manager')->getStorage('rest_resource_config'));
+    return new static(
+      $container->get('plugin.manager.api_resource'),
+      $container->get('plugin.manager.format_negotiator')
+    );
   }
 
   /**
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @param \Drupal\Core\Routing\RouteMatchInterface  $route_match
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
    */
-  protected function container() {
-    return \Drupal::getContainer();
-  }
+  public function handle(RouteMatchInterface $route_match, Request $request) {
+    $route = $route_match->getRouteObject();
+    $method = strtolower($request->getMethod());
+    $format = $this->getFormat($route);
 
-  /**
-   * @return \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected function serializer() {
-    if (!$this->serializer) {
-      $this->serializer = $this->container()->get('serializer');
+    $negotiator = $this->negotiatorManager->select($format);
+    $serializer = $negotiator->serializer();
+
+    $api_resource_id = $route->getDefault('_api_resource');
+    $api_resource = $this->getResource($api_resource_id);
+
+    $content = $request->getContent();
+    $parameters = $this->getParameters($route_match);
+    $render_contexts = [];
+
+    // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
+    $query = $request->query->all();
+    $context = ['query' => $query, 'api_resource_id' => $api_resource_id];
+
+    $entity = NULL;
+    $definition = $api_resource->getPluginDefinition();
+
+    if (!empty($content)) {
+      try {
+        $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
+
+        // If we have a workspace parameter, pass it to the deserializer.
+        foreach ($parameters as $parameter) {
+          if ($parameter instanceof WorkspaceInterface) {
+            $context['workspace'] = $parameter;
+            break;
+          }
+        }
+
+        // Process a multipart/related PUT request.
+        if ($method == 'put' && !$this->isValidJson($content) && !$api_resource->isAttachment()) {
+          $content = $api_resource->putMultipartRequest($request);
+        }
+
+        $entity = $serializer->deserialize($content, $class, $format, $context);
+      }
+      catch (\Exception $e) {
+        return $this->errorResponse($e);
+      }
     }
-    return $this->serializer;
+
+    try {
+      $render_context = new RenderContext();
+      /** @var \Drupal\rest\ResourceResponse $response */
+      $response = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($api_resource, $method, $parameters, $entity, $request) {
+        return call_user_func_array([$api_resource, $method], array_merge($parameters, [$entity, $request]));
+      });
+
+      if (!$render_context->isEmpty()) {
+        $render_contexts[] = $render_context->pop();
+      }
+    }
+    catch (\Exception $e) {
+      return $this->errorResponse($e);
+    }
+
+    $response_format = (in_array($request->getMethod(), ['GET', 'HEAD']) && $format == 'stream')
+      ? 'stream'
+      : 'json';
+
+    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
+
+    $render_contexts = [];
+
+    foreach ($responses as $response_part) {
+      if ($response_data = $response_part->getResponseData()) {
+        // Collect bubbleable metadata in a render context.
+        $render_context = new RenderContext();
+        $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
+          return $serializer->serialize($response_data, $response_format, $context);
+        });
+
+        if (!$render_context->isEmpty()) {
+          $render_contexts[] = $render_context->pop();
+        }
+
+        $response_part->setContent($response_output);
+      }
+
+      if (!$response_part->headers->get('Content-Type')) {
+        $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
+      }
+    }
+
+    if ($request->getMethod() !== 'HEAD') {
+      $response->headers->set('Content-Length', strlen($response->getContent()));
+    }
+
+    if ($response instanceof CacheableResponseInterface) {
+      /** @var \Drupal\relaxed\Plugin\ApiResourceInterface $api_resource */
+      $api_resource = $this->getResource($api_resource_id);
+      // Add rest config's cache tags.
+      $response->addCacheableDependency($api_resource);
+    }
+
+    $cacheable_dependencies = [];
+    foreach ($render_contexts as $render_context) {
+      $cacheable_dependencies[] = $render_context;
+    }
+    foreach ($parameters as $parameter) {
+      if (is_array($parameter)) {
+        array_merge($cacheable_dependencies, $parameter);
+      }
+      else {
+        $cacheable_dependencies[] = $parameter;
+      }
+    }
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
+    $this->addCacheableDependency($response, $cacheable_dependencies);
+
+    return $response;
   }
 
   /**
    * @return string
    */
-  protected function getMethod() {
-    return strtolower($this->request->getMethod());
-  }
-
-  /**
-   * @return string
-   */
-  protected function getFormat() {
-    if (!$format = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format')) {
-      return $this->getResource()->isAttachment() ? 'stream' : 'json';
+  protected function getFormat(Route $route) {
+    if (!$format = $route->getRequirement('_format')) {
+      $plugin_id = $route->getDefault('_api_resource');
+      return 'json';
+      //return $this->getResource($plugin_id)->isAttachment() ? 'stream' : 'json';
     }
     return $format;
   }
@@ -98,11 +212,8 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   /**
    * @return \Drupal\relaxed\Plugin\rest\resource\RelaxedResourceInterface
    */
-  protected function getResource() {
-    $plugin_id = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getDefault('_plugin');
-    return $this->container()
-      ->get('plugin.manager.rest')
-      ->getInstance(['id' => $plugin_id]);
+  protected function getResource($plugin_id) {
+    return $this->resourceManager->createInstance($plugin_id, $this->resourceManager->getDefinition($plugin_id));
   }
 
   /**
@@ -149,133 +260,17 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       $error = 'file_exists';
     }
 
+    $format = $this->getFormat();
+    $headers = ['Content-Type' => $this->request->getMimeType($format)];
+
     $content = '';
-    $headers = [];
     // We shouldn't respond with content for HEAD requests.
     if ($this->request->getMethod() != 'HEAD') {
-      $format = $this->getFormat();
-      $headers = ['Content-Type' => $this->request->getMimeType($format)];
       $data = ['error' => $error, 'reason' => $reason];
       $content = $this->serializer()->serialize($data, $format);
     }
     watchdog_exception('Relaxed', $e);
     return new Response($content, $status, $headers);
-  }
-
-  /**
-   * @param \Drupal\Core\Routing\RouteMatchInterface  $route_match
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function handle(RouteMatchInterface $route_match, Request $request) {
-    $this->request = $request;
-
-    $method = $this->getMethod();
-    $format = $this->getFormat();
-    $resource = $this->getResource();
-
-    $content = $this->request->getContent();
-    $parameters = $this->getParameters($route_match);
-    $render_contexts = [];
-
-    // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
-    $query = $this->request->query->all();
-    $resource_config_id = $route_match->getRouteObject()->getDefault('_rest_resource_config');
-    $context = ['query' => $query, 'resource_id' => $resource_config_id];
-    $entity = NULL;
-    $definition = $resource->getPluginDefinition();
-    if (!empty($content)) {
-      try {
-        $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
-
-        // If we have a workspace parameter, pass it to the deserializer.
-        foreach ($parameters as $parameter) {
-          if ($parameter instanceof WorkspaceInterface) {
-            $context['workspace'] = $parameter;
-            break;
-          }
-        }
-
-        // Process a multipart/related PUT request.
-        if ($method == 'put' && !$this->isValidJson($content) && !$resource->isAttachment()) {
-          $content = $resource->putMultipartRequest($request);
-        }
-
-        $entity = $this->serializer()->deserialize($content, $class, $format, $context);
-      }
-      catch (\Exception $e) {
-        return $this->errorResponse($e);
-      }
-    }
-
-    try {
-      $render_context = new RenderContext();
-      /** @var \Drupal\rest\ResourceResponse $response */
-      $response = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($resource, $method, $parameters, $entity, $request) {
-        return call_user_func_array([$resource, $method], array_merge($parameters, [$entity, $request]));
-      });
-      if (!$render_context->isEmpty()) {
-        $render_contexts[] = $render_context->pop();
-      }
-    }
-    catch (\Exception $e) {
-      return $this->errorResponse($e);
-    }
-
-    $response_format = (in_array($request->getMethod(), ['GET', 'HEAD']) && $format == 'stream')
-      ? 'stream'
-      : 'json';
-
-    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
-
-    $render_contexts = [];
-    $serializer = $this->serializer();
-    foreach ($responses as $response_part) {
-      if ($response_data = $response_part->getResponseData()) {
-        // Collect bubbleable metadata in a render context.
-        $render_context = new RenderContext();
-        $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
-          return $serializer->serialize($response_data, $response_format, $context);
-        });
-        if (!$render_context->isEmpty()) {
-          $render_contexts[] = $render_context->pop();
-        }
-        $response_part->setContent($response_output);
-      }
-      if (!$response_part->headers->get('Content-Type')) {
-        $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
-      }
-    }
-
-    if ($request->getMethod() !== 'HEAD') {
-      $response->headers->set('Content-Length', strlen($response->getContent()));
-    }
-
-    /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
-    $resource_config = $this->resourceStorage->load($resource_config_id);
-    if ($response instanceof CacheableResponseInterface) {
-      // Add rest config's cache tags.
-      $response->addCacheableDependency($resource_config);
-    }
-
-    $cacheable_dependencies = [];
-    foreach ($render_contexts as $render_context) {
-      $cacheable_dependencies[] = $render_context;
-    }
-    foreach ($parameters as $parameter) {
-      if (is_array($parameter)) {
-        array_merge($cacheable_dependencies, $parameter);
-      }
-      else {
-        $cacheable_dependencies[] = $parameter;
-      }
-    }
-    $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
-    $this->addCacheableDependency($response, $cacheable_dependencies);
-
-    return $response;
   }
 
   /**
@@ -285,7 +280,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    *   The response object.
    */
   public function csrfToken() {
-    return new Response(\Drupal::csrfToken()->get('rest'), 200, ['Content-Type' => 'text/plain']);
+    return new Response(\Drupal::csrfToken()->get('relaxed'), 200, ['Content-Type' => 'text/plain']);
   }
 
   /**
