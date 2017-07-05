@@ -6,7 +6,7 @@ use Drupal\rest\ModifiedResourceResponse;
 
 /**
  * @ApiResource(
- *   id = "relaxed:bulk_docs",
+ *   id = "bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\BulkDocs\BulkDocs",

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
 /**
  * @ApiResource(
- *   id = "relaxed:db",
+ *   id = "db",
  *   label = "Workspace",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",

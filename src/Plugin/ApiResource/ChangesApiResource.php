@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @ApiResource(
- *   id = "relaxed:changes",
+ *   id = "changes",
  *   label = "Changes",
  *   serialization_class = {
  *     "canonical" = "Drupal\replication\Changes\Changes",

@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * with the replication protocol.
  *
  * @ApiResource(
- *   id = "relaxed:ensure_full_commit",
+ *   id = "ensure_full_commit",
  *   label = "Ensure Full Commit",
  *   serialization_class = {
  *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",

@@ -6,7 +6,7 @@ use Drupal\rest\ResourceResponse;
 
 /**
  * @ApiResource(
- *   id = "relaxed:root",
+ *   id = "root",
  *   label = "Root",
  *   path = ""
  * )

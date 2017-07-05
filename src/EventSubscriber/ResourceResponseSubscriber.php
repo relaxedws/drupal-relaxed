@@ -98,7 +98,7 @@ class ResourceResponseSubscriber extends CoreResourceResponseSubscriber {
    */
   public static function getSubscribedEvents() {
     // Run shortly before \Drupal\rest\EventSubscriber\ResourceResponseSubscriber.
-    $events[KernelEvents::RESPONSE][] = ['onResponse', 6];
+    $events[KernelEvents::RESPONSE][] = ['onResponse', 129];
     return $events;
   }
 

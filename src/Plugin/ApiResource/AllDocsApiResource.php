@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @ApiResource(
- *   id = "relaxed:all_docs",
+ *   id = "all_docs",
  *   label = "All Docs",
  *   serialization_class = {
  *     "canonical" = "Drupal\relaxed\AllDocs\AllDocs",
