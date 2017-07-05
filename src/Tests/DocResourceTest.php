@@ -365,7 +365,6 @@ class DocResourceTest extends ResourceTestBase {
             'entity_type_id' => 'taxonomy_term',
             'target_uuid' => $reference_uuid,
           ]],
-          'default_langcode' => [['value' => TRUE]],
         ],
       ];
 
