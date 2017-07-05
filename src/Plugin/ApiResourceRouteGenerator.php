@@ -113,8 +113,6 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
       ], [
         '_permission' => $permissions,
         '_csrf_request_header_token' => 'TRUE',
-        // We might want to remove this so any format will always return the same...
-        '_format' => implode('|', $this->availableFormats()),
       ],
         [
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
@@ -126,7 +124,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
       );
 
       $route->setOption('_auth', $this->authenticationProviders());
-      $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats())]);
+      $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats($api_resource))]);
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
       // logic to a generic route enhancer instead.}
@@ -138,8 +136,8 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         }
       }
 
-      if (!empty($definition['uri_parameters']['canonical'])) {
-        foreach ($definition['uri_parameters']['canonical'] as $parameter => $type) {
+      if (!empty($definition['parameters'])) {
+        foreach ($definition['parameters'] as $parameter => $type) {
           $parameters[$parameter] = ['type' => $type];
         }
       }
@@ -148,26 +146,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         $route->addOptions(['parameters' => $parameters]);
       }
 
-      switch ($method) {
-        case 'POST':
-        case 'PUT':
-          // Restrict on the Content-Type header.
-          if (!$this->isAttachment()) {
-            // @todo Remove this?!
-          }
-          $collection->add("$route_name.$method_lower", $route);
-          break;
-
-        case 'GET':
-          $collection->add("$route_name.$method_lower", $route);
-          break;
-
-        case 'DELETE':
-          $format_route = clone $route;
-          $format_route->addRequirements(['_format' => implode('|', $this->availableFormats())]);
-          $collection->add("$route_name.$method_lower", $format_route);
-          break;
-      }
+      $collection->add("$route_name.$method_lower", $route);
     }
 
     return $collection;
@@ -206,14 +185,24 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   /**
    * Returns a list of all available formats.
    *
+   * @param \Drupal\relaxed\Plugin\ApiResourceInterface
+   *
    * @return array
    */
-  protected function availableFormats() {
+  protected function availableFormats(ApiResourceInterface $api_resource) {
+    $resource_available_formats = $api_resource->getPluginDefinition()['allowed_formats'];
+
     if (!isset($this->availableFormats)) {
       $this->availableFormats = $this->formatManager->availableFormats();
     }
 
-    return $this->availableFormats;
+    if (empty($resource_available_formats)) {
+      // Return all formats.
+      return $this->availableFormats;
+    }
+
+    // Otherwise, intersect them.
+    return array_intersect($this->availableFormats, $resource_available_formats);
   }
 
   /**

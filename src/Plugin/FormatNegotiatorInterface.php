@@ -20,15 +20,18 @@ interface FormatNegotiatorInterface {
    *
    * @param string $format
    * @param string $method
+   * @param string $type
+   *   Either 'request' or 'response'.
    *
    * @return bool
    *   TRUE if this negotiator applies, FALSE otherwise.
    */
-  public function applies($format, $method);
+  public function applies($format, $method, $type);
 
   /**
-   * This would return a serializer instance, pretty much every time would be
-   * injected into the plugin and just returned.
+   * Return a serializer instance.
+   *
+   * Pretty much every time would be injected into the plugin and just returned.
    *
    * @return \Symfony\Component\Serializer\Serializer
    */

@@ -19,10 +19,12 @@ interface FormatNegotiatorManagerInterface extends PluginManagerInterface {
    *
    * @param string $format
    * @param string $method
+   * @param string $type
+   *   Either 'request' or 'response'.
    *
    * @return \Drupal\relaxed\Plugin\FormatNegotiatorInterface|NULL
    */
-  public function select($format, $method);
+  public function select($format, $method, $type);
 
   /**
    * Return a list of all available formats.
