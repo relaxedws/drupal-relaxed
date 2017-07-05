@@ -7,10 +7,12 @@
 
 namespace Drupal\relaxed\Plugin;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
+
 /**
  * Interface for format negotiator plugin manager.
  */
-interface FormatNegotiatorManagerInterface {
+interface FormatNegotiatorManagerInterface extends PluginManagerInterface {
 
   /**
    * Selects an appropriate negotiator

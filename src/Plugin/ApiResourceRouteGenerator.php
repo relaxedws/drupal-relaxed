@@ -112,7 +112,9 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         '_api_resource' => $plugin_id,
       ], [
         '_permission' => $permissions,
-        '_csrf_request_header_token' => 'TRUE'
+        '_csrf_request_header_token' => 'TRUE',
+        // We might want to remove this so any format will always return the same...
+        '_format' => implode('|', $this->availableFormats()),
       ],
         [
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
@@ -124,6 +126,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
       );
 
       $route->setOption('_auth', $this->authenticationProviders());
+      $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats())]);
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
       // logic to a generic route enhancer instead.}
@@ -150,7 +153,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         case 'PUT':
           // Restrict on the Content-Type header.
           if (!$this->isAttachment()) {
-            $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats())]);
+            // @todo Remove this?!
           }
           $collection->add("$route_name.$method_lower", $route);
           break;

@@ -7,9 +7,11 @@
 
 namespace Drupal\relaxed\Plugin;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
+
 /**
  * Contract for API resource managers.
  */
-interface ApiResourceManagerInterface {
+interface ApiResourceManagerInterface extends PluginManagerInterface {
 
 }
