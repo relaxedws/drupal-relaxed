@@ -108,8 +108,6 @@ class ChangesResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
-    // Unset first value from results, it shouldn't be returned when since == $first_seq.
-    unset($expected_without_docs['results'][0]);
     // Reset the keys of the results array.
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
