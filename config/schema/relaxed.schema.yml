@@ -17,6 +17,12 @@ relaxed.settings:
     encrypt_profile:
       type: string
       label: 'Encryption profile to use'
+    authentication:
+      type: sequence
+      label: 'Authentication Providers'
+      sequence:
+        type: string
+        label: 'Authentication provider'
 
 relaxed.endpoint.*:
   type: config_entity
