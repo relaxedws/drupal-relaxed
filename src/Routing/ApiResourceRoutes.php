@@ -2,9 +2,10 @@
 
 namespace Drupal\relaxed\Routing;
 
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
-use Psr\Log\LoggerInterface;
+use Drupal\relaxed\Plugin\ApiResourceRouteGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -21,9 +22,16 @@ class ApiResourceRoutes extends RouteSubscriberBase {
   protected $manager;
 
   /**
+   * The API resource route generator.
+   *
+   * @var \Drupal\relaxed\Plugin\ApiResourceRouteGeneratorInterface
+   */
+  protected $generator;
+
+  /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
   protected $logger;
 
@@ -32,11 +40,14 @@ class ApiResourceRoutes extends RouteSubscriberBase {
    *
    * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $manager
    *   The resource plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param \Drupal\relaxed\Plugin\ApiResourceRouteGeneratorInterface $generator
+   *   The resource route generator.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   A logger instance.
    */
-  public function __construct(ApiResourceManagerInterface $manager, LoggerInterface $logger) {
+  public function __construct(ApiResourceManagerInterface $manager, ApiResourceRouteGeneratorInterface $generator, LoggerChannelInterface $logger) {
     $this->manager = $manager;
+    $this->generator = $generator;
     $this->logger = $logger;
   }
 
@@ -53,8 +64,8 @@ class ApiResourceRoutes extends RouteSubscriberBase {
       /** @var \Drupal\relaxed\Plugin\ApiResourceInterface $api_resource */
       $api_resource = $this->manager->createInstance($definition['id'], $definition);
 
-      // Use the new generator.
-      $api_resource_routes = $this->getRoutesForResourceConfig($api_resource);
+      // Use the generator.
+      $api_resource_routes = $this->generator->routes($api_resource);
       $collection->addCollection($api_resource_routes);
     }
   }

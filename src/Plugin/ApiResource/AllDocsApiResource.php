@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   path = "/{db}/_all_docs"
  * )
  */
-class AllDocsResource extends ResourceBase {
+class AllDocsApiResource extends ApiResourceBase {
 
   /**
    * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace

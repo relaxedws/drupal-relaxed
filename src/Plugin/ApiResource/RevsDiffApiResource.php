@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   no_cache = TRUE
  * )
  */
-class RevsDiffResource extends ResourceBase {
+class RevsDiffApiResource extends ApiResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace

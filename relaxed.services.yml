@@ -50,9 +50,12 @@ services:
     tags:
       - { name: normalizer, priority: 10 }
     arguments: ['@relaxed.replicate']
-  rest.resource_routes:
-    class: Drupal\rest\Routing\ResourceRoutes
-    arguments: ['@plugin.manager.rest', '@logger.channel.relaxed']
+  relaxed.api_resource.route_generator:
+    class: Drupal\relaxed\Plugin\ApiResourceRouteGenerator
+    arguments: ['@plugin.manager.format_negotiator', '@logger.channel.relaxed']
+  relaxed.resource_routes:
+    class: Drupal\relaxed\Routing\ApiResourceRoutes
+    arguments: ['@plugin.manager.api_resource', '@relaxed.api_resource.route_generator', '@logger.channel.relaxed']
     tags:
       - { name: 'event_subscriber' }
   relaxed.resource_response.subscriber:

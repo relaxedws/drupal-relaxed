@@ -3,12 +3,16 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
+use Drupal\Core\Plugin\PluginBase;
+use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceInterface {
+/**
+ * Base API resource plugin.
+ */
+abstract class ApiResourceBase extends PluginBase implements ApiResourceInterface {
 
   public function isAttachment() {
     return (substr($this->getPluginId(), -strlen('attachment')) == 'attachment');

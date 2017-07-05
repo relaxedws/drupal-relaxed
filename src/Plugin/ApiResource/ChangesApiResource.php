@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\replication\Changes\ChangesInterface;
 use Drupal\replication\ChangesFactoryInterface;
@@ -22,13 +23,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   no_cache = TRUE
  * )
  */
-class ChangesResource extends ResourceBase {
+class ChangesApiResource extends ApiResourceBase implements ContainerFactoryPluginInterface {
 
-  /** @var ChangesFactoryInterface  */
+  /**
+   * @var \Drupal\replication\ChangesFactoryInterface
+   */
   protected $changesFactory;
 
   /**
-   * Constructs a Drupal\rest\Plugin\ResourceBase object.
+   * Constructs a Drupal\rest\Plugin\ApiResourceBase object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -43,8 +46,9 @@ class ChangesResource extends ResourceBase {
    * @param \Drupal\replication\ChangesFactoryInterface $changes_factory
    *  The ChangesFactory service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger, ChangesFactoryInterface $changes_factory) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ChangesFactoryInterface $changes_factory) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
     $this->changesFactory = $changes_factory;
   }
 
@@ -56,8 +60,6 @@ class ChangesResource extends ResourceBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->getParameter('serializer.formats'),
-      $container->get('logger.factory')->get('rest'),
       $container->get('replication.changes_factory')
     );
   }

@@ -29,7 +29,7 @@ use GuzzleHttp\Psr7;
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
  */
-class DocResource extends ResourceBase {
+class DocApiResource extends ApiResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace

@@ -14,7 +14,7 @@ use Drupal\rest\ResourceResponse;
  *   path = "/_replicate"
  * )
  */
-class ReplicateResource extends ResourceBase {
+class ReplicateApiResource extends ApiResourceBase {
 
   /**
    * @param \Drupal\relaxed\Replicate\Replicate $replicate

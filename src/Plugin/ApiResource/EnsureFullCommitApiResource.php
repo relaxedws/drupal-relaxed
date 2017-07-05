@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   path = "/{db}/_ensure_full_commit",
  * )
  */
-class EnsureFullCommitResource extends ResourceBase {
+class EnsureFullCommitApiResource extends ApiResourceBase {
 
   public function post($workspace) {
     if (!$workspace instanceof WorkspaceInterface) {
