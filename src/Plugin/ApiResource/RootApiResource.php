@@ -11,7 +11,7 @@ use Drupal\rest\ResourceResponse;
  *   path = ""
  * )
  */
-class RootResource extends ResourceBase {
+class RootApiResource extends ApiResourceBase {
 
   /**
    * @return ResourceResponse

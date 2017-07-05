@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
  */
-class AttachmentResource extends ResourceBase {
+class AttachmentApiResource extends ApiResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace

@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   path = "/{db}/_local/{docid}"
  * )
  */
-class LocalDocResource extends DocResource {
+class LocalDocResource extends DocApiResource {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace

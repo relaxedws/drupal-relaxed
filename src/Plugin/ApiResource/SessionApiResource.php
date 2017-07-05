@@ -13,7 +13,7 @@ use Drupal\Core\Cache\CacheableMetadata;
  *   path = "/_session"
  * )
  */
-class SessionResource extends ResourceBase {
+class SessionApiResource extends ApiResourceBase {
 
   /**
    * @return ResourceResponse

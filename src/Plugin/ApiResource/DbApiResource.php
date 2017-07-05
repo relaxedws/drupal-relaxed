@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   no_cache = TRUE
  * )
  */
-class DbResource extends ResourceBase {
+class DbApiResource extends ApiResourceBase {
 
   /**
    * @param $entity

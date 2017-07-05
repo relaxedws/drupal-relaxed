@@ -20,7 +20,7 @@ use Drupal\multiversion\Entity\Workspace;
  *   path = "/_all_dbs"
  * )
  */
-class AllDbsResource extends ResourceBase {
+class AllDbsApiResource extends ApiResourceBase {
 
   /**
    * Retrieve list of all entity types.

@@ -14,7 +14,7 @@ use Drupal\rest\ModifiedResourceResponse;
  *   path = "/{db}/_bulk_docs"
  * )
  */
-class BulkDocsResource extends ResourceBase {
+class BulkDocsApiResource extends ApiResourceBase {
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace

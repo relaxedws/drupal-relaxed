@@ -2,17 +2,28 @@
 
 namespace Drupal\relaxed\Plugin;
 
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+
 /**
  * API resource route generator.
  */
 class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
 
   /**
-   * The plugin manager for API resource plugins.
+   * The plugin manager for format negotiator plugins.
    *
-   * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
+   * @var \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface
    */
-  protected $manager;
+  protected $formatManager;
+
+  /**
+   * A logger instance.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected $logger;
 
   /**
    * Allowed request methods.
@@ -32,6 +43,8 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   ];
 
   /**
+   * The relaxed API root (base) path.
+   *
    * @var string
    */
   protected $apiRoot;
@@ -44,13 +57,13 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   /**
    * Constructs an ApiResourceRoutes object.
    *
-   * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $manager
-   *   The resource plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $manager
+   *   The format negotiator plugin manager.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   A logger instance.
    */
-  public function __construct(ApiResourceManagerInterface $manager, LoggerInterface $logger) {
-    $this->manager = $manager;
+  public function __construct(FormatNegotiatorManagerInterface $format_manager, LoggerChannelInterface $logger) {
+    $this->formatManager = $format_manager;
     $this->logger = $logger;
 
     // @todo Inject this, or make a container param instead?
@@ -82,6 +95,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
       }
 
       $method_lower = strtolower($method);
+
       $route = new Route($this->apiRoot . $definition['path'], [
         '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
         '_api_resource' => $plugin_id,
@@ -98,32 +112,24 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         [$method]
       );
 
-      // Check that authentication providers are defined.
-      // @todo !! I think we want this to be configured globally for relaxed. !!
-      if (empty($api_resource->getAuthenticationProviders($method))) {
-        $this->logger->error('At least one authentication provider must be defined for resource @id', [':id' => $rest_resource_config->id()]);
-        continue;
-      }
-
-      $route->setOption('_auth', $api_resource->getAuthenticationProviders($method));
-
-      if (isset($definition['uri_paths'][$method_lower])) {
-        $route->setPath($definition['uri_paths'][$method_lower]);
-      }
+      $route->setOption('_auth', $this->getAuthenticationProviders($method));
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
       // logic to a generic route enhancer instead.}
       $parameters = [];
+
       foreach (['db', 'docid'] as $parameter) {
         if (strpos($route->getPath(), '{' . $parameter . '}')) {
           $parameters[$parameter] = ['type' => 'relaxed:' . $parameter];
         }
       }
+
       if (!empty($definition['uri_parameters']['canonical'])) {
         foreach ($definition['uri_parameters']['canonical'] as $parameter => $type) {
           $parameters[$parameter] = ['type' => $type];
         }
       }
+
       if ($parameters) {
         $route->addOptions(['parameters' => $parameters]);
       }
@@ -135,22 +141,21 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
           if (!$this->isAttachment()) {
             $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats())]);
           }
-          $collection->add("$route_name.$method", $route);
+          $collection->add("$route_name.$method_lower", $route);
           break;
 
         case 'GET':
-          $collection->add("$route_name.$method", $route);
+          $collection->add("$route_name.$method_lower", $route);
           break;
 
         case 'DELETE':
-          foreach ($this->availableFormats() as $format) {
-            $format_route = clone $route;
-            $format_route->addRequirements(['_format' => $format]);
-            $collection->add("$route_name.$method.$format", $format_route);
-          }
+          $format_route = clone $route;
+          $format_route->addRequirements(['_format' => implode('|', $this->availableFormats())]);
+          $collection->add("$route_name.$method_lower", $format_route);
           break;
       }
     }
+
     return $collection;
   }
 
@@ -191,10 +196,25 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
    */
   protected function availableFormats() {
     if (!isset($this->availableFormats)) {
-      $this->availableFormats = $this->manager->availableFormats();
+      $this->availableFormats = $this->formatManager->availableFormats();
     }
 
     return $this->availableFormats;
+  }
+
+  /**
+   * @param $method
+   * @return array
+   */
+  protected function getAuthenticationProviders($method) {
+    return ['cookie', 'basic_auth'];
+  }
+
+  /**
+   * @return bool
+   */
+  protected function isAttachment() {
+    return FALSE;
   }
 
 }
