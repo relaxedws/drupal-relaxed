@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Serializer\Serializer;
 
 class ResourceController implements ContainerAwareInterface, ContainerInjectionInterface {
 
@@ -133,6 +134,10 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     $method = strtolower($request->getMethod());
     $format = $this->getFormat($route, $request);
 
+    // Select the format negotiator for the request data.
+    $negotiator = $this->negotiatorManager->select($format, $method, 'request');
+    $serializer = $negotiator->serializer();
+
     $api_resource_id = $route->getDefault('_api_resource');
     $api_resource = $this->getResource($api_resource_id);
 
@@ -148,10 +153,6 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     $definition = $api_resource->getPluginDefinition();
 
     if (!empty($content)) {
-      // Select the format negotiator for the request data.
-      $negotiator = $this->negotiatorManager->select($format, $method, 'request');
-      $serializer = $negotiator->serializer();
-
       try {
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
 
@@ -171,7 +172,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
         $entity = $serializer->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
-        return $this->errorResponse($e);
+        return $this->errorResponse($e, $format, $serializer);
       }
     }
 
@@ -187,12 +188,26 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       }
     }
     catch (\Exception $e) {
-      return $this->errorResponse($e);
+      return $this->errorResponse($e, $format, $serializer);
     }
 
     // Select the format negotiator for the response data.
     $negotiator = $this->negotiatorManager->select($format, $method, 'response');
     $serializer = $negotiator->serializer();
+
+    // @todo This is not nice, it's hacky. Find a nicer way to get response
+    // formats based on the chosen negotiator. We might have to switch to one
+    // format per negotiator.
+    // If the format for the response is not in the chosen negotiator, use the
+    // first one from the definition.
+    $negotiator_formats = $negotiator->getPluginDefinition()['formats'];
+    if (!in_array($format, $negotiator_formats, TRUE)) {
+      // Use the first.
+      $response_format = reset($negotiator_formats);
+    }
+    else {
+      $response_format = $format;
+    }
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
 
@@ -202,8 +217,8 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       if ($response_data = $response_part->getResponseData()) {
         // Collect bubbleable metadata in a render context.
         $render_context = new RenderContext();
-        $response_output = $this->renderer->executeInRenderContext($render_context, function() use ($serializer, $response_data, $format, $context) {
-          return $serializer->serialize($response_data, $format, $context);
+        $response_output = $this->renderer->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
+          return $serializer->serialize($response_data, $response_format, $context);
         });
 
         if (!$render_context->isEmpty()) {
@@ -309,14 +324,17 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    *
    * @todo {@link https://www.drupal.org/node/2599912 Improve to handle error and reason messages more generically.}
    */
-  public function errorResponse(\Exception $e) {
+  public function errorResponse(\Exception $e, $format, Serializer $serializer) {
     // Default to 400 Bad Request.
     $status = 400;
     $error = 'bad_request';
     $reason = $e->getMessage();
+    $headers = [];
 
     if ($e instanceof HttpExceptionInterface) {
       $status = $e->getStatusCode();
+      // Use any headers passed from the HTTP exception.
+      $headers = $e->getHeaders();
     }
 
     if ($e instanceof UnauthorizedHttpException || $e instanceof AccessDeniedHttpException) {
@@ -332,16 +350,19 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       $error = 'file_exists';
     }
 
-    $format = $this->getFormat();
-    $headers = ['Content-Type' => $this->request->getMimeType($format)];
+    // Always try and set the content type for the response.
+    $headers['Content-Type'] = $this->request->getMimeType($format);
 
     $content = '';
+
     // We shouldn't respond with content for HEAD requests.
     if ($this->request->getMethod() != 'HEAD') {
       $data = ['error' => $error, 'reason' => $reason];
-      $content = $this->serializer()->serialize($data, $format);
+      $content = $serializer->serialize($data, $format);
     }
+
     watchdog_exception('Relaxed', $e);
+
     return new Response($content, $status, $headers);
   }
 

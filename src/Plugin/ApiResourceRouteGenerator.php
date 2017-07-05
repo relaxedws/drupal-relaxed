@@ -113,6 +113,9 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
       ], [
         '_permission' => $permissions,
         '_csrf_request_header_token' => 'TRUE',
+        // @todo We might want to remove this so any format will always return the same...
+        // Add all formats we have to allowed responses on the route.
+        '_format' => implode('|', $this->availableFormats()),
       ],
         [
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
@@ -189,8 +192,8 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
    *
    * @return array
    */
-  protected function availableFormats(ApiResourceInterface $api_resource) {
-    $resource_available_formats = $api_resource->getPluginDefinition()['allowed_formats'];
+  protected function availableFormats(ApiResourceInterface $api_resource = NULL) {
+    $resource_available_formats = $api_resource ? $api_resource->getPluginDefinition()['allowed_formats'] : [];
 
     if (!isset($this->availableFormats)) {
       $this->availableFormats = $this->formatManager->availableFormats();
