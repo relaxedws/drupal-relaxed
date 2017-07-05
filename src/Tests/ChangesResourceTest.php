@@ -108,6 +108,8 @@ class ChangesResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
 
     $data = Json::decode($response);
+    // Unset first value from results, it shouldn't be returned when since == $first_seq.
+    unset($expected_without_docs['results'][0]);
     // Reset the keys of the results array.
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
@@ -119,6 +121,8 @@ class ChangesResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     // The result array should be empty in this case.
     $expected_without_docs['results'] = [];
+    // And last_seq == 0.
+    $expected_without_docs['last_seq'] = 0;
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     // @todo: {@link https://www.drupal.org/node/2600488 Assert the sort order.}
