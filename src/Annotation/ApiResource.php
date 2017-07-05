@@ -31,10 +31,26 @@ class ApiResource extends Plugin {
   public $label;
 
   /**
+   * The formats allowed by this resource or empty for any format.
+   *
+   * Formats are defined by format negotiator plugins.
+   *
+   * @var array
+   */
+  public $allowed_formats = [];
+
+  /**
    * The path for the resource.
    *
    * @var string
    */
   public $path;
+
+  /**
+   * Path parameters.
+   *
+   * @var array
+   */
+  public $parameters;
 
 }

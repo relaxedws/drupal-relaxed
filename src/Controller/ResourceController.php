@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
@@ -30,16 +31,6 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   use ContainerAwareTrait;
 
   /**
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
-  /**
-   * @var \Symfony\Component\HttpFoundation\Request $request
-   */
-  protected $request;
-
-  /**
    * The resource configuration storage.
    *
    * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
@@ -52,14 +43,24 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   protected $negotiatorManager;
 
   /**
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * Creates a new RequestHandler instance.
    *
    * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $resource_manager
    *   The API resource manager.
+   * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $negotiator_manager
+   *   The format negotiator manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
    */
-  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager) {
+  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer) {
     $this->resourceManager = $resource_manager;
     $this->negotiatorManager = $negotiator_manager;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -68,7 +69,8 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.api_resource'),
-      $container->get('plugin.manager.format_negotiator')
+      $container->get('plugin.manager.format_negotiator'),
+      $container->get('renderer')
     );
   }
 
@@ -81,10 +83,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   public function handle(RouteMatchInterface $route_match, Request $request) {
     $route = $route_match->getRouteObject();
     $method = strtolower($request->getMethod());
-    $format = $this->getFormat($route);
-
-    $negotiator = $this->negotiatorManager->select($format);
-    $serializer = $negotiator->serializer();
+    $format = $this->getFormat($route, $request);
 
     $api_resource_id = $route->getDefault('_api_resource');
     $api_resource = $this->getResource($api_resource_id);
@@ -101,6 +100,10 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     $definition = $api_resource->getPluginDefinition();
 
     if (!empty($content)) {
+      // Select the format negotiator for the request data.
+      $negotiator = $this->negotiatorManager->select($format, $method, 'request');
+      $serializer = $negotiator->serializer();
+
       try {
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
 
@@ -127,7 +130,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     try {
       $render_context = new RenderContext();
       /** @var \Drupal\rest\ResourceResponse $response */
-      $response = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($api_resource, $method, $parameters, $entity, $request) {
+      $response = $this->renderer->executeInRenderContext($render_context, function() use ($api_resource, $method, $parameters, $entity, $request) {
         return call_user_func_array([$api_resource, $method], array_merge($parameters, [$entity, $request]));
       });
 
@@ -139,9 +142,9 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       return $this->errorResponse($e);
     }
 
-    $response_format = (in_array($request->getMethod(), ['GET', 'HEAD']) && $format == 'stream')
-      ? 'stream'
-      : 'json';
+    // Select the format negotiator for the response data.
+    $negotiator = $this->negotiatorManager->select($format, $method, 'response');
+    $serializer = $negotiator->serializer();
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
 
@@ -151,8 +154,8 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       if ($response_data = $response_part->getResponseData()) {
         // Collect bubbleable metadata in a render context.
         $render_context = new RenderContext();
-        $response_output = $this->container->get('renderer')->executeInRenderContext($render_context, function() use ($serializer, $response_data, $response_format, $context) {
-          return $serializer->serialize($response_data, $response_format, $context);
+        $response_output = $this->renderer->executeInRenderContext($render_context, function() use ($serializer, $response_data, $format, $context) {
+          return $serializer->serialize($response_data, $format, $context);
         });
 
         if (!$render_context->isEmpty()) {
@@ -200,13 +203,34 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   /**
    * @return string
    */
-  protected function getFormat(Route $route) {
-    if (!$format = $route->getRequirement('_format')) {
-      $plugin_id = $route->getDefault('_api_resource');
-      return 'json';
-      //return $this->getResource($plugin_id)->isAttachment() ? 'stream' : 'json';
+  protected function getFormat(Route $route, Request $request) {
+    $acceptable_request_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
+    $acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
+    $acceptable_formats = $request->isMethodSafe() ? $acceptable_request_formats : $acceptable_content_type_formats;
+
+    $requested_format = $request->getRequestFormat();
+    $content_type_format = $request->getContentType();
+
+    // If an acceptable format is requested, then use that. Otherwise, including
+    // and particularly when the client forgot to specify a format, then use
+    // heuristics to select the format that is most likely expected.
+    if (in_array($requested_format, $acceptable_formats)) {
+      return $requested_format;
     }
-    return $format;
+    // If a request body is present, then use the format corresponding to the
+    // request body's Content-Type for the response, if it's an acceptable
+    // format for the request.
+    elseif (!empty($request->getContent()) && in_array($content_type_format, $acceptable_content_type_formats)) {
+      return $content_type_format;
+    }
+    // Otherwise, use the first acceptable format.
+    elseif (!empty($acceptable_formats)) {
+      return $acceptable_formats[0];
+    }
+    // Default to JSON otherwise.
+    else {
+      return 'json';
+    }
   }
 
   /**

@@ -23,7 +23,7 @@ abstract class NegotiatorBase extends PluginBase implements FormatNegotiatorInte
   /**
    * {@inheritdoc}
    */
-  public function applies($format, $method) {
+  public function applies($format, $method, $type) {
     return in_array($format, $this->getPluginDefinition()['formats']);
   }
 

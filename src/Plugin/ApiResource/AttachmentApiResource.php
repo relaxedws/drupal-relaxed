@@ -19,11 +19,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   serialization_class = {
  *     "canonical" = "Drupal\file\Entity\File",
  *   },
+ *   allowed_formats = {"stream","base64_stream"},
  *   path = "/{db}/{docid}/{field_name}/{delta}/{file_uuid}/{scheme}/{filename}",
- *   uri_parameters = {
- *     "canonical" = {
- *       "file_uuid" = "entity_uuid:file",
- *     }
+ *   parameters = {
+ *     "file_uuid" = "entity_uuid:file",
  *   }
  * )
  *

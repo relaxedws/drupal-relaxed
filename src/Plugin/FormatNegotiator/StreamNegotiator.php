@@ -42,4 +42,23 @@ class StreamNegotiator extends NegotiatorBase implements ContainerFactoryPluginI
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($format, $method, $type) {
+    // If the format doesn't match at all, we don't care anyway.
+    if (!parent::applies($format, $method, $type)) {
+      return FALSE;
+    }
+
+    // If it's applying to response data, only allow stream for GET and HEAD.
+    if ($type === 'response') {
+      return in_array($method, ['get', 'head'], TRUE);
+    }
+
+    // If this is for applying to incoming request data, it's ok.
+    // I.e. '$type === "request"'.
+    return TRUE;
+  }
+
 }

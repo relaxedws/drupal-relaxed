@@ -51,11 +51,11 @@ class FormatNegotiatorManager extends DefaultPluginManager implements FormatNego
   /**
    * {@inheritdoc}
    */
-  public function select($format, $method) {
+  public function select($format, $method, $type) {
     foreach ($this->getDefinitions() as $definition) {
       $plugin = $this->createInstance($definition['id'], $definition);
 
-      if ($plugin->applies($format, $method)) {
+      if ($plugin->applies($format, $method, $type)) {
         return $plugin;
       }
     }

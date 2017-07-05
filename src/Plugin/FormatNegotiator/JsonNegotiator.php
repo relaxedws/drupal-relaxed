@@ -43,7 +43,7 @@ class JsonNegotiator extends NegotiatorBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function applies($format, $method) {
+  public function applies($format, $method, $type) {
     return TRUE;
   }
 
