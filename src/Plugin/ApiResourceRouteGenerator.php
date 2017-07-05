@@ -55,6 +55,13 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   protected $availableFormats;
 
   /**
+   * The configured authentication providers for relaxed endpoints.
+   *
+   * @var array
+   */
+  protected $authenticationProviders;
+
+  /**
    * Constructs an ApiResourceRoutes object.
    *
    * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $manager
@@ -67,7 +74,10 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
     $this->logger = $logger;
 
     // @todo Inject this, or make a container param instead?
-    $this->apiRoot = trim(\Drupal::config('relaxed.settings')->get('api_root'), '/');
+    $relaxed_config = \Drupal::config('relaxed.settings');
+
+    $this->apiRoot = trim($relaxed_config->get('api_root'), '/');
+    $this->authenticationProviders = $relaxed_config->get('authentication');
   }
 
   /**
@@ -112,7 +122,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         [$method]
       );
 
-      $route->setOption('_auth', $this->getAuthenticationProviders($method));
+      $route->setOption('_auth', $this->authenticationProviders());
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
       // logic to a generic route enhancer instead.}
@@ -206,8 +216,8 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
    * @param $method
    * @return array
    */
-  protected function getAuthenticationProviders($method) {
-    return ['cookie', 'basic_auth'];
+  protected function authenticationProviders() {
+    return $this->authenticationProviders;
   }
 
   /**
