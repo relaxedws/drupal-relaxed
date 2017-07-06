@@ -135,16 +135,6 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   }
 
   /**
-   * Generates a CSRF protecting session token.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   The response object.
-   */
-  public function csrfToken() {
-    return new Response($this->token->get('relaxed'), 200, ['Content-Type' => 'text/plain']);
-  }
-
-  /**
    * @param \Drupal\Core\Routing\RouteMatchInterface  $route_match
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
