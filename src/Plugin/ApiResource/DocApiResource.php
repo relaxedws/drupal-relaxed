@@ -3,10 +3,9 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
-use Drupal\rest\ModifiedResourceResponse;
-use Drupal\rest\ResourceResponse;
+use Drupal\file\FileInterface;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -31,7 +30,7 @@ class DocApiResource extends ApiResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $existing) {
     $this->checkWorkspaceExists($workspace);
@@ -47,20 +46,15 @@ class DocApiResource extends ApiResourceBase {
       }
     }
 
-    $response = new ResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
-    $response->addCacheableDependency($workspace);
-    foreach ($revisions as $revision) {
-      $response->addCacheableDependency($revision);
-    }
-
-    return $response;
+    // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
+    return new ApiResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
   }
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $existing) {
     $this->checkWorkspaceExists($workspace);
@@ -93,8 +87,9 @@ class DocApiResource extends ApiResourceBase {
       if ($request->headers->get('Accept') === 'multipart/mixed'
         || ($request->headers->get('Accept') === '*/*' && $request->headers->get('multipart') === 'mixed')) {
         foreach ($revisions as $revision) {
-          $parts[] = new ResourceResponse($revision, 200, ['Content-Type' => 'application/json']);
+          $parts[] = new ApiResourceResponse($revision, 200, ['Content-Type' => 'application/json']);
         }
+
         return new ResourceMultipartResponse($parts, 200, ['Content-Type' => 'multipart/mixed']);
       }
       else {
@@ -110,13 +105,8 @@ class DocApiResource extends ApiResourceBase {
     if ($entity_type_id == 'replication_log') {
       $result = $revisions[0];
     }
-    $response = new ResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
-    $response->addCacheableDependency($workspace);
-    foreach ($revisions as $revision) {
-      $response->addCacheableDependency($revision);
-    }
 
-    return $response;
+    return new ApiResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
   }
 
   /**
@@ -125,7 +115,7 @@ class DocApiResource extends ApiResourceBase {
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     $this->checkWorkspaceExists($workspace);
@@ -160,7 +150,8 @@ class DocApiResource extends ApiResourceBase {
       $received_entity->save();
       $rev = $received_entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev];
-      return new ModifiedResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
+
+      return new ApiResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
     }
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage(), $e);
@@ -171,7 +162,7 @@ class DocApiResource extends ApiResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity) {
     $this->checkWorkspaceExists($workspace);
@@ -196,7 +187,48 @@ class DocApiResource extends ApiResourceBase {
       throw new HttpException(500, NULL, $e);
     }
 
-    return new ModifiedResourceResponse(['ok' => TRUE], 200);
+    return new ApiResourceResponse(['ok' => TRUE], 200);
+  }
+
+  /**
+   * Handles a multipart/related PUT request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *
+   * @return resource|string
+   */
+  public function putMultipartRequest(Request $request) {
+    $stream = Psr7\stream_for($request);
+    $parts = MultipartResponseParser::parseMultipartBody($stream);
+    foreach ($parts as $key => $part) {
+      if ($key > 1 && isset($part['headers']['content-disposition'])) {
+        $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
+        if ($file_info_found) {
+          $file = \Drupal::service('replication.process_file_attachment')
+            ->process($part['body'], $file_info[1], 'stream');
+          if ($file instanceof FileInterface) {
+            $this->putAttachment($file);
+          }
+        }
+      }
+    }
+
+    return (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $request->getContent();
+  }
+
+  /**
+   * Saves a file.
+   *
+   * @param \Drupal\file\FileInterface $file
+   */
+  public function putAttachment(FileInterface $file) {
+    Cache::invalidateTags(['file_list']);
+    try {
+      $file->save();
+    }
+    catch (\Exception $e) {
+      throw new HttpException(500, NULL, $e);
+    }
   }
 
 }

@@ -3,8 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\rest\ResourceResponse;
 use Drupal\multiversion\Entity\Workspace;
+use Drupal\relaxed\Http\ApiResourceResponse;
 
 /**
  * Implements http://docs.couchdb.org/en/latest/api/server/common.html#all-dbs
@@ -39,7 +39,7 @@ class AllDbsApiResource extends ApiResourceBase {
       }
     }
 
-    $response = new ResourceResponse($workspace_machine_names, 200);
+    $response = new ApiResourceResponse($workspace_machine_names, 200);
     foreach ($workspaces as $workspace) {
       if ($workspace->isPublished()) {
         $response->addCacheableDependency($workspace);

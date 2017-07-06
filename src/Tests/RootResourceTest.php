@@ -12,10 +12,8 @@ use Drupal\Component\Serialization\Json;
 class RootResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $this->enableService('relaxed:root', 'GET');
-
     // Create a user with the correct permissions.
-    $permissions[] = 'restful get relaxed:root';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 

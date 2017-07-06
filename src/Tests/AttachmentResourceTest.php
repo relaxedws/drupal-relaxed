@@ -16,7 +16,6 @@ use Drupal\file\Entity\File;
 class AttachmentResourceTest extends ResourceTestBase {
 
   public static $modules = [
-    'rest',
     'entity_test',
     'file',
     'image'
@@ -36,13 +35,9 @@ class AttachmentResourceTest extends ResourceTestBase {
     parent::setUp();
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_rev', 'view');
-    $permissions = array_merge($permissions, $this->entityPermissions('entity_test_rev', 'create'));
-    $permissions = array_merge($permissions, $this->entityPermissions('entity_test_rev', 'delete'));
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:attachment';
-    $permissions[] = 'restful put relaxed:attachment';
-    $permissions[] = 'restful delete relaxed:attachment';
+    $permissions[] = 'perform pull replication';
+    $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -127,8 +122,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testHead() {
-    $this->enableService('relaxed:attachment', 'GET');
-
     $file_contents = file_get_contents($this->files['1']->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
 
@@ -164,8 +157,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testGet() {
-    $this->enableService('relaxed:attachment', 'GET');
-
     $file_contents = file_get_contents($this->files['1']->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
 
@@ -204,9 +195,7 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $this->enableService('relaxed:attachment', 'PUT');
-
-    $serializer = $this->container->get('serializer');
+    $serializer = $this->container->get('replication.serializer');
     $file_uri = 'public://new_example.txt';
     file_put_contents($file_uri, $this->randomMachineName());
     $file_stub = File::create(['uri' => $file_uri]);
@@ -220,7 +209,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
     /** @var \Drupal\file\FileInterface $file */
-    $files = \Drupal::entityManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
+    $files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
     $file = reset($files);
     $this->assertTrue(!empty($file), 'File was saved.');
     $this->assertEqual($file->getFileUri(), $file_uri, 'File was saved with the correct URI.');
@@ -230,8 +219,6 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testDelete() {
-    $this->enableService('relaxed:attachment', 'DELETE');
-
     $field_name = 'field_test_file';
     $attachment_info = $field_name . '/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);

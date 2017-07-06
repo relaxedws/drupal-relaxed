@@ -23,7 +23,7 @@ class LocalDocResource extends DocApiResource {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $existing) {
     $this->checkWorkspaceExists($workspace);
@@ -44,7 +44,7 @@ class LocalDocResource extends DocApiResource {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $existing) {
     $this->checkWorkspaceExists($workspace);
@@ -67,7 +67,7 @@ class LocalDocResource extends DocApiResource {
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (!$received_entity->getEntityType()->get('local')) {

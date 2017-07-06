@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\rest\ModifiedResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 
 /**
  * @ApiResource(
@@ -20,13 +20,14 @@ class BulkDocsApiResource extends ApiResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\replication\BulkDocs\BulkDocsInterface $bulk_docs
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function post($workspace, $bulk_docs) {
     $this->checkWorkspaceExists($workspace);
 
     $bulk_docs->save();
-    return new ModifiedResourceResponse($bulk_docs, 201);
+
+    return new ApiResourceResponse($bulk_docs, 201);
   }
 
 }

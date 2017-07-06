@@ -12,10 +12,11 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 abstract class ApiResourceBase extends PluginBase implements ApiResourceInterface {
 
-  public function isAttachment() {
-    return (substr($this->getPluginId(), -strlen('attachment')) == 'attachment');
-  }
-
+  /**
+   * Validates a content entity.
+   *
+   * @param ContentEntityInterface $entity
+   */
   protected function validate(ContentEntityInterface $entity) {
     $violations = $entity->validate();
 

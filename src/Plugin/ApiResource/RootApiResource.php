@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 
 /**
  * @ApiResource(
@@ -14,12 +14,13 @@ use Drupal\rest\ResourceResponse;
 class RootApiResource extends ApiResourceBase {
 
   /**
-   * @return ResourceResponse
+   * @return ApiResourceResponse
    */
   public function get() {
     $request = \Drupal::request();
     $uuid = MD5($request->getHost() . $request->getPort());
-    return new ResourceResponse(
+
+    return new ApiResourceResponse(
       [
         'couchdb' => t('Welcome'),
         'uuid' => $uuid,

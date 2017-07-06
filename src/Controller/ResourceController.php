@@ -232,7 +232,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
         $response_part->setContent($response_output);
       }
 
-      if (!$response_part->headers->get('Content-Type')) {
+      if (!$response_part->headers->has('Content-Type')) {
         $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
       }
     }
@@ -335,7 +335,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   }
 
   /**
-   * @return \Drupal\relaxed\Plugin\rest\resource\RelaxedResourceInterface
+   * @return \Drupal\relaxed\Plugin\ApiResourceInterface
    */
   protected function getResource($plugin_id) {
     return $this->resourceManager->createInstance($plugin_id, $this->resourceManager->getDefinition($plugin_id));

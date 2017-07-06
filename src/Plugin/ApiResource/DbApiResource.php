@@ -3,10 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\rest\ModifiedResourceResponse;
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -31,12 +29,14 @@ class DbApiResource extends ApiResourceBase {
   /**
    * @param $entity
    *
-   * @return ResourceResponse
+   * @return ApiResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function head($entity) {
-    $this->checkWorkspaceExists($entity);
-    $response = new ResourceResponse(NULL, 200);
+    if (!$entity instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
+    $response = new ApiResourceResponse(NULL, 200);
     $response->addCacheableDependency($entity);
 
     return $response;
@@ -45,13 +45,13 @@ class DbApiResource extends ApiResourceBase {
   /**
    * @param $entity
    *
-   * @return ResourceResponse
+   * @return ApiResourceResponse
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($entity) {
     $this->checkWorkspaceExists($entity);
     // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
-    $response =  new ResourceResponse($entity, 200);
+    $response =  new ApiResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
 
     return $response;
@@ -60,7 +60,10 @@ class DbApiResource extends ApiResourceBase {
   /**
    * @param $entity
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ApiResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
   public function put($entity) {
     $this->checkWorkspaceExists($entity);
@@ -78,14 +81,22 @@ class DbApiResource extends ApiResourceBase {
       throw new HttpException(500, t($e->getMessage()), $e);
     }
 
-    return new ModifiedResourceResponse(['ok' => TRUE], 201);
+    $response = new ApiResourceResponse(['ok' => TRUE], 201);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 
   /**
    * @param $workspace
    * @param ContentEntityInterface $entity
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ApiResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
   public function post($workspace, ContentEntityInterface $entity = NULL) {
     // If the workspace parameter is a string it means it could not be upcasted
@@ -119,7 +130,10 @@ class DbApiResource extends ApiResourceBase {
       $entity->save();
       $rev = $entity->_rev->value;
 
-      return new ModifiedResourceResponse(['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev], 201, ['ETag' => $rev]);
+      $response = new ApiResourceResponse(['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev], 201, ['ETag' => $rev]);
+      $response->addCacheableDependency($entity);
+
+      return $response;
     }
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage(), $e);
@@ -129,7 +143,8 @@ class DbApiResource extends ApiResourceBase {
   /**
    * @param WorkspaceInterface $entity
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ApiResourceResponse
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function delete(WorkspaceInterface $entity) {
     if (!$entity->isPublished()) {
@@ -143,7 +158,10 @@ class DbApiResource extends ApiResourceBase {
       throw new HttpException(500, $e->getMessage(), $e);
     }
 
-    return new ModifiedResourceResponse(['ok' => TRUE], 200);
+    $response = new ApiResourceResponse(['ok' => TRUE], 200);
+    $response->addCacheableDependency($entity);
+
+    return $response;
   }
 
 }

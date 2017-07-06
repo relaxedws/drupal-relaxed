@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\rest\ModifiedResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -25,7 +25,7 @@ class EnsureFullCommitApiResource extends ApiResourceBase {
   /**
    * @param $workspace
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function post($workspace) {
     if (!$workspace instanceof WorkspaceInterface) {
@@ -37,7 +37,7 @@ class EnsureFullCommitApiResource extends ApiResourceBase {
       'instance_start_time' => (string) $workspace->getStartTime(),
     ];
 
-    return new ModifiedResourceResponse($response_data, 201);
+    return new ApiResourceResponse($response_data, 201);
   }
 
 }

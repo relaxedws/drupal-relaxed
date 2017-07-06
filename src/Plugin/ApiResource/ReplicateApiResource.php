@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\rest\ModifiedResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 
 /**
  * @ApiResource(
@@ -19,11 +19,11 @@ class ReplicateApiResource extends ApiResourceBase {
   /**
    * @param \Drupal\relaxed\Replicate\Replicate $replicate
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function post($replicate) {
     $replicate->doReplication();
 
-    return new ModifiedResourceResponse($replicate, 200);
+    return new ApiResourceResponse($replicate, 201);
   }
 }

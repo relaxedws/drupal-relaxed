@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Drupal\Core\Cache\CacheableMetadata;
 
@@ -16,7 +16,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 class SessionApiResource extends ApiResourceBase {
 
   /**
-   * @return ResourceResponse
+   * @return ApiResourceResponse
    */
   public function get() {
     $account = \Drupal::currentUser();
@@ -30,7 +30,7 @@ class SessionApiResource extends ApiResourceBase {
       $roles[] = '_admin';
     }
 
-    $response = new ResourceResponse(
+    $response = new ApiResourceResponse(
       [
         'info' => [],
         'ok' => TRUE,

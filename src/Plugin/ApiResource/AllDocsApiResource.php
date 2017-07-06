@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -34,7 +34,7 @@ class AllDocsApiResource extends ApiResourceBase {
       $all_docs->includeDocs(TRUE);
     }
 
-    $response = new ResourceResponse($all_docs, 200);
+    $response = new ApiResourceResponse($all_docs, 200);
     foreach (\Drupal::service('multiversion.manager')->getSupportedEntityTypes() as $entity_type) {
       $response->addCacheableDependency($entity_type);
     }

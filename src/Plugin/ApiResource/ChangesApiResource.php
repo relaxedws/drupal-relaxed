@@ -3,9 +3,9 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Drupal\replication\Changes\ChangesInterface;
 use Drupal\replication\ChangesFactoryInterface;
-use Drupal\rest\ResourceResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -72,7 +72,7 @@ class ChangesApiResource extends ApiResourceBase implements ContainerFactoryPlug
       $changes->includeDocs(TRUE);
     }
 
-    return new ResourceResponse($changes, 200);
+    return new ApiResourceResponse($changes, 200);
   }
 
 }

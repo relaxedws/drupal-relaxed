@@ -3,10 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
-use Drupal\rest\ModifiedResourceResponse;
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -38,7 +36,7 @@ class AttachmentApiResource extends ApiResourceBase {
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ResourceResponse
+   * @return ApiResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     $this->checkWorkspaceExists($workspace);
@@ -50,7 +48,7 @@ class AttachmentApiResource extends ApiResourceBase {
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    return new ResourceResponse(NULL, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
+    return new ApiResourceResponse(NULL, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
   }
 
   /**
@@ -61,7 +59,7 @@ class AttachmentApiResource extends ApiResourceBase {
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ResourceResponse
+   * @return ApiResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     $this->checkWorkspaceExists($workspace);
@@ -73,7 +71,7 @@ class AttachmentApiResource extends ApiResourceBase {
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
-    return new ResourceResponse($file, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
+    return new ApiResourceResponse($file, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
   }
 
   /**
@@ -86,7 +84,7 @@ class AttachmentApiResource extends ApiResourceBase {
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ApiResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
     $this->checkWorkspaceExists($workspace);
@@ -116,7 +114,8 @@ class AttachmentApiResource extends ApiResourceBase {
       $entity->save();
 
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value];
-      return new ModifiedResourceResponse($data, 200, $this->responseHeaders($file, ['Content-MD5', 'X-Relaxed-ETag']));
+
+      return new ApiResourceResponse($data, 200, $this->responseHeaders($file, ['Content-MD5', 'X-Relaxed-ETag']));
     }
     catch (\Exception $e) {
       throw new HttpException(500, t($e->getMessage()), $e);
@@ -132,7 +131,7 @@ class AttachmentApiResource extends ApiResourceBase {
    * @param string $scheme
    * @param string $filename
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     $this->checkWorkspaceExists($workspace);
@@ -156,7 +155,8 @@ class AttachmentApiResource extends ApiResourceBase {
       $entity->save();
       $rev = $entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev];
-      return new ModifiedResourceResponse($data, 200, ['X-Relaxed-ETag' => $rev]);
+
+      return new ApiResourceResponse($data, 200, $this->responseHeaders($file, ['X-Relaxed-ETag']), $rev);
     }
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage(), $e);
