@@ -9,6 +9,11 @@ use Drupal\relaxed\Plugin\FormatNegotiatorInterface;
 abstract class NegotiatorBase extends PluginBase implements FormatNegotiatorInterface {
 
   /**
+   * @var array
+   */
+  protected $cacheTags = [];
+
+  /**
    * @var \Symfony\Component\Serializer\Serializer
    */
   protected $serializer;
@@ -25,6 +30,27 @@ abstract class NegotiatorBase extends PluginBase implements FormatNegotiatorInte
    */
   public function applies($format, $method, $type) {
     return in_array($format, $this->getPluginDefinition()['formats']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return $this->cacheTags;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    return CACHE::PERMANENT;
   }
 
 }

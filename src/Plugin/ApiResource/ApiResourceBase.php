@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
@@ -13,6 +14,11 @@ use Symfony\Component\Routing\RouteCollection;
  * Base API resource plugin.
  */
 abstract class ApiResourceBase extends PluginBase implements ApiResourceInterface {
+
+  /**
+   * @var array
+   */
+  protected $cacheTags = [];
 
   /**
    * Validates a content entity.
@@ -34,4 +40,26 @@ abstract class ApiResourceBase extends PluginBase implements ApiResourceInterfac
       throw new BadRequestHttpException(implode('. ', $messages));
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return $this->cacheTags;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    return Cache::PERMANENT;
+  }
+
 }
