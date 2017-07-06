@@ -7,8 +7,8 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
-use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -35,7 +35,7 @@ class DocApiResource extends ApiResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $existing) {
     if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
@@ -51,14 +51,14 @@ class DocApiResource extends ApiResourceBase {
     }
 
     // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
+    return new ApiResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
   }
 
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param mixed $existing
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $existing) {
     if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
@@ -90,8 +90,9 @@ class DocApiResource extends ApiResourceBase {
       if ($request->headers->get('Accept') === 'multipart/mixed'
         || ($request->headers->get('Accept') === '*/*' && $request->headers->get('multipart') === 'mixed')) {
         foreach ($revisions as $revision) {
-          $parts[] = new ResourceResponse($revision, 200, ['Content-Type' => 'application/json']);
+          $parts[] = new ApiResourceResponse($revision, 200, ['Content-Type' => 'application/json']);
         }
+
         return new ResourceMultipartResponse($parts, 200, ['Content-Type' => 'multipart/mixed']);
       }
       else {
@@ -108,7 +109,7 @@ class DocApiResource extends ApiResourceBase {
       $result = $revisions[0];
     }
 
-    return new ResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
+    return new ApiResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
   }
 
   /**
@@ -117,7 +118,7 @@ class DocApiResource extends ApiResourceBase {
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (!$workspace instanceof WorkspaceInterface) {
@@ -154,7 +155,7 @@ class DocApiResource extends ApiResourceBase {
       $received_entity->save();
       $rev = $received_entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev];
-      return new ResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
+      return new ApiResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, $e->getMessage());
@@ -165,7 +166,7 @@ class DocApiResource extends ApiResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity) {
     if (!($workspace instanceof WorkspaceInterface)
@@ -190,7 +191,7 @@ class DocApiResource extends ApiResourceBase {
       throw new HttpException(500, NULL, $e);
     }
 
-    return new ResourceResponse(['ok' => TRUE], 200);
+    return new ApiResourceResponse(['ok' => TRUE], 200);
   }
 
   /**

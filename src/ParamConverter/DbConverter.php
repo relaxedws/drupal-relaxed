@@ -40,7 +40,7 @@ class DbConverter implements ParamConverterInterface {
     $workspace = $this->workspaceManager->loadByMachineName($machine_name);
     if (!$workspace) {
       $methods = $defaults['_route_object']->getMethods();
-      if (in_array('PUT', $methods) && $defaults['_plugin'] == 'relaxed:db') {
+      if (in_array('PUT', $methods) && $defaults['_api_resource'] == 'db') {
         $workspace_types = WorkspaceType::loadMultiple();
         $workspace_type = reset($workspace_types);
         $workspace = Workspace::create([

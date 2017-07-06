@@ -13,40 +13,30 @@ class DbResourceTest extends ResourceTestBase {
 
   public function testHead() {
     // HEAD and GET is handled by the same resource.
-    $this->enableService('relaxed:db', 'GET');
-
-    // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
-    $permissions[] = 'restful get relaxed:db';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
-
-    $response = $this->httpRequest($this->dbname, 'HEAD', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertTrue(empty($response), 'HEAD request returned no body.');
 
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->dbname, 'GET', NULL);
+    $this->httpRequest($this->dbname, 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertTrue(empty($response), 'HEAD request returned no body.');
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->dbname, 'GET', NULL);
+    $this->httpRequest($this->dbname, 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertTrue(empty($response), 'HEAD request returned no body.');
   }
 
   public function testGet() {
-    $this->enableService('relaxed:db', 'GET');
-
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
-    $permissions[] = 'restful get relaxed:db';
+    $permissions[] = 'administer workspaces';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -80,11 +70,9 @@ class DbResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $this->enableService('relaxed:db', 'PUT');
-
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'create');
-    $permissions[] = 'restful put relaxed:db';
+    $permissions[] = 'administer workspaces';
+    $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -128,14 +116,14 @@ class DbResourceTest extends ResourceTestBase {
   }
 
   public function testPost() {
-    $this->enableService('relaxed:db', 'POST');
-    $serializer = $this->container->get('serializer');
+    $serializer = $this->container->get('replication.serializer');
 
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
-      $permissions[] = 'restful post relaxed:db';
+      $permissions[] = 'administer workspaces';
+      $permissions[] = 'perform push replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -171,11 +159,9 @@ class DbResourceTest extends ResourceTestBase {
   }
 
   public function testDelete() {
-    $this->enableService('relaxed:db', 'DELETE');
-
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'delete');
-    $permissions[] = 'restful delete relaxed:db';
+    $permissions[] = 'administer workspaces';
+    $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 

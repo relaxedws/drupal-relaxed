@@ -12,13 +12,11 @@ use Drupal\Component\Serialization\Json;
 class ChangesResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $serializer = \Drupal::service('serializer');
-    $this->enableService('relaxed:changes', 'GET');
+    $serializer = \Drupal::service('replication.serializer');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:changes';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 

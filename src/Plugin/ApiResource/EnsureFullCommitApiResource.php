@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -32,6 +32,6 @@ class EnsureFullCommitApiResource extends ApiResourceBase {
       'instance_start_time' => (string) $workspace->getStartTime(),
     ];
 
-    return new ResourceResponse($response_data, 201);
+    return new ApiResourceResponse($response_data, 201);
   }
 }

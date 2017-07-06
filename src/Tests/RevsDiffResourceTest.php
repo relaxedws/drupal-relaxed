@@ -12,12 +12,9 @@ use Drupal\Component\Serialization\Json;
 class RevsDiffResourceTest extends ResourceTestBase {
 
   public function testPostNoMissingRevisions() {
-    $this->enableService('relaxed:revs_diff', 'POST');
-
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful post relaxed:revs_diff';
+    $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -58,11 +55,9 @@ class RevsDiffResourceTest extends ResourceTestBase {
   }
 
   public function testPostMissingRevisions() {
-    $this->enableService('relaxed:revs_diff', 'POST');
-
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
-    $permissions[] = 'restful post relaxed:revs_diff';
+    $permissions[] = 'administer workspaces';
+    $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 

@@ -12,13 +12,17 @@ use Drupal\Component\Serialization\Json;
 class SessionResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $this->enableService('relaxed:session', 'GET');
-
     // Create a user with the correct permissions and admin role.
-    $permissions = ['restful get relaxed:session', 'administer permissions', 'administer users'];
+    $permissions = [
+      'perform pull replication',
+      'administer permissions',
+      'administer users',
+    ];
     $account = $this->drupalCreateUser($permissions, 'test_admin_user');
     $roles = $account->getRoles();
+
     $this->drupalLogin($account);
+
     \Drupal::configFactory()->getEditable('user.settings')->set('admin_role', $roles[1])->save();
 
     $response = $this->httpRequest('_session', 'GET', NULL);

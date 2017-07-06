@@ -12,14 +12,13 @@ use Drupal\Component\Serialization\Json;
 class BulkDocsResourceTest extends ResourceTestBase {
 
   public function testPostCreate() {
-    $this->enableService('relaxed:bulk_docs', 'POST');
-
     $entity_types = ['entity_test_rev'];
+
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful post relaxed:bulk_docs';
+      $permissions[] = 'perform push replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -40,16 +39,15 @@ class BulkDocsResourceTest extends ResourceTestBase {
   }
 
   public function testPostUpdate() {
-    $this->enableService('relaxed:bulk_docs', 'POST');
     /** @var \Symfony\Component\Serializer\SerializerInterface $serializer */
-    $serializer = $this->container->get('serializer');
+    $serializer = $this->container->get('replication.serializer');
 
     $entity_type = 'entity_test_rev';
 
     // Create a user with the correct permissions.
     $permissions = $this->entityPermissions($entity_type, 'update');
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful post relaxed:bulk_docs';
+    $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 

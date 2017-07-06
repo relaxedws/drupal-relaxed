@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -22,7 +22,8 @@ class RevsDiffApiResource extends ApiResourceBase {
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\replication\RevisionDiff\RevisionDiffInterface $revs_diff
-   * @return \Drupal\rest\ResourceResponse
+   *
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function post($workspace, $revs_diff) {
     if (!$workspace instanceof WorkspaceInterface) {
@@ -32,7 +33,7 @@ class RevsDiffApiResource extends ApiResourceBase {
       throw new BadRequestHttpException(t('No content info received'));
     }
 
-    return new ResourceResponse($revs_diff, 200);
+    return new ApiResourceResponse($revs_diff, 200);
   }
 
 }
