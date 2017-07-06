@@ -30,4 +30,4 @@ projects:
     download:
       type: git
       branch: 8.x-1.x
-      url: "https://github.com/timmillwood/drupal-workspace.git"
+      url: "https://github.com/relaxedws/drupal-workspace.git"

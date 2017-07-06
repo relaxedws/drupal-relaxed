@@ -32,6 +32,9 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.4.x.make.yml
 
+matrix:
+  fast_finish: true
+
 notifications:
   slack: det:YiOiwfzUBtt9aTnWvocK8uDI
 
