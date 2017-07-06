@@ -12,13 +12,11 @@ use Drupal\Component\Serialization\Json;
 class AllDocsResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $this->enableService('relaxed:all_docs', 'GET');
-    $serializer = \Drupal::service('serializer');
+    $serializer = \Drupal::service('replication.serializer');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:all_docs';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 

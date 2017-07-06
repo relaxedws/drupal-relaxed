@@ -37,7 +37,7 @@ class MultipartResponse extends ResourceResponse {
       foreach ($this->getParts() as $part) {
         $content .= "--{$this->boundary}\r\n";
         $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
-        $content .= \Drupal::service('serializer')
+        $content .= \Drupal::service('replication.serializer')
           ->serialize($part->getResponseData(), 'json');
         $content .= "\r\n";
       }
