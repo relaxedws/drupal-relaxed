@@ -17,7 +17,7 @@ class RemoteTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['serialization', 'system', 'user', 'rest', 'key_value', 'multiversion', 'relaxed', 'replication'];
+  public static $modules = ['serialization', 'system', 'user', 'key_value', 'multiversion', 'relaxed', 'replication'];
 
   /**
    * {@inheritdoc}

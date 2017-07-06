@@ -47,7 +47,6 @@ abstract class ReplicationTestBase extends KernelTestBase {
   public static $modules = [
     'serialization',
     'system',
-    'rest',
     'key_value',
     'multiversion',
     'relaxed',
