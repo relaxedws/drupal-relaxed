@@ -101,7 +101,9 @@ abstract class ResourceTestBase extends WebTestBase {
     }
     if (!in_array($method, ['GET', 'HEAD'])) {
       // GET the CSRF token first for writing requests.
-      $token = $this->drupalGet('rest/session/token');
+      // The '/rest/session/token' route has been deprecated in favour of the
+      // generic system route.
+      $token = $this->drupalGet('session/token');
     }
     $additional_headers = [];
     if (is_array($headers)) {
