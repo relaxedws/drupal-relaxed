@@ -30,7 +30,7 @@ class LocalDocResource extends DocResource {
    */
   public function head($workspace, $existing) {
     if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
-      throw new NotFoundHttpException();
+      throw new NotFoundHttpException('This 404 error is totally normal for ReplicationLog entities.');
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
@@ -50,7 +50,7 @@ class LocalDocResource extends DocResource {
    */
   public function get($workspace, $existing) {
     if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
-      throw new NotFoundHttpException();
+      throw new NotFoundHttpException('This 404 error is totally normal for ReplicationLog entities.');
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
