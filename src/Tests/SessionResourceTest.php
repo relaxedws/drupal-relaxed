@@ -14,12 +14,16 @@ class SessionResourceTest extends ResourceTestBase {
   public function testGet() {
     // Create a user with the correct permissions and admin role.
     $permissions = [
-      'perform pull replication',
       'administer permissions',
       'administer users',
     ];
     $account = $this->drupalCreateUser($permissions, 'test_admin_user');
     $roles = $account->getRoles();
+
+    \Drupal::entityTypeManager()->getStorage('user_role')
+      ->load($roles[1])
+      ->setIsAdmin(TRUE)
+      ->save();
 
     $this->drupalLogin($account);
 
@@ -47,7 +51,6 @@ class SessionResourceTest extends ResourceTestBase {
     $this->drupalLogout();
 
     // Create a simple user with the correct permissions (no admin role).
-    $permissions = ['restful get relaxed:session'];
     $account = $this->drupalCreateUser($permissions, 'test_user');
     $roles = $account->getRoles();
     $this->drupalLogin($account);
