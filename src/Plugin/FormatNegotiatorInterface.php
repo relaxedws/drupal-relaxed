@@ -7,12 +7,13 @@
 
 namespace Drupal\relaxed\Plugin;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * Contract for format negotiator plugins.
  */
-interface FormatNegotiatorInterface {
+interface FormatNegotiatorInterface extends CacheableDependencyInterface {
 
   /**
    * Use this applies method OR the in the annotation. This was is

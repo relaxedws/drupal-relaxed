@@ -237,15 +237,16 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       }
     }
 
-    if ($request->getMethod() !== 'HEAD') {
+    if ($method !== 'HEAD') {
       $response->headers->set('Content-Length', strlen($response->getContent()));
     }
 
     if ($response instanceof CacheableResponseInterface) {
       /** @var \Drupal\relaxed\Plugin\ApiResourceInterface $api_resource */
       $api_resource = $this->getResource($api_resource_id);
-      // Add rest config's cache tags.
+      // Add API resource and format negotiator as dependencies.
       $response->addCacheableDependency($api_resource);
+      $response->addCacheableDependency($negotiator);
     }
 
     $cacheable_dependencies = [];
