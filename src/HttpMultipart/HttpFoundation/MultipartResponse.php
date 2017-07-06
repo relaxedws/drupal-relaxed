@@ -2,11 +2,11 @@
 
 namespace Drupal\relaxed\HttpMultipart\HttpFoundation;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MultipartResponse extends ResourceResponse {
+class MultipartResponse extends ApiResourceResponse {
   /**
    * @var string
    */
