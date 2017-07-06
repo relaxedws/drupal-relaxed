@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Controller;
 
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -98,6 +99,11 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   protected $renderer;
 
   /**
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   */
+  protected $token;
+
+  /**
    * Creates a new RequestHandler instance.
    *
    * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $resource_manager
@@ -106,11 +112,14 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    *   The format negotiator manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $token
+   *   The token manager.
    */
-  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer) {
+  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer, CsrfTokenGenerator $token) {
     $this->resourceManager = $resource_manager;
     $this->negotiatorManager = $negotiator_manager;
     $this->renderer = $renderer;
+    $this->token = $token;
   }
 
   /**
@@ -120,8 +129,19 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     return new static(
       $container->get('plugin.manager.api_resource'),
       $container->get('plugin.manager.format_negotiator'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('csrf_token')
     );
+  }
+
+  /**
+   * Generates a CSRF protecting session token.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response object.
+   */
+  public function csrfToken() {
+    return new Response($this->token->get('relaxed'), 200, ['Content-Type' => 'text/plain']);
   }
 
   /**
@@ -183,7 +203,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
 
     try {
       $render_context = new RenderContext();
-      /** @var \Drupal\rest\ResourceResponse $response */
+      /** @var \Drupal\relaxed\Http\ApiResourceResponse $response */
       $response = $this->renderer->executeInRenderContext($render_context, function() use ($api_resource, $method, $parameters, $entity, $request) {
         return call_user_func_array([$api_resource, $method], array_merge($parameters, [$entity, $request]));
       });
@@ -363,7 +383,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    *
    * @todo {@link https://www.drupal.org/node/2599912 Improve to handle error and reason messages more generically.}
    */
-  public function errorResponse(\Exception $e, $format, Serializer $serializer, Request $request) {
+  protected function errorResponse(\Exception $e, $format, Serializer $serializer, Request $request) {
     // Default to 400 Bad Request.
     $status = 400;
     $error = 'bad_request';
@@ -403,16 +423,6 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     watchdog_exception('relaxed', $e);
 
     return new Response($content, $status, $headers);
-  }
-
-  /**
-   * Generates a CSRF protecting session token.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   The response object.
-   */
-  public function csrfToken() {
-    return new Response(\Drupal::csrfToken()->get('relaxed'), 200, ['Content-Type' => 'text/plain']);
   }
 
   /**
