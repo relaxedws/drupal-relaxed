@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\FormatNegotiator;
 
-
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\relaxed\Plugin\FormatNegotiatorInterface;
 
@@ -50,7 +50,7 @@ abstract class NegotiatorBase extends PluginBase implements FormatNegotiatorInte
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    return CACHE::PERMANENT;
+    return Cache::PERMANENT;
   }
 
 }
