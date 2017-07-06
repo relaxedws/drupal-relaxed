@@ -112,7 +112,6 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         '_api_resource' => $plugin_id,
       ], [
         '_permission' => $permissions,
-        '_csrf_request_header_token' => 'TRUE',
         // @todo We might want to remove this so any format will always return the same...
         // Add all formats we have to allowed responses on the route.
         //'_format' => implode('|', $this->availableFormats()),

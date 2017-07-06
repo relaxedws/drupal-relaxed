@@ -23,8 +23,6 @@ class SessionResourceTest extends ResourceTestBase {
 
     $this->drupalLogin($account);
 
-    \Drupal::configFactory()->getEditable('user.settings')->set('admin_role', $roles[1])->save();
-
     $response = $this->httpRequest('_session', 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);

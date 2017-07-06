@@ -13,6 +13,7 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
 
   public function testPost() {
     // Create a user with the correct permissions.
+    $permissions[] = 'administer workspaces';
     $permissions[] = 'perform push replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);

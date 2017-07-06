@@ -12,18 +12,19 @@ use Drupal\Component\Serialization\Json;
 class RevsDiffResourceTest extends ResourceTestBase {
 
   public function testPostNoMissingRevisions() {
-    // Create a user with the correct permissions.
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'perform push replication';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
-
     // We set this here just to test creation and saving
-    // (with 'relaxed:revs_diff') the entity on the same workspace.
+    // (with 'revs_diff') the entity on the same workspace.
     $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
+      // Create a user with the correct permissions.
+      $permissions = $this->entityPermissions($entity_type, 'create');
+      $permissions[] = 'administer workspaces';
+      $permissions[] = 'perform push replication';
+      $account = $this->drupalCreateUser($permissions);
+      $this->drupalLogin($account);
+
       // Create a new test entity.
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
@@ -55,14 +56,14 @@ class RevsDiffResourceTest extends ResourceTestBase {
   }
 
   public function testPostMissingRevisions() {
-    // Create a user with the correct permissions.
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'perform push replication';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
-
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
+      // Create a user with the correct permissions.
+      $permissions = $this->entityPermissions($entity_type, 'create');
+      $permissions[] = 'administer workspaces';
+      $permissions[] = 'perform push replication';
+      $account = $this->drupalCreateUser($permissions);
+      $this->drupalLogin($account);
 
       // Create a new test entity.
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
