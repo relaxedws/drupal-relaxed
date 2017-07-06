@@ -10,6 +10,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
+use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
@@ -84,14 +85,15 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   public function handle(RouteMatchInterface $route_match, Request $request) {
     $route = $route_match->getRouteObject();
     $method = strtolower($request->getMethod());
-    $format = $this->getFormat($route, $request);
-
-    // Select the format negotiator for the request data.
-    $negotiator = $this->negotiatorManager->select($format, $method, 'request');
-    $serializer = $negotiator->serializer();
 
     $api_resource_id = $route->getDefault('_api_resource');
     $api_resource = $this->getResource($api_resource_id);
+
+    $content_type_format = $this->getContentTypeFormat($route, $request, $api_resource);
+
+    // Select the format negotiator for the request data.
+    $negotiator = $this->negotiatorManager->select($content_type_format, $method, 'request');
+    $serializer = $negotiator->serializer();
 
     $content = $request->getContent();
     $parameters = $this->getParameters($route_match);
@@ -99,7 +101,10 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
 
     // @todo {@link https://www.drupal.org/node/2600500 Check if this is safe.}
     $query = $request->query->all();
-    $context = ['query' => $query, 'api_resource_id' => $api_resource_id];
+    $context = [
+      'query' => $query,
+      'api_resource_id' => $api_resource_id,
+    ];
 
     $entity = NULL;
     $definition = $api_resource->getPluginDefinition();
@@ -121,10 +126,10 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
           $content = $api_resource->putMultipartRequest($request);
         }
 
-        $entity = $serializer->deserialize($content, $class, $format, $context);
+        $entity = $serializer->deserialize($content, $class, $content_type_format, $context);
       }
       catch (\Exception $e) {
-        return $this->errorResponse($e, $format, $serializer);
+        return $this->errorResponse($e, $content_type_format, $serializer, $request);
       }
     }
 
@@ -140,11 +145,13 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       }
     }
     catch (\Exception $e) {
-      return $this->errorResponse($e, $format, $serializer);
+      return $this->errorResponse($e, $content_type_format, $serializer, $request);
     }
 
     // Select the format negotiator for the response data.
-    $negotiator = $this->negotiatorManager->select($format, $method, 'response');
+    $response_format = $this->getResponseFormat($route, $request, $api_resource);
+
+    $negotiator = $this->negotiatorManager->select($response_format, $method, 'response');
     $serializer = $negotiator->serializer();
 
     // @todo This is not nice, it's hacky. Find a nicer way to get response
@@ -153,12 +160,9 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     // If the format for the response is not in the chosen negotiator, use the
     // first one from the definition.
     $negotiator_formats = $negotiator->getPluginDefinition()['formats'];
-    if (!in_array($format, $negotiator_formats, TRUE)) {
-      // Use the first.
+    if (!in_array($response_format, $negotiator_formats, TRUE)) {
+      // Use the first from the chosen negotiator.
       $response_format = reset($negotiator_formats);
-    }
-    else {
-      $response_format = $format;
     }
 
     $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
@@ -216,12 +220,18 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
   }
 
   /**
+   * Gets the response format.
+   *
+   * This uses the content type format if an actual format is no specified.
+   *
    * @return string
    */
-  protected function getFormat(Route $route, Request $request) {
+  protected function getResponseFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
+    $api_resource_formats = $api_resource->getPluginDefinition()['allowed_formats'];
     $acceptable_request_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
-    $acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
-    $acceptable_formats = $request->isMethodSafe() ? $acceptable_request_formats : $acceptable_content_type_formats;
+    //$acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
+    //$acceptable_formats = $request->isMethodSafe() ? $acceptable_request_formats : $acceptable_content_type_formats;
+    $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_request_formats;
 
     $requested_format = $request->getRequestFormat();
     $content_type_format = $request->getContentType();
@@ -235,14 +245,42 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     // If a request body is present, then use the format corresponding to the
     // request body's Content-Type for the response, if it's an acceptable
     // format for the request.
-    elseif (!empty($request->getContent()) && in_array($content_type_format, $acceptable_content_type_formats)) {
+    elseif (!empty($request->getContent()) && in_array($content_type_format, $acceptable_formats)) {
       return $content_type_format;
     }
     // Otherwise, use the first acceptable format.
     elseif (!empty($acceptable_formats)) {
       return $acceptable_formats[0];
     }
-    // Default to JSON otherwise.
+    // Do we want this to be JSON instead.
+    else {
+      return 'json';
+    }
+  }
+
+  /**
+   * Gets the content type format.
+   *
+   * @return string
+   */
+  protected function getContentTypeFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
+    $api_resource_formats = $api_resource->getPluginDefinition()['allowed_formats'];
+    $acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
+    $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_content_type_formats;
+
+    $content_type_format = $request->getContentType();
+
+    // If a request body is present, then use the format corresponding to the
+    // request body's Content-Type for the response, if it's an acceptable
+    // format for the request.
+    if (in_array($content_type_format, $acceptable_formats)) {
+      return $content_type_format;
+    }
+    // Otherwise, use the first acceptable format.
+    elseif (!empty($acceptable_formats)) {
+      return reset($acceptable_formats);
+    }
+    // Default and assume JSON otherwise.
     else {
       return 'json';
     }
@@ -276,7 +314,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    *
    * @todo {@link https://www.drupal.org/node/2599912 Improve to handle error and reason messages more generically.}
    */
-  public function errorResponse(\Exception $e, $format, Serializer $serializer) {
+  public function errorResponse(\Exception $e, $format, Serializer $serializer, Request $request) {
     // Default to 400 Bad Request.
     $status = 400;
     $error = 'bad_request';
@@ -303,17 +341,17 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
     }
 
     // Always try and set the content type for the response.
-    $headers['Content-Type'] = $this->request->getMimeType($format);
+    $headers['Content-Type'] = $request->getMimeType($format);
 
     $content = '';
 
     // We shouldn't respond with content for HEAD requests.
-    if ($this->request->getMethod() != 'HEAD') {
+    if ($request->getMethod() != 'HEAD') {
       $data = ['error' => $error, 'reason' => $reason];
       $content = $serializer->serialize($data, $format);
     }
 
-    watchdog_exception('Relaxed', $e);
+    watchdog_exception('relaxed', $e);
 
     return new Response($content, $status, $headers);
   }

@@ -115,7 +115,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         '_csrf_request_header_token' => 'TRUE',
         // @todo We might want to remove this so any format will always return the same...
         // Add all formats we have to allowed responses on the route.
-        '_format' => implode('|', $this->availableFormats()),
+        //'_format' => implode('|', $this->availableFormats()),
       ],
         [
           'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
@@ -127,7 +127,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
       );
 
       $route->setOption('_auth', $this->authenticationProviders());
-      $route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats($api_resource))]);
+      //$route->addRequirements(['_content_type_format' => implode('|', $this->availableFormats($api_resource))]);
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
       // logic to a generic route enhancer instead.}
@@ -193,19 +193,19 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
    * @return array
    */
   protected function availableFormats(ApiResourceInterface $api_resource = NULL) {
-    $resource_available_formats = $api_resource ? $api_resource->getPluginDefinition()['allowed_formats'] : [];
+    $resource_allowed_formats = $api_resource ? $api_resource->getPluginDefinition()['allowed_formats'] : [];
 
     if (!isset($this->availableFormats)) {
       $this->availableFormats = $this->formatManager->availableFormats();
     }
 
-    if (empty($resource_available_formats)) {
+    if (empty($resource_allowed_formats)) {
       // Return all formats.
       return $this->availableFormats;
     }
 
     // Otherwise, intersect them.
-    return array_intersect($this->availableFormats, $resource_available_formats);
+    return array_intersect($this->availableFormats, $resource_allowed_formats);
   }
 
   /**
