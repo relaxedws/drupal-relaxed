@@ -186,7 +186,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_POST => TRUE,
-      CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '"}',
+      CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "http_connections":2, "worker_processes":1}',
       CURLOPT_URL => "$this->couchdbUrl/_replicate",
       CURLOPT_NOBODY => FALSE,
       CURLOPT_HTTPHEADER => [
