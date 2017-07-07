@@ -12,10 +12,6 @@ use Drupal\Component\Serialization\Json;
 class RevsDiffResourceTest extends ResourceTestBase {
 
   public function testPostNoMissingRevisions() {
-    // We set this here just to test creation and saving
-    // (with 'revs_diff') the entity on the same workspace.
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
-
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
@@ -24,6 +20,11 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $permissions[] = 'perform push replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
+
+      // We set this here just to test creation and saving (with 'revs_diff')
+      // the entity on the same workspace. Set this after the user has been
+      // created and logged in.
+      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
 
       // Create a new test entity.
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
