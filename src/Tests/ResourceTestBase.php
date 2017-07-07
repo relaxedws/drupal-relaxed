@@ -12,7 +12,7 @@ abstract class ResourceTestBase extends WebTestBase {
     'file',
     'multiversion',
     'relaxed',
-    'relaxed_test'
+    'relaxed_test',
   ];
 
   /**

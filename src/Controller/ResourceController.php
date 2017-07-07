@@ -180,7 +180,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
         }
 
         // Process a multipart/related PUT request.
-        if ($method == 'put' && !$this->isValidJson($content) && !$api_resource->isAttachment()) {
+        if (($method == 'put') && !$this->isValidJson($content) && ($content_type_format === 'json')) {
           $content = $api_resource->putMultipartRequest($request);
         }
 
