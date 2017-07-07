@@ -24,9 +24,18 @@ class SessionApiResource extends ApiResourceBase {
       throw new UnauthorizedHttpException('', 'Username or password was not recognized.');
     }
 
-    $roles = array_values($account->getRoles());
-    $admin_role = \Drupal::config('user.settings')->get('admin_role');
-    if (in_array($admin_role, $roles)) {
+    $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+    $roles = $account->getRoles();
+
+    // Query the users roles to see if any have admin.
+    $admin_role_count = $role_storage->getQuery()
+      ->condition('id', $roles)
+      ->condition('is_admin', TRUE)
+      ->count()
+      ->execute();
+
+    // Add computed '_admin' role to list if user has any admin flagged role.
+    if ($admin_role_count > 0) {
       $roles[] = '_admin';
     }
 
