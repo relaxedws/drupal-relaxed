@@ -121,6 +121,8 @@ class ChangesResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     // The result array should be empty in this case.
     $expected_without_docs['results'] = [];
+    // And last_seq == 0.
+    $expected_without_docs['last_seq'] = 0;
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     // @todo: {@link https://www.drupal.org/node/2600488 Assert the sort order.}
