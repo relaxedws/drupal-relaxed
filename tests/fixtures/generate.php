@@ -11,10 +11,13 @@
 
 define('DOCUMENTS', './documents.txt');
 define('FILE1', './file1.txt');
+define('FILEID', '6f9e1f07-e713-4840-bf95-8326c8317800');
 
 function _file_info($filename) {
   $contents = file_get_contents($filename);
   return [
+    'uuid' => FILEID,
+    'uri' => 'public://file1.txt',
     'content_type' => mime_content_type($filename),
     'digest' => 'md5-' . base64_encode(md5($contents)),
     'length' => filesize($filename),
@@ -136,12 +139,13 @@ $docs = [
       '@language' => 'en',
     ],
     '@type' => 'file',
-    '_id' => '6f9e1f07-e713-4840-bf95-8326c8317800',
+    '_id' => FILEID,
     'en' => [
       'filename' => ['value' => 'file1.txt'],
       'uri' => ['value' => 'public://file1.txt'],
       'filemime' => ['value' => 'text/plain'],
-    ]
+    ],
+    '_attachment' => _file_info(FILE1),
   ],
   // Entity with attachment.
   [
@@ -154,9 +158,6 @@ $docs = [
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [],
-    ],
-    '_attachments' => [
-      'files/0/6f9e1f07-e713-4840-bf95-8326c8317800/public/file1.txt' => _file_info(FILE1),
     ],
   ],
 ];
