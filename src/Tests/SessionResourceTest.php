@@ -50,6 +50,11 @@ class SessionResourceTest extends ResourceTestBase {
     // Logout the test_admin_user user.
     $this->drupalLogout();
 
+    $roles = [
+      'authenticated',
+      $roles[1],
+    ];
+
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 200.
     $expected = [
@@ -57,7 +62,7 @@ class SessionResourceTest extends ResourceTestBase {
       'ok' => TRUE,
       'userCtx' => [
         'user' => 'test_user_pull',
-        'roles' => ['perform pull replication'],
+        'roles' => $roles,
       ],
     ];
 
@@ -75,7 +80,7 @@ class SessionResourceTest extends ResourceTestBase {
       'ok' => TRUE,
       'userCtx' => [
         'user' => 'test_user_push',
-        'roles' => ['perform push replication'],
+        'roles' => $roles,
       ],
     ];
 
