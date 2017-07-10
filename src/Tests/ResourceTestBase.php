@@ -96,15 +96,18 @@ abstract class ResourceTestBase extends WebTestBase {
     if ($mime_type === NULL) {
       $mime_type = $this->defaultMimeType;
     }
+
     if ($mime_type === $this->defaultMimeType && !isset($query['_format'])) {
       $query['_format'] = $this->defaultFormat;
     }
+
     if (!in_array($method, ['GET', 'HEAD'])) {
       // GET the CSRF token first for writing requests.
       // The '/rest/session/token' route has been deprecated in favour of the
       // generic system route.
       $token = $this->drupalGet('session/token');
     }
+
     $additional_headers = [];
     if (is_array($headers)) {
       foreach ($headers as $name => $value) {
@@ -232,6 +235,27 @@ abstract class ResourceTestBase extends WebTestBase {
       '<hr />Response body: ' . $response);
 
     return $response;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * This method is overridden to deal with a cURL quirk: the usage of
+   * CURLOPT_CUSTOMREQUEST cannot be unset on the cURL handle, so we need to
+   * override it every time it is omitted.
+   */
+  protected function curlExec($curl_options, $redirect = FALSE) {
+    unset($this->response);
+
+    if (!isset($curl_options[CURLOPT_CUSTOMREQUEST])) {
+      if (!empty($curl_options[CURLOPT_HTTPGET])) {
+        $curl_options[CURLOPT_CUSTOMREQUEST] = 'GET';
+      }
+      if (!empty($curl_options[CURLOPT_POST])) {
+        $curl_options[CURLOPT_CUSTOMREQUEST] = 'POST';
+      }
+    }
+    return parent::curlExec($curl_options, $redirect);
   }
 
   /**
