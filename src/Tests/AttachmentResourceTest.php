@@ -137,7 +137,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
-    $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['2']->getSize());

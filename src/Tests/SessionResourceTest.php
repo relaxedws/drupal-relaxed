@@ -50,39 +50,41 @@ class SessionResourceTest extends ResourceTestBase {
     // Logout the test_admin_user user.
     $this->drupalLogout();
 
-    // Create a simple user with the correct permissions (no admin role).
-    $account = $this->drupalCreateUser($permissions, 'test_user');
-    $roles = $account->getRoles();
-    $this->drupalLogin($account);
-
-    $response = $this->httpRequest('_session', 'GET', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
-
+    // Create a user with the 'perform pull replication' permission and test the
+    // response code. It should be 200.
     $expected = [
       'info' => [],
       'ok' => TRUE,
       'userCtx' => [
-        'user' => 'test_user',
-        'roles' => $roles,
+        'user' => 'test_user_pull',
+        'roles' => ['perform pull replication'],
       ],
     ];
-    $this->assertIdentical($expected, $data, ('Correct values in response.'));
 
-    // Create a user with the 'perform pull replication' permission and test the
-    // response code. It should be 200.
-    $account = $this->drupalCreateUser(['perform pull replication']);
+    $account = $this->drupalCreateUser(['perform pull replication'], 'test_user_pull');
     $this->drupalLogin($account);
-    $this->httpRequest('_session', 'GET', NULL);
+    $response = $this->httpRequest('_session', 'GET', NULL);
+    $data = Json::decode($response);
     $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertIdentical($expected, $data, ('Correct values in response.'));
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
-    $account = $this->drupalCreateUser(['perform push replication']);
+    $expected = [
+      'info' => [],
+      'ok' => TRUE,
+      'userCtx' => [
+        'user' => 'test_user_push',
+        'roles' => ['perform push replication'],
+      ],
+    ];
+
+    $account = $this->drupalCreateUser(['perform push replication'], 'test_user_push');
     $this->drupalLogin($account);
-    $this->httpRequest('_session', 'GET', NULL);
+    $response = $this->httpRequest('_session', 'GET', NULL);
+    $data = Json::decode($response);
     $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertIdentical($expected, $data, ('Correct values in response.'));
   }
 
 }

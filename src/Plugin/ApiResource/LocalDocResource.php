@@ -70,7 +70,7 @@ class LocalDocResource extends DocApiResource {
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (!$received_entity->getEntityType()->get('local')) {
-      throw new BadRequestHttpException('This endpoint only support local entity types.');
+      throw new BadRequestHttpException('This endpoint only supports local entity types.');
     }
     return parent::put($workspace, $existing_entity, $received_entity, $request);
   }
