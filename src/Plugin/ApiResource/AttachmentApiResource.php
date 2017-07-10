@@ -47,7 +47,9 @@ class AttachmentApiResource extends ApiResourceBase {
 
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
+
     }
+
     return new ApiResourceResponse(NULL, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
   }
 
@@ -71,6 +73,7 @@ class AttachmentApiResource extends ApiResourceBase {
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
       throw new AccessDeniedHttpException();
     }
+
     return new ApiResourceResponse($file, 200, $this->responseHeaders($file, ['Content-Type', 'Content-Length', 'Content-MD5', 'X-Relaxed-ETag']));
   }
 

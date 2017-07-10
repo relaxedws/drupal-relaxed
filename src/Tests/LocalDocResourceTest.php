@@ -99,7 +99,12 @@ class LocalDocResourceTest extends ResourceTestBase {
     $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
     $serialized = $serializer->serialize($entity, $this->defaultFormat);
     $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'PUT', $serialized);
-    $this->assertEqual('', $response);
+
+    $expected = [
+      'error' => 'bad_request',
+      'reason' => 'This endpoint only supports local entity types.',
+    ];
+    $this->assertEqual($serializer->serialize($expected, 'json'), $response);
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertResponse('400', 'HTTP response code is correct.');
   }

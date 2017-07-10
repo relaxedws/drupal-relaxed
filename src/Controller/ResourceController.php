@@ -247,7 +247,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       }
     }
 
-    if ($method !== 'HEAD') {
+    if ($method !== 'head') {
       $response->headers->set('Content-Length', strlen($response->getContent()));
     }
 
