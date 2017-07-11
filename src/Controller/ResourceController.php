@@ -15,8 +15,6 @@ use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,9 +27,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Serializer\Serializer;
 
-class ResourceController implements ContainerAwareInterface, ContainerInjectionInterface {
-
-  use ContainerAwareTrait;
+class ResourceController implements ContainerInjectionInterface {
 
   /**
    * The resource configuration storage.
