@@ -9,6 +9,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Serializer;
 
 /**
+ * Default JSON format(s).
+ *
+ * This will always apply and should come last.
+ *
  * @FormatNegotiator(
  *   id = "json",
  *   label = "JSON (default)",

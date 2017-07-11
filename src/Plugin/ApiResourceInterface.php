@@ -10,4 +10,11 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
  */
 interface ApiResourceInterface extends PluginInspectionInterface, CacheableDependencyInterface {
 
+  /**
+   * An array of allowed formats this resource supports.
+   *
+   * @return array
+   */
+  public function getAllowedFormats();
+
 }

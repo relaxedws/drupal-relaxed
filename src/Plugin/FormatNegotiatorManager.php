@@ -53,7 +53,7 @@ class FormatNegotiatorManager extends DefaultPluginManager implements FormatNego
    */
   public function select($format, $method, $type) {
     foreach ($this->getDefinitions() as $definition) {
-      $plugin = $this->createInstance($definition['id'], $definition);
+      $plugin = $this->createInstance($definition['id']);
 
       if ($plugin->applies($format, $method, $type)) {
         return $plugin;
@@ -67,6 +67,8 @@ class FormatNegotiatorManager extends DefaultPluginManager implements FormatNego
    * {@inheritdoc}
    */
   protected function findDefinitions() {
+    // Overriding findDefinitions means the definitions will be sorted before
+    // they are cached.
     $definitions = parent::findDefinitions();
 
     // Sort the definitions by priority.
