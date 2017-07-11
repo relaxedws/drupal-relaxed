@@ -145,7 +145,7 @@ $docs = [
       'uri' => ['value' => 'public://file1.txt'],
       'filemime' => ['value' => 'text/plain'],
     ],
-    '_attachment' => _file_info(FILE1),
+    '_attachments' => _file_info(FILE1),
   ],
   // Entity with attachment.
   [
