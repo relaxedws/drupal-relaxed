@@ -234,7 +234,7 @@ class ResourceController implements ContainerInjectionInterface {
    * @return string
    */
   protected function getResponseFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
-    $api_resource_formats = $api_resource->getPluginDefinition()['allowed_formats'];
+    $api_resource_formats = $api_resource->getAllowedFormats();
     $acceptable_request_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
     //$acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
     //$acceptable_formats = $request->isMethodSafe() ? $acceptable_request_formats : $acceptable_content_type_formats;
@@ -271,7 +271,7 @@ class ResourceController implements ContainerInjectionInterface {
    * @return string
    */
   protected function getContentTypeFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
-    $api_resource_formats = $api_resource->getPluginDefinition()['allowed_formats'];
+    $api_resource_formats = $api_resource->getAllowedFormats();
     $acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
     $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_content_type_formats;
 
@@ -297,7 +297,7 @@ class ResourceController implements ContainerInjectionInterface {
    * @return \Drupal\relaxed\Plugin\ApiResourceInterface
    */
   protected function getResource($plugin_id) {
-    return $this->resourceManager->createInstance($plugin_id, $this->resourceManager->getDefinition($plugin_id));
+    return $this->resourceManager->createInstance($plugin_id);
   }
 
   /**

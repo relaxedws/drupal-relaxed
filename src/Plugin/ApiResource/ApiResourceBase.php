@@ -44,6 +44,13 @@ abstract class ApiResourceBase extends PluginBase implements ApiResourceInterfac
   /**
    * {@inheritdoc}
    */
+  public function getAllowedFormats() {
+    return $this->getPluginDefinition()['allowed_formats'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheContexts() {
     return [];
   }

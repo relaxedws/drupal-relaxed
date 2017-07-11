@@ -168,7 +168,11 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the available methods for an API resource plugin.
+   *
+   * @param ApiResourceInterface $api_resource
+   *
+   * @return array
    */
   protected function availableMethods(ApiResourceInterface $api_resource) {
     $methods = $this->requestMethods();
@@ -192,7 +196,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
    * @return array
    */
   protected function availableFormats(ApiResourceInterface $api_resource = NULL) {
-    $resource_allowed_formats = $api_resource ? $api_resource->getPluginDefinition()['allowed_formats'] : [];
+    $resource_allowed_formats = $api_resource ? $api_resource->getAllowedFormats() : [];
 
     if (!isset($this->availableFormats)) {
       $this->availableFormats = $this->formatManager->availableFormats();
@@ -208,18 +212,12 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   }
 
   /**
-   * @param $method
+   * Returns the configured relaxed authentication providers.
+   *
    * @return array
    */
   protected function authenticationProviders() {
     return $this->authenticationProviders;
-  }
-
-  /**
-   * @return bool
-   */
-  protected function isAttachment() {
-    return FALSE;
   }
 
 }
