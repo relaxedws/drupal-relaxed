@@ -76,9 +76,6 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $this->port = getenv('COUCH_PORT') ?: 5984;
     $this->couchdbUrl = 'http://localhost:' . $this->port;
 
-    $cors_config = \Drupal::configFactory()->getEditable('cors.config');
-    $cors_config->set('enabled', TRUE)->save();
-
     // If source database exists, delete it.
     if ($this->existsDb($this->sourceDb)) {
       $this->deleteDb($this->sourceDb);
@@ -190,7 +187,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_POST => TRUE,
       CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "http_connections":2, "worker_processes":1}',
-      CURLOPT_URL => "$this->couchdbUrl/_replicate",
+      CURLOPT_URL => 'http://localhost:5984/_replicate',
       CURLOPT_NOBODY => FALSE,
       CURLOPT_HTTPHEADER => [
         'Content-Type: application/json',
