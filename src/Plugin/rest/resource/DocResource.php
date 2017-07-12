@@ -26,7 +26,8 @@ use GuzzleHttp\Psr7;
  *   },
  *   uri_paths = {
  *     "canonical" = "/{db}/{docid}",
- *   }
+ *   },
+ *   no_cache = TRUE
  * )
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
