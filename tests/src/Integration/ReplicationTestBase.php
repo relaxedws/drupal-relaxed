@@ -76,6 +76,9 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $this->port = getenv('COUCH_PORT') ?: 5984;
     $this->couchdbUrl = 'http://localhost:' . $this->port;
 
+    $cors_config = \Drupal::configFactory()->getEditable('cors.config');
+    $cors_config->set('enabled', TRUE)->save();
+
     // If source database exists, delete it.
     if ($this->existsDb($this->sourceDb)) {
       $this->deleteDb($this->sourceDb);
