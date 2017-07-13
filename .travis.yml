@@ -44,7 +44,7 @@ before_install:
   - nginx -c $TRAVIS_BUILD_DIR/.travis/nginx.conf
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
-  - composer --working-dir=$HOME/www require relaxedws/replicator:dev-8.x-2.x
+  - composer --working-dir=$HOME/www require relaxedws/replicator:dev-replication-optimisation
   # Install CouchDB.
   - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
