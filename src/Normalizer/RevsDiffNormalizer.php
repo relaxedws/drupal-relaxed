@@ -22,7 +22,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
   /** @var  \Drupal\replication\RevisionDiffFactoryInterface */
   protected $revisionDiffFactory;
 
-  public function __construct() {
+  public function __construct(RevisionDiffFactoryInterface $revisiondiff_factory) {
     $this->revisionDiffFactory = $revisiondiff_factory;
   }
 

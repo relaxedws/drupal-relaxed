@@ -7,16 +7,17 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Entity\RemoteInterface;
-use Drupal\workspace\Replication\ReplicationInterface;
+use Drupal\replication\Entity\ReplicationLog;
+use Drupal\replication\ReplicationTask\ReplicationTask;
+use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
 use Drupal\workspace\ReplicatorInterface;
-use Drupal\workspace\UpstreamInterface;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
 use Relaxed\Replicator\ReplicationTask as RelaxedReplicationTask;
 use Relaxed\Replicator\Replicator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class CouchdbReplicator implements ReplicationInterface {
+class CouchdbReplicator implements ReplicatorInterface{
 
   protected $relaxedSettings;
 
@@ -27,7 +28,7 @@ class CouchdbReplicator implements ReplicationInterface {
   /**
    * {@inheritDoc}
    */
-  public function applies(UpstreamInterface $source, UpstreamInterface $target) {
+  public function applies(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
     if ($this->setupEndpoint($source) && $this->setupEndpoint($target)) {
       return TRUE;
     }
@@ -36,7 +37,7 @@ class CouchdbReplicator implements ReplicationInterface {
   /**
    * {@inheritDoc}
    */
-  public function replicate(UpstreamInterface $source, UpstreamInterface $target, $task = NULL) {
+  public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target, $task = NULL) {
     if ($task !== NULL && !$task instanceof ReplicationTaskInterface && !$task instanceof RelaxedReplicationTask) {
       throw new UnexpectedTypeException($task, 'Drupal\replication\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
     }
@@ -87,7 +88,7 @@ class CouchdbReplicator implements ReplicationInterface {
     }
   }
 
-  protected function setupEndpoint(UpstreamInterface $pointer) {
+  protected function setupEndpoint(WorkspacePointerInterface $pointer) {
     if (!empty($pointer->getWorkspaceId())) {
       /** @var string $api_root */
       $api_root = trim($this->relaxedSettings->get('api_root'), '/');
@@ -126,7 +127,7 @@ class CouchdbReplicator implements ReplicationInterface {
     }
   }
 
-  protected function errorReplicationLog(UpstreamInterface $source, UpstreamInterface $target) {
+  protected function errorReplicationLog(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
     $time = new \DateTime();
     $history = [
       'start_time' => $time->format('D, d M Y H:i:s e'),

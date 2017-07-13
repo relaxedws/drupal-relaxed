@@ -3,9 +3,9 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\relaxed\Entity\Index\UuidIndexInterface;
-use Drupal\workspace\Entity\ReplicationLog;
-use Drupal\workspace\Entity\ReplicationLogInterface;
+use Drupal\multiversion\Entity\Index\UuidIndexInterface;
+use Drupal\replication\Entity\ReplicationLog;
+use Drupal\replication\Entity\ReplicationLogInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 

@@ -1,34 +1,7 @@
 services:
-  # Index Factory
-  relaxed.entity_index.factory:
-    class: Drupal\relaxed\Entity\Index\IndexFactory
-    arguments: ['@service_container', '@workspace.manager']
-
-  # Index children
-  relaxed.entity_index.id.scope:
-    parent: relaxed.entity_index.id
-    scope: prototype
-  relaxed.entity_index.uuid.scope:
-    parent: relaxed.entity_index.uuid
-    scope: prototype
-  relaxed.entity_index.rev.scope:
-    parent: relaxed.entity_index.rev
-    scope: prototype
-
-  # Indexes
-  relaxed.entity_index.id:
-    class: Drupal\relaxed\Entity\Index\EntityIndex
-    arguments: ['@keyvalue', '@workspace.manager']
-  relaxed.entity_index.uuid:
-    class: Drupal\relaxed\Entity\Index\UuidIndex
-    arguments: ['@keyvalue', '@workspace.manager']
-  relaxed.entity_index.rev:
-    class: Drupal\relaxed\Entity\Index\RevisionIndex
-    arguments: ['@keyvalue', '@workspace.manager']
-    
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@relaxed.entity_index.uuid', '@relaxed.entity_index.rev']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
@@ -38,7 +11,7 @@ services:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@relaxed.entity_index.uuid']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: paramconverter, priority: 20 }
   workspace.negotiator.relaxed:
@@ -73,17 +46,11 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@serializer', '@renderer', '@current_route_match']
-  relaxed.process_file_attachment:
-    class: Drupal\relaxed\ProcessFileAttachment
-    arguments: ['@current_user', '@entity_type.manager', '@relaxed.entity_index.factory']
-  relaxed.users_mapping:
-    class: Drupal\relaxed\UsersMapping
-    arguments: ['@config.factory', '@entity_type.manager']
 
 #Normalizers
   relaxed.normalizer.link_item:
     class: Drupal\relaxed\Normalizer\LinkItemNormalizer
-    arguments: ['@entity_type.manager', '@relaxed.entity_index.factory']
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.factory']
     tags:
       - { name: normalizer, priority: 5 }
   relaxed.normalizer.text_item:
@@ -92,12 +59,12 @@ services:
       - { name: normalizer, priority: 5 }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
-    arguments: ['@entity.manager', '@relaxed.entity_index.factory', '@language_manager', '@relaxed.process_file_attachment', '@relaxed.users_mapping', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.process_file_attachment', '@relaxed.users_mapping', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.replication_log:
-    class: Drupal\relaxed\Normalizer\ReplicationLogNormalizer
-    arguments: ['@entity_type.manager', '@relaxed.entity_index.uuid']
+    class: Drupal\relaxed\Normalizer\relaxedLogNormalizer
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: normalizer, priority: 20 }
   relaxed.normalizer.bulk_docs:
@@ -106,7 +73,7 @@ services:
       - { name: normalizer, priority: 20 }
   relaxed.normalizer.all_docs:
     class: Drupal\relaxed\Normalizer\AllDocsNormalizer
-    arguments: ['@entity.manager', '@relaxed.entity_index.uuid']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.changes:
@@ -128,12 +95,12 @@ services:
       - { name: normalizer, priority: 10 }
   relaxed.normalizer.revs_diff:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
-    arguments: []
+    arguments: ['@relaxed.revisiondiff_factory']
     tags:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.attachment:
     class: Drupal\relaxed\Normalizer\AttachmentNormalizer
-    arguments: ['@entity.manager', '@relaxed.entity_index.factory', '@language_manager', '@relaxed.process_file_attachment', '@relaxed.users_mapping', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.process_file_attachment', '@relaxed.users_mapping', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: normalizer, priority: 30 }
   relaxed.normalizer.file_item:

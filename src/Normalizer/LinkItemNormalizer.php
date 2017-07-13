@@ -4,8 +4,8 @@ namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\relaxed\Entity\Index\IndexFactory;
-use Drupal\workspace\Entity\WorkspaceInterface;
+use Drupal\multiversion\Entity\Index\MultiversionIndexFactory;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -32,7 +32,7 @@ class LinkItemNormalizer extends NormalizerBase implements DenormalizerInterface
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\multiversion\Entity\Index\MultiversionIndexFactory $index_factory
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, IndexFactory $index_factory) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, MultiversionIndexFactory $index_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->indexFactory = $index_factory;
   }

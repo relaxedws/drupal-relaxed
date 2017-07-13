@@ -2,20 +2,21 @@
 
 namespace Drupal\relaxed\ParamConverter;
 
-use Drupal\workspace\Entity\Workspace;
-use Drupal\workspace\WorkspaceManagerInterface;
+use Drupal\multiversion\Entity\Workspace;
+use Drupal\multiversion\Entity\WorkspaceType;
+use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Symfony\Component\Routing\Route;
 
 class DbConverter implements ParamConverterInterface {
 
   /**
-   * @var \Drupal\workspace\WorkspaceManagerInterface
+   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
   /**
-   * @param \Drupal\workspace\WorkspaceManagerInterface $workspace_manager
+   * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
    */
   public function __construct(WorkspaceManagerInterface $workspace_manager) {
     $this->workspaceManager = $workspace_manager;
@@ -40,9 +41,12 @@ class DbConverter implements ParamConverterInterface {
     if (!$workspace) {
       $methods = $defaults['_route_object']->getMethods();
       if (in_array('PUT', $methods) && $defaults['_plugin'] == 'relaxed:db') {
+        $workspace_types = WorkspaceType::loadMultiple();
+        $workspace_type = reset($workspace_types);
         $workspace = Workspace::create([
           'machine_name' => $machine_name,
           'label' => ucfirst($machine_name),
+          'type' => $workspace_type->id(),
         ]);
       }
     }
