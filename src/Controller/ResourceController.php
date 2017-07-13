@@ -109,6 +109,11 @@ class ResourceController implements ContainerInjectionInterface {
   protected $token;
 
   /**
+   * @var \Drupal\replication\ProcessFileAttachment
+   */
+  protected $attachment;
+
+  /**
    * Creates a new RequestHandler instance.
    *
    * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $resource_manager
@@ -119,12 +124,15 @@ class ResourceController implements ContainerInjectionInterface {
    *   The renderer.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $token
    *   The token manager.
+   * @param \Drupal\replication\ProcessFileAttachment $attachment
+   *   The file attachment processor.
    */
-  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer, CsrfTokenGenerator $token) {
+  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer, CsrfTokenGenerator $token, ProcessFileAttachment $attachment) {
     $this->resourceManager = $resource_manager;
     $this->negotiatorManager = $negotiator_manager;
     $this->renderer = $renderer;
     $this->token = $token;
+    $this->attachment = $attachment;
   }
 
   /**
@@ -135,7 +143,8 @@ class ResourceController implements ContainerInjectionInterface {
       $container->get('plugin.manager.api_resource'),
       $container->get('plugin.manager.format_negotiator'),
       $container->get('renderer'),
-      $container->get('csrf_token')
+      $container->get('csrf_token'),
+      $container->get('replication.process_file_attachment')
     );
   }
 
@@ -314,7 +323,7 @@ class ResourceController implements ContainerInjectionInterface {
     }
     // Otherwise, use the first acceptable format.
     elseif (!empty($acceptable_formats)) {
-      return $acceptable_formats[0];
+      return reset($acceptable_formats);
     }
     // Return the default format.
     else {
@@ -453,8 +462,7 @@ class ResourceController implements ContainerInjectionInterface {
         $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
 
         if ($file_info_found) {
-          $file = \Drupal::service('replication.process_file_attachment')
-            ->process($part['body'], $file_info[1], 'stream');
+          $file = $this->attachment->process($part['body'], $file_info[1], 'stream');
 
           if ($file instanceof FileInterface) {
             $this->putAttachment($file);
