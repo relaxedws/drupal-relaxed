@@ -17,7 +17,6 @@ use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,29 +37,6 @@ class ResourceController implements ContainerInjectionInterface {
    */
   const DEFAULT_FORMAT = 'json';
 
-  /**
-   * The resource configuration storage.
-   *
-   * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
-   */
-  protected $resourceManager;
-
-  /**
-   * Creates a new RequestHandler instance.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
-   *   The resource configuration storage.
-   */
-  public function __construct(EntityStorageInterface $entity_storage) {
-    $this->resourceStorage = $entity_storage;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('entity_type.manager')->getStorage('rest_resource_config'));
-  }
 
   /**
    * @return \Symfony\Component\DependencyInjection\ContainerInterface
@@ -159,7 +135,7 @@ class ResourceController implements ContainerInjectionInterface {
     $method = strtolower($request->getMethod());
 
     $api_resource_id = $route->getDefault('_api_resource');
-    $api_resource = $this->getResource($api_resource_id);
+    $api_resource = $this->resourceManager->createInstance($api_resource_id);
 
     $content_type_format = $this->getContentTypeFormat($route, $request, $api_resource);
 
@@ -266,28 +242,30 @@ class ResourceController implements ContainerInjectionInterface {
     }
 
     if ($response instanceof CacheableResponseInterface) {
-      /** @var \Drupal\relaxed\Plugin\ApiResourceInterface $api_resource */
-      $api_resource = $this->getResource($api_resource_id);
       // Add API resource and format negotiator as dependencies.
       $response->addCacheableDependency($api_resource);
       $response->addCacheableDependency($negotiator);
-    }
 
-    $cacheable_dependencies = [];
-    foreach ($render_contexts as $render_context) {
-      $cacheable_dependencies[] = $render_context;
-    }
-    foreach ($parameters as $parameter) {
-      if (is_array($parameter)) {
-        array_merge($cacheable_dependencies, $parameter);
+      $cacheable_dependencies = [];
+
+      foreach ($render_contexts as $render_context) {
+        $cacheable_dependencies[] = $render_context;
       }
-      else {
-        $cacheable_dependencies[] = $parameter;
+
+      foreach ($parameters as $parameter) {
+        if (is_array($parameter)) {
+          array_merge($cacheable_dependencies, $parameter);
+        }
+        else {
+          $cacheable_dependencies[] = $parameter;
+        }
       }
+
+      $cacheable_metadata = new CacheableMetadata();
+      $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
+
+      $this->addCacheableDependency($response, $cacheable_dependencies);
     }
-    $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url.query_args', 'request_format', 'headers:If-None-Match']);
-    $this->addCacheableDependency($response, $cacheable_dependencies);
 
     return $response;
   }
@@ -301,10 +279,10 @@ class ResourceController implements ContainerInjectionInterface {
    */
   protected function getResponseFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
     $api_resource_formats = $api_resource->getAllowedFormats();
-    $acceptable_request_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
+    $acceptable_response_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
     //$acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
     //$acceptable_formats = $request->isMethodSafe() ? $acceptable_request_formats : $acceptable_content_type_formats;
-    $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_request_formats;
+    $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_response_formats;
 
     $requested_format = $request->getRequestFormat();
     $content_type_format = $request->getContentType();
@@ -357,13 +335,6 @@ class ResourceController implements ContainerInjectionInterface {
     else {
       return static::DEFAULT_FORMAT;
     }
-  }
-
-  /**
-   * @return \Drupal\relaxed\Plugin\ApiResourceInterface
-   */
-  protected function getResource($plugin_id) {
-    return $this->resourceManager->createInstance($plugin_id);
   }
 
   /**
@@ -471,7 +442,7 @@ class ResourceController implements ContainerInjectionInterface {
       }
     }
 
-    return (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $request->getContent();
+    return !empty($parts[1]['body']) ? $parts[1]['body'] : $request->getContent();
   }
 
   /**

@@ -34,8 +34,13 @@ interface FormatNegotiatorInterface extends CacheableDependencyInterface {
    *
    * Pretty much every time would be injected into the plugin and just returned.
    *
+   * @param string $format
+   * @param string $method
+   * @param string $type
+   *   Either 'request' or 'response'.
+   *
    * @return \Symfony\Component\Serializer\Serializer
    */
-  public function serializer();
+  public function serializer($format, $method, $type);
 
 }

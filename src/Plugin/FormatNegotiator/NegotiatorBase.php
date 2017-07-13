@@ -21,7 +21,7 @@ abstract class NegotiatorBase extends PluginBase implements FormatNegotiatorInte
   /**
    * {@inheritdoc}
    */
-  public function serializer() {
+  public function serializer($format, $method, $type) {
     return $this->serializer;
   }
 
