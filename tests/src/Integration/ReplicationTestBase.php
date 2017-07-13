@@ -191,10 +191,12 @@ abstract class ReplicationTestBase extends KernelTestBase {
       CURLOPT_NOBODY => FALSE,
       CURLOPT_HTTPHEADER => [
         'Content-Type: application/json',
+        'Accept: application/json',
       ],
       CURLOPT_RETURNTRANSFER => TRUE,
     ]);
     $response = curl_exec($curl);
+    sleep(20);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     switch ($code) {
       case 200:
