@@ -11,7 +11,7 @@ matrix:
 
 services:
   - mysql
-  - couchdb
+  - docker
 
 addons:
   apt:
@@ -28,6 +28,9 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=2.0-dev
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.4.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=1.6.1
+
 
 matrix:
   fast_finish: true
@@ -50,7 +53,7 @@ before_install:
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-replication-optimisation
   # Install CouchDB.
-  #- if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
+  - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
