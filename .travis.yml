@@ -11,9 +11,6 @@ matrix:
 
 services:
   - mysql
-  # In Docker we will have CouchDB 2.0-dev on 127.0.0.1:3001.
-  - docker
-  # CouchDB 1.6.1 on 127.0.0.1:5984.
   - couchdb
 
 addons:
@@ -53,7 +50,7 @@ before_install:
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-replication-optimisation
   # Install CouchDB.
-  - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
+  #- if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
