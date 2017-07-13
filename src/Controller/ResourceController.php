@@ -3,14 +3,17 @@
 namespace Drupal\relaxed\Controller;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse;
+use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse as HttpFoundationMultipartResponse;
+use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
@@ -20,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
@@ -133,8 +137,8 @@ class ResourceController implements ContainerInjectionInterface {
         }
 
         // Process a multipart/related PUT request.
-        if (($method == 'put') && !$this->isValidJson($content) && ($content_type_format === 'json')) {
-          $content = $api_resource->putMultipartRequest($request);
+        if ($content_type_format === 'related') {
+          $content = $this->putMultipartRequest($request);
         }
 
         $entity = $serializer->deserialize($content, $class, $content_type_format, $context);
@@ -176,7 +180,7 @@ class ResourceController implements ContainerInjectionInterface {
       $response_format = reset($negotiator_formats);
     }
 
-    $responses = ($response instanceof MultipartResponse) ? $response->getParts() : [$response];
+    $responses = ($response instanceof HttpFoundationMultipartResponse) ? $response->getParts() : [$response];
 
     $render_contexts = [];
 
@@ -369,18 +373,6 @@ class ResourceController implements ContainerInjectionInterface {
   }
 
   /**
-   * Check if a string is a valid json.
-   *
-   * @param $string
-   *
-   * @return bool
-   */
-  protected function isValidJson($string) {
-    json_decode($string);
-    return (json_last_error() == JSON_ERROR_NONE);
-  }
-
-  /**
    * Adds cacheable dependencies.
    *
    * @param \Drupal\Core\Cache\CacheableResponseInterface
@@ -394,6 +386,51 @@ class ResourceController implements ContainerInjectionInterface {
     }
     else {
       $response->addCacheableDependency($parameters);
+    }
+  }
+
+  /**
+   * Handles a multipart/related PUT request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *
+   * @return resource|string
+   */
+  protected function putMultipartRequest(Request $request) {
+    $stream = \Psr7\stream_for($request);
+    $parts = MultipartResponse::parseMultipartBody($stream);
+
+    foreach ($parts as $key => $part) {
+      if ($key > 1 && isset($part['headers']['content-disposition'])) {
+        $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
+
+        if ($file_info_found) {
+          $file = \Drupal::service('replication.process_file_attachment')
+            ->process($part['body'], $file_info[1], 'stream');
+
+          if ($file instanceof FileInterface) {
+            $this->putAttachment($file);
+          }
+        }
+      }
+    }
+
+    return (isset($parts[1]['body']) && $parts[1]['body']) ? $parts[1]['body'] : $request->getContent();
+  }
+
+  /**
+   * Saves a file.
+   *
+   * @param \Drupal\file\FileInterface $file
+   */
+   protected function putAttachment(FileInterface $file) {
+    Cache::invalidateTags(['file_list']);
+
+    try {
+      $file->save();
+    }
+    catch (\Exception $e) {
+      throw new HttpException(500, NULL, $e);
     }
   }
 
