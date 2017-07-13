@@ -22,7 +22,7 @@ class CouchDBReplicatorTest extends ReplicationTestBase {
     $this->assertAllDocsNumber('http://replicator:replicator@127.0.0.1:8081/relaxed/live/_all_docs', 9);
 
     // Run Drupal to CouchDB replication.
-    $this->couchDbReplicate('http://replicator:replicator@127.0.0.1:8081/relaxed/live', $this->targetDb);
+    $this->couchDbReplicate('http://replicator:replicator@127.0.0.1:8081/relaxed/live', $this->couchdbUrl . '/' . $this->targetDb);
     $this->assertAllDocsNumber($this->couchdbUrl . '/' . $this->targetDb . '/_all_docs', 9);
   }
 
