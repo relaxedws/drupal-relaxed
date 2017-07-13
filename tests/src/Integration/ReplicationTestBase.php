@@ -73,7 +73,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $this->sourceDb = 'source';
     $this->targetDb = 'target';
     $this->port = getenv('COUCH_PORT') ?: 5984;
-    $this->couchdbUrl = 'http://localhost:' . $this->port;
+    $this->couchdbUrl = 'http://127.0.0.1:' . $this->port;
 
     // If source database exists, delete it.
     if ($this->existsDb($this->sourceDb)) {
@@ -178,51 +178,6 @@ abstract class ReplicationTestBase extends KernelTestBase {
   }
 
   /**
-   * Replicates content from source and target using the CouchDB replicator.
-   */
-  protected function couchDbReplicate($source, $target) {
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-      CURLOPT_HTTPGET => FALSE,
-      CURLOPT_POST => TRUE,
-      CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "http_connections":2, "worker_processes":1}',
-      CURLOPT_URL => "$this->couchdbUrl/_replicate",
-      CURLOPT_NOBODY => FALSE,
-      CURLOPT_HTTPHEADER => [
-        'Content-Type: application/json',
-      ],
-      CURLOPT_RETURNTRANSFER => TRUE,
-    ]);
-    $response = curl_exec($curl);
-    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    switch ($code) {
-      case 200:
-        $this->assertTrue(TRUE, 'Replication request successfully completed.');
-        break;
-      case 202:
-        $this->assertTrue(TRUE, 'Continuous replication request has been accepted.');
-        break;
-      case 400:
-        $this->assertTrue(FALSE, 'Invalid JSON data.');
-        break;
-      case 401:
-        $this->assertTrue(FALSE, 'CouchDB Server Administrator privileges required.');
-        break;
-      case 404:
-        $this->assertTrue(FALSE, 'Either the source or target DB is not found or attempt to cancel unknown replication task.');
-        break;
-      case 500:
-        $this->assertTrue(FALSE, "Server error: $response");
-        break;
-      default:
-        $this->assertTrue(FALSE, "Error: $code");
-    }
-    curl_close($curl);
-
-    return $code;
-  }
-
-  /**
    * Replicates content from source to target using the PHP replicator.
    */
   protected function phpReplicate($data) {
@@ -258,7 +213,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     ]);
     $response = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    $this->assertEquals(201, $code);
+    $this->assertEquals(200, $code);
     if (strpos($response, 'error') !== FALSE) {
       $this->assertTrue(FALSE, "Replication error: $response");
     }

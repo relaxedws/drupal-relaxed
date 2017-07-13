@@ -24,7 +24,8 @@ use GuzzleHttp\Psr7;
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
- *   path = "/{db}/{docid}"
+ *   path = "/{db}/{docid}",
+ *   no_cache = TRUE
  * )
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
