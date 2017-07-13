@@ -194,9 +194,9 @@ abstract class ReplicationTestBase extends KernelTestBase {
         'Accept: application/json',
       ],
       CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_TIMEOUT => 60,
     ]);
     $response = curl_exec($curl);
-    sleep(20);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     switch ($code) {
       case 200:
