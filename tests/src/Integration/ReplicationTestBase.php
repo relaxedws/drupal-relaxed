@@ -182,7 +182,8 @@ abstract class ReplicationTestBase extends KernelTestBase {
    */
   protected function couchDbReplicate($source, $target) {
     $curl = curl_init();
-    curl_setopt_array($curl, [
+
+    $options = [
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_POST => TRUE,
       CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "http_connections":2, "worker_processes":1}',
@@ -192,7 +193,11 @@ abstract class ReplicationTestBase extends KernelTestBase {
         'Content-Type: application/json',
       ],
       CURLOPT_RETURNTRANSFER => TRUE,
-    ]);
+    ];
+
+    print_r($options);
+
+    curl_setopt_array($curl, $options);
     $response = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     switch ($code) {
