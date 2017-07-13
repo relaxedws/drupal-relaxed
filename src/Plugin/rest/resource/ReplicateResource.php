@@ -26,6 +26,6 @@ class ReplicateResource extends ResourceBase {
   public function post($replicate) {
     $replicate->doReplication();
 
-    return new ResourceResponse($replicate, 201);
+    return new ResourceResponse($replicate, 200);
   }
 }
