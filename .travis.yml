@@ -11,7 +11,10 @@ matrix:
 
 services:
   - mysql
+  # In Docker we will have CouchDB 2.0-dev on 127.0.0.1:3001.
   - docker
+  # CouchDB 1.6.1 on 127.0.0.1:5984.
+  - couchdb
 
 addons:
   apt:
@@ -53,7 +56,7 @@ before_install:
   - nginx -c $TRAVIS_BUILD_DIR/.travis/nginx.conf
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
-  - composer --working-dir=$HOME/www require relaxedws/replicator:dev-replication-optimisation
+  - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
   - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
@@ -66,12 +69,7 @@ script:
 
 after_script:
   # -----------------------
-  - cat /tmp/error.log
-  # -----------------------
   - cat /tmp/access8080.log
-  # -----------------------
-  - cat /tmp/error8080.log
   # -----------------------
   - cat /tmp/access8081.log
   # -----------------------
-  - cat /tmp/error8081.log

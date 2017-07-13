@@ -197,11 +197,6 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
           }
         }
 
-        // Process a multipart/related PUT request.
-        if ($method == 'put' && !$this->isValidJson($content) && !$resource->isAttachment()) {
-          $content = $resource->putMultipartRequest($request);
-        }
-
         $entity = $this->serializer()->deserialize($content, $class, $format, $context);
       }
       catch (\Exception $e) {
