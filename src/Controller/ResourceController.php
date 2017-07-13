@@ -30,6 +30,11 @@ use Symfony\Component\Serializer\Serializer;
 class ResourceController implements ContainerInjectionInterface {
 
   /**
+   * The default format.
+   */
+  const DEFAULT_FORMAT = 'json';
+
+  /**
    * The resource configuration storage.
    *
    * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
@@ -307,9 +312,9 @@ class ResourceController implements ContainerInjectionInterface {
     elseif (!empty($acceptable_formats)) {
       return $acceptable_formats[0];
     }
-    // Do we want this to be JSON instead.
+    // Return the default format.
     else {
-      return 'json';
+      return static::DEFAULT_FORMAT;
     }
   }
 
@@ -335,9 +340,9 @@ class ResourceController implements ContainerInjectionInterface {
     elseif (!empty($acceptable_formats)) {
       return reset($acceptable_formats);
     }
-    // Default and assume JSON otherwise.
+    // Return the default format.
     else {
-      return 'json';
+      return static::DEFAULT_FORMAT;
     }
   }
 
