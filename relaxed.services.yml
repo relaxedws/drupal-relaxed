@@ -1,4 +1,8 @@
 services:
+  logger.channel.relaxed:
+    parent: logger.channel_base
+    arguments: ['relaxed']
+# Param converters
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
     arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
@@ -14,6 +18,7 @@ services:
     arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: paramconverter, priority: 20 }
+
   workspace.negotiator.relaxed:
     class: Drupal\relaxed\Workspace\RelaxedWorkspaceNegotiator
     arguments: ['@config.factory']
@@ -23,9 +28,17 @@ services:
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
       - { name: workspace_negotiator, priority: 200 }
+# Plugin
+  plugin.manager.api_resource:
+    class: Drupal\relaxed\Plugin\ApiResourceManager
+    parent: default_plugin_manager
+  plugin.manager.format_negotiator:
+    class: Drupal\relaxed\Plugin\FormatNegotiatorManager
+    parent: default_plugin_manager
   plugin.manager.remote_check:
     class: Drupal\relaxed\Plugin\RemoteCheckManager
     parent: default_plugin_manager
+
   relaxed.remote_pointer:
     class: Drupal\relaxed\RemotePointer
     arguments: ['@entity_type.manager', '@http_client']
@@ -36,13 +49,20 @@ services:
       - {name: workspace_replicator, priority: 20}
   relaxed.replicate:
     class: Drupal\relaxed\Replicate\Replicate
+
   relaxed.normalizer.replicate:
     class: Drupal\relaxed\Normalizer\ReplicateNormalizer
     tags:
-      - { name: normalizer, priority: 10 }
+      - { name: replication_normalizer, priority: 60 }
     arguments: ['@relaxed.replicate']
-  relaxed.resource_response.subscriber:
-    class: Drupal\relaxed\EventSubscriber\ResourceResponseSubscriber
+
+  relaxed.api_resource.route_generator:
+    class: Drupal\relaxed\Plugin\ApiResourceRouteGenerator
+    arguments: ['@plugin.manager.format_negotiator', '@logger.channel.relaxed']
+# Subscribers
+  relaxed.resource_routes:
+    class: Drupal\relaxed\Routing\ApiResourceRoutes
+    arguments: ['@plugin.manager.api_resource', '@relaxed.api_resource.route_generator', '@logger.channel.relaxed']
     tags:
-      - { name: event_subscriber }
+      - { name: 'event_subscriber' }
     arguments: ['@serializer', '@renderer', '@current_route_match']

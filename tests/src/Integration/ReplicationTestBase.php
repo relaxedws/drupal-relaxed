@@ -14,25 +14,32 @@ abstract class ReplicationTestBase extends KernelTestBase {
   protected $strictConfigSchema = FALSE;
 
   /**
+   * CouchDB port.
+   *
+   * @var int
+   */
+  protected $port;
+
+  /**
    * CouchDB source database name.
    *
    * @var string
    */
-  protected $source_db;
+  protected $sourceDb;
 
   /**
    * CouchDB target database name.
    *
    * @var string
    */
-  protected $target_db;
+  protected $targetDb;
 
   /**
    * CouchDB url.
    *
    * @var string
    */
-  protected $couchdb_url;
+  protected $couchdbUrl;
 
   /**
    * {@inheritdoc}
@@ -40,13 +47,13 @@ abstract class ReplicationTestBase extends KernelTestBase {
   public static $modules = [
     'serialization',
     'system',
-    'rest',
     'key_value',
     'multiversion',
     'relaxed',
     'workspace',
     'replication',
     'entity_test',
+    'relaxed_test',
     'user',
   ];
 
@@ -55,7 +62,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig(['multiversion', 'workspace', 'replication', 'relaxed']);
+    $this->installConfig(['multiversion', 'workspace', 'replication', 'relaxed', 'relaxed_test']);
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('workspace_pointer');
     $this->installEntitySchema('user');
@@ -63,16 +70,27 @@ abstract class ReplicationTestBase extends KernelTestBase {
     // not executed in unit tests.
     Workspace::create(['machine_name' => 'live', 'label' => 'Live', 'type' => 'basic'])->save();
 
-    $this->source_db = 'source';
-    $this->target_db = 'target';
-    $this->couchdb_url = 'http://localhost:5984';
+    $this->sourceDb = 'source';
+    $this->targetDb = 'target';
+    $this->port = getenv('COUCH_PORT') ?: 5984;
+    $this->couchdbUrl = 'http://localhost:' . $this->port;
+
+    // If source database exists, delete it.
+    if ($this->existsDb($this->sourceDb)) {
+      $this->deleteDb($this->sourceDb);
+    }
+
+    // If target database exists, delete it.
+    if ($this->existsDb($this->targetDb)) {
+      $this->deleteDb($this->targetDb);
+    }
 
     // Create a source database.
-    $response_code = $this->createDb($this->source_db);
+    $response_code = $this->createDb($this->sourceDb);
     $this->assertEquals(201, $response_code);
 
     // Create a target database.
-    $response_code = $this->createDb($this->target_db);
+    $response_code = $this->createDb($this->targetDb);
     $this->assertEquals(201, $response_code);
 
     // Load documents from documents.txt and save them in the 'source' database.
@@ -84,7 +102,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_POST => TRUE,
           CURLOPT_POSTFIELDS => $line,
-          CURLOPT_URL => "$this->couchdb_url/$this->source_db",
+          CURLOPT_URL => "$this->couchdbUrl/$this->sourceDb",
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
@@ -102,6 +120,23 @@ abstract class ReplicationTestBase extends KernelTestBase {
   }
 
   /**
+   * Check if a database exists.
+   */
+  protected function existsDb($db_name) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+      CURLOPT_NOBODY => TRUE,
+      CURLOPT_URL => "$this->couchdbUrl/$db_name",
+    ]);
+
+    curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    return $code == 200;
+  }
+
+  /**
    * Creates a new database.
    */
   protected function createDb($db_name) {
@@ -109,7 +144,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_CUSTOMREQUEST => 'PUT',
-      CURLOPT_URL => "$this->couchdb_url/$db_name",
+      CURLOPT_URL => "$this->couchdbUrl/$db_name",
     ]);
 
     curl_exec($curl);
@@ -127,11 +162,16 @@ abstract class ReplicationTestBase extends KernelTestBase {
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_CUSTOMREQUEST => 'DELETE',
-      CURLOPT_URL => "$this->couchdb_url/$db_name",
+      CURLOPT_URL => "$this->couchdbUrl/$db_name",
+      CURLOPT_RETURNTRANSFER => TRUE,
     ]);
 
-    curl_exec($curl);
+    $response = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $this->assertEquals(200, $code);
+    if (strpos($response, '{"ok":true}') === FALSE) {
+      $this->assertTrue(FALSE, "Error: $response");
+    }
     curl_close($curl);
 
     return $code;
@@ -145,17 +185,41 @@ abstract class ReplicationTestBase extends KernelTestBase {
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => FALSE,
       CURLOPT_POST => TRUE,
-      CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "worker_processes": 1}',
-      CURLOPT_URL => "$this->couchdb_url/_replicate",
+      CURLOPT_POSTFIELDS => '{"source": "' . $source . '", "target": "' . $target . '", "http_connections":2, "worker_processes":1}',
+      CURLOPT_URL => "$this->couchdbUrl/_replicate",
+      CURLOPT_NOBODY => FALSE,
       CURLOPT_HTTPHEADER => [
         'Content-Type: application/json',
-        'Accept: application/json',
       ],
+      CURLOPT_RETURNTRANSFER => TRUE,
     ]);
     $response = curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    switch ($code) {
+      case 200:
+        $this->assertTrue(TRUE, 'Replication request successfully completed.');
+        break;
+      case 202:
+        $this->assertTrue(TRUE, 'Continuous replication request has been accepted.');
+        break;
+      case 400:
+        $this->assertTrue(FALSE, 'Invalid JSON data.');
+        break;
+      case 401:
+        $this->assertTrue(FALSE, 'CouchDB Server Administrator privileges required.');
+        break;
+      case 404:
+        $this->assertTrue(FALSE, 'Either the source or target DB is not found or attempt to cancel unknown replication task.');
+        break;
+      case 500:
+        $this->assertTrue(FALSE, "Server error: $response");
+        break;
+      default:
+        $this->assertTrue(FALSE, "Error: $code");
+    }
     curl_close($curl);
 
-    return $response;
+    return $code;
   }
 
   /**
@@ -170,7 +234,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $source = CouchDBClient::create($json['source']);
     $target = CouchDBClient::create($json['target']);
 
-    $task = new ReplicationTask();
+    $task = new ReplicationTask(null, false, null, null, false, null, 10000, 10000, false, "all_docs", 0, 2, 2);
     $replicator = new Replicator($source, $target, $task);
 
     return $replicator->startReplication();
@@ -190,8 +254,14 @@ abstract class ReplicationTestBase extends KernelTestBase {
         'Content-Type: application/json',
         'Accept: application/json',
       ],
+      CURLOPT_RETURNTRANSFER => TRUE,
     ]);
     $response = curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $this->assertEquals(201, $code);
+    if (strpos($response, 'error') !== FALSE) {
+      $this->assertTrue(FALSE, "Replication error: $response");
+    }
     curl_close($curl);
 
     return $response;
@@ -203,7 +273,19 @@ abstract class ReplicationTestBase extends KernelTestBase {
    * @param $db_url
    * @param $docs_number
    */
-  protected function assertAllDocsNumber($db_url, $docs_number) {
+  public function assertAllDocsNumber($db_url, $docs_number) {
+    $all_docs = $this->getAllDocs($db_url);
+    preg_match('~"total_rows":([/\d+/]*)~', $all_docs, $output);
+    $this->assertEquals($docs_number, $output[1], 'The request returned the correct number of docs.');
+  }
+
+  /**
+   * Getsl all docs from a database.
+   *
+   * @param $db_url
+   * @return mixed
+   */
+  protected function getAllDocs($db_url) {
     $curl = curl_init();
     curl_setopt_array($curl, [
       CURLOPT_HTTPGET => TRUE,
@@ -211,9 +293,8 @@ abstract class ReplicationTestBase extends KernelTestBase {
       CURLOPT_URL => $db_url,
     ]);
     $response = curl_exec($curl);
-    preg_match('~"total_rows":([/\d+/]*)~', $response, $output);
-    $this->assertEquals($docs_number, $output[1], 'The request returned the correct number of docs.');
     curl_close($curl);
+    return $response;
   }
 
 }

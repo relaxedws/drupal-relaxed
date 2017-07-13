@@ -17,13 +17,12 @@ class DocResourceTest extends ResourceTestBase {
 
   public function testHead() {
     // HEAD and GET is handled by the same resource.
-    $this->enableService('relaxed:doc', 'GET');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful get relaxed:doc';
+      $permissions[] = 'perform pull replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -69,7 +68,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertHeader('x-relaxed-etag', $second_rev);
 
       // Test the response for a fake revision using if-none-match header.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, array('if-none-match' => '11112222333344445555'));
+      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => '11112222333344445555']);
       $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
@@ -78,13 +77,12 @@ class DocResourceTest extends ResourceTestBase {
    * Tests non-multipart GET requests.
    */
   public function testGet() {
-    $this->enableService('relaxed:doc', 'GET');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful get relaxed:doc';
+      $permissions[] = 'perform pull replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -148,13 +146,12 @@ class DocResourceTest extends ResourceTestBase {
    * Tests GET requests with multiple parts.
    */
   public function testGetOpenRevs() {
-    $this->enableService('relaxed:doc', 'GET', 'mixed');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'view');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful get relaxed:doc';
+      $permissions[] = 'perform pull replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -217,14 +214,13 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $this->enableService('relaxed:doc', 'PUT');
-    $serializer = $this->container->get('serializer');
+    $serializer = $this->container->get('replication.serializer');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful put relaxed:doc';
+      $permissions[] = 'perform push replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -269,13 +265,12 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testDelete() {
-    $this->enableService('relaxed:doc', 'DELETE');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'delete');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful delete relaxed:doc';
+      $permissions[] = 'perform push replication';
       $account = $this->drupalCreateUser($permissions);
       $this->drupalLogin($account);
 
@@ -330,14 +325,13 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testStub() {
-    $this->enableService('relaxed:doc', 'PUT');
-    $serializer = $this->container->get('serializer');
+    $serializer = $this->container->get('replication.serializer');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type_id) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type_id, 'create');
       $permissions[] = 'administer workspaces';
-      $permissions[] = 'restful put relaxed:doc';
+      $permissions[] = 'perform push replication';
       $permissions[] = 'administer users';
       $permissions[] = 'administer taxonomy';
       $account = $this->drupalCreateUser($permissions);
@@ -365,7 +359,6 @@ class DocResourceTest extends ResourceTestBase {
             'entity_type_id' => 'taxonomy_term',
             'target_uuid' => $reference_uuid,
           ]],
-          'default_langcode' => [['value' => TRUE]],
         ],
       ];
 

@@ -12,13 +12,11 @@ use Drupal\Component\Serialization\Json;
 class AllDocsResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $this->enableService('relaxed:all_docs', 'GET');
-    $serializer = \Drupal::service('serializer');
+    $serializer = \Drupal::service('replication.serializer');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:all_docs';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -38,13 +36,13 @@ class AllDocsResourceTest extends ResourceTestBase {
 
     // Test without including docs.
     foreach ($entities as $entity) {
-      $rows[] = array(
+      $rows[] = [
         'id' => $entity->uuid(),
         'key' => $entity->uuid(),
-        'value' => array(
+        'value' => [
           'rev' => $entity->_rev->value,
-        ),
-      );
+        ],
+      ];
     }
     usort($rows, function($a, $b) {
       return ($a['id'] > $b['id']) ? +1 : -1;
@@ -73,14 +71,14 @@ class AllDocsResourceTest extends ResourceTestBase {
     // Test with including docs.
     $rows = [];
     foreach ($entities as $entity) {
-      $rows[] = array(
+      $rows[] = [
         'id' => $entity->uuid(),
         'key' => $entity->uuid(),
-        'value' => array(
+        'value' => [
           'rev' => $entity->_rev->value,
           'doc' => $serializer->normalize($entity),
-        ),
-      );
+        ],
+      ];
     }
     usort($rows, function($a, $b) {
       return ($a['id'] > $b['id']) ? +1 : -1;

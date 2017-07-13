@@ -45,7 +45,7 @@ class StubTest extends WebTestBase {
     $entity_type_id = 'entity_test_mulrev';
 
     /** @var \Symfony\Component\Serializer\SerializerInterface $serializer */
-    $serializer = \Drupal::service('serializer');
+    $serializer = \Drupal::service('replication.serializer');
 
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = \Drupal::service('entity_type.manager');

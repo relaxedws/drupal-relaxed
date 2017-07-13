@@ -14,14 +14,13 @@ use Drupal\simpletest\WebTestBase;
  */
 class EntityAccessTest extends WebTestBase  {
 
-  public static $modules = array(
+  public static $modules = [
     'entity_test',
     'file',
     'multiversion',
-    'rest',
     'relaxed',
     'relaxed_test'
-  );
+  ];
 
   protected $strictConfigSchema = FALSE;
 
@@ -30,10 +29,10 @@ class EntityAccessTest extends WebTestBase  {
    */
   function assertEntityAccess($ops, AccessibleInterface $object, AccountInterface $account = NULL) {
     foreach ($ops as $op => $result) {
-      $message = format_string("Entity access returns @result with operation '@op'.", array(
+      $message = format_string("Entity access returns @result with operation '@op'.", [
         '@result' => !isset($result) ? 'null' : ($result ? 'true' : 'false'),
         '@op' => $op,
-      ));
+      ]);
 
       $this->assertEqual($result, $object->access($op, $account), $message);
     }
@@ -49,41 +48,41 @@ class EntityAccessTest extends WebTestBase  {
     $values = [
       'name' => $this->randomMachineName(),
       'user_id' => 1,
-      'field_test_text' => array(
+      'field_test_text' => [
         'value' => $this->randomMachineName(),
         'format' => 'full_html',
-      ),
+      ],
     ];
     $entity = EntityTest::create($values);
 
     // The current user is allowed to view entities.
-    $this->assertEntityAccess(array(
+    $this->assertEntityAccess([
       'create' => FALSE,
       'update' => FALSE,
       'delete' => FALSE,
       'view' => TRUE,
-    ), $entity);
+    ], $entity);
 
     // Test entity access with 'perform push replication' permission.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
 
     // The current user is allowed to do all operations.
-    $this->assertEntityAccess(array(
+    $this->assertEntityAccess([
       'create' => TRUE,
       'update' => TRUE,
       'delete' => TRUE,
       'view' => TRUE,
-    ), $entity);
+    ], $entity);
 
     // The custom user is not allowed to perform any operation on test entities.
     $custom_user = $this->createUser();
-    $this->assertEntityAccess(array(
+    $this->assertEntityAccess([
       'create' => FALSE,
       'update' => FALSE,
       'delete' => FALSE,
       'view' => FALSE,
-    ), $entity, $custom_user);
+    ], $entity, $custom_user);
   }
 
 }

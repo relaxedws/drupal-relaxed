@@ -12,13 +12,11 @@ use Drupal\Component\Serialization\Json;
 class ChangesResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $serializer = \Drupal::service('serializer');
-    $this->enableService('relaxed:changes', 'GET');
+    $serializer = \Drupal::service('replication.serializer');
 
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
     $permissions[] = 'administer workspaces';
-    $permissions[] = 'restful get relaxed:changes';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -121,6 +119,8 @@ class ChangesResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     // The result array should be empty in this case.
     $expected_without_docs['results'] = [];
+    // And last_seq == 0.
+    $expected_without_docs['last_seq'] = 0;
     $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     // @todo: {@link https://www.drupal.org/node/2600488 Assert the sort order.}

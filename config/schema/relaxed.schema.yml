@@ -5,6 +5,12 @@ relaxed.settings:
     api_root:
       type: string
       label: 'Absolute base path to the API root, without trailing slash.'
+    authentication:
+      type: sequence
+      label: 'Authentication Providers'
+      sequence:
+        type: string
+        label: 'Authentication provider'
 
 relaxed.endpoint.*:
   type: config_entity

@@ -26,7 +26,7 @@ use Drupal\taxonomy\TermStorageInterface;
  * @ingroup relaxed_api
  */
 function hook_entity_create_stub(EntityStorageInterface $target_storage) {
-  $target_entity_values = array();
+  $target_entity_values = [];
 
   if ($target_storage instanceof TermStorageInterface) {
     $target_entity_values['vid'] = 'tags';

@@ -115,7 +115,7 @@ $docs = [
       'vid' => [['value' => 'tags']],
     ],
   ],
-  // Entity with existing revision.
+  // Simple entity.
   [
     '@context' => [
       '_id' => '@id',
@@ -123,7 +123,6 @@ $docs = [
     ],
     '@type' => 'entity_test_mulrev',
     '_id' => '1da2a674-4740-4edb-ad3d-2e243c9e6821',
-    '_rev' => '1-e4af2d5d944d64db082b484bc1088d1a',
     'en' => [
       'type' => [['value' => 'entity_test_mulrev']],
       'user_id' => [],
