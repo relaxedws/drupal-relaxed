@@ -172,7 +172,7 @@ class ResourceController implements ContainerInjectionInterface {
       try {
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
 
-        // If we have a workspace parameter, pass it to the deserializer.
+        // If we have a workspace parameter, pass it to the serializer for denormalization.
         foreach ($parameters as $parameter) {
           if ($parameter instanceof WorkspaceInterface) {
             $context['workspace'] = $parameter;
