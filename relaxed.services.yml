@@ -32,7 +32,7 @@ services:
 # Param converters
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@relaxed.entity_index.uuid', '@relaxed.entity_index.rev']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
@@ -42,7 +42,7 @@ services:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@relaxed.entity_index.uuid']
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: paramconverter, priority: 20 }
 
@@ -93,3 +93,77 @@ services:
     arguments: ['@plugin.manager.api_resource', '@relaxed.api_resource.route_generator', '@logger.channel.relaxed']
     tags:
       - { name: 'event_subscriber' }
+  relaxed.resource_response.subscriber:
+    class: Drupal\relaxed\EventSubscriber\ResourceResponseSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@serializer', '@renderer', '@current_route_match']
+
+#Normalizers
+  relaxed.normalizer.link_item:
+    class: Drupal\relaxed\Normalizer\LinkItemNormalizer
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.factory']
+    tags:
+      - { name: normalizer, priority: 5 }
+  relaxed.normalizer.text_item:
+    class: Drupal\relaxed\Normalizer\TextItemNormalizer
+    tags:
+      - { name: normalizer, priority: 5 }
+  relaxed.normalizer.content_entity:
+    class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
+    arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.process_file_attachment', '@relaxed.users_mapping', '@plugin.manager.entity_reference_selection']
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.replication_log:
+    class: Drupal\relaxed\Normalizer\relaxedLogNormalizer
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.uuid']
+    tags:
+      - { name: normalizer, priority: 20 }
+  relaxed.normalizer.bulk_docs:
+    class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
+    tags:
+      - { name: normalizer, priority: 20 }
+  relaxed.normalizer.all_docs:
+    class: Drupal\relaxed\Normalizer\AllDocsNormalizer
+    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.changes:
+    class: Drupal\relaxed\Normalizer\ChangesNormalizer
+    tags:
+      - { name: normalizer }
+  relaxed.normalizer.workspace:
+    class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
+    tags:
+      - { name: normalizer, priority: 20 }
+    arguments: ['@entity.manager']
+  relaxed.normalizer.deleted_flag_item_list:
+    class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.revision_info_item_list:
+    class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.revs_diff:
+    class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
+    arguments: ['@relaxed.revisiondiff_factory']
+    tags:
+      - { name: normalizer, priority: 30 }
+  relaxed.normalizer.attachment:
+    class: Drupal\relaxed\Normalizer\AttachmentNormalizer
+    arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.process_file_attachment', '@relaxed.users_mapping', '@plugin.manager.entity_reference_selection']
+    tags:
+      - { name: normalizer, priority: 30 }
+  relaxed.normalizer.file_item:
+    class: Drupal\relaxed\Normalizer\FileItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.entity_reference_item:
+    class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
+  relaxed.normalizer.comment_item:
+    class: Drupal\relaxed\Normalizer\CommentItemNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }

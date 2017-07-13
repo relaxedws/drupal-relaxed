@@ -8,11 +8,11 @@ use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\relaxed\Entity\Index\IndexFactory;
-use Drupal\workspace\Entity\WorkspaceInterface;
-use Drupal\relaxed\ProcessFileAttachment;
+use Drupal\multiversion\Entity\Index\MultiversionIndexFactory;
+use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\replication\ProcessFileAttachment;
 use Drupal\file\FileInterface;
-use Drupal\relaxed\UsersMapping;
+use Drupal\replication\UsersMapping;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -67,7 +67,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param \Drupal\replication\UsersMapping $users_mapping
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
    */
-  public function __construct(EntityManagerInterface $entity_manager, IndexFactory $index_factory, LanguageManagerInterface $language_manager, ProcessFileAttachment $process_file_attachment, UsersMapping $users_mapping, SelectionPluginManagerInterface $selection_manager = NULL) {
+  public function __construct(EntityManagerInterface $entity_manager, MultiversionIndexFactory $index_factory, LanguageManagerInterface $language_manager, ProcessFileAttachment $process_file_attachment, UsersMapping $users_mapping, SelectionPluginManagerInterface $selection_manager = NULL) {
     $this->entityManager = $entity_manager;
     $this->indexFactory = $index_factory;
     $this->languageManager = $language_manager;
