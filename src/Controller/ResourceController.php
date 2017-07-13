@@ -171,11 +171,6 @@ class ResourceController implements ContainerInjectionInterface {
           }
         }
 
-        // Process a multipart/related PUT request.
-        if ($content_type_format === 'related') {
-          $content = $this->putMultipartRequest($request);
-        }
-
         $entity = $serializer->deserialize($content, $class, $content_type_format, $context);
       }
       catch (\Exception $e) {
@@ -416,50 +411,6 @@ class ResourceController implements ContainerInjectionInterface {
     }
     else {
       $response->addCacheableDependency($parameters);
-    }
-  }
-
-  /**
-   * Handles a multipart/related PUT request.
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *
-   * @return resource|string
-   */
-  protected function putMultipartRequest(Request $request) {
-    $stream = \Psr7\stream_for($request);
-    $parts = MultipartResponse::parseMultipartBody($stream);
-
-    foreach ($parts as $key => $part) {
-      if ($key > 1 && isset($part['headers']['content-disposition'])) {
-        $file_info_found = preg_match('/(?<=\")(.*?)(?=\")/', $part['headers']['content-disposition'], $file_info);
-
-        if ($file_info_found) {
-          $file = $this->attachment->process($part['body'], $file_info[1], 'stream');
-
-          if ($file instanceof FileInterface) {
-            $this->putAttachment($file);
-          }
-        }
-      }
-    }
-
-    return !empty($parts[1]['body']) ? $parts[1]['body'] : $request->getContent();
-  }
-
-  /**
-   * Saves a file.
-   *
-   * @param \Drupal\file\FileInterface $file
-   */
-  protected function putAttachment(FileInterface $file) {
-    Cache::invalidateTags(['file_list']);
-
-    try {
-      $file->save();
-    }
-    catch (\Exception $e) {
-      throw new HttpException(500, NULL, $e);
     }
   }
 
