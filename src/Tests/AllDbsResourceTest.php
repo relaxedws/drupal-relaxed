@@ -13,11 +13,8 @@ use Drupal\multiversion\Entity\Workspace;
 class AllDbsResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $this->enableService('relaxed:all_dbs', 'GET');
-
     // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('workspace', 'view');
-    $permissions[] = 'restful get relaxed:all_dbs';
+    $permissions[] = 'perform pull replication';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
@@ -25,6 +22,7 @@ class AllDbsResourceTest extends ResourceTestBase {
     foreach (Workspace::loadMultiple() as $workspace) {
       $workspaces[] = $workspace->getMachineName();
     }
+
     for ($i = 0; $i < 3; $i++) {
       $machine_name = $this->randomMachineName();
       $entity = Workspace::create(['machine_name' => $machine_name, 'type' => 'basic']);

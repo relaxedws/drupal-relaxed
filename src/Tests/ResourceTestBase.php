@@ -4,19 +4,17 @@ namespace Drupal\relaxed\Tests;
 
 use Drupal\multiversion\Entity\Workspace;
 use Drupal\rest\Tests\RESTTestBase;
+use Drupal\simpletest\WebTestBase;
 
-abstract class ResourceTestBase extends RESTTestBase {
+abstract class ResourceTestBase extends WebTestBase {
 
   public static $modules = [
     'entity_test',
     'file',
     'multiversion',
-    'rest',
     'relaxed',
-    'relaxed_test'
+    'relaxed_test',
   ];
-
-  protected $strictConfigSchema = FALSE;
 
   /**
    * @var string
@@ -86,28 +84,6 @@ abstract class ResourceTestBase extends RESTTestBase {
 
   /**
    * {@inheritdoc}
-   */
-  protected function entityPermissions($entity_type, $operation) {
-    $return = parent::entityPermissions($entity_type, $operation);
-
-    // Extending with further entity types.
-    if (!$return) {
-      if (in_array($entity_type, ['entity_test_rev', 'entity_test_local'])) {
-        switch ($operation) {
-          case 'view':
-            return ['view test entity'];
-          case 'create':
-          case 'update':
-          case 'delete':
-            return ['administer entity_test content'];
-        }
-      }
-    }
-    return $return;
-  }
-
-  /**
-   * {@inheritdoc}
    *
    * @todo {@link https://www.drupal.org/node/2600494 Simplify this method}
    *   when {@link https://drupal.org/node/2274153 core tests supporting HEAD
@@ -120,13 +96,18 @@ abstract class ResourceTestBase extends RESTTestBase {
     if ($mime_type === NULL) {
       $mime_type = $this->defaultMimeType;
     }
+
     if ($mime_type === $this->defaultMimeType && !isset($query['_format'])) {
       $query['_format'] = $this->defaultFormat;
     }
-    if (!in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'])) {
+
+    if (!in_array($method, ['GET', 'HEAD'])) {
       // GET the CSRF token first for writing requests.
-      $token = $this->drupalGet('rest/session/token');
+      // The '/rest/session/token' route has been deprecated in favour of the
+      // generic system route.
+      $token = $this->drupalGet('session/token');
     }
+
     $additional_headers = [];
     if (is_array($headers)) {
       foreach ($headers as $name => $value) {
@@ -257,10 +238,49 @@ abstract class ResourceTestBase extends RESTTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   *
+   * This method is overridden to deal with a cURL quirk: the usage of
+   * CURLOPT_CUSTOMREQUEST cannot be unset on the cURL handle, so we need to
+   * override it every time it is omitted.
+   */
+  protected function curlExec($curl_options, $redirect = FALSE) {
+    unset($this->response);
+
+    if (!isset($curl_options[CURLOPT_CUSTOMREQUEST])) {
+      if (!empty($curl_options[CURLOPT_HTTPGET])) {
+        $curl_options[CURLOPT_CUSTOMREQUEST] = 'GET';
+      }
+      if (!empty($curl_options[CURLOPT_POST])) {
+        $curl_options[CURLOPT_CUSTOMREQUEST] = 'POST';
+      }
+    }
+    return parent::curlExec($curl_options, $redirect);
+  }
+
+  /**
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
     return workspace::create(['machine_name' => $name, 'label' => ucfirst($name), 'type' => 'basic']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function entityPermissions($entity_type, $operation) {
+    if (in_array($entity_type, array('entity_test_rev', 'entity_test_local'))) {
+      switch ($operation) {
+        case 'view':
+          return array('view test entity');
+        case 'create':
+        case 'update':
+        case 'delete':
+          return array('administer entity_test content');
+      }
+    }
+
+    return [];
   }
 
 }

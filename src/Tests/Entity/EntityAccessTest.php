@@ -18,7 +18,6 @@ class EntityAccessTest extends WebTestBase  {
     'entity_test',
     'file',
     'multiversion',
-    'rest',
     'relaxed',
     'relaxed_test'
   ];

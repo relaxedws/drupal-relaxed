@@ -2,11 +2,11 @@
 
 namespace Drupal\relaxed\HttpMultipart\HttpFoundation;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MultipartResponse extends ResourceResponse {
+class MultipartResponse extends ApiResourceResponse {
   /**
    * @var string
    */
@@ -37,7 +37,7 @@ class MultipartResponse extends ResourceResponse {
       foreach ($this->getParts() as $part) {
         $content .= "--{$this->boundary}\r\n";
         $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
-        $content .= \Drupal::service('serializer')
+        $content .= \Drupal::service('replication.serializer')
           ->serialize($part->getResponseData(), 'json');
         $content .= "\r\n";
       }

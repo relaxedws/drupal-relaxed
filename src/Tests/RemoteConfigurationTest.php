@@ -20,7 +20,6 @@ class RemoteConfigurationTest extends WebTestBase {
   public static $modules = [
     'file',
     'multiversion',
-    'rest',
     'relaxed',
     'relaxed_test'
   ];
