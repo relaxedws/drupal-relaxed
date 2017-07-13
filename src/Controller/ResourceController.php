@@ -76,6 +76,7 @@ class ResourceController implements ContainerInjectionInterface {
   protected $negotiatorManager;
 
   /**
+<<<<<<< HEAD
    * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
@@ -451,7 +452,7 @@ class ResourceController implements ContainerInjectionInterface {
    *
    * @param \Drupal\file\FileInterface $file
    */
-   protected function putAttachment(FileInterface $file) {
+  protected function putAttachment(FileInterface $file) {
     Cache::invalidateTags(['file_list']);
 
     try {
