@@ -155,19 +155,6 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   }
 
   /**
-   * Provides predefined HTTP request methods.
-   *
-   * Plugins can override this method to provide additional custom request
-   * methods.
-   *
-   * @return array
-   *   The list of allowed HTTP request method strings.
-   */
-  protected function requestMethods() {
-    return $this->requestMethods;
-  }
-
-  /**
    * Returns the available methods for an API resource plugin.
    *
    * @param ApiResourceInterface $api_resource
@@ -209,6 +196,19 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
 
     // Otherwise, intersect them.
     return array_intersect($this->availableFormats, $resource_allowed_formats);
+  }
+
+  /**
+   * Provides predefined HTTP request methods.
+   *
+   * Plugins can override this method to provide additional custom request
+   * methods.
+   *
+   * @return array
+   *   The list of allowed HTTP request method strings.
+   */
+  protected function requestMethods() {
+    return $this->requestMethods;
   }
 
   /**
