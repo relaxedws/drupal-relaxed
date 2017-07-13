@@ -214,7 +214,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     ]);
     $response = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    $this->assertEquals(201, $code);
+    $this->assertEquals(200, $code);
     if (strpos($response, 'error') !== FALSE) {
       $this->assertTrue(FALSE, "Replication error: $response");
     }
