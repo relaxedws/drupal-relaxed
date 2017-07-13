@@ -143,7 +143,7 @@ class ResourceController implements ContainerInjectionInterface {
 
     // Select the format negotiator for the request data.
     $negotiator = $this->negotiatorManager->select($content_type_format, $method, 'request');
-    $serializer = $negotiator->serializer();
+    $serializer = $negotiator->serializer($content_type_format, $method, 'request');
 
     $content = $request->getContent();
     $parameters = $this->getParameters($route_match);
@@ -197,7 +197,7 @@ class ResourceController implements ContainerInjectionInterface {
     $response_format = $this->getResponseFormat($route, $request, $api_resource);
 
     $negotiator = $this->negotiatorManager->select($response_format, $method, 'response');
-    $serializer = $negotiator->serializer();
+    $serializer = $negotiator->serializer($response_format, $method, 'response');
 
     // @todo This is not nice, it's hacky. Find a nicer way to get response
     // formats based on the chosen negotiator. We might have to switch to one
