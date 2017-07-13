@@ -51,6 +51,8 @@ before_install:
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
+  # Install CORS for CouchDB.
+  - source ./tests/bin/run-couchdb.sh;
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
