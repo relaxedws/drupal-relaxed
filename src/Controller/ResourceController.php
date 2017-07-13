@@ -7,7 +7,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -49,7 +48,6 @@ class ResourceController implements ContainerInjectionInterface {
 
   /**
    * @var \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface
-   *   The resource configuration storage.
    */
   protected $negotiatorManager;
 
@@ -70,33 +68,6 @@ class ResourceController implements ContainerInjectionInterface {
 
   /**
    * Creates a new RequestHandler instance.
-   */
-  protected function getMethod() {
-    return strtolower($this->request->getMethod());
-  }
-
-  /**
-   * @return string
-   */
-  protected function getFormat() {
-    if (!$format = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format')) {
-      return $this->getResource()->isAttachment() ? 'stream' : 'json';
-    }
-    return $format;
-  }
-
-  /**
-   * @return \Drupal\relaxed\Plugin\rest\resource\RelaxedResourceInterface
-   */
-  protected function getResource() {
-    $plugin_id = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getDefault('_plugin');
-    return $this->container()
-      ->get('plugin.manager.rest')
-      ->getInstance(array('id' => $plugin_id));
-  }
-
-  /**
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *
    * @param \Drupal\relaxed\Plugin\ApiResourceManagerInterface $resource_manager
    *   The API resource manager.
@@ -110,8 +81,6 @@ class ResourceController implements ContainerInjectionInterface {
    *   The file attachment processor.
    */
   public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer, CsrfTokenGenerator $token, ProcessFileAttachment $attachment) {
-    $parameters = array();
-    foreach ($route_match->getParameters() as $key => $parameter) {
     $this->resourceManager = $resource_manager;
     $this->negotiatorManager = $negotiator_manager;
     $this->renderer = $renderer;
@@ -224,7 +193,6 @@ class ResourceController implements ContainerInjectionInterface {
     $responses = ($response instanceof HttpFoundationMultipartResponse) ? $response->getParts() : [$response];
 
     $render_contexts = [];
-    /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
 
     foreach ($responses as $response_part) {
       if ($response_data = $response_part->getResponseData()) {
@@ -239,10 +207,11 @@ class ResourceController implements ContainerInjectionInterface {
         }
 
         $response_part->setContent($response_output);
-      // Add rest config's cache tags.
+      }
 
       if (!$response_part->headers->has('Content-Type')) {
         $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
+      }
     }
 
     if ($method !== 'head') {
@@ -458,7 +427,7 @@ class ResourceController implements ContainerInjectionInterface {
    *
    * @param \Drupal\file\FileInterface $file
    */
-   protected function putAttachment(FileInterface $file) {
+  protected function putAttachment(FileInterface $file) {
     Cache::invalidateTags(['file_list']);
 
     try {
