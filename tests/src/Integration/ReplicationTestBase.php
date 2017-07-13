@@ -73,7 +73,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
 
     $this->sourceDb = 'source';
     $this->targetDb = 'target';
-    $this->port = getenv('COUCH_PORT') ?: 5984;
+    $this->port = 5984;
     $this->couchdbUrl = 'http://127.0.0.1:' . $this->port;
 
     // If source database exists, delete it.
