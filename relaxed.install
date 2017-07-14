@@ -25,13 +25,3 @@ function relaxed_install() {
     ])->save();
   }
 }
-
-/**
- * Load new rest configuration for RESTful Web Services module.
- */
-function relaxed_update_8301() {
-  \Drupal::state()->set('relaxed_update_8301_resources', \Drupal::config('rest.settings')->get('resources'));
-  \Drupal::configFactory()->getEditable('rest.settings')
-    ->clear('resources')
-    ->save();
-}
