@@ -2,18 +2,14 @@
 
 namespace Drupal\relaxed\Controller;
 
-use Drupal\Core\Access\CsrfTokenGenerator;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\file\FileInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse as HttpFoundationMultipartResponse;
-use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
@@ -230,7 +226,7 @@ class ResourceController implements ContainerInjectionInterface {
       $cacheable_metadata = new CacheableMetadata();
       $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
 
-      $this->addCacheableDependency($response, $cacheable_dependencies);
+      $response->addCacheableDependency($cacheable_dependencies);
     }
 
     return $response;
@@ -364,23 +360,6 @@ class ResourceController implements ContainerInjectionInterface {
     watchdog_exception('relaxed', $e);
 
     return new Response($content, $status, $headers);
-  }
-
-  /**
-   * Adds cacheable dependencies.
-   *
-   * @param \Drupal\Core\Cache\CacheableResponseInterface
-   * @param $parameters
-   */
-  protected function addCacheableDependency(CacheableResponseInterface $response, $parameters) {
-    if (is_array($parameters)) {
-      foreach ($parameters as $parameter) {
-        $response->addCacheableDependency($parameter);
-      }
-    }
-    else {
-      $response->addCacheableDependency($parameters);
-    }
   }
 
 }

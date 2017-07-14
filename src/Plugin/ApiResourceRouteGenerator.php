@@ -112,8 +112,6 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         $permissions .= '+perform pull replication';
       }
 
-      $method_lower = strtolower($method);
-
       $route = new Route($this->apiRoot . $definition['path'], [
         '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
         '_api_resource' => $plugin_id,
@@ -155,6 +153,7 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
         $route->addOptions(['parameters' => $parameters]);
       }
 
+      $method_lower = strtolower($method);
       $collection->add("$route_name.$method_lower", $route);
     }
 
