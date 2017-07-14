@@ -21,8 +21,6 @@ abstract class TestSuiteBase extends CoreTestSuiteBase {
    */
   protected function addTestsBySuiteNamespace($path, $suite_namespace) {
     if ($suite_namespace == 'Integration') {
-      $this->addTestFiles(TestDiscovery::scanDirectory("Drupal\\Tests\\", "$root/tests/src/$suite_namespace"));
-
       $test_path = "$path/$suite_namespace";
       if (is_dir($test_path)) {
         $this->addTestFiles(TestDiscovery::scanDirectory("Drupal\\Tests\\relaxed\\$suite_namespace\\", $test_path));
