@@ -32,6 +32,9 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Serializer\Serializer;
 
+/**
+ * Controller to handle all requests for API resource routes.
+ */
 class ResourceController implements ContainerInjectionInterface {
 
   /**
@@ -52,19 +55,14 @@ class ResourceController implements ContainerInjectionInterface {
   protected $negotiatorManager;
 
   /**
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
-   */
-  protected $token;
-
-  /**
    * @var \Drupal\replication\ProcessFileAttachment
    */
   protected $attachment;
+
+  /**
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
 
   /**
    * Creates a new RequestHandler instance.
@@ -73,19 +71,16 @@ class ResourceController implements ContainerInjectionInterface {
    *   The API resource manager.
    * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $negotiator_manager
    *   The format negotiator manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $token
-   *   The token manager.
    * @param \Drupal\replication\ProcessFileAttachment $attachment
    *   The file attachment processor.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
    */
-  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, RendererInterface $renderer, CsrfTokenGenerator $token, ProcessFileAttachment $attachment) {
+  public function __construct(ApiResourceManagerInterface $resource_manager, FormatNegotiatorManagerInterface $negotiator_manager, ProcessFileAttachment $attachment, RendererInterface $renderer) {
     $this->resourceManager = $resource_manager;
     $this->negotiatorManager = $negotiator_manager;
-    $this->renderer = $renderer;
-    $this->token = $token;
     $this->attachment = $attachment;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -95,9 +90,8 @@ class ResourceController implements ContainerInjectionInterface {
     return new static(
       $container->get('plugin.manager.api_resource'),
       $container->get('plugin.manager.format_negotiator'),
-      $container->get('renderer'),
-      $container->get('csrf_token'),
-      $container->get('replication.process_file_attachment')
+      $container->get('replication.process_file_attachment'),
+      $container->get('renderer')
     );
   }
 
