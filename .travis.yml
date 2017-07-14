@@ -3,15 +3,17 @@ sudo: false
 language: php
 
 php:
-  - 5.5
   - 5.6
-  - 7.0
+  - 7.1
 
 matrix:
   fast_finish: true
 
 services:
   - mysql
+  # In Docker we will have CouchDB 2.0-dev on 127.0.0.1:3001.
+  - docker
+  # CouchDB 1.6.1 on 127.0.0.1:5984.
   - couchdb
 
 addons:
@@ -21,18 +23,12 @@ addons:
 
 env:
   matrix:
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.3.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.3.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.4.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.4.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=1.6.1
 
 matrix:
-  allow_failures:
-    - env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml
   fast_finish: true
 
 notifications:
@@ -52,6 +48,8 @@ before_install:
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.0.0-rc3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
+  # Install CouchDB.
+  - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
@@ -59,3 +57,10 @@ install:
 
 script:
   - cd ~/www && bash $SCRIPT
+
+after_script:
+  # -----------------------
+  - cat /tmp/access8080.log
+  # -----------------------
+  - cat /tmp/access8081.log
+  # -----------------------

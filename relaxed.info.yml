@@ -4,6 +4,9 @@ description: 'Provides a RESTful API that exposes all content entities over UUID
 package: Web services
 core: 8.x
 dependencies:
-  - rest
   - basic_auth
-  - workspace (>=8.x-2.x)
+  - multiversion
+  - replication
+  - system (>=8.4.x)
+test_dependencies:
+  - workspace

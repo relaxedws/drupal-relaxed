@@ -11,61 +11,16 @@ use Drupal\relaxed\Entity\Remote;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Implements hook_entity_insert().
- */
-function relaxed_entity_insert(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'workspace') {
-    // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
-    try {
-      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
-    } catch (InvalidArgumentException $e) {
-      watchdog_exception('relaxed', $e);
-    }
-  }
-}
-
-/**
- * Implements hook_entity_update().
- */
-function relaxed_entity_update(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'workspace') {
-    // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
-    try {
-      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
-    } catch (InvalidArgumentException $e) {
-      watchdog_exception('relaxed', $e);
-    }
-  }
-}
-
-/**
- * Implements hook_entity_delete().
- */
-function relaxed_entity_delete(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'workspace') {
-    // In some cases (mostly testing) the plugin manager is not yet initialized.
-    // @todo {@link https://www.drupal.org/node/2599864 Fix this.}
-    try {
-      \Drupal::service('plugin.manager.rest')->clearCachedDefinitions();
-    } catch (InvalidArgumentException $e) {
-      watchdog_exception('relaxed', $e);
-    }
-  }
-}
-
-/**
  * Implements hook_entity_access().
  */
 function relaxed_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
-  /** @var \Drupal\workspace\WorkspaceManagerInterface $workspace_manager */
-  $workspace_manager = \Drupal::service('workspace.manager');
+  /** @var \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager */
+  $multiversion_manager = \Drupal::service('multiversion.manager');
   $entity_type = $entity->getEntityType();
   $entity_type_id = $entity_type->id();
 
   // Set entity access restrictions depending on pull and push permissions.
-  if ($workspace_manager->entityTypeCanBelongToWorkspaces($entity_type) || $entity_type_id == 'replication_log') {
+  if ($multiversion_manager->isEnabledEntityType($entity_type) || $entity_type_id == 'replication_log') {
     if ($operation == 'view') {
       return AccessResult::allowedIfHasPermissions($account, ['perform push replication', 'perform pull replication'], 'OR');
     }
@@ -82,13 +37,13 @@ return AccessResult::neutral();
  * Implements hook_entity_create_access().
  */
 function multiversion_entity_create_access(AccountInterface $account, array $context, $entity_bundle) {
-  /** @var \Drupal\workspace\WorkspaceManagerInterface $workspace_manager */
-  $workspace_manager = \Drupal::service('workspace.manager');
+  /** @var \Drupal\multiversion\MultiversionManagerInterface $multiversion_manager */
+  $multiversion_manager = \Drupal::service('multiversion.manager');
   $bundles_info = \Drupal::service('entity_type.bundle.info')->getAllBundleInfo();
   foreach ($bundles_info as $entity_type_id => $bundles) {
     if (in_array($entity_bundle, array_keys($bundles))) {
       $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
-      if ($workspace_manager->entityTypeCanBelongToWorkspaces($entity_type) || $entity_type_id == 'replication_log') {
+      if ($multiversion_manager->isEnabledEntityType($entity_type) || $entity_type_id == 'replication_log') {
         return AccessResult::allowedIfHasPermission($account, 'perform push replication');
       }
     }
@@ -180,10 +135,10 @@ function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
   $fields['remote_database'] = BaseFieldDefinition::create('string')
     ->setLabel(t('Remote database'))
     ->setDescription(t('The remote database name.'))
-    ->setSettings(array(
+    ->setSettings([
       'max_length' => 50,
       'text_processing' => 0,
-    ))
+    ])
     ->setRevisionable(TRUE);
 
   return $fields;
@@ -194,11 +149,4 @@ function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
  */
 function relaxed_cron() {
   \Drupal::service('relaxed.remote_pointer')->addAllPointers();
-}
-
-function relaxed_entity_type_alter(array &$entity_types) {
-  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
-  if (isset($entity_types['rest_resource_config'])) {
-    $entity_types['rest_resource_config']->setClass('Drupal\relaxed\Entity\RestResourceConfig');
-  }
 }
