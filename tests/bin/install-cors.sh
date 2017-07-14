@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# Wait for couchdb to start, add CORS.
-npm install add-cors-to-couchdb
-while [ '200' != $(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:5984) ]; do
-  echo waiting for couch to load... ;
-  sleep 1;
-done
-./node_modules/.bin/add-cors-to-couchdb http://127.0.0.1:5984
+curl -X PUT http://127.0.0.1:5984/_config/httpd/enable_cors -d '"true"'
+curl -X PUT http://127.0.0.1:5984/_config/cors/origins -d '"*"'
+curl -X PUT http://127.0.0.1:5984/_config/cors/credentials -d '"true"'
+curl -X PUT http://127.0.0.1:5984/_config/cors/methods -d '"GET, PUT, POST, HEAD, DELETE"'
+curl -X PUT http://127.0.0.1:5984/_config/cors/headers -d '"accept, authorization, content-type, origin, referer, x-csrf-token"'
