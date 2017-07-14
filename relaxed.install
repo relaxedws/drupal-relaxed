@@ -24,5 +24,4 @@ function relaxed_install() {
       ],
     ])->save();
   }
-
 }
