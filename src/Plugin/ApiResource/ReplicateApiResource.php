@@ -24,6 +24,6 @@ class ReplicateApiResource extends ApiResourceBase {
   public function post($replicate) {
     $replicate->doReplication();
 
-    return new ApiResourceResponse($replicate, 201);
+    return new ApiResourceResponse($replicate, 200);
   }
 }
