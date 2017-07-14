@@ -83,10 +83,10 @@ services:
     tags:
       - { name: replication_normalizer, priority: 60 }
     arguments: ['@relaxed.replicate']
-
+# Routing
   relaxed.api_resource.route_generator:
     class: Drupal\relaxed\Plugin\ApiResourceRouteGenerator
-    arguments: ['@plugin.manager.format_negotiator', '@logger.channel.relaxed']
+    arguments: ['@plugin.manager.format_negotiator', '@config.factory', '@logger.channel.relaxed']
 # Subscribers
   relaxed.resource_routes:
     class: Drupal\relaxed\Routing\ApiResourceRoutes

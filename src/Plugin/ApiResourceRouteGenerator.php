@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -50,6 +51,13 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   protected $apiRoot;
 
   /**
+   * The relaxed configuration.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $config;
+
+  /**
    * @var array
    */
   protected $availableFormats;
@@ -69,12 +77,11 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   A logger instance.
    */
-  public function __construct(FormatNegotiatorManagerInterface $format_manager, LoggerChannelInterface $logger) {
+  public function __construct(FormatNegotiatorManagerInterface $format_manager, ConfigFactoryInterface $config_factory, LoggerChannelInterface $logger) {
     $this->formatManager = $format_manager;
     $this->logger = $logger;
 
-    // @todo Inject this, or make a container param instead?
-    $relaxed_config = \Drupal::config('relaxed.settings');
+    $relaxed_config = $config_factory->get('relaxed.settings');
 
     $this->apiRoot = trim($relaxed_config->get('api_root'), '/');
     $this->authenticationProviders = $relaxed_config->get('authentication');
