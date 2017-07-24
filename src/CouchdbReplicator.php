@@ -41,7 +41,7 @@ class CouchdbReplicator implements ReplicatorInterface{
     if ($task !== NULL && !$task instanceof ReplicationTaskInterface && !$task instanceof RelaxedReplicationTask) {
       throw new UnexpectedTypeException($task, 'Drupal\replication\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
     }
-    
+
     $source_db = $this->setupEndpoint($source);
     $target_db = $this->setupEndpoint($target);
 
@@ -102,7 +102,7 @@ class CouchdbReplicator implements ReplicatorInterface{
       $uri = new Uri($url);
       $uri = $uri->withUserInfo(
         $this->relaxedSettings->get('username'),
-        base64_decode($this->relaxedSettings->get('password'))
+        $this->relaxedSettings->get('password')
       );
     }
 
