@@ -38,6 +38,7 @@ class RelaxedWorkspaceNegotiator extends WorkspaceNegotiatorBase {
         }
       }
     }
+    return FALSE;
   }
 
   /**
