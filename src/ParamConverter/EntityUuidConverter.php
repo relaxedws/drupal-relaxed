@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\ParamConverter;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Drupal\multiversion\Entity\Index\UuidIndex;
 use Symfony\Component\Routing\Route;
@@ -10,9 +10,9 @@ use Symfony\Component\Routing\Route;
 class EntityUuidConverter implements ParamConverterInterface {
 
   /**
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * @var \Drupal\multiversion\Entity\Index\UuidIndex
@@ -20,16 +20,25 @@ class EntityUuidConverter implements ParamConverterInterface {
   protected $uuidIndex;
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\multiversion\Entity\Index\UuidIndex $uuid_index
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndex $uuid_index) {
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, UuidIndex $uuid_index) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->uuidIndex = $uuid_index;
   }
 
   /**
    * Converts a UUID into an existing entity.
    *
+   * @param mixed $uuid
+   *   The UUID value.
+   * @param mixed $definition
+   *   The parameter definition provided in the route options.
+   * @param string $name
+   *   The name of the parameter.
+   * @param array $defaults
+   *   The route defaults array.
    * @return string | \Drupal\Core\Entity\EntityInterface
    *   The entity if it exists in the database or else the original UUID string.
    */
@@ -41,11 +50,12 @@ class EntityUuidConverter implements ParamConverterInterface {
       if ($item = $this->uuidIndex->get($uuid)) {
         $entity_type_id = $item['entity_type_id'];
         $entity_id = $item['entity_id'];
-        return $this->entityManager->getStorage($entity_type_id)->load($entity_id);
+        return $this->entityTypeManager->getStorage($entity_type_id)->load($entity_id);
       }
       return $uuid;
     }
-    return $this->entityManager->loadEntityByUuid($entity_type_id, $uuid) ?: $uuid;
+    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadByProperties(['uuid' => $uuid]);
+    return reset($entities) ?: $uuid;
   }
 
   /**
@@ -57,4 +67,5 @@ class EntityUuidConverter implements ParamConverterInterface {
     }
     return FALSE;
   }
+
 }
