@@ -58,7 +58,15 @@ class ContentReplicationTest extends ReplicationTestBase {
     parent::setUp();
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');
-    $this->installConfig(['node', 'taxonomy', 'block', 'block_content', 'comment', 'shortcut']);
+    $this->installConfig([
+      'node',
+      'taxonomy',
+      'block',
+      'block_content',
+      'comment',
+      'shortcut',
+      'language',
+      ]);
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('block_content');
