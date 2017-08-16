@@ -68,6 +68,7 @@ class ContentReplicationTest extends ReplicationTestBase {
       'shortcut',
       'language',
       ]);
+    $this->installSchema('key_value', 'key_value_sorted');
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('block_content');
