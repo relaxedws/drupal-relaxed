@@ -39,7 +39,9 @@ class ContentReplicationTest extends ReplicationTestBase {
     'block_content',
     'comment',
     'shortcut',
-    'datetime'
+    'datetime',
+    'migrate',
+    'migrate_drupal',
   ];
 
   /**
@@ -70,6 +72,7 @@ class ContentReplicationTest extends ReplicationTestBase {
       ]);
     $this->installSchema('node', 'node_access');
     $this->installSchema('key_value', 'key_value_sorted');
+    $this->installConfig(['migrate', 'migrate_drupal']);
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('block_content');
