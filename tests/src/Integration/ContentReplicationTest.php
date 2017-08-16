@@ -110,7 +110,7 @@ class ContentReplicationTest extends ReplicationTestBase {
 
     $term = $taxonomy_term_storage->create([
       'name' => 'Book',
-      'vid' => 123,
+      'vid' => 'tags',
     ]);
     $term->save();
     // Add Romanian translation.
