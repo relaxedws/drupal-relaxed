@@ -4,6 +4,8 @@ namespace Drupal\Tests\relaxed\Integration;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\multiversion\Entity\Workspace;
+use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
 
 require_once __DIR__ . '/ReplicationTestBase.php';
 
@@ -71,11 +73,13 @@ class ContentReplicationTest extends ReplicationTestBase {
       'shortcut',
       'language',
       'field',
+      'migrate',
+      'migrate_drupal',
       ]);
+    $this->installSchema('system', 'sequences');
     $this->installSchema('node', ['node_access']);
     $this->installSchema('comment', ['comment_entity_statistics']);
     $this->installSchema('key_value', ['key_value_sorted']);
-    $this->installConfig(['migrate', 'migrate_drupal', 'comment']);
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('block_content');
@@ -83,6 +87,7 @@ class ContentReplicationTest extends ReplicationTestBase {
     $this->installEntitySchema('shortcut');
     $this->installEntitySchema('field_config');
     $this->installEntitySchema('field_storage_config');
+    $this->installEntitySchema('user');
     /** @var \Drupal\multiversion\MultiversionManager $multiversion_manager */
     $this->multiversionManager = $this->container->get('multiversion.manager');
     $this->multiversionManager->enableEntityTypes();
@@ -186,13 +191,21 @@ class ContentReplicationTest extends ReplicationTestBase {
     $shortcut_romanian->set('title', 'Poveste');
     $shortcut_romanian->save();
 
+    $account = User::create([
+      'name' => 'replicator',
+      'status' => 1,
+      'roles' => ['replicator'],
+    ]);
+    $account->save();
+    $this->container->get('current_user')->setAccount($account);
+
     // Run CouchDB to Drupal replication with PHP replicator.
     $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
     $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "dev", "timeout": 60}';
     $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
     $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/dev/_all_docs', 4);
 
-//    $this->multiversionManager->setActiveWorkspaceId(2);
+    $this->multiversionManager->setActiveWorkspaceId(2);
   }
 
 }
