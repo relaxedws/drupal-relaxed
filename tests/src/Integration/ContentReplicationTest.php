@@ -39,6 +39,7 @@ class ContentReplicationTest extends ReplicationTestBase {
     'block_content',
     'comment',
     'shortcut',
+    'field',
     'datetime',
     'migrate',
     'migrate_drupal',
@@ -69,15 +70,19 @@ class ContentReplicationTest extends ReplicationTestBase {
       'comment',
       'shortcut',
       'language',
+      'field',
       ]);
-    $this->installSchema('node', 'node_access');
-    $this->installSchema('key_value', 'key_value_sorted');
-    $this->installConfig(['migrate', 'migrate_drupal']);
+    $this->installSchema('node', ['node_access']);
+    $this->installSchema('comment', ['comment_entity_statistics']);
+    $this->installSchema('key_value', ['key_value_sorted']);
+    $this->installConfig(['migrate', 'migrate_drupal', 'comment']);
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('comment');
     $this->installEntitySchema('shortcut');
+    $this->installEntitySchema('field_config');
+    $this->installEntitySchema('field_storage_config');
     /** @var \Drupal\multiversion\MultiversionManager $multiversion_manager */
     $this->multiversionManager = $this->container->get('multiversion.manager');
     $this->multiversionManager->enableEntityTypes();
@@ -89,6 +94,23 @@ class ContentReplicationTest extends ReplicationTestBase {
     ConfigurableLanguage::createFromLangcode('ro')->save();
 
     $this->multiversionManager->setActiveWorkspaceId(1);
+
+    // Add comment type.
+    $this->entityTypeManager->getStorage('comment_type')->create([
+      'id' => 'comment',
+      'label' => 'comment',
+      'target_entity_type_id' => 'node',
+    ])->save();
+
+    // Add comment field to content.
+    $this->entityTypeManager->getStorage('field_storage_config')->create([
+      'entity_type' => 'node',
+      'field_name' => 'comment',
+      'type' => 'comment',
+      'settings' => [
+        'comment_type' => 'comment',
+      ]
+    ])->save();
   }
 
   function testTranslatedContentReplication() {
