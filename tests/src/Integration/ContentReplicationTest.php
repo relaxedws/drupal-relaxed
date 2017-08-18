@@ -201,7 +201,7 @@ class ContentReplicationTest extends ReplicationTestBase {
 
     // Run CouchDB to Drupal replication with PHP replicator.
     $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
-    $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "dev", "timeout": 60}';
+    $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "stage", "timeout": 60}';
     $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
     $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/dev/_all_docs', 4);
 
