@@ -88,7 +88,12 @@ class ContentReplicationTest extends ReplicationTestBase {
     $this->multiversionManager->enableEntityTypes();
 
     // Create a new workspace.
-    Workspace::create(['machine_name' => 'dev', 'label' => 'Dev', 'type' => 'basic'])->save();
+    $stage = Workspace::create(['machine_name' => 'stage', 'label' => 'Stage', 'type' => 'basic']);
+    $stage->set('upstream', 1);
+    $stage->save();
+    $live = Workspace::load(1);
+    $live->set('upstream', 2);
+    $live->save();
 
     // Create a new language.
     ConfigurableLanguage::createFromLangcode('ro')->save();
@@ -110,6 +115,13 @@ class ContentReplicationTest extends ReplicationTestBase {
       'settings' => [
         'comment_type' => 'comment',
       ]
+    ])->save();
+
+    // Create a block content type.
+    $this->entityTypeManager->getStorage('block_content_type')->create([
+      'id' => 'test',
+      'label' => 'Test block',
+      'description' => "Provides a test block type.",
     ])->save();
   }
 
@@ -140,9 +152,15 @@ class ContentReplicationTest extends ReplicationTestBase {
     $term_romanian->set('name', 'Carte');
     $term_romanian->save();
 
-    //    $block_content_storage->create([
-    //
-    //    ]);
+    $block = $block_content_storage->create([
+      'info' => 'About the author',
+      'type' => 'test',
+    ]);
+    $block->save();
+    // Add Romanian translation.
+    $block_romanian = $block->addTranslation('ro');
+    $block_romanian->set('info', 'Despre autor');
+    $block_romanian->save();
 
     $comment = $comment_storage->create([
       'entity_type' => 'node',
@@ -169,12 +187,12 @@ class ContentReplicationTest extends ReplicationTestBase {
     $shortcut_romanian->save();
 
     // Run CouchDB to Drupal replication with PHP replicator.
-//    $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
-//    $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "dev", "timeout": 60}';
-//    $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
-//    $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/dev/_all_docs', 4);
+    $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
+    $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "dev", "timeout": 60}';
+    $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
+    $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/dev/_all_docs', 4);
 
-    $this->multiversionManager->setActiveWorkspaceId(2);
+//    $this->multiversionManager->setActiveWorkspaceId(2);
   }
 
 }
