@@ -4,8 +4,8 @@ namespace Drupal\Tests\relaxed\Integration;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\multiversion\Entity\Workspace;
-use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 require_once __DIR__ . '/ReplicationTestBase.php';
 
@@ -76,7 +76,7 @@ class ContentReplicationTest extends ReplicationTestBase {
       'migrate',
       'migrate_drupal',
       ]);
-    $this->installSchema('system', 'sequences');
+    $this->installSchema('system', ['sequences', 'key_value_expire']);
     $this->installSchema('node', ['node_access']);
     $this->installSchema('comment', ['comment_entity_statistics']);
     $this->installSchema('key_value', ['key_value_sorted']);
@@ -191,13 +191,12 @@ class ContentReplicationTest extends ReplicationTestBase {
     $shortcut_romanian->set('title', 'Poveste');
     $shortcut_romanian->save();
 
-    $account = User::create([
-      'name' => 'replicator',
-      'status' => 1,
-      'roles' => ['replicator'],
-    ]);
-    $account->save();
-    $this->container->get('current_user')->setAccount($account);
+    $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => 'replicator']);
+    $account = reset($accounts);
+    $this->assertTrue($account instanceof UserInterface, 'Replicator user account has been loaded successfully.');
+    if ($account) {
+      $this->container->get('current_user')->setAccount($account);
+    }
 
     // Run CouchDB to Drupal replication with PHP replicator.
     $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
