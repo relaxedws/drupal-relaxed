@@ -2,10 +2,15 @@
 
 namespace Drupal\Tests\relaxed\Integration;
 
+use Doctrine\CouchDB\CouchDBClient;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Test\TestDatabase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\multiversion\Entity\Workspace;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use Relaxed\Replicator\ReplicationTask;
+use Relaxed\Replicator\Replicator;
 
 require_once __DIR__ . '/ReplicationTestBase.php';
 
@@ -58,6 +63,21 @@ class ContentReplicationTest extends ReplicationTestBase {
   private $multiversionManager;
 
   /**
+   * @var \Drupal\workspace\ReplicatorManager
+   */
+  private $replicatorManager;
+
+  /**
+   * @var \Drupal\multiversion\Entity\WorkspaceInterface
+   */
+  private $live;
+
+  /**
+   * @var \Drupal\multiversion\Entity\WorkspaceInterface
+   */
+  private $stage;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -65,6 +85,7 @@ class ContentReplicationTest extends ReplicationTestBase {
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->installConfig([
+      'user',
       'node',
       'taxonomy',
       'block',
@@ -75,6 +96,11 @@ class ContentReplicationTest extends ReplicationTestBase {
       'field',
       'migrate',
       'migrate_drupal',
+      'multiversion',
+      'workspace',
+      'replication',
+      'relaxed',
+      'relaxed_test',
       ]);
     $this->installSchema('system', ['sequences', 'key_value_expire']);
     $this->installSchema('node', ['node_access']);
@@ -88,7 +114,8 @@ class ContentReplicationTest extends ReplicationTestBase {
     $this->installEntitySchema('field_config');
     $this->installEntitySchema('field_storage_config');
     $this->installEntitySchema('user');
-    /** @var \Drupal\multiversion\MultiversionManager $multiversion_manager */
+    $this->installEntitySchema('workspace');
+
     $this->multiversionManager = $this->container->get('multiversion.manager');
     $this->multiversionManager->enableEntityTypes();
 
@@ -100,6 +127,9 @@ class ContentReplicationTest extends ReplicationTestBase {
     $live->set('upstream', 2);
     $live->save();
 
+    $this->live = $live;
+    $this->stage = $stage;
+
     // Create a new language.
     ConfigurableLanguage::createFromLangcode('ro')->save();
 
@@ -108,7 +138,7 @@ class ContentReplicationTest extends ReplicationTestBase {
     // Add comment type.
     $this->entityTypeManager->getStorage('comment_type')->create([
       'id' => 'comment',
-      'label' => 'comment',
+      'label' => 'Comment',
       'target_entity_type_id' => 'node',
     ])->save();
 
@@ -122,12 +152,35 @@ class ContentReplicationTest extends ReplicationTestBase {
       ]
     ])->save();
 
+    // Create a page node type.
+    $this->entityTypeManager->getStorage('node_type')->create([
+      'type' => 'article',
+      'name' => 'Article',
+    ])->save();
+
+    // Add comment field to article content.
+    /** @var \Drupal\field\FieldConfigInterface $field */
+    $field = $this->entityTypeManager->getStorage('field_config')->create([
+      'field_name' => 'comment',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Comment settings',
+    ]);
+    $field->save();
+
     // Create a block content type.
     $this->entityTypeManager->getStorage('block_content_type')->create([
-      'id' => 'test',
-      'label' => 'Test block',
-      'description' => "Provides a test block type.",
+      'id' => 'basic',
+      'label' => 'Basic block',
     ])->save();
+
+    $account = User::create([
+      'name' => 'replicator',
+      'status' => 1,
+      'roles' => ['replicator'],
+    ]);
+    $account->save();
+    $this->container->get('current_user')->setAccount($account);
   }
 
   function testTranslatedContentReplication() {
@@ -176,7 +229,7 @@ class ContentReplicationTest extends ReplicationTestBase {
     $comment->save();
     // Add Romanian translation.
     $comment_romanian = $comment->addTranslation('ro');
-    $comment_romanian->set('name', 'Carte');
+    $comment_romanian->set('subject', 'Un caricaturist a caricaturizat o caricatura');
     $comment_romanian->save();
 
     $shortcut = $shortcut_storage->create([
@@ -199,10 +252,27 @@ class ContentReplicationTest extends ReplicationTestBase {
     }
 
     // Run CouchDB to Drupal replication with PHP replicator.
-    $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
-    $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "stage", "timeout": 60}';
-    $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
-    $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/dev/_all_docs', 4);
+//    $source_info = '"source": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
+//    $target_info = '"target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "stage", "timeout": 60}';
+//    $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
+//    $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/stage/_all_docs', 4);
+
+//    $test_connection_key = TestDatabase::getConnection()->getKey();
+//    Database::setActiveConnection($test_connection_key);
+//    $source_info = '"source": {"host": "www.drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}';
+//    $target_info = '"target": {"host": "www.drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "stage", "timeout": 60}';
+//    $this->phpReplicate('{' . $source_info . ',' . $target_info . '}');
+
+    $source = CouchDBClient::create(json_decode('{"host": "www.drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}', TRUE));
+    $target = CouchDBClient::create(json_decode('{"host": "www.drupal8dev.loc", "path": "relaxed", "port": 80, "user": "replicator", "password": "replicator", "dbname": "stage", "timeout": 60}', TRUE));
+
+    $task = new ReplicationTask(null, false, null, null, false, null, 10000, 10000, false, "all_docs", 0, 2, 2);
+    $replicator = new Replicator($source, $target, $task);
+
+    $replicator->startReplication();
+
+    $this->assertAllDocsNumber('http://replicator:replicator@www.drupal8dev.loc/relaxed/stage/_all_docs', 4);
+
 
     $this->multiversionManager->setActiveWorkspaceId(2);
   }

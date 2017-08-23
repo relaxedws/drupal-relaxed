@@ -93,9 +93,13 @@ abstract class ReplicationTestBase extends KernelTestBase {
     // Create a target database.
     $response_code = $this->createDb($this->targetDb);
     $this->assertEquals(201, $response_code);
+  }
 
-    // Load documents from documents.txt and save them in the 'source' database.
-    $handle = fopen(realpath(dirname(__FILE__) . '/../..') . '/fixtures/documents.txt', "r");
+  /**
+   * Load documents from documents.txt and save them in the 'source' database.
+   */
+  protected function loadFixturesToSource($doc_name, $db_url) {
+    $handle = fopen(realpath(dirname(__FILE__) . '/../..') . "/fixtures/$doc_name", "r");
     if ($handle) {
       $curl = curl_init();
       while (($line = fgets($handle)) !== FALSE) {
@@ -103,7 +107,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_POST => TRUE,
           CURLOPT_POSTFIELDS => $line,
-          CURLOPT_URL => "$this->couchdbUrl/$this->sourceDb",
+          CURLOPT_URL => $db_url,
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',

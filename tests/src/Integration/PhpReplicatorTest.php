@@ -14,6 +14,7 @@ class PhpReplicatorTest extends ReplicationTestBase {
    */
   public function testPhpReplicator() {
     // Run CouchDB to Drupal replication.
+    $this->loadFixturesToSource('documents.txt', "$this->couchdbUrl/$this->sourceDb");
     $this->phpReplicate('{"source": {"dbname": "' . $this->sourceDb . '", "port": ' . $this->port . '}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}}');
     $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/live/_all_docs', 9);
 

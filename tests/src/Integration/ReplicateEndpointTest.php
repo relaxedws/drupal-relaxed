@@ -14,6 +14,7 @@ class ReplicateEndpointTest extends ReplicationTestBase {
    */
   public function testReplicateEndpoint() {
     // Run CouchDB to Drupal replication.
+    $this->loadFixturesToSource('documents.txt', "$this->couchdbUrl/$this->sourceDb");
     $this->endpointReplicate('{"source": {"dbname": "' . $this->sourceDb . '", "port": ' . $this->port . '}, "target": {"host": "localhost", "path": "relaxed", "port": 8080, "user": "replicator", "password": "replicator", "dbname": "live", "timeout": 60}}', 'http://replicator:replicator@localhost:8080/relaxed/_replicate');
     $this->assertAllDocsNumber('http://replicator:replicator@localhost:8080/relaxed/live/_all_docs', 9);
 
