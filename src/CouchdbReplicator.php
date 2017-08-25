@@ -59,8 +59,10 @@ class CouchdbReplicator implements ReplicatorInterface{
       if ($task !== NULL) {
         $couchdb_task->setFilter($task->getFilter());
         $couchdb_task->setParameters($task->getParameters());
-        $couchdb_task->setLimit($task->getLimit());
-        $couchdb_task->setBulkDocsLimit($task->getBulkDocsLimit());
+        $changes_limit = \Drupal::config('replication.settings')->get('changes_limit');
+        $couchdb_task->setLimit($changes_limit ? $changes_limit : $task->getLimit());
+        $bulk_docs_limit = \Drupal::config('replication.settings')->get('changes_limit');
+        $couchdb_task->setBulkDocsLimit($bulk_docs_limit ? $bulk_docs_limit : $task->getBulkDocsLimit());
       }
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
