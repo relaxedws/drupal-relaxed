@@ -8,7 +8,6 @@ use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\replication\Entity\ReplicationLog;
-use Drupal\replication\ReplicationTask\ReplicationTask;
 use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
@@ -46,10 +45,7 @@ class CouchdbReplicator implements ReplicatorInterface{
     $target_db = $this->setupEndpoint($target);
 
     try {
-      if ($task === NULL) {
-        $couchdb_task = new RelaxedReplicationTask();
-      }
-      elseif ($task instanceof ReplicationTaskInterface) {
+      if ($task === NULL || $task instanceof ReplicationTaskInterface) {
         $couchdb_task = new RelaxedReplicationTask();
       }
       else {
@@ -60,9 +56,21 @@ class CouchdbReplicator implements ReplicatorInterface{
         $couchdb_task->setFilter($task->getFilter());
         $couchdb_task->setParameters($task->getParameters());
         $changes_limit = \Drupal::config('replication.settings')->get('changes_limit');
-        $couchdb_task->setLimit($changes_limit ? $changes_limit : $task->getLimit());
+        $couchdb_task->setLimit($changes_limit ?: $task->getLimit());
         $bulk_docs_limit = \Drupal::config('replication.settings')->get('changes_limit');
-        $couchdb_task->setBulkDocsLimit($bulk_docs_limit ? $bulk_docs_limit : $task->getBulkDocsLimit());
+        $couchdb_task->setBulkDocsLimit($bulk_docs_limit ?: $task->getBulkDocsLimit());
+
+        $replication_log_id = $source->generateReplicationId($target, $task);
+        /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
+        $replication_logs = \Drupal::entityTypeManager()
+          ->getStorage('replication_log')
+          ->loadByProperties(['uuid' => $replication_log_id]);
+        $replication_log = reset($replication_logs);
+        $since = 0;
+        if (!empty($replication_log) && $replication_log->get('ok')->value == TRUE) {
+          $since = $replication_log->getSourceLastSeq() ?: $since;
+        }
+        $couchdb_task->setSinceSeq($since);
       }
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
@@ -83,12 +91,12 @@ class CouchdbReplicator implements ReplicatorInterface{
         return reset($replication_logs);
       }
       else {
-        return $this->errorReplicationLog($source, $target);
+        return $this->errorReplicationLog($source, $target, $task);
       }
     }
     catch (\Exception $e) {
       watchdog_exception('Relaxed', $e);
-      return $this->errorReplicationLog($source, $target);
+      return $this->errorReplicationLog($source, $target, $task);
     }
   }
 
@@ -131,7 +139,7 @@ class CouchdbReplicator implements ReplicatorInterface{
     }
   }
 
-  protected function errorReplicationLog(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
+  protected function errorReplicationLog(WorkspacePointerInterface $source, WorkspacePointerInterface $target, ReplicationTaskInterface $task = NULL) {
     $time = new \DateTime();
     $history = [
       'start_time' => $time->format('D, d M Y H:i:s e'),
@@ -139,7 +147,7 @@ class CouchdbReplicator implements ReplicatorInterface{
       'session_id' => \md5((\microtime(true) * 1000000)),
       'start_last_seq' => $source->getWorkspace()->getUpdateSeq(),
     ];
-    $replication_log_id = $source->generateReplicationId($target);
+    $replication_log_id = $source->generateReplicationId($target, $task);
     /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
     $replication_log = ReplicationLog::loadOrCreate($replication_log_id);
     $replication_log->set('ok', FALSE);
