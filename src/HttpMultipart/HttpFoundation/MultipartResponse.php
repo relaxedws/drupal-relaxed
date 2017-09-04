@@ -20,7 +20,7 @@ class MultipartResponse extends ResourceResponse {
   /**
    * @var Response[]
    */
-  protected $parts;
+  protected $parts = [];
 
   /**
    * Constructor.
@@ -28,30 +28,37 @@ class MultipartResponse extends ResourceResponse {
   public function __construct(array $parts = NULL, $status = 200, $headers = [], $subtype = NULL) {
     parent::__construct(NULL, $status, $headers);
 
+    if ($parts) {
+      $this->setParts($parts);
+    }
+
     $this->subtype = $subtype ?: 'mixed';
     $this->boundary = md5(microtime());
-
-    if (NULL !== $parts) {
-      $this->setParts($parts);
-      $content = '';
-      foreach ($this->getParts() as $part) {
-        $content .= "--{$this->boundary}\r\n";
-        $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
-        $content .= \Drupal::service('serializer')
-          ->serialize($part->getResponseData(), 'json');
-        $content .= "\r\n";
-      }
-      $content .= "--{$this->boundary}--";
-      $this->setContent($content);
-    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function prepare(Request $request) {
-    $this->headers->set('Content-Type', "multipart/{$this->subtype}; boundary=\"{$this->boundary}\"");
+    $this->headers->set('Content-Type', sprintf('multipart/%s; boundary="%s"', $this->subtype, $this->boundary));
     $this->headers->set('Transfer-Encoding', 'chunked');
+
+    // Prepare the response content from the parts.
+    $parts = $this->getParts();
+
+    if ($parts) {
+      $content = '';
+
+      foreach ($parts as $part) {
+        $content .= "--{$this->boundary}\r\n";
+        $content .= "Content-Type: {$part->headers->get('Content-Type')}\r\n\r\n";
+        $content .= $part->getContent();
+        $content .= "\r\n";
+      }
+
+      $content .= "--{$this->boundary}--";
+      $this->setContent($content);
+    }
 
     return parent::prepare($request);
   }
