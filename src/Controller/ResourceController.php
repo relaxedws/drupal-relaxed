@@ -16,6 +16,7 @@ use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
 use Drupal\replication\ProcessFileAttachment;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -241,9 +242,21 @@ class ResourceController implements ContainerInjectionInterface {
    */
   protected function getResponseFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
     $api_resource_formats = $api_resource->getAllowedFormats();
-    $acceptable_response_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
-    //$acceptable_content_type_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
-    //$acceptable_formats = $request->isMethodSafe() ? $acceptable_request_formats : $acceptable_content_type_formats;
+
+    $acceptable_response_formats = $this->getAcceptableResponseFormatsFromRequest($request);
+    $acceptable_route_response_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
+
+    if ($acceptable_response_formats) {
+      // If there are required formats enforced, intersect that with the acceptable formats from the accept header.
+      if ($acceptable_route_response_formats) {
+        $acceptable_response_formats = array_intersect($acceptable_response_formats, $acceptable_route_response_formats);
+      }
+    }
+    // Otherwise, use route ones.
+    else {
+      $acceptable_response_formats = $acceptable_route_response_formats;
+    }
+
     $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_response_formats;
 
     $requested_format = $request->getRequestFormat();
@@ -267,7 +280,7 @@ class ResourceController implements ContainerInjectionInterface {
     }
     // Return the default format.
     else {
-      return static::DEFAULT_FORMAT;
+      return $acceptable_response_formats ? reset($acceptable_response_formats) : static::DEFAULT_FORMAT;
     }
   }
 
@@ -313,6 +326,19 @@ class ResourceController implements ContainerInjectionInterface {
       }
     }
     return $parameters;
+  }
+
+  /**
+   * @param Request $request
+   *
+   * @return array
+   */
+  protected function getAcceptableResponseFormatsFromRequest(Request $request) {
+    $acceptable_content_types = array_keys(AcceptHeader::fromString($request->headers->get('X-Relaxed-Document-Accept'))->all());
+
+    return array_unique(array_filter(array_map(function ($content_type) use ($request) {
+      return $request->getFormat($content_type);
+    }, $acceptable_content_types)));
   }
 
   /**
