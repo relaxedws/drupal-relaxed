@@ -243,7 +243,7 @@ class ResourceController implements ContainerInjectionInterface {
   protected function getResponseFormat(Route $route, Request $request, ApiResourceInterface $api_resource) {
     $api_resource_formats = $api_resource->getAllowedFormats();
 
-    $acceptable_response_formats = $this->getAcceptableResponseFormatsFromRequest($request);
+    $acceptable_response_formats = $this->getAcceptableResponseFormatsFromRequestHeaders($request);
     $acceptable_route_response_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
 
     if ($acceptable_response_formats) {
@@ -265,7 +265,7 @@ class ResourceController implements ContainerInjectionInterface {
     // If an acceptable format is requested, then use that. Otherwise, including
     // and particularly when the client forgot to specify a format, then use
     // heuristics to select the format that is most likely expected.
-    if (in_array($requested_format, $acceptable_formats)) {
+    if (empty($acceptable_formats)|| in_array($requested_format, $acceptable_formats)) {
       return $requested_format;
     }
     // If a request body is present, then use the format corresponding to the
@@ -333,7 +333,7 @@ class ResourceController implements ContainerInjectionInterface {
    *
    * @return array
    */
-  protected function getAcceptableResponseFormatsFromRequest(Request $request) {
+  protected function getAcceptableResponseFormatsFromRequestHeaders(Request $request) {
     $acceptable_content_types = array_keys(AcceptHeader::fromString($request->headers->get('X-Relaxed-Document-Accept'))->all());
 
     return array_unique(array_filter(array_map(function ($content_type) use ($request) {
