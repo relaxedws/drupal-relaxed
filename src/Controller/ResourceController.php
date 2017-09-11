@@ -300,7 +300,7 @@ class ResourceController implements ContainerInjectionInterface {
     // heuristics to select the format that is most likely expected.
     // Special case mixed here. We can't use this as a response format for
     // serialization.
-    if (!in_array($requested_format, ['mixed', 'related'], TRUE) && (empty($acceptable_formats) || in_array($response_format, $acceptable_formats, TRUE))) {
+    if (!in_array($response_format, ['mixed', 'related'], TRUE) && (empty($acceptable_formats) || in_array($response_format, $acceptable_formats, TRUE))) {
       return $response_format;
     }
     // Otherwise, use the first acceptable format.
@@ -328,7 +328,7 @@ class ResourceController implements ContainerInjectionInterface {
     // If a request body is present, then use the format corresponding to the
     // request body's Content-Type for the response, if it's an acceptable
     // format for the request.
-    if (in_array($content_type_format, $acceptable_formats)) {
+    if (in_array($content_type_format, $acceptable_formats, TRUE)) {
       return $content_type_format;
     }
     // Otherwise, use the first acceptable format.
