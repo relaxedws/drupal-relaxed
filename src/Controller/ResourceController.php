@@ -168,22 +168,9 @@ class ResourceController implements ContainerInjectionInterface {
       }
     }
 
-    try {
-      $render_context = new RenderContext();
-      /** @var \Drupal\relaxed\Http\ApiResourceResponse $response */
-      $response = $this->renderer->executeInRenderContext($render_context, function() use ($api_resource, $method, $parameters, $entity, $request) {
-        return call_user_func_array([$api_resource, $method], array_merge($parameters, [$entity, $request]));
-      });
-
-      if (!$render_context->isEmpty()) {
-        $render_contexts[] = $render_context->pop();
-      }
-    }
-    catch (\Exception $e) {
-      return $this->errorResponse($e, $content_type_format, $serializer, $request);
-    }
-
-    // Select the format negotiator for the response data.
+    // Select the format negotiator for the response data. Do this before
+    // invoking the API resource method so we can return error responses in the
+    // required format too.
     $response_format = $this->getResponseFormat($route, $request, $api_resource);
 
     $negotiator = $this->negotiatorManager->select($response_format, $method, 'response');
@@ -198,6 +185,21 @@ class ResourceController implements ContainerInjectionInterface {
     if (!in_array($response_format, $negotiator_formats, TRUE)) {
       // Use the first from the chosen negotiator.
       $response_format = reset($negotiator_formats);
+    }
+
+    try {
+      $render_context = new RenderContext();
+      /** @var \Drupal\relaxed\Http\ApiResourceResponse $response */
+      $response = $this->renderer->executeInRenderContext($render_context, function() use ($api_resource, $method, $parameters, $entity, $request) {
+        return call_user_func_array([$api_resource, $method], array_merge($parameters, [$entity, $request]));
+      });
+
+      if (!$render_context->isEmpty()) {
+        $render_contexts[] = $render_context->pop();
+      }
+    }
+    catch (\Exception $e) {
+      return $this->errorResponse($e, $response_format, $serializer, $request);
     }
 
     $responses = ($response instanceof HttpFoundationMultipartResponse) ? $response->getParts() : [$response];
@@ -222,6 +224,10 @@ class ResourceController implements ContainerInjectionInterface {
       if (!$response_part->headers->has('Content-Type')) {
         $response_part->headers->set('Content-Type', $request->getMimeType($response_format));
       }
+    }
+
+    if (!$response->headers->has('Content-Type')) {
+      $response->headers->set('Content-Type', $request->getMimeType($response_format));
     }
 
     if ($method !== 'head') {
