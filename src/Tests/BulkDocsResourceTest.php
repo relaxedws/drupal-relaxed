@@ -14,6 +14,8 @@ class BulkDocsResourceTest extends ResourceTestBase {
   public function testPostCreate() {
     $entity_types = ['entity_test_rev'];
 
+    $serializer = $this->container->get('replication.serializer');
+
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
@@ -24,7 +26,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
       $data = ['docs' => []];
       foreach ($this->createTestEntities($entity_type) as $entity) {
-        $data['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+        $data['docs'][] = $serializer->normalize($entity, $this->defaultFormat);
       }
 
       $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($data));
@@ -71,7 +73,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
         // Delete an entity.
         $entity->delete();
       }
-      $input['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+      $input['docs'][] = $serializer->normalize($entity, $this->defaultFormat);
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
