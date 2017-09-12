@@ -265,22 +265,19 @@ class ResourceController implements ContainerInjectionInterface {
 
     $acceptable_formats = !empty($api_resource_formats) ? $api_resource_formats : $acceptable_response_formats;
 
-    $requested_format = $request->getRequestFormat();
+    $requested_format = $request->getRequestFormat(NULL);
     $content_type_format = $request->getContentType();
+    // Determine the ideal response format based on whether there was a
+    // requested format or not.
+    $response_format = $requested_format ?: $content_type_format;
 
     // If an acceptable format is requested, then use that. Otherwise, including
     // and particularly when the client forgot to specify a format, then use
     // heuristics to select the format that is most likely expected.
     // Special case mixed here. We can't use this as a response format for
     // serialization.
-    if (!in_array($requested_format, ['mixed', 'related'], TRUE) && (empty($acceptable_formats) || in_array($requested_format, $acceptable_formats))) {
-      return $requested_format;
-    }
-    // If a request body is present, then use the format corresponding to the
-    // request body's Content-Type for the response, if it's an acceptable
-    // format for the request.
-    elseif (!empty($request->getContent()) && in_array($content_type_format, $acceptable_formats)) {
-      return $content_type_format;
+    if (!in_array($response_format, ['mixed', 'related'], TRUE) && (empty($acceptable_formats) || in_array($response_format, $acceptable_formats, TRUE))) {
+      return $response_format;
     }
     // Otherwise, use the first acceptable format.
     elseif (!empty($acceptable_formats)) {
@@ -307,7 +304,7 @@ class ResourceController implements ContainerInjectionInterface {
     // If a request body is present, then use the format corresponding to the
     // request body's Content-Type for the response, if it's an acceptable
     // format for the request.
-    if (in_array($content_type_format, $acceptable_formats)) {
+    if (in_array($content_type_format, $acceptable_formats, TRUE)) {
       return $content_type_format;
     }
     // Otherwise, use the first acceptable format.

@@ -163,7 +163,7 @@ abstract class ResourceTestBase extends WebTestBase {
           CURLOPT_HTTPGET => FALSE,
           CURLOPT_POST => TRUE,
           CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => $this->buildUrl($url, ['absolute' => TRUE]),
+          CURLOPT_URL => $this->buildUrl($url, $options),
           CURLOPT_NOBODY => FALSE,
           CURLOPT_HTTPHEADER => $post_headers,
         ];
