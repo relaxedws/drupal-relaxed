@@ -67,8 +67,12 @@ class CouchdbReplicator implements ReplicatorInterface{
           ->loadByProperties(['uuid' => $replication_log_id]);
         $replication_log = reset($replication_logs);
         $since = 0;
-        if (!empty($replication_log) && $replication_log->get('ok')->value == TRUE) {
-          $since = $replication_log->getSourceLastSeq() ?: $since;
+        if (!empty($replication_log) && $replication_log->get('ok')->value == TRUE && $replication_log_history = $replication_log->getHistory()) {
+          $dw = $replication_log_history[0]['docs_written'];
+          $mf = $replication_log_history[0]['missing_found'];
+          if ($dw !== NULL && $mf !== NULL && $dw == $mf) {
+            $since = $replication_log->getSourceLastSeq() ?: $since;
+          }
         }
         $couchdb_task->setSinceSeq($since);
       }
