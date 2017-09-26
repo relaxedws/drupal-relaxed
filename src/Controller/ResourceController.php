@@ -146,21 +146,21 @@ class ResourceController implements ContainerInjectionInterface {
       'api_resource_id' => $api_resource_id,
     ];
 
+    // If we have a workspace parameter, pass it to the serializer for
+    // denormalization.
+    foreach ($parameters as $parameter) {
+      if ($parameter instanceof WorkspaceInterface) {
+        $context['workspace'] = $parameter;
+        break;
+      }
+    }
+
     $entity = NULL;
     $definition = $api_resource->getPluginDefinition();
 
     if (!empty($content)) {
       try {
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
-
-        // If we have a workspace parameter, pass it to the serializer for denormalization.
-        foreach ($parameters as $parameter) {
-          if ($parameter instanceof WorkspaceInterface) {
-            $context['workspace'] = $parameter;
-            break;
-          }
-        }
-
         $entity = $serializer->deserialize($content, $class, $content_type_format, $context);
       }
       catch (\Exception $e) {
