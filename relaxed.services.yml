@@ -31,7 +31,7 @@ services:
     arguments: ['@entity_type.manager', '@http_client']
   relaxed.couchdb_replicator:
     class: Drupal\relaxed\CouchdbReplicator
-    arguments: ['@config.factory']
+    arguments: ['@config.factory', '@relaxed.sensitive_data.transformer']
     tags:
       - {name: workspace_replicator, priority: 20}
   relaxed.replicate:
@@ -46,3 +46,6 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@serializer', '@renderer', '@current_route_match']
+  relaxed.sensitive_data.transformer:
+    class: Drupal\relaxed\SensitiveDataTransformer
+    arguments: ['@config.factory']

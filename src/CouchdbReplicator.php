@@ -6,6 +6,7 @@ use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\relaxed\SensitiveDataTransformer;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\replication\Entity\ReplicationLog;
 use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
@@ -18,10 +19,21 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class CouchdbReplicator implements ReplicatorInterface{
 
+  /**
+   * Relaxed configuration settings.
+   */
   protected $relaxedSettings;
 
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  /**
+   * Relaxed sensitive data transformer service.
+   *
+   * @var Drupal\relaxed\SensitiveDataTransformer
+   */
+  protected $transformer;
+
+  public function __construct(ConfigFactoryInterface $config_factory, SensitiveDataTransformer $transformer) {
     $this->relaxedSettings = $config_factory->get('relaxed.settings');
+    $this->transformer = $transformer;
   }
 
   /**
@@ -40,7 +52,7 @@ class CouchdbReplicator implements ReplicatorInterface{
     if ($task !== NULL && !$task instanceof ReplicationTaskInterface && !$task instanceof RelaxedReplicationTask) {
       throw new UnexpectedTypeException($task, 'Drupal\replication\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
     }
-    
+
     $source_db = $this->setupEndpoint($source);
     $target_db = $this->setupEndpoint($target);
 
@@ -116,7 +128,7 @@ class CouchdbReplicator implements ReplicatorInterface{
       $uri = new Uri($url);
       $uri = $uri->withUserInfo(
         $this->relaxedSettings->get('username'),
-        base64_decode($this->relaxedSettings->get('password'))
+        $this->transformer->get($this->relaxedSettings->get('password'))
       );
     }
 
