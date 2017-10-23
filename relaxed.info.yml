@@ -11,3 +11,5 @@ dependencies:
   - system (>=8.3.x)
 test_dependencies:
   - workspace
+  - key
+  - encrypt
