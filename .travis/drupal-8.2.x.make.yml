@@ -5,6 +5,8 @@ core: 8.x
 projects:
   drupal: 8.2.x
   key_value: 1.x
+  key: 1.x
+  encrypt: 3.x
   conflict:
     type: module
     download:
