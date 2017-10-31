@@ -23,10 +23,10 @@ addons:
 
 env:
   matrix:
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.2.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml COUCHDB_VERSION=2.0-dev
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.2.x.make.yml COUCHDB_VERSION=1.6.1
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.4.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.4.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.3.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.3.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.3.x.make.yml COUCHDB_VERSION=2.0-dev
