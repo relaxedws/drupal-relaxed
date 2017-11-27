@@ -132,6 +132,10 @@ class DocIdConverter implements ParamConverterInterface {
    * {@inheritdoc}
    */
   public function applies($definition, $name, Route $route) {
-    return ($definition['type'] == 'relaxed:docid');
+    if (!empty($definition['type']) && $definition['type'] == 'relaxed:docid') {
+      return TRUE;
+    }
+    return FALSE;
   }
+
 }
