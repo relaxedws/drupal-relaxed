@@ -116,7 +116,7 @@ class CouchdbReplicator implements ReplicatorInterface{
     }
   }
 
-  protected function setupEndpoint(WorkspacePointerInterface $pointer) {
+  public function setupEndpoint(WorkspacePointerInterface $pointer) {
     if (!empty($pointer->getWorkspaceId())) {
       /** @var string $api_root */
       $api_root = trim($this->relaxedSettings->get('api_root'), '/');
