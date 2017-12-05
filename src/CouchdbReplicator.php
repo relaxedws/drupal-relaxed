@@ -122,9 +122,14 @@ class CouchdbReplicator implements ReplicatorInterface{
       $api_root = trim($this->relaxedSettings->get('api_root'), '/');
       /** @var WorkspaceInterface $workspace */
       $workspace = $pointer->getWorkspace();
-      $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), [])
-        ->setAbsolute()
-        ->toString();
+      $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), []);
+      // This is a workaround for the case when the site/server is not configured
+      // correctly and 'base:/' returns the URL with 'http' instead of 'https';
+      if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
+        $url->setOption('https', TRUE);
+      }
+      $url = $url->setAbsolute()->toString();
       $uri = new Uri($url);
       $uri = $uri->withUserInfo(
         $this->relaxedSettings->get('username'),
