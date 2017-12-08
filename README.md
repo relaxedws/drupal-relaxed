@@ -28,14 +28,14 @@ REQUIREMENTS
 
 This module requires:
 
- * Multiversion - https://www.drupal.org/project/multiversion
- * Replication - https://www.drupal.org/project/replication
+ * [Multiversion](https://www.drupal.org/project/multiversion)
+ * [Replication](https://www.drupal.org/project/replication)
 
 
 RECOMMENDED MODULES
 -------------------
 
- * Deploy - https://www.drupal.org/project/deploy
+ * [Deploy](https://www.drupal.org/project/deploy)
 
 
 INSTALLATION
@@ -72,14 +72,14 @@ Since the API is heavily inspired by CouchDB (http://docs.couchdb.org/) it can
 be used to create "offline-first" apps or websites with compatible frontend
 libraries such as:
 
- * PouchDB - http://pouchdb.com/
- * Hood.ie. - http://hood.ie/
+ * [PouchDB](http://pouchdb.com)
+ * [Hood.ie](http://hood.ie)
 
 
 MAINTAINERS
 -----------
 
- * Andrei Jechiu (jeqq) - https://www.drupal.org/u/jeqq
- * Tim Millwood (timmillwood) - https://www.drupal.org/u/timmillwood
- * Damian Lee (damiankloip) - https://www.drupal.org/u/damiankloip
- * Dick Olsson (dixon_) - https://www.drupal.org/u/dixon_
+ * Andrei Jechiu ([jeqq](https://www.drupal.org/u/jeqq))
+ * Tim Millwood ([timmillwood](https://www.drupal.org/u/timmillwood))
+ * Damian Lee ([damiankloip](https://www.drupal.org/u/damiankloip))
+ * Dick Olsson ([dixon_](https://www.drupal.org/u/dixon_))
