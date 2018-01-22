@@ -6,9 +6,12 @@ use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\relaxed\Event\RelaxedEvents;
+use Drupal\relaxed\Event\RelaxedReplicationFinishedEvent;
 use Drupal\relaxed\SensitiveDataTransformer;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\replication\Entity\ReplicationLog;
+use Drupal\replication\Entity\ReplicationLogInterface;
 use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
@@ -104,15 +107,20 @@ class CouchdbReplicator implements ReplicatorInterface{
             ->getStorage('replication_log')
             ->loadByProperties(['session_id' => $result['session_id']]);
         }
-        return reset($replication_logs);
+        $log = reset($replication_logs);
       }
       else {
-        return $this->errorReplicationLog($source, $target, $task);
+        $log = $this->errorReplicationLog($source, $target, $task);
       }
+
+      $this->dispatchReplicationFinishedEvent($source, $target, $log);
+      return $log;
     }
     catch (\Exception $e) {
       watchdog_exception('Relaxed', $e);
-      return $this->errorReplicationLog($source, $target, $task);
+      $log = $this->errorReplicationLog($source, $target, $task);
+      $this->dispatchReplicationFinishedEvent($source, $target, $log);
+      return $log;
     }
   }
 
@@ -178,6 +186,19 @@ class CouchdbReplicator implements ReplicatorInterface{
     $replication_log->setHistory($history);
     $replication_log->save();
     return $replication_log;
+  }
+
+  protected function dispatchReplicationFinishedEvent(WorkspacePointerInterface $source, WorkspacePointerInterface $target, ReplicationLogInterface $log) {
+    $replication_info = [
+      'source' => $source->label(),
+      'target' => $target->label(),
+      'status' => (int) !empty($log->get('ok')->value),
+      'last_seq' => $log->getSourceLastSeq(),
+      'session_id' => $log->getSessionId(),
+    ];
+    $event = new RelaxedReplicationFinishedEvent($replication_info);
+    $dispatcher = \Drupal::service('event_dispatcher');
+    $dispatcher->dispatch(RelaxedEvents::REPLICATION_FINISHED, $event);
   }
 
 }
