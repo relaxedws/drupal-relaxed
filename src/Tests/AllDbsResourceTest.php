@@ -25,10 +25,14 @@ class AllDbsResourceTest extends ResourceTestBase {
     foreach (Workspace::loadMultiple() as $workspace) {
       $workspaces[] = $workspace->getMachineName();
     }
-    for ($i = 0; $i < 3; $i++) {
+    for ($i = 0; $i < 5; $i++) {
       $machine_name = $this->randomMachineName();
       $entity = Workspace::create(['machine_name' => $machine_name, 'type' => 'basic']);
       $entity->save();
+      if ($i % 2 == 0) {
+        $entity->setUnpublished()->save();
+        continue;
+      }
       $workspaces[] = $machine_name;
     }
 
