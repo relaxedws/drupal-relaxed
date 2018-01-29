@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,7 +28,8 @@ class LocalDocResource extends DocResource {
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
+    $this->checkWorkspaceExists($workspace);
+    if (is_string($existing)) {
       throw new NotFoundHttpException('This 404 error is totally normal for ReplicationLog entities.');
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
@@ -49,7 +49,8 @@ class LocalDocResource extends DocResource {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
+    $this->checkWorkspaceExists($workspace);
+    if (is_string($existing)) {
       throw new NotFoundHttpException('This 404 error is totally normal for ReplicationLog entities.');
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */

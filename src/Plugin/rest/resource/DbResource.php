@@ -4,7 +4,6 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\multiversion\Entity\Workspace;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
@@ -37,9 +36,7 @@ class DbResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function head($entity) {
-    if (!$entity instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
+    $this->checkWorkspaceExists($entity);
     $response = new ResourceResponse(NULL, 200);
     $response->addCacheableDependency($entity);
 
@@ -53,9 +50,7 @@ class DbResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($entity) {
-    if (!$entity instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
+    $this->checkWorkspaceExists($entity);
     // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
     $response =  new ResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
@@ -72,21 +67,19 @@ class DbResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
   public function put($entity) {
-    if (!$entity instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
-    elseif (!$entity->isNew()) {
-      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
+    $this->checkWorkspaceExists($entity);
+    if (!$entity->isNew()) {
+      throw new PreconditionFailedHttpException(t('The workspace could not be created, it already exists.'));
     }
     elseif ($entity->validate()->count() != 0) {
-      throw new NotFoundHttpException(t('Invalid database'));
+      throw new NotFoundHttpException(t('Invalid workspace.'));
     }
 
     try {
       $entity->save();
     }
     catch (EntityStorageException $e) {
-      throw new HttpException(500, t('Internal server error'), $e);
+      throw new HttpException(500, t('Internal server error.'), $e);
     }
     $response = new ResourceResponse(['ok' => TRUE], 201);
     $response->addCacheableDependency($entity);
@@ -108,11 +101,9 @@ class DbResource extends ResourceBase {
   public function post($workspace, ContentEntityInterface $entity = NULL) {
     // If the workspace parameter is a string it means it could not be upcasted
     // to an entity because none existed.
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException(t('Database does not exist')); 
-    }
-    elseif (empty($entity)) {
-      throw new BadRequestHttpException(t('No content received'));
+    $this->checkWorkspaceExists($workspace);
+    if (empty($entity)) {
+      throw new BadRequestHttpException(t('No content received.'));
     }
 
     // Check entity and field level access.
@@ -153,16 +144,20 @@ class DbResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function delete(WorkspaceInterface $entity) {
+    if (!$entity->isPublished()) {
+      throw new HttpException(500, t('Workspace does not exist or it has been archived.'));
+    }
     try {
       // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
       $entity->delete();
     }
     catch (\Exception $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage(), $e);
     }
     $response = new ResourceResponse(['ok' => TRUE], 200);
     $response->addCacheableDependency($entity);
 
     return $response;
   }
+
 }

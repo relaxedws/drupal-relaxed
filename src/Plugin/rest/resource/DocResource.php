@@ -2,11 +2,8 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\file\FileInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,8 +11,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseParser;
-use GuzzleHttp\Psr7;
 
 /**
  * @RestResource(
@@ -41,8 +36,9 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function head($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
-      throw new NotFoundHttpException();
+    $this->checkWorkspaceExists($workspace);
+    if (is_string($existing)) {
+      throw new NotFoundHttpException(t('Document does not exist.'));
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
@@ -64,8 +60,9 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function get($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
-      throw new NotFoundHttpException();
+    $this->checkWorkspaceExists($workspace);
+    if (is_string($existing)) {
+      throw new NotFoundHttpException(t('Document does not exist.'));
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
@@ -123,9 +120,7 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
+    $this->checkWorkspaceExists($workspace);
 
     // Check entity and field level access.
     if (!$received_entity->access('create')) {
@@ -171,9 +166,9 @@ class DocResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function delete($workspace, $entity) {
-    if (!($workspace instanceof WorkspaceInterface)
-      || !($entity instanceof ContentEntityInterface)) {
-      throw new NotFoundHttpException();
+    $this->checkWorkspaceExists($workspace);
+    if (!($entity instanceof ContentEntityInterface)) {
+      throw new NotFoundHttpException(t('Document does not exist.'));
     }
 
     if (!$entity->access('delete')) {
