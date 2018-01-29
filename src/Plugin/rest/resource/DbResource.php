@@ -145,7 +145,7 @@ class DbResource extends ResourceBase {
    */
   public function delete(WorkspaceInterface $entity) {
     if (!$entity->isPublished()) {
-      throw new HttpException(500, t('Workspace does not exist or it has been archived.'));
+      throw new HttpException(500, t('Workspace does not exist.'));
     }
     try {
       // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
