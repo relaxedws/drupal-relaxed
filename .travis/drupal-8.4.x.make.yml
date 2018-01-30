@@ -17,7 +17,7 @@ projects:
     type: module
     download:
       type: git
-      branch: archive-workspace
+      branch: 8.x-1.x
       url: "https://github.com/dickolsson/drupal-multiversion.git"
   replication:
     type: module
