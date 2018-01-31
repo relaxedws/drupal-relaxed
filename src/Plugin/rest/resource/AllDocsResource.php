@@ -2,11 +2,8 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
@@ -30,9 +27,7 @@ class AllDocsResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($workspace) {
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
+    $this->checkWorkspaceExists($workspace);
 
     $all_docs = \Drupal::service('replication.alldocs_factory')->get($workspace);
 

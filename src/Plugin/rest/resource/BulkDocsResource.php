@@ -2,9 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
@@ -26,11 +24,10 @@ class BulkDocsResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $bulk_docs) {
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
+    $this->checkWorkspaceExists($workspace);
 
     $bulk_docs->save();
     return new ResourceResponse($bulk_docs, 201);
   }
+
 }

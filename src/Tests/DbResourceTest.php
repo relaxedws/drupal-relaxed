@@ -39,6 +39,12 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($this->dbname, 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+
+    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $this->httpRequest($workspace->getMachineName(), 'HEAD', NULL);
+    $this->assertResponse('404', 'HTTP response code is correct.');
   }
 
   public function testGet() {
@@ -77,6 +83,14 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($this->dbname, 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+
+    // Test getting an archived workspace.
+    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $this->httpRequest($workspace->getMachineName(), 'GET', NULL);
+    $this->assertResponse('404', 'HTTP response code is correct.');
+
   }
 
   public function testPut() {
@@ -125,6 +139,12 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct.');
+
+    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $this->httpRequest($workspace->getMachineName(), 'PUT', NULL);
+    $this->assertResponse('404', 'HTTP response code is correct.');
   }
 
   public function testPost() {
@@ -167,6 +187,12 @@ class DbResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
       $this->httpRequest($this->dbname, 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct.');
+
+      /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+      $workspace = $this->createWorkspace($this->randomMachineName());
+      $workspace->setUnpublished()->save();
+      $this->httpRequest($workspace->getMachineName(), 'POST', $serialized);
+      $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
 
@@ -211,6 +237,12 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
+
+    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $this->httpRequest($workspace->getMachineName(), 'DELETE', NULL);
+    $this->assertResponse('500', 'HTTP response code is correct.');
   }
 
 }

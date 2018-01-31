@@ -5,7 +5,6 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -44,10 +43,10 @@ class AttachmentResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface
+    $this->checkWorkspaceExists($workspace);
+    if (!$entity instanceof ContentEntityInterface
       || !$file instanceof FileInterface) {
-      throw new NotFoundHttpException();
+      throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
     }
 
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
@@ -67,10 +66,10 @@ class AttachmentResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface
+    $this->checkWorkspaceExists($workspace);
+    if (!$entity instanceof ContentEntityInterface
       || !$file instanceof FileInterface) {
-      throw new NotFoundHttpException();
+      throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
     }
 
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
@@ -92,9 +91,9 @@ class AttachmentResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface) {
-      throw new NotFoundHttpException();
+    $this->checkWorkspaceExists($workspace);
+    if (!$entity instanceof ContentEntityInterface) {
+      throw new NotFoundHttpException(t('Specified document was not found.'));
     }
 
     // Check entity and field level access.
@@ -140,10 +139,10 @@ class AttachmentResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface
+    $this->checkWorkspaceExists($workspace);
+    if (!$entity instanceof ContentEntityInterface
       || !$file instanceof FileInterface) {
-      throw new NotFoundHttpException();
+      throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
     }
 
     // Check entity and field level access.
@@ -161,7 +160,7 @@ class AttachmentResource extends ResourceBase {
       $entity->save();
       $rev = $entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev];
-      return new ResourceResponse($data, 200, ['X-Relaxed-ETag'], $rev);
+      return new ResourceResponse($data, 200, ['X-Relaxed-ETag' => $rev]);
     }
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage());
@@ -193,4 +192,5 @@ class AttachmentResource extends ResourceBase {
     }
     return $return;
   }
+
 }

@@ -27,11 +27,11 @@ class RevsDiffResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    */
   public function post($workspace, $revs_diff) {
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new BadRequestHttpException(t('Database does not exist'));
+    if (!$workspace instanceof WorkspaceInterface || !$workspace->isPublished()) {
+      throw new BadRequestHttpException(t('Invalid workspace name.'));
     }
     if (empty($revs_diff)) {
-      throw new BadRequestHttpException(t('No content info received'));
+      throw new BadRequestHttpException(t('No content info received.'));
     }
 
     return new ResourceResponse($revs_diff, 200);

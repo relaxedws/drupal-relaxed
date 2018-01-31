@@ -35,12 +35,16 @@ class AllDbsResource extends ResourceBase {
 
     $workspace_machine_names = [];
     foreach ($workspaces as $workspace) {
-      $workspace_machine_names[] = $workspace->getMachineName();
+      if ($workspace->isPublished()) {
+        $workspace_machine_names[] = $workspace->getMachineName();
+      }
     }
 
     $response = new ResourceResponse($workspace_machine_names, 200);
     foreach ($workspaces as $workspace) {
-      $response->addCacheableDependency($workspace);
+      if ($workspace->isPublished()) {
+        $response->addCacheableDependency($workspace);
+      }
     }
     $workspace_entity_type = \Drupal::entityTypeManager()->getDefinition('workspace');
     $response->addCacheableDependency((new CacheableMetadata())
@@ -49,4 +53,5 @@ class AllDbsResource extends ResourceBase {
 
     return $response;
   }
+
 }

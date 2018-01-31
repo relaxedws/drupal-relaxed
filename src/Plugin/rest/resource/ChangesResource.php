@@ -2,14 +2,12 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\replication\Changes\ChangesInterface;
 use Drupal\replication\ChangesFactoryInterface;
 use Drupal\rest\ResourceResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RestResource(
@@ -65,9 +63,7 @@ class ChangesResource extends ResourceBase {
   }
 
   public function get($workspace) {
-    if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException();
-    }
+    $this->checkWorkspaceExists($workspace);
 
     /** @var ChangesInterface $changes */
     $changes = $this->changesFactory->get($workspace);

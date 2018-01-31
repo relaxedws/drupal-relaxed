@@ -26,7 +26,7 @@ class EnsureFullCommitResource extends ResourceBase {
 
   public function post($workspace) {
     if (!$workspace instanceof WorkspaceInterface) {
-      throw new BadRequestHttpException(t('Database does not exist'));
+      throw new BadRequestHttpException(t('Invalid workspace name.'));
     }
 
     $response_data = [
@@ -36,4 +36,5 @@ class EnsureFullCommitResource extends ResourceBase {
 
     return new ResourceResponse($response_data, 201);
   }
+
 }

@@ -3,8 +3,10 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -115,4 +117,14 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       throw new BadRequestHttpException(implode('. ', $messages));
     }
   }
+
+  /**
+   * @param mixed $workspace
+   */
+  protected function checkWorkspaceExists($workspace) {
+    if (!$workspace instanceof WorkspaceInterface || !$workspace->isPublished()) {
+      throw new NotFoundHttpException(t('Workspace does not exist.'));
+    }
+  }
+
 }
