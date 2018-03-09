@@ -3,7 +3,7 @@ api: 2
 core: 8.x
 
 projects:
-  drupal: 8.3.x
+  drupal: 8.5.x
   key_value: 1.x
   key: 1.x
   encrypt: 3.x
