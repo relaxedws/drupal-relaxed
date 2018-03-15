@@ -20,13 +20,11 @@ configuration:
       - json
       - related
     supported_auth:
-      - cookie
       - basic_auth
   DELETE:
     supported_formats:
       - json
     supported_auth:
-      - cookie
       - basic_auth
 dependencies:
   module:
