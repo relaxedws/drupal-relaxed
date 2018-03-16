@@ -28,6 +28,28 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       $canonical = $definition['uri_paths']['canonical'];
       $route = $this->getBaseRoute($api_root . $canonical, $method, $no_cache);
 
+      $lower_method = strtolower($method);
+      if (isset($definition['uri_paths'][$lower_method])) {
+        $route->setPath($definition['uri_paths'][$lower_method]);
+      }
+
+      // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
+      // logic to a generic route enhancer instead.}
+      $parameters = [];
+      foreach (['db', 'docid'] as $parameter) {
+        if (strpos($route->getPath(), '{' . $parameter . '}')) {
+          $parameters[$parameter] = ['type' => 'relaxed:' . $parameter];
+        }
+      }
+      if (!empty($definition['uri_parameters']['canonical'])) {
+        foreach ($definition['uri_parameters']['canonical'] as $parameter => $type) {
+          $parameters[$parameter] = ['type' => $type];
+        }
+      }
+      if ($parameters) {
+        $route->addOptions(['parameters' => $parameters]);
+      }
+
       if ($method === 'PUT' && !$this->isAttachment()) {
         $route->addRequirements(['_content_type_format' => implode('|', $this->serializerFormats)]);
       }
