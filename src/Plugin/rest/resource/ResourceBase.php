@@ -51,7 +51,7 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
    */
   protected function getBaseRoute($canonical_path, $method, $no_cache = NULL) {
     return new Route($canonical_path, [
-      'Drupal\relaxed\Controller\ResourceController::handle',
+      '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
       '_plugin' => $this->pluginId,
     ],
       $this->getBaseRouteRequirements($method),
