@@ -170,18 +170,19 @@ class CouchdbReplicator implements ReplicatorInterface{
 
   protected function errorReplicationLog(WorkspacePointerInterface $source, WorkspacePointerInterface $target, ReplicationTaskInterface $task = NULL) {
     $time = new \DateTime();
-    $last_sequence = ($source->getWorkspace() instanceof WorkspaceInterface) ? $source->getWorkspace()->getUpdateSeq() : 0;
     $history = [
       'start_time' => $time->format('D, d M Y H:i:s e'),
       'end_time' => $time->format('D, d M Y H:i:s e'),
       'session_id' => \md5((\microtime(true) * 1000000)),
-      'start_last_seq' => $last_sequence,
     ];
     $replication_log_id = $source->generateReplicationId($target, $task);
     /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
     $replication_log = ReplicationLog::loadOrCreate($replication_log_id);
+    if ($replication_log->isNew()) {
+      $replication_log->setSourceLastSeq(0);
+      $history['start_last_seq'] = 0;
+    }
     $replication_log->set('ok', FALSE);
-    $replication_log->setSourceLastSeq($last_sequence);
     $replication_log->setSessionId($history['session_id']);
     $replication_log->setHistory($history);
     $replication_log->save();
