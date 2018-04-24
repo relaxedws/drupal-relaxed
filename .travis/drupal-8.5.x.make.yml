@@ -6,7 +6,7 @@ projects:
   drupal:
     version: 8.5.x
     patch:
-      https://www.drupal.org/files/issues/2018-04-23/2854543-72-PASS--51_plus_test_plus_67.patch
+      2854543-7: https://www.drupal.org/files/issues/2018-04-23/2854543-72-PASS--51_plus_test_plus_67.patch
   key_value: 1.x
   key: 1.x
   encrypt: 3.x
