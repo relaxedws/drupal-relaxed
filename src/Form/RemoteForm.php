@@ -87,7 +87,7 @@ class RemoteForm extends EntityForm {
       $form_state->getValue('username'),
       $form_state->getValue('password')
     );
-    $encoded = \Drupal::service('relaxed.sensitive_data.transformer')->set($uri);
+    $encoded = \Drupal::service('relaxed.sensitive_data.transformer')->set((string) $uri);
     $remote->set('uri', $encoded);
     $status = $remote->save();
 
