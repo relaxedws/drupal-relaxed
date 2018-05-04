@@ -22,7 +22,7 @@ services:
       - [setCurrentUser, ['@current_user']]
       - [setWorkspaceManager, ['@workspace.manager']]
     tags:
-      - { name: workspace_negotiator, priority: 200 }
+      - { name: workspace_negotiator, priority: 300 }
   plugin.manager.remote_check:
     class: Drupal\relaxed\Plugin\RemoteCheckManager
     parent: default_plugin_manager
