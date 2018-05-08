@@ -54,7 +54,7 @@ class RequestFormatSetter implements HttpKernelInterface {
    * @return bool
    */
   protected function isRelaxedRequest(Request $request) {
-    return strpos($request->getPathInfo(), "/$this->api_root/") === 0;
+    return strpos($request->getPathInfo(), "/$this->api_root") === 0;
   }
 
   /**

@@ -58,12 +58,6 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
       // added in ResourceRoutes::getRoutesForResourceConfig().
       $collection->add("$route_name.$method", $route);
 
-      if ($method === 'GET' || $method === 'HEAD' || $method === 'DELETE') {
-        foreach ($this->serializerFormats as $format_name) {
-          $collection->add("$route_name.$method.$format_name", (new BcRoute())->setRequirement('_format', $format_name));
-        }
-      }
-
     }
     return $collection;
   }
