@@ -35,3 +35,13 @@ function relaxed_update_8301() {
     ->clear('resources')
     ->save();
 }
+
+/**
+ * Load new rest configuration.
+ */
+function relaxed_update_8302() {
+  \Drupal::state()->set('relaxed_update_8302_resources', \Drupal::config('rest.settings')->get('resources'));
+  \Drupal::configFactory()->getEditable('rest.settings')
+    ->clear('resources')
+    ->save();
+}
