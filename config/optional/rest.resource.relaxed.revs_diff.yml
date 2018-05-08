@@ -8,6 +8,7 @@ configuration:
     - json
   authentication:
     - basic_auth
+    - cookie
 dependencies:
   module:
     - basic_auth
