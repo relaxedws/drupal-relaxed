@@ -60,6 +60,15 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
+      $entity->set(
+        'field_test_text',
+        [
+          0 => [
+            'value' => $this->randomString(),
+            'format' => 'plain_text',
+          ],
+        ]
+      );
       if ($key == 1) {
         // Delete an entity.
         $entity->delete();
@@ -97,6 +106,15 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
       $patched_entities['docs'][$key] = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
+      $patched_entities['docs'][$key]->set(
+        'field_test_text',
+        [
+          0 => [
+            'value' => $this->randomString(),
+            'format' => 'plain_text',
+          ],
+        ]
+      );
       if ($key == 1) {
         // Delete an entity.
         $patched_entities['docs'][$key]->delete();
@@ -128,17 +146,9 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     while ($number >= 1) {
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
-      $entity->save();
-      $entity->set(
-        'field_test_text',
-        [
-          0 => [
-            'value' => $this->randomString(),
-            'format' => 'plain_text',
-          ],
-        ]
-      );
-      $entity->save();
+      if ($save) {
+        $entity->save();
+      }
       $entities[] = $entity;
       $number--;
     }
