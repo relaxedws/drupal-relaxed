@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\filter\FilterProcessResult;
 
 /**
  * Tests the /db/_bulk_docs resource.
@@ -60,22 +61,13 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
-      $text = $this->randomString();
-      $entity->set(
-        'field_test_text',
-        [
-          0 => [
-            'value' => $text,
-            'format' => 'plain_text',
-            'processed' => "<p>$text</p>"
-          ],
-        ]
-      );
       if ($key == 1) {
         // Delete an entity.
         $entity->delete();
       }
-      $input['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+      $normalized = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+      $normalized['en']['field_test_text'][0]['value'] = $this->randomString();
+      $input['docs'][] = $normalized;
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
@@ -108,17 +100,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
       $patched_entities['docs'][$key] = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
-      $text = $this->randomString();
-      $patched_entities['docs'][$key]->set(
-        'field_test_text',
-        [
-          0 => [
-            'value' => $text,
-            'format' => 'plain_text',
-            'processed' => "<p>$text</p>"
-          ],
-        ]
-      );
       if ($key == 1) {
         // Delete an entity.
         $patched_entities['docs'][$key]->delete();
