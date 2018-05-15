@@ -60,13 +60,20 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
+      $entity->set(
+        'field_test_text',
+        [
+          0 => [
+            'value' => $this->randomString(),
+            'format' => 'plain_text',
+          ],
+        ]
+      );
       if ($key == 1) {
         // Delete an entity.
         $entity->delete();
       }
-      $normalized = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
-      $normalized['en']['field_test_text'][0]['value'] = $this->randomString();
-      $input['docs'][] = $normalized;
+      $input['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
@@ -99,6 +106,15 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
       $patched_entities['docs'][$key] = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
+      $patched_entities['docs'][$key]->set(
+        'field_test_text',
+        [
+          0 => [
+            'value' => $this->randomString(),
+            'format' => 'plain_text',
+          ],
+        ]
+      );
       if ($key == 1) {
         // Delete an entity.
         $patched_entities['docs'][$key]->delete();
