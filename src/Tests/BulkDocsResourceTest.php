@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\filter\FilterProcessResult;
 
 /**
  * Tests the /db/_bulk_docs resource.
