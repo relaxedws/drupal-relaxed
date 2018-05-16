@@ -36,7 +36,7 @@ class LocalDocResource extends DocResource {
     $revisions = is_array($existing) ? $existing : [$existing];
 
     if ($revisions[0] instanceof ContentEntityInterface && !$revisions[0]->getEntityType()->get('local')) {
-      throw new BadRequestHttpException('This endpoint only support local entity types.');
+      throw new BadRequestHttpException(t('This endpoint only support local entity types.'));
     }
 
     return parent::head($workspace, $revisions);
@@ -57,7 +57,7 @@ class LocalDocResource extends DocResource {
     $revisions = is_array($existing) ? $existing : [$existing];
 
     if ($revisions[0] instanceof ContentEntityInterface && !$revisions[0]->getEntityType()->get('local')) {
-      throw new BadRequestHttpException('This endpoint only support local entity types.');
+      throw new BadRequestHttpException(t('This endpoint only support local entity types.'));
     }
 
     return parent::get($workspace, $revisions);
@@ -69,11 +69,11 @@ class LocalDocResource extends DocResource {
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     if (!$received_entity->getEntityType()->get('local')) {
-      throw new BadRequestHttpException('This endpoint only support local entity types.');
+      throw new BadRequestHttpException(t('This endpoint only support local entity types.'));
     }
     return parent::put($workspace, $existing_entity, $received_entity, $request);
   }

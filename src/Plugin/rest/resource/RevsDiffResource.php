@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\rest\ResourceResponse;
+use Drupal\rest\ModifiedResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -24,7 +24,8 @@ class RevsDiffResource extends ResourceBase {
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\replication\RevisionDiff\RevisionDiffInterface $revs_diff
-   * @return \Drupal\rest\ResourceResponse
+   *
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function post($workspace, $revs_diff) {
     if (!$workspace instanceof WorkspaceInterface || !$workspace->isPublished()) {
@@ -34,7 +35,7 @@ class RevsDiffResource extends ResourceBase {
       throw new BadRequestHttpException(t('No content info received.'));
     }
 
-    return new ResourceResponse($revs_diff, 200);
+    return new ModifiedResourceResponse($revs_diff, 200);
   }
 
 }
