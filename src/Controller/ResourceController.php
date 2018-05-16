@@ -247,28 +247,28 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
       $response->headers->set('Content-Length', strlen($response->getContent()));
     }
 
-    /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
-    $resource_config = $this->resourceStorage->load($resource_config_id);
     if ($response instanceof CacheableResponseInterface) {
+      /** @var \Drupal\rest\RestResourceConfigInterface $resource_config */
+      $resource_config = $this->resourceStorage->load($resource_config_id);
       // Add rest config's cache tags.
       $response->addCacheableDependency($resource_config);
-    }
 
-    $cacheable_dependencies = [];
-    foreach ($render_contexts as $render_context) {
-      $cacheable_dependencies[] = $render_context;
-    }
-    foreach ($parameters as $parameter) {
-      if (is_array($parameter)) {
-        array_merge($cacheable_dependencies, $parameter);
+      $cacheable_dependencies = [];
+      foreach ($render_contexts as $render_context) {
+        $cacheable_dependencies[] = $render_context;
       }
-      else {
-        $cacheable_dependencies[] = $parameter;
+      foreach ($parameters as $parameter) {
+        if (is_array($parameter)) {
+          array_merge($cacheable_dependencies, $parameter);
+        }
+        else {
+          $cacheable_dependencies[] = $parameter;
+        }
       }
+      $cacheable_metadata = new CacheableMetadata();
+      $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
+      $this->addCacheableDependency($response, $cacheable_dependencies);
     }
-    $cacheable_metadata = new CacheableMetadata();
-    $cacheable_dependencies[] = $cacheable_metadata->setCacheContexts(['url', 'request_format', 'headers:If-None-Match', 'headers:Content-Type', 'headers:Accept']);
-    $this->addCacheableDependency($response, $cacheable_dependencies);
 
     return $response;
   }
