@@ -5,6 +5,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
+use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -88,7 +89,7 @@ class AttachmentResource extends ResourceBase {
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
    *
-   * @return ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
     $this->checkWorkspaceExists($workspace);
@@ -118,12 +119,10 @@ class AttachmentResource extends ResourceBase {
       $entity->save();
 
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value];
-      return new ResourceResponse($data, 200, $this->responseHeaders($file, ['Content-MD5', 'X-Relaxed-ETag']));
+      return new ModifiedResourceResponse($data, 200, $this->responseHeaders($file, ['Content-MD5', 'X-Relaxed-ETag']));
     }
-    // @todo {@link https://www.drupal.org/node/2599912 Catch more generic
-    // exceptions here and on other places.}
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e);
+    catch (\Exception $e) {
+      throw new HttpException(500, t($e->getMessage()), $e);
     }
   }
 
@@ -136,7 +135,7 @@ class AttachmentResource extends ResourceBase {
    * @param string $scheme
    * @param string $filename
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     $this->checkWorkspaceExists($workspace);
@@ -160,10 +159,10 @@ class AttachmentResource extends ResourceBase {
       $entity->save();
       $rev = $entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev];
-      return new ResourceResponse($data, 200, ['X-Relaxed-ETag' => $rev]);
+      return new ModifiedResourceResponse($data, 200, ['X-Relaxed-ETag' => $rev]);
     }
     catch (\Exception $e) {
-      throw new HttpException(500, $e->getMessage());
+      throw new HttpException(500, $e->getMessage(), $e);
     }
   }
 

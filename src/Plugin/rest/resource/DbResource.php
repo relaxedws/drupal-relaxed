@@ -5,6 +5,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\ResourceResponse;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -61,10 +62,7 @@ class DbResource extends ResourceBase {
   /**
    * @param $entity
    *
-   * @return ResourceResponse
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function put($entity) {
     $this->checkWorkspaceExists($entity);
@@ -78,25 +76,18 @@ class DbResource extends ResourceBase {
     try {
       $entity->save();
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, t('Internal server error.'), $e);
+    catch (\Exception $e) {
+      throw new HttpException(500, t($e->getMessage()), $e);
     }
-    $response = new ResourceResponse(['ok' => TRUE], 201);
-    $response->addCacheableDependency($entity);
 
-    return $response;
+    return new ModifiedResourceResponse(['ok' => TRUE], 201);
   }
 
   /**
    * @param $workspace
    * @param ContentEntityInterface $entity
    *
-   * @return ResourceResponse
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function post($workspace, ContentEntityInterface $entity = NULL) {
     // If the workspace parameter is a string it means it could not be upcasted
@@ -127,21 +118,18 @@ class DbResource extends ResourceBase {
     try {
       $entity->save();
       $rev = $entity->_rev->value;
-      $response = new ResourceResponse(['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev], 201, ['ETag' => $rev]);
-      $response->addCacheableDependency($entity);
 
-      return $response;
+      return new ModifiedResourceResponse(['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev], 201, ['ETag' => $rev]);
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, $e->getMessage());
+    catch (\Exception $e) {
+      throw new HttpException(500, $e->getMessage(), $e);
     }
   }
 
   /**
    * @param WorkspaceInterface $entity
    *
-   * @return ResourceResponse
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function delete(WorkspaceInterface $entity) {
     if (!$entity->isPublished()) {
@@ -154,10 +142,8 @@ class DbResource extends ResourceBase {
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage(), $e);
     }
-    $response = new ResourceResponse(['ok' => TRUE], 200);
-    $response->addCacheableDependency($entity);
 
-    return $response;
+    return new ModifiedResourceResponse(['ok' => TRUE], 200);
   }
 
 }

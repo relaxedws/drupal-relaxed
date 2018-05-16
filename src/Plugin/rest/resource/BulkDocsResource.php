@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\rest\ModifiedResourceResponse;
 
 /**
  * @RestResource(
@@ -21,13 +21,14 @@ class BulkDocsResource extends ResourceBase {
   /**
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param \Drupal\replication\BulkDocs\BulkDocsInterface $bulk_docs
-   * @return \Drupal\rest\ResourceResponse
+   *
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function post($workspace, $bulk_docs) {
     $this->checkWorkspaceExists($workspace);
 
     $bulk_docs->save();
-    return new ResourceResponse($bulk_docs, 201);
+    return new ModifiedResourceResponse($bulk_docs, 201);
   }
 
 }

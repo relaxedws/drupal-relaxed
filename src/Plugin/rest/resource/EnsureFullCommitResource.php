@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\rest\ResourceResponse;
+use Drupal\rest\ModifiedResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -24,6 +24,11 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class EnsureFullCommitResource extends ResourceBase {
 
+  /**
+   * @param $workspace
+   *
+   * @return \Drupal\rest\ModifiedResourceResponse
+   */
   public function post($workspace) {
     if (!$workspace instanceof WorkspaceInterface) {
       throw new BadRequestHttpException(t('Invalid workspace name.'));
@@ -34,7 +39,7 @@ class EnsureFullCommitResource extends ResourceBase {
       'instance_start_time' => (string) $workspace->getStartTime(),
     ];
 
-    return new ResourceResponse($response_data, 201);
+    return new ModifiedResourceResponse($response_data, 201);
   }
 
 }

@@ -28,6 +28,7 @@ class AllDbsResource extends ResourceBase {
    * Retrieve list of all entity types.
    *
    * @return \Drupal\rest\ResourceResponse
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function get() {
     /** @var \Drupal\multiversion\Entity\WorkspaceInterface[] $workspaces */
