@@ -5,6 +5,7 @@ namespace Drupal\relaxed\Plugin\rest\resource;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
+use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -49,8 +50,13 @@ class DocResource extends ResourceBase {
       }
     }
 
-    // @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    return new ResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
+    $response = new ResourceResponse(NULL, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
+    $response->addCacheableDependency($workspace);
+    foreach ($revisions as $revision) {
+      $response->addCacheableDependency($revision);
+    }
+
+    return $response;
   }
 
   /**
@@ -107,8 +113,13 @@ class DocResource extends ResourceBase {
     if ($entity_type_id == 'replication_log') {
       $result = $revisions[0];
     }
+    $response = new ResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
+    $response->addCacheableDependency($workspace);
+    foreach ($revisions as $revision) {
+      $response->addCacheableDependency($revision);
+    }
 
-    return new ResourceResponse($result, 200, ['X-Relaxed-ETag' => $revisions[0]->_rev->value]);
+    return $response;
   }
 
   /**
@@ -117,7 +128,7 @@ class DocResource extends ResourceBase {
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
     $this->checkWorkspaceExists($workspace);
@@ -152,10 +163,10 @@ class DocResource extends ResourceBase {
       $received_entity->save();
       $rev = $received_entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev];
-      return new ResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
+      return new ModifiedResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, $e->getMessage());
+    catch (\Exception $e) {
+      throw new HttpException(500, $e->getMessage(), $e);
     }
   }
 
@@ -163,7 +174,7 @@ class DocResource extends ResourceBase {
    * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function delete($workspace, $entity) {
     $this->checkWorkspaceExists($workspace);
@@ -188,7 +199,7 @@ class DocResource extends ResourceBase {
       throw new HttpException(500, NULL, $e);
     }
 
-    return new ResourceResponse(['ok' => TRUE], 200);
+    return new ModifiedResourceResponse(['ok' => TRUE], 200);
   }
 
 }

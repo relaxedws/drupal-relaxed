@@ -32,4 +32,5 @@ class RootResource extends ResourceBase {
       200
     );
   }
+
 }

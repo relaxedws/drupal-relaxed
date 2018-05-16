@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\rest\resource;
 
-use Drupal\rest\ResourceResponse;
+use Drupal\rest\ModifiedResourceResponse;
 
 /**
  * @RestResource(
@@ -21,11 +21,11 @@ class ReplicateResource extends ResourceBase {
   /**
    * @param \Drupal\relaxed\Replicate\Replicate $replicate
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function post($replicate) {
     $replicate->doReplication();
 
-    return new ResourceResponse($replicate, 200);
+    return new ModifiedResourceResponse($replicate, 200);
   }
 }
