@@ -125,7 +125,7 @@ abstract class ResourceTestBase extends RESTTestBase {
     }
     if (!in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'])) {
       // GET the CSRF token first for writing requests.
-      $token = $this->drupalGet('rest/session/token');
+      $token = $this->drupalGet('session/token');
     }
     $additional_headers = [];
     if (is_array($headers)) {

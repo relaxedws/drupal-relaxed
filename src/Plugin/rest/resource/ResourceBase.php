@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Routing\BcRoute;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -23,36 +24,13 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
     $route_name = strtr($this->pluginId, ':', '.');
 
     foreach ($this->availableMethods() as $method) {
-      // HEAD and GET are equivalent as per RFC and handled by the same route.
-      // @see \Symfony\Component\Routing\Matcher::matchCollection()
-      if ($method == 'HEAD') {
-        continue;
-      }
+      $no_cache = isset($definition['no_cache']) ? $definition['no_cache'] : FALSE;
+      $canonical = $definition['uri_paths']['canonical'];
+      $route = $this->getBaseRoute($api_root . $canonical, $method, $no_cache);
 
-      // Allow pull or push permissions depending on the method.
-      $permissions = 'perform push replication';
-      if ($method === 'GET') {
-        $permissions .= '+perform pull replication';
-      }
-
-      $method_lower = strtolower($method);
-      $route = new Route($api_root . $definition['uri_paths']['canonical'], [
-        '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
-        '_plugin' => $this->pluginId,
-      ], [
-        '_permission' => "restful " . $method_lower . " $this->pluginId" . "+$permissions",
-      ],
-        [
-          'no_cache' => isset($definition['no_cache']) ? $definition['no_cache'] : FALSE,
-        ],
-        '',
-        [],
-        // The HTTP method is a requirement for this route.
-        [$method]
-      );
-
-      if (isset($definition['uri_paths'][$method_lower])) {
-        $route->setPath($definition['uri_paths'][$method_lower]);
+      $lower_method = strtolower($method);
+      if (isset($definition['uri_paths'][$lower_method])) {
+        $route->setPath($definition['uri_paths'][$lower_method]);
       }
 
       // @todo {@link https://www.drupal.org/node/2600450 Move this parameter
@@ -72,30 +50,67 @@ abstract class ResourceBase extends CoreResourceBase implements RelaxedResourceI
         $route->addOptions(['parameters' => $parameters]);
       }
 
-      switch ($method) {
-        case 'POST':
-        case 'PUT':
-          // Restrict on the Content-Type header.
-          if (!$this->isAttachment()) {
-            $route->addRequirements(['_content_type_format' => implode('|', $this->serializerFormats)]);
-          }
-          $collection->add("$route_name.$method", $route);
-          break;
-
-        case 'GET':
-          $collection->add("$route_name.$method", $route);
-          break;
-
-        case 'DELETE':
-          foreach ($this->serializerFormats as $format) {
-            $format_route = clone $route;
-            $format_route->addRequirements(['_format' => $format]);
-            $collection->add("$route_name.$method.$format", $format_route);
-          }
-          break;
+      if ($method === 'PUT' && !$this->isAttachment()) {
+        $route->addRequirements(['_content_type_format' => implode('|', $this->serializerFormats)]);
       }
+
+      // Note that '_format' and '_content_type_format' route requirements are
+      // added in ResourceRoutes::getRoutesForResourceConfig().
+      $collection->add("$route_name.$method", $route);
+
     }
     return $collection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getBaseRoute($canonical_path, $method, $no_cache = NULL) {
+    return new Route($canonical_path, [
+      '_controller' => 'Drupal\relaxed\Controller\ResourceController::handle',
+      '_plugin' => $this->pluginId,
+    ],
+      $this->getBaseRouteRequirements($method),
+      [
+        'no_cache' => $no_cache ? $no_cache : FALSE,
+      ],
+      '',
+      [],
+      // The HTTP method is a requirement for this route.
+      [$method]
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getBaseRouteRequirements($method) {
+    $lower_method = strtolower($method);
+    // Every route MUST have requirements that result in the access manager
+    // having access checks to check. If it does not, the route is made
+    // inaccessible. So, we default to granting access to everyone. If a
+    // permission exists, then we add that below. The access manager requires
+    // that ALL access checks must grant access, so this still results in
+    // correct behavior.
+    $requirements = [
+      '_access' => 'TRUE',
+    ];
+
+    // Allow pull or push permissions depending on the method.
+    $push_and_pull_permissions = 'perform push replication';
+    if ($method === 'GET') {
+      $push_and_pull_permissions .= '+perform pull replication';
+    }
+
+    // Only specify route requirements if the default permission exists. For any
+    // more advanced route definition, resource plugins extending this base
+    // class must override this method.
+    $permission = "restful $lower_method $this->pluginId";
+    if (isset($this->permissions()[$permission])) {
+      $requirements['_permission'] = $permission . "+$push_and_pull_permissions";
+    }
+
+    return $requirements;
   }
 
   public function isAttachment() {
