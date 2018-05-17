@@ -89,10 +89,7 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
    * @return string
    */
   protected function getFormat() {
-    if (!$format = $this->request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)->getRequirement('_format')) {
-      return $this->getResource()->isAttachment() ? 'stream' : 'json';
-    }
-    return $format;
+    return $this->getResource()->isAttachment() ? 'stream' : $this->request->getRequestFormat('json');
   }
 
   /**
