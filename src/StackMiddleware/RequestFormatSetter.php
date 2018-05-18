@@ -31,7 +31,7 @@ class RequestFormatSetter implements HttpKernelInterface {
    */
   public function __construct(HttpKernelInterface $http_kernel, ConfigFactoryInterface $config_factory) {
     $this->httpKernel = $http_kernel;
-    $config =  $config_factory->get('relaxed.settings');
+    $config = $config_factory->get('relaxed.settings');
     $this->api_root = trim($config->get('api_root'), '/');
   }
 
@@ -54,7 +54,7 @@ class RequestFormatSetter implements HttpKernelInterface {
    * @return bool
    */
   protected function isRelaxedRequest(Request $request) {
-    return strpos($request->getPathInfo(), "/$this->api_root") === 0;
+    return !empty($this->api_root) ? strpos($request->getPathInfo(), "/$this->api_root") === 0 : FALSE;
   }
 
   /**
