@@ -19,10 +19,12 @@ class RootResource extends ResourceBase {
    * @return ResourceResponse
    */
   public function get() {
+    $request = \Drupal::request();
+    $uuid = MD5($request->getHost() . $request->getPort());
     return new ResourceResponse(
       [
         'couchdb' => t('Welcome'),
-        'uuid' => \Drupal::config('system.site')->get('uuid'),
+        'uuid' => $uuid,
         'vendor' => [
           'name' => 'Drupal',
           'version' => \Drupal::VERSION,

@@ -24,9 +24,11 @@ class RootResourceTest extends ResourceTestBase {
     $this->assertHeader('content-type', $this->defaultMimeType);
     $data = Json::decode($response);
 
+    $request = \Drupal::request();
+    $uuid = $uuid = MD5($request->getHost() . $request->getPort());
     $expected = [
       'couchdb' => 'Welcome',
-      'uuid' => \Drupal::config('system.site')->get('uuid'),
+      'uuid' => $uuid,
       'vendor' => [
         'name' => 'Drupal',
         'version' => \Drupal::VERSION,

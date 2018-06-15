@@ -74,22 +74,6 @@ class CouchdbReplicator implements ReplicatorInterface{
         $couchdb_task->setLimit($changes_limit ?: $task->getLimit());
         $bulk_docs_limit = \Drupal::config('replication.settings')->get('changes_limit');
         $couchdb_task->setBulkDocsLimit($bulk_docs_limit ?: $task->getBulkDocsLimit());
-
-        $replication_log_id = $source->generateReplicationId($target, $task);
-        /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
-        $replication_logs = \Drupal::entityTypeManager()
-          ->getStorage('replication_log')
-          ->loadByProperties(['uuid' => $replication_log_id]);
-        $replication_log = reset($replication_logs);
-        $since = 0;
-        if (!empty($replication_log) && $replication_log->get('ok')->value == TRUE && $replication_log_history = $replication_log->getHistory()) {
-          $dw = $replication_log_history[0]['docs_written'];
-          $mf = $replication_log_history[0]['missing_found'];
-          if ($dw !== NULL && $mf !== NULL && $dw == $mf) {
-            $since = $replication_log->getSourceLastSeq() ?: $since;
-          }
-        }
-        $couchdb_task->setSinceSeq($since);
       }
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
@@ -108,6 +92,9 @@ class CouchdbReplicator implements ReplicatorInterface{
             ->loadByProperties(['session_id' => $result['session_id']]);
         }
         $log = reset($replication_logs);
+        if (empty($log)) {
+          $log = $this->errorReplicationLog($source, $target, $task);
+        }
       }
       else {
         $log = $this->errorReplicationLog($source, $target, $task);
