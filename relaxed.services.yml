@@ -98,3 +98,6 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@serializer', '@renderer', '@current_route_match']
+  relaxed.sensitive_data.transformer:
+    class: Drupal\relaxed\SensitiveDataTransformer
+    arguments: ['@config.factory']
