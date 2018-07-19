@@ -29,17 +29,14 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($this->dbname, 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-<<<<<<< HEAD
 
     /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
     $this->httpRequest($workspace->getMachineName(), 'HEAD', NULL);
     $this->assertResponse('404', 'HTTP response code is correct.');
-=======
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertTrue(empty($response), 'HEAD request returned no body.');
->>>>>>> Fix some tests, introduce ApiResourceResponse object
   }
 
   public function testGet() {
