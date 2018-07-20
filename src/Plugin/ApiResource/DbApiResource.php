@@ -49,11 +49,12 @@ class DbApiResource extends ApiResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function get($entity) {
-    $this->checkWorkspaceExists($entity);
+    if (!$entity instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
     $response =  new ApiResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
-
     return $response;
   }
 

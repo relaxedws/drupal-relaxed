@@ -93,11 +93,6 @@ services:
     arguments: ['@plugin.manager.api_resource', '@relaxed.api_resource.route_generator', '@logger.channel.relaxed']
     tags:
       - { name: 'event_subscriber' }
-  relaxed.resource_response.subscriber:
-    class: Drupal\relaxed\EventSubscriber\ResourceResponseSubscriber
-    tags:
-      - { name: event_subscriber }
-    arguments: ['@serializer', '@renderer', '@current_route_match']
   relaxed.sensitive_data.transformer:
     class: Drupal\relaxed\SensitiveDataTransformer
     arguments: ['@config.factory']

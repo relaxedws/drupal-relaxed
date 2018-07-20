@@ -6,7 +6,7 @@ core: 8.x
 dependencies:
   - basic_auth
   - multiversion
-  - replication
+  - replication (>=8.x-2.x)
   - workspace
   - system (>=8.4.x)
 test_dependencies:
