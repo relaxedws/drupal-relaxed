@@ -4,6 +4,7 @@ namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\file\FileInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -39,7 +40,9 @@ class AttachmentApiResource extends ApiResourceBase {
    * @return ApiResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (!$entity instanceof ContentEntityInterface
       || !$file instanceof FileInterface) {
       throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
@@ -64,7 +67,9 @@ class AttachmentApiResource extends ApiResourceBase {
    * @return ApiResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (!$entity instanceof ContentEntityInterface
       || !$file instanceof FileInterface) {
       throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
@@ -90,7 +95,9 @@ class AttachmentApiResource extends ApiResourceBase {
    * @return ApiResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (!$entity instanceof ContentEntityInterface) {
       throw new NotFoundHttpException(t('Specified document was not found.'));
     }
@@ -137,7 +144,9 @@ class AttachmentApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (!$entity instanceof ContentEntityInterface
       || !$file instanceof FileInterface) {
       throw new NotFoundHttpException(t('Specified document or attachment was not found.'));

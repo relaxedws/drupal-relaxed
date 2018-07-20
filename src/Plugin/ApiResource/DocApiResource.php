@@ -3,8 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
-use Drupal\file\FileInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -33,7 +33,9 @@ class DocApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $existing) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (is_string($existing)) {
       throw new NotFoundHttpException(t('Document does not exist.'));
     }
@@ -57,7 +59,9 @@ class DocApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $existing) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (is_string($existing)) {
       throw new NotFoundHttpException(t('Document does not exist.'));
     }
@@ -118,7 +122,9 @@ class DocApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function put($workspace, $existing_entity, ContentEntityInterface $received_entity, Request $request) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
 
     // Check entity and field level access.
     if (!$received_entity->access('create')) {
@@ -165,7 +171,9 @@ class DocApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (!($entity instanceof ContentEntityInterface)) {
       throw new NotFoundHttpException(t('Document does not exist.'));
     }

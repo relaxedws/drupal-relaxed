@@ -2,7 +2,9 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @ApiResource(
@@ -23,7 +25,9 @@ class BulkDocsApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function post($workspace, $bulk_docs) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
 
     $bulk_docs->save();
 

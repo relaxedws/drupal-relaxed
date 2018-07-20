@@ -16,7 +16,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 class SessionApiResource extends ApiResourceBase {
 
   /**
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get() {
     $account = \Drupal::currentUser();

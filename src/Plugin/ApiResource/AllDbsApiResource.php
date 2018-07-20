@@ -25,7 +25,8 @@ class AllDbsApiResource extends ApiResourceBase {
   /**
    * Retrieve list of all entity types.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
+   *
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function get() {

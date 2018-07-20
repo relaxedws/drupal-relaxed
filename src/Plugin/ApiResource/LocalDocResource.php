@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -26,17 +27,14 @@ class LocalDocResource extends DocApiResource {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $existing) {
-    $this->checkWorkspaceExists($workspace);
-    if (is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException('This 404 error is totally normal for ReplicationLog entities.');
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
-
     if ($revisions[0] instanceof ContentEntityInterface && !$revisions[0]->getEntityType()->get('local')) {
-      throw new BadRequestHttpException(t('This endpoint only support local entity types.'));
+      throw new BadRequestHttpException('This endpoint only support local entity types.');
     }
-
     return parent::head($workspace, $revisions);
   }
 
@@ -47,17 +45,14 @@ class LocalDocResource extends DocApiResource {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $existing) {
-    $this->checkWorkspaceExists($workspace);
-    if (is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
       throw new NotFoundHttpException('This 404 error is totally normal for ReplicationLog entities.');
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
-
     if ($revisions[0] instanceof ContentEntityInterface && !$revisions[0]->getEntityType()->get('local')) {
-      throw new BadRequestHttpException(t('This endpoint only support local entity types.'));
+      throw new BadRequestHttpException('This endpoint only support local entity types.');
     }
-
     return parent::get($workspace, $revisions);
   }
 

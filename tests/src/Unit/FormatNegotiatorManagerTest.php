@@ -9,6 +9,7 @@ use Drupal\relaxed\Plugin\FormatNegotiator\StreamNegotiator;
 
 /**
  * @coversDefaultClass \Drupal\relaxed\Plugin\FormatNegotiatorManager
+ * @group relaxed
  */
 class FormatNegotiatorManagerTest extends KernelTestBase {
 

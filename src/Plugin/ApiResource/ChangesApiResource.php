@@ -3,11 +3,13 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Drupal\replication\Changes\ChangesInterface;
 use Drupal\replication\ChangesFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @ApiResource(
@@ -62,7 +64,9 @@ class ChangesApiResource extends ApiResourceBase implements ContainerFactoryPlug
   }
 
   public function get($workspace) {
-    $this->checkWorkspaceExists($workspace);
+    if (!$workspace instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
 
     /** @var ChangesInterface $changes */
     $changes = $this->changesFactory->get($workspace);

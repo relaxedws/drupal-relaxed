@@ -67,7 +67,9 @@ class DbApiResource extends ApiResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
    */
   public function put($entity) {
-    $this->checkWorkspaceExists($entity);
+    if (!$entity instanceof WorkspaceInterface) {
+      throw new NotFoundHttpException();
+    }
     if (!$entity->isNew()) {
       throw new PreconditionFailedHttpException(t('The workspace could not be created, it already exists.'));
     }
