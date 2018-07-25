@@ -1,8 +1,6 @@
 <?php
 
-namespace Drupal\Tests\relaxed\Integration;
-
-require_once __DIR__ . '/ReplicationTestBase.php';
+namespace Drupal\Tests\relaxed\Kernel;
 
 /**
  * @group relaxed

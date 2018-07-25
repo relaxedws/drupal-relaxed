@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\relaxed\Integration;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workspaces\Entity\Workspace;
