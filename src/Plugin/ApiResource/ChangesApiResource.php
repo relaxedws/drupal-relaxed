@@ -3,10 +3,10 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
-use Drupal\replication\Changes\ChangesInterface;
-use Drupal\replication\ChangesFactoryInterface;
+use Drupal\relaxed\Changes\ChangesInterface;
+use Drupal\relaxed\ChangesFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "changes",
  *   label = "Changes",
  *   serialization_class = {
- *     "canonical" = "Drupal\replication\Changes\Changes",
+ *     "canonical" = "Drupal\relaxed\Changes\Changes",
  *   },
  *   path = "/{db}/_changes",
  *   no_cache = TRUE
@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ChangesApiResource extends ApiResourceBase implements ContainerFactoryPluginInterface {
 
   /**
-   * @var \Drupal\replication\ChangesFactoryInterface
+   * @var \Drupal\relaxed\ChangesFactoryInterface
    */
   protected $changesFactory;
 
@@ -42,7 +42,7 @@ class ChangesApiResource extends ApiResourceBase implements ContainerFactoryPlug
    *   The available serialization formats.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\replication\ChangesFactoryInterface $changes_factory
+   * @param \Drupal\relaxed\ChangesFactoryInterface $changes_factory
    *  The ChangesFactory service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ChangesFactoryInterface $changes_factory) {

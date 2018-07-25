@@ -30,7 +30,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->httpRequest($this->dbname, 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
 
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
     $this->httpRequest($workspace->getMachineName(), 'HEAD', NULL);
@@ -75,7 +75,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->assertResponse('200', 'HTTP response code is correct.');
 
     // Test getting an archived workspace.
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
     $this->httpRequest($workspace->getMachineName(), 'GET', NULL);
@@ -128,7 +128,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct.');
 
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
     $this->httpRequest($workspace->getMachineName(), 'PUT', NULL);
@@ -176,7 +176,7 @@ class DbResourceTest extends ResourceTestBase {
       $this->httpRequest($this->dbname, 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct.');
 
-      /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+      /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
       $workspace = $this->createWorkspace($this->randomMachineName());
       $workspace->setUnpublished()->save();
       $this->httpRequest($workspace->getMachineName(), 'POST', $serialized);
@@ -224,7 +224,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
 
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface $workspace */
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
     $this->httpRequest($workspace->getMachineName(), 'DELETE', NULL);

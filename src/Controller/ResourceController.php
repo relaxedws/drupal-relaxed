@@ -8,12 +8,12 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse as HttpFoundationMultipartResponse;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
-use Drupal\replication\ProcessFileAttachment;
+use Drupal\relaxed\ProcessFileAttachment;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,7 +76,7 @@ class ResourceController implements ContainerInjectionInterface {
 
 
   /**
-   * @var \Drupal\replication\ProcessFileAttachment
+   * @var \Drupal\relaxed\ProcessFileAttachment
    */
   protected $attachment;
 
@@ -92,7 +92,7 @@ class ResourceController implements ContainerInjectionInterface {
    *   The API resource manager.
    * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $negotiator_manager
    *   The format negotiator manager.
-   * @param \Drupal\replication\ProcessFileAttachment $attachment
+   * @param \Drupal\relaxed\ProcessFileAttachment $attachment
    *   The file attachment processor.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.

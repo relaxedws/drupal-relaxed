@@ -4,11 +4,12 @@ namespace Drupal\relaxed;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
+use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 
 /**
  * Defines a service profiler for the relaxed module.
  */
-class RelaxedServiceProvider implements ServiceModifierInterface {
+class RelaxedServiceProvider implements ServiceModifierInterface, ServiceProviderInterface {
 
   /**
    * {@inheritdoc}
@@ -21,6 +22,13 @@ class RelaxedServiceProvider implements ServiceModifierInterface {
       // Adds mixed as known format.
       $negotiation->addMethodCall('registerFormat', ['mixed', ['multipart/mixed']]);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container) {
+    $container->addCompilerPass(new RegisterSerializerCompilerPass());
   }
 
 }

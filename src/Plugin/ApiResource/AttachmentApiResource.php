@@ -4,7 +4,7 @@ namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\file\FileInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -30,14 +30,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AttachmentApiResource extends ApiResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    * @param string $field_name
    * @param integer $delta
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     if (!$workspace instanceof WorkspaceInterface) {
@@ -57,14 +57,14 @@ class AttachmentApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
     if (!$workspace instanceof WorkspaceInterface) {
@@ -83,7 +83,7 @@ class AttachmentApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
@@ -92,7 +92,7 @@ class AttachmentApiResource extends ApiResourceBase {
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
    *
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
     if (!$workspace instanceof WorkspaceInterface) {
@@ -133,7 +133,7 @@ class AttachmentApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta

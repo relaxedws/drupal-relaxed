@@ -3,8 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\multiversion\Entity\Workspace;
 use Drupal\relaxed\Http\ApiResourceResponse;
+use Drupal\workspaces\Entity\Workspace;
 
 /**
  * Implements http://docs.couchdb.org/en/latest/api/server/common.html#all-dbs
@@ -30,21 +30,17 @@ class AllDbsApiResource extends ApiResourceBase {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function get() {
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface[] $workspaces */
+    /** @var \Drupal\workspaces\WorkspaceInterface[] $workspaces */
     $workspaces = Workspace::loadMultiple();
 
-    $workspace_machine_names = [];
+    $workspace_ids = [];
     foreach ($workspaces as $workspace) {
-      if ($workspace->isPublished()) {
-        $workspace_machine_names[] = $workspace->getMachineName();
-      }
+      $workspace_ids[] = $workspace->id();
     }
 
-    $response = new ApiResourceResponse($workspace_machine_names, 200);
+    $response = new ApiResourceResponse($workspace_ids, 200);
     foreach ($workspaces as $workspace) {
-      if ($workspace->isPublished()) {
-        $response->addCacheableDependency($workspace);
-      }
+      $response->addCacheableDependency($workspace);
     }
     $workspace_entity_type = \Drupal::entityTypeManager()->getDefinition('workspace');
     $response->addCacheableDependency((new CacheableMetadata())

@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
- *     "canonical" = "Drupal\replication\BulkDocs\BulkDocs",
+ *     "canonical" = "Drupal\relaxed\BulkDocs\BulkDocs",
  *   },
  *   path = "/{db}/_bulk_docs"
  * )
@@ -19,8 +19,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class BulkDocsApiResource extends ApiResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\replication\BulkDocs\BulkDocsInterface $bulk_docs
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */

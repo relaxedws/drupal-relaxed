@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   id = "ensure_full_commit",
  *   label = "Ensure Full Commit",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
+ *     "canonical" = "Drupal\workspaces\WorkspaceInterface",
  *   },
  *   path = "/{db}/_ensure_full_commit",
  * )
@@ -34,7 +34,7 @@ class EnsureFullCommitApiResource extends ApiResourceBase {
 
     $response_data = [
       'ok' => TRUE,
-      'instance_start_time' => (string) $workspace->getStartTime(),
+      'instance_start_time' => (string) $workspace->getCreatedTime(),
     ];
 
     return new ApiResourceResponse($response_data, 201);

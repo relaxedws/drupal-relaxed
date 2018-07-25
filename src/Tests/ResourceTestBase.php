@@ -21,7 +21,7 @@ abstract class ResourceTestBase extends WebTestBase {
   protected $apiRoot;
 
   /**
-   * @var \Drupal\multiversion\Entity\WorkspaceInterface
+   * @var \Drupal\workspaces\WorkspaceInterface
    */
   protected $workspace;
 
@@ -36,7 +36,7 @@ abstract class ResourceTestBase extends WebTestBase {
   protected $multiversionManager;
 
   /**
-   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
+   * @var \Drupal\workspaces\WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
@@ -68,7 +68,7 @@ abstract class ResourceTestBase extends WebTestBase {
     $this->apiRoot = \Drupal::config('relaxed.settings')->get('api_root');
 
     $this->multiversionManager = $this->container->get('multiversion.manager');
-    $this->workspaceManager = $this->container->get('workspace.manager');
+    $this->workspaceManager = $this->container->get('workspaces.manager');
 
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);

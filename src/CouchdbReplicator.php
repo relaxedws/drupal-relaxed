@@ -5,13 +5,13 @@ namespace Drupal\relaxed;
 use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Event\RelaxedEvents;
 use Drupal\relaxed\Event\RelaxedReplicationFinishedEvent;
 use Drupal\relaxed\Entity\RemoteInterface;
-use Drupal\replication\Entity\ReplicationLog;
-use Drupal\replication\Entity\ReplicationLogInterface;
-use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
+use Drupal\relaxed\Entity\ReplicationLog;
+use Drupal\relaxed\Entity\ReplicationLogInterface;
+use Drupal\relaxed\ReplicationTask\ReplicationTaskInterface;
 use Drupal\workspace\Replication\ReplicationInterface;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
@@ -53,7 +53,7 @@ class CouchdbReplicator implements ReplicatorInterface{
    */
   public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target, $task = NULL) {
     if ($task !== NULL && !$task instanceof ReplicationTaskInterface && !$task instanceof RelaxedReplicationTask) {
-      throw new UnexpectedTypeException($task, 'Drupal\replication\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
+      throw new UnexpectedTypeException($task, 'Drupal\relaxed\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
     }
 
     $source_db = $this->setupEndpoint($source);
@@ -164,7 +164,7 @@ class CouchdbReplicator implements ReplicatorInterface{
       'session_id' => \md5((\microtime(true) * 1000000)),
     ];
     $replication_log_id = $source->generateReplicationId($target, $task);
-    /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
+    /** @var \Drupal\relaxed\Entity\ReplicationLogInterface $replication_log */
     $replication_log = ReplicationLog::loadOrCreate($replication_log_id);
     if ($replication_log->isNew()) {
       $replication_log->setSourceLastSeq(0);

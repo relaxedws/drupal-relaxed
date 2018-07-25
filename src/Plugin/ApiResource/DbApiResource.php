@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   id = "db",
  *   label = "Workspace",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
+ *     "canonical" = "Drupal\workspaces\WorkspaceInterface",
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   path = "/{db}",

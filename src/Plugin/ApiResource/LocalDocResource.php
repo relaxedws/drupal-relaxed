@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class LocalDocResource extends DocApiResource {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
@@ -39,7 +39,7 @@ class LocalDocResource extends DocApiResource {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
@@ -57,7 +57,7 @@ class LocalDocResource extends DocApiResource {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request

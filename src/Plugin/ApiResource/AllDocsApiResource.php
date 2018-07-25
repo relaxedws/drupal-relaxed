@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -31,7 +31,7 @@ class AllDocsApiResource extends ApiResourceBase {
       throw new NotFoundHttpException();
     }
     /**
-     * @var \Drupal\replication\AllDocs\AllDocsInterface $all_docs
+     * @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs
      */
     $all_docs = \Drupal::service('replication.alldocs_factory')->get($workspace);
     $request = Request::createFromGlobals();
