@@ -3,7 +3,7 @@
 namespace Drupal\Tests\relaxed\Unit;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\multiversion\Entity\Workspace;
+use Drupal\workspaces\Entity\Workspace;
 use Drupal\relaxed\Entity\Remote;
 use GuzzleHttp\Psr7\Uri;
 
@@ -17,7 +17,7 @@ class RemoteTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['serialization', 'system', 'user', 'key_value', 'multiversion', 'relaxed', 'replication'];
+  public static $modules = ['serialization', 'system', 'user', 'key_value', 'multiversion', 'relaxed', 'workspaces'];
 
   /**
    * {@inheritdoc}
@@ -28,7 +28,7 @@ class RemoteTest extends KernelTestBase {
     $this->installEntitySchema('workspace');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
-    Workspace::create(['machine_name' => 'default', 'type' => 'basic'])->save();
+    Workspace::create(['id' => 'default', 'label' => 'Default'])->save();
   }
 
   /**

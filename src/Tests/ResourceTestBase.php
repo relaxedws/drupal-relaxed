@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\Tests;
 
-use Drupal\multiversion\Entity\Workspace;
+use Drupal\workspaces\Entity\Workspace;
 use Drupal\simpletest\WebTestBase;
 
 abstract class ResourceTestBase extends WebTestBase {

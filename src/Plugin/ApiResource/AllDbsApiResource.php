@@ -15,7 +15,7 @@ use Drupal\workspaces\Entity\Workspace;
  *   id = "all_dbs",
  *   label = "All Workspaces",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\Workspace",
+ *     "canonical" = "Drupal\workspaces\Entity\Workspace",
  *   },
  *   path = "/_all_dbs"
  * )

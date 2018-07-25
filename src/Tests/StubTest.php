@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\multiversion\Entity\Workspace;
+use Drupal\workspaces\Entity\Workspace;
 use Drupal\simpletest\WebTestBase;
 
 /**

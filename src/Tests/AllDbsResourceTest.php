@@ -3,7 +3,7 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\multiversion\Entity\Workspace;
+use Drupal\workspaces\Entity\Workspace;
 
 /**
  * Tests the /_all_dbs resource.

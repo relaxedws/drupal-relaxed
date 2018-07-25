@@ -3,13 +3,12 @@
 namespace Drupal\Tests\relaxed\Integration;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\multiversion\Entity\Workspace;
+use Drupal\workspaces\Entity\Workspace;
 use Doctrine\CouchDB\CouchDBClient;
-use Exception;
 use Relaxed\Replicator\ReplicationTask;
 use Relaxed\Replicator\Replicator;
 
-abstract class ReplicationTestBase extends KernelTestBase {
+class ReplicationTestBase extends KernelTestBase {
 
   protected $strictConfigSchema = FALSE;
 
@@ -50,8 +49,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
     'key_value',
     'multiversion',
     'relaxed',
-    'workspace',
-    'replication',
+    'workspaces',
     'entity_test',
     'relaxed_test',
     'user',
@@ -62,13 +60,10 @@ abstract class ReplicationTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig(['multiversion', 'workspace', 'replication', 'relaxed', 'relaxed_test']);
+    $this->installConfig(['multiversion', 'workspaces', 'relaxed', 'relaxed_test']);
     $this->installEntitySchema('workspace');
-    $this->installEntitySchema('workspace_pointer');
     $this->installEntitySchema('user');
-    // Create the default workspace because the multiversion_install() hook is
-    // not executed in unit tests.
-    Workspace::create(['machine_name' => 'live', 'label' => 'Live', 'type' => 'basic'])->save();
+    Workspace::create(['id' => 'live', 'label' => 'Live'])->save();
 
     $this->sourceDb = 'source';
     $this->targetDb = 'target';

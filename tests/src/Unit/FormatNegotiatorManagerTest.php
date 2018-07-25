@@ -3,7 +3,7 @@
 namespace Drupal\Tests\relaxed\Unit;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\multiversion\Entity\Workspace;
+use Drupal\workspaces\Entity\Workspace;
 use Drupal\relaxed\Plugin\FormatNegotiator\JsonNegotiator;
 use Drupal\relaxed\Plugin\FormatNegotiator\StreamNegotiator;
 
@@ -16,7 +16,7 @@ class FormatNegotiatorManagerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['serialization', 'system', 'user', 'key_value', 'multiversion', 'relaxed', 'replication'];
+  public static $modules = ['serialization', 'system', 'user', 'key_value', 'multiversion', 'relaxed', 'workspaces'];
 
   /**
    * @var \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface
@@ -33,7 +33,7 @@ class FormatNegotiatorManagerTest extends KernelTestBase {
     $this->installEntitySchema('workspace');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
-    Workspace::create(['machine_name' => 'default', 'type' => 'basic'])->save();
+    Workspace::create(['id' => 'default', 'label' => 'Default'])->save();
 
     $this->manager = $this->container->get('plugin.manager.format_negotiator');
   }

@@ -3,8 +3,8 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\multiversion\Entity\WorkspaceType;
-use Drupal\multiversion\Entity\WorkspaceTypeInterface;
+use Drupal\workspaces\Entity\WorkspaceType;
+use Drupal\workspaces\Entity\WorkspaceTypeInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
