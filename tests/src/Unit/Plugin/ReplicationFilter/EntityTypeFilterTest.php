@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\Tests\replication\Unit\Plugin\ReplicationFilter;
+namespace Drupal\Tests\relaxed\Unit\Plugin\ReplicationFilter;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\replication\Plugin\ReplicationFilter\EntityTypeFilter;
+use Drupal\relaxed\Plugin\ReplicationFilter\EntityTypeFilter;
 use Drupal\Tests\UnitTestCase;
 
 /**

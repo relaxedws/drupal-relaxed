@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Functional;
+namespace Drupal\Tests\relaxed\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\workspaces\Entity\Workspace;
@@ -56,7 +56,7 @@ class ReplicationFilterTest extends BrowserTestBase {
     $container = \Drupal::getContainer();
     $changes_factory = $container->get('replication.changes_factory');
 
-    $workspace = Workspace::create(['machine_name' => 'default', 'type' => 'basic']);
+    $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
 
     $entity1 = Node::create([
@@ -87,7 +87,7 @@ class ReplicationFilterTest extends BrowserTestBase {
     $container = \Drupal::getContainer();
     $changes_factory = $container->get('replication.changes_factory');
 
-    $workspace = Workspace::create(['machine_name' => 'default', 'type' => 'basic']);
+    $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
 
     $entity1 = Node::create([
@@ -121,7 +121,7 @@ class ReplicationFilterTest extends BrowserTestBase {
 
     $this->drupalCreateContentType(['type' => 'article2', 'name' => 'Article2']);
 
-    $workspace = Workspace::create(['machine_name' => 'default', 'type' => 'basic']);
+    $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
 
     $entity1 = Node::create([

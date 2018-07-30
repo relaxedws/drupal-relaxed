@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\replication\Entity\ReplicationLog;
+use Drupal\relaxed\Entity\ReplicationLog;
 
 /**
  * Test the creation and operation of the Replication Log entity.
@@ -15,7 +15,14 @@ class ReplicationLogTest extends KernelTestBase {
 
   protected $strictConfigSchema = FALSE;
 
-  public static $modules = ['user', 'serialization', 'key_value', 'multiversion', 'replication'];
+  public static $modules = [
+    'user',
+    'serialization',
+    'key_value',
+    'workspaces',
+    'multiversion',
+    'relaxed',
+    ];
 
   public function testOperations() {
     $this->installEntitySchema('replication_log');

@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workspaces\Entity\Workspace;
-use Drupal\replication\RevisionDiff\RevisionDiffInterface;
+use Drupal\relaxed\RevisionDiff\RevisionDiffInterface;
 
 /**
  * Tests the revision diff factory.
@@ -19,8 +19,9 @@ class RevisionDiffFactoryTest extends KernelTestBase {
     'system',
     'user',
     'key_value',
+    'workspaces',
     'multiversion',
-    'replication',
+    'relaxed',
   ];
 
   /** @var  Workspace */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 
@@ -23,8 +23,9 @@ class ReplicationSettingsTest extends KernelTestBase {
     'user',
     'serialization',
     'key_value',
+    'workspaces',
     'multiversion',
-    'replication',
+    'relaxed',
   ];
 
   /**

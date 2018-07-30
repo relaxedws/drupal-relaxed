@@ -19,16 +19,17 @@ class AllDbsResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     $workspaces = [];
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     foreach (Workspace::loadMultiple() as $workspace) {
-      $workspaces[] = $workspace->getMachineName();
+      $workspaces[] = $workspace->id();
     }
 
     for ($i = 0; $i < 3; $i++) {
       $machine_name = $this->randomMachineName();
-      $entity = Workspace::create(['machine_name' => $machine_name, 'type' => 'basic']);
+      $entity = Workspace::create(['id' => $machine_name, 'label' => $machine_name]);
       $entity->save();
       if ($i % 2 == 0) {
-        $entity->setUnpublished()->save();
+        $entity->save();
         continue;
       }
       $workspaces[] = $machine_name;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\Tests\replication\Unit\Plugin\ReplicationFilter;
+namespace Drupal\Tests\relaxed\Unit\Plugin\ReplicationFilter;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\replication\Plugin\ReplicationFilter\UuidFilter;
+use Drupal\relaxed\Plugin\ReplicationFilter\UuidFilter;
 use Drupal\Tests\UnitTestCase;
 
 /**

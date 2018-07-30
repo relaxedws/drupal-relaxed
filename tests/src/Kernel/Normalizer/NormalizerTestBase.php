@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Normalizer;
+namespace Drupal\Tests\relaxed\Kernel\Normalizer;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -16,12 +16,13 @@ abstract class NormalizerTestBase extends KernelTestBase {
    */
   public static $modules = [
     'serialization',
+    'workspaces',
     'multiversion',
     'key_value',
     'system',
     'field',
     'entity_test',
-    'replication',
+    'relaxed',
     'text',
     'filter',
     'user',
@@ -44,7 +45,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
     $this->installEntitySchema('file');
     $this->installSchema('system', ['url_alias', 'router']);
     $this->installSchema('key_value', ['key_value_sorted']);
-    $this->installConfig(['multiversion', 'replication', 'language', 'field']);
+    $this->installConfig(['multiversion', 'relaxed', 'language', 'field']);
     $this->container->get('multiversion.manager')->enableEntityTypes();
     $this->container->get('router.builder')->rebuild();
 

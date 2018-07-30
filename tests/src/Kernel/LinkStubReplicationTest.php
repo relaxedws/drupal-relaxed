@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -23,10 +23,11 @@ class LinkStubReplicationTest extends KernelTestBase {
   public static $modules = [
     'serialization',
     'system',
+    'workspaces',
     'multiversion',
     'key_value',
     'field',
-    'replication',
+    'relaxed',
     'text',
     'user',
     'link',
@@ -158,8 +159,8 @@ class LinkStubReplicationTest extends KernelTestBase {
       'new_edits' => FALSE,
     ];
 
-    /** @var \Drupal\replication\BulkDocs\BulkDocs $bulk_docs */
-    $bulk_docs = $this->serializer->denormalize($data, 'Drupal\replication\BulkDocs\BulkDocs', 'json', ['workspace' => $workspace]);
+    /** @var \Drupal\relaxed\BulkDocs\BulkDocs $bulk_docs */
+    $bulk_docs = $this->serializer->denormalize($data, 'Drupal\relaxed\BulkDocs\BulkDocs', 'json', ['workspace' => $workspace]);
     $bulk_docs->save();
 
     $node = $this->container->get('entity.repository')->loadEntityByUuid('node', 'c0b478b6-3a86-4571-8a83-a32c2f18ecd7');

@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\replication_alter_test\Event;
+namespace Drupal\relaxed_alter_test\Event;
 
 
-use Drupal\replication\Event\ReplicationContentDataAlterEvent;
-use Drupal\replication\Event\ReplicationDataEvents;
+use Drupal\relaxed\Event\ReplicationContentDataAlterEvent;
+use Drupal\relaxed\Event\ReplicationDataEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

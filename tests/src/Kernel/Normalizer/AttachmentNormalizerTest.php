@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Normalizer;
+namespace Drupal\Tests\relaxed\Kernel\Normalizer;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\file\Entity\File;

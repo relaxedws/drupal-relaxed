@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workspaces\Entity\Workspace;
-use Drupal\replication\AllDocs\AllDocsInterface;
+use Drupal\relaxed\AllDocs\AllDocsInterface;
 
 /**
  * Tests the AllDocsFactory
@@ -19,8 +19,9 @@ class AllDocsFactoryTest extends KernelTestBase {
     'system',
     'user',
     'key_value',
+    'workspaces',
     'multiversion',
-    'replication',
+    'relaxed',
   ];
 
   /** @var  Workspace */

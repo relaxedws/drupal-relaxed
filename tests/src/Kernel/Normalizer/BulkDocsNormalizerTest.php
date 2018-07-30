@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Normalizer;
+namespace Drupal\Tests\relaxed\Kernel\Normalizer;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\entity_test\Entity\EntityTestMulRev;
-use Drupal\replication\BulkDocs\BulkDocsInterface;
+use Drupal\relaxed\BulkDocs\BulkDocsInterface;
 
 /**
  * Tests the content serialization format.
@@ -21,7 +21,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   protected $testEntities = [];
 
   /**
-   * @var \Drupal\replication\BulkDocs\BulkDocsInterface
+   * @var \Drupal\relaxed\BulkDocs\BulkDocsInterface
    */
   protected $bulkDocs;
 
@@ -89,7 +89,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
       $data['docs'][] = $this->serializer->normalize($entity);
     }
     $context = ['workspace' => $this->workspaceManager->getActiveWorkspace()];
-    $bulk_docs = $this->serializer->denormalize($data, 'Drupal\replication\BulkDocs\BulkDocs', 'json', $context);
+    $bulk_docs = $this->serializer->denormalize($data, 'Drupal\relaxed\BulkDocs\BulkDocs', 'json', $context);
     $this->assertTrue($bulk_docs instanceof BulkDocsInterface, 'Denormalized data is an instance of the correct interface.');
     foreach ($bulk_docs->getEntities() as $key => $entity) {
       $entity_number = $key+1;

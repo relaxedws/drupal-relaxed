@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Plugin\ReplicationFilter;
+namespace Drupal\Tests\relaxed\Kernel\Plugin\ReplicationFilter;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\block_content\Entity\BlockContentType;
@@ -25,9 +25,10 @@ class PublishedFilterTest extends KernelTestBase {
     'block',
     'block_content',
     'key_value',
+    'workspaces',
     'multiversion',
     'node',
-    'replication',
+    'relaxed',
     'serialization',
     'system',
     'user',
@@ -67,7 +68,7 @@ class PublishedFilterTest extends KernelTestBase {
    * @dataProvider filterTestProvider
    */
   public function testFilter($include_unpublishable_entities, $entity_type_id, $entity_values, $expected) {
-    /** @var \Drupal\replication\Plugin\ReplicationFilterManagerInterface $filter_manager */
+    /** @var \Drupal\relaxed\Plugin\ReplicationFilterManagerInterface $filter_manager */
     $filter_manager = $this->container->get('plugin.manager.replication_filter');
     $configuration = [
       'include_unpublishable_entities' => $include_unpublishable_entities,
@@ -87,7 +88,7 @@ class PublishedFilterTest extends KernelTestBase {
    * Test default configuration for published filter.
    */
   public function testDefaultConfig() {
-    /** @var \Drupal\replication\Plugin\ReplicationFilterManagerInterface $filter_manager */
+    /** @var \Drupal\relaxed\Plugin\ReplicationFilterManagerInterface $filter_manager */
     $filter_manager = $this->container->get('plugin.manager.replication_filter');
     $filter = $filter_manager->createInstance('published');
     $entity = $this->container

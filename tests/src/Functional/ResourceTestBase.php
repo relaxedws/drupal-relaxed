@@ -3,9 +3,9 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\workspaces\Entity\Workspace;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
-abstract class ResourceTestBase extends WebTestBase {
+abstract class ResourceTestBase extends BrowserTestBase {
 
   public static $modules = [
     'entity_test',

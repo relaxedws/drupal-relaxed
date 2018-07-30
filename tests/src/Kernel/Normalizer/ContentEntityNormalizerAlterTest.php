@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Normalizer;
+namespace Drupal\Tests\relaxed\Kernel\Normalizer;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
@@ -24,7 +24,7 @@ class ContentEntityNormalizerAlterTest extends NormalizerTestBase {
     'system',
     'field',
     'entity_test',
-    'replication',
+    'relaxed',
     'text',
     'filter',
     'user',
@@ -60,7 +60,7 @@ class ContentEntityNormalizerAlterTest extends NormalizerTestBase {
   public function testNormalizerAlterEvent() {
     $normalized = $this->serializer->normalize($this->entity);
     // The '_test' key should be added in
-    // \Drupal\replication_alter_test\Event\ContentEntityTestAlterSubscriber::onAlterContentData
+    // \Drupal\relaxed_alter_test\Event\ContentEntityTestAlterSubscriber::onAlterContentData
     $this->assertSame(['foo' => 'bar'], $normalized['_test']);
   }
 

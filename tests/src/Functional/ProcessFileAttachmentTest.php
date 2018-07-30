@@ -22,9 +22,8 @@ class ProcessFileAttachmentTest extends BrowserTestBase {
    * Test ProcessFileAttachment.
    */
   public function testProcessFileAttachment() {
-    $live = Workspace::load(1);
-    $stage = Workspace::create(['id' => 'stage', 'label' => 'Stage']);
-    $stage->save();
+    $live = Workspace::load('live');
+    $stage = Workspace::load('stage');
 
     $data = [
       'data' => 'aGVsbG8gd29ybGQK',

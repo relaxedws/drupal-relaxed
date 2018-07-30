@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel;
+namespace Drupal\Tests\relaxed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workspaces\Entity\Workspace;
-use Drupal\replication\Changes\ChangesInterface;
+use Drupal\relaxed\Changes\ChangesInterface;
 
 /**
  * Tests the replication_log serialization format.
@@ -19,8 +19,9 @@ class ChangesFactoryTest extends KernelTestBase {
     'system',
     'user',
     'key_value',
+    'workspaces',
     'multiversion',
-    'replication',
+    'relaxed',
   ];
 
   /** @var  Workspace */

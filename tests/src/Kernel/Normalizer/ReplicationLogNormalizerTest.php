@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Normalizer;
+namespace Drupal\Tests\relaxed\Kernel\Normalizer;
 
-use Drupal\replication\Entity\ReplicationLog;
+use Drupal\relaxed\Entity\ReplicationLog;
 
 /**
  * Tests the replication_log serialization format.
@@ -11,7 +11,7 @@ use Drupal\replication\Entity\ReplicationLog;
  */
 class ReplicationLogNormalizerTest extends NormalizerTestBase {
 
-  protected $entityClass = 'Drupal\replication\Entity\ReplicationLog';
+  protected $entityClass = 'Drupal\relaxed\Entity\ReplicationLog';
 
   protected function setUp() {
     parent::setUp();

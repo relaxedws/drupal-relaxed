@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\Tests\replication\Kernel\Encoder;
+namespace Drupal\Tests\relaxed\Kernel\Encoder;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\replication\Encoder\StreamEncoder;
+use Drupal\relaxed\Encoder\StreamEncoder;
 
 /**
  * Tests the stream encoder.
@@ -15,7 +15,7 @@ class StreamEncoderTest extends KernelTestBase {
   protected $strictConfigSchema = FALSE;
 
   /**
-   * @var \Drupal\replication\Encoder\StreamEncoder
+   * @var \Drupal\relaxed\Encoder\StreamEncoder
    */
   protected $encoder;
 
