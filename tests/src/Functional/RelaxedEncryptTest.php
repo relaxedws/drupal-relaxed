@@ -21,10 +21,6 @@ class RelaxedEncryptTest extends BrowserTestBase {
     'encrypt',
     'encrypt_test',
     'relaxed',
-    'replication',
-    'multiversion',
-    'key_value',
-    'serialization',
     'rest',
     'basic_auth'
   ];

@@ -1,0 +1,6 @@
+name: 'Replication alter test'
+type: module
+description: 'Tests content normalization alter events in replication'
+core: 8.x
+version: VERSION
+hidden: true
