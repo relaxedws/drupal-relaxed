@@ -23,6 +23,21 @@ relaxed.settings:
       sequence:
         type: string
         label: 'Authentication provider'
+    mapping_type:
+      type: string
+      label: 'Users mapping type'
+    uid:
+      type: integer
+      label: 'UID'
+    changes_limit:
+      type: integer
+      label: 'Changes limit'
+    bulk_docs_limit:
+      type: integer
+      label: 'Bulk docs limit'
+    verbose_logging:
+      type: boolean
+      label: 'Verbose logging'
 
 relaxed.endpoint.*:
   type: config_entity
