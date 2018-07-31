@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Tests;
+namespace Drupal\Tests\relaxed\Functional;
 
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\Tests\BrowserTestBase;

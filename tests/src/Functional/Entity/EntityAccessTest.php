@@ -1,18 +1,18 @@
 <?php
 
-namespace Drupal\relaxed\Tests\Entity;
+namespace Drupal\Tests\relaxed\Functional\Entity;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessibleInterface;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests the entity access.
  *
- * @group Entity
+ * @group relaxed
  */
-class EntityAccessTest extends WebTestBase  {
+class EntityAccessTest extends BrowserTestBase  {
 
   public static $modules = [
     'entity_test',

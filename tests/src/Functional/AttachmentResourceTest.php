@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Tests;
+namespace Drupal\Tests\relaxed\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\entity_test\Entity\EntityTestRev;

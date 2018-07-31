@@ -1,18 +1,17 @@
 <?php
 
-namespace Drupal\relaxed\Tests;
+namespace Drupal\Tests\relaxed\Functional;
 
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\workspaces\Entity\Workspace;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
- * @group multiversion
+ * @group relaxed
  *
  * @todo It's too late at night and I can't figure out how to get this test to
  *   work with KernelTestBase. Fix this when you've had some sleep.
  */
-class StubTest extends WebTestBase {
+class StubTest extends BrowserTestBase {
 
   use EntityReferenceTestTrait;
 

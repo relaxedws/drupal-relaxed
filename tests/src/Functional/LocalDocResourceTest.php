@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\relaxed\Tests;
+namespace Drupal\Tests\relaxed\Functional;
 
 /**
  * Tests the /db/doc resource.
