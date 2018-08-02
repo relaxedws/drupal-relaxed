@@ -19,21 +19,22 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     $response = $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST', NULL);
-    $this->assertResponse('201', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $this->assertEquals('201', $response->getStatusCode());
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
+
     $expected = [
       'ok' => TRUE,
-      'instance_start_time' => (string) $this->workspace->getStartTime(),
+      'instance_start_time' => (string) $this->workspace->getCreatedTime(),
     ];
-    $this->assertIdentical($expected, $data, ('Correct values in response.'));
+    $this->assertSame($expected, $data, ('Correct values in response.'));
 
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
     $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST', NULL);
-    $this->assertResponse('403', 'HTTP response code is correct.');
+    $this->assertEquals('403', $response->getStatusCode());
   }
 
 }

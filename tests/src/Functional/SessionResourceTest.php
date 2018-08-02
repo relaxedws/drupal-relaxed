@@ -28,9 +28,9 @@ class SessionResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     $response = $this->httpRequest('_session', 'GET', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $this->assertEquals('200', $response->getStatusCode());
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
 
     $roles = [
       'authenticated',
@@ -45,7 +45,7 @@ class SessionResourceTest extends ResourceTestBase {
         'roles' => $roles,
       ],
     ];
-    $this->assertIdentical($expected, $data, ('Correct values in response.'));
+    $this->assertSame($expected, $data, ('Correct values in response.'));
 
     // Logout the test_admin_user user.
     $this->drupalLogout();
@@ -71,9 +71,10 @@ class SessionResourceTest extends ResourceTestBase {
 
     $this->drupalLogin($account);
     $response = $this->httpRequest('_session', 'GET', NULL);
-    $data = Json::decode($response);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertIdentical($expected, $data, ('Correct values in response.'));
+    $this->assertEquals('200', $response->getStatusCode());
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
+    $this->assertSame($expected, $data, ('Correct values in response.'));
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
@@ -91,9 +92,10 @@ class SessionResourceTest extends ResourceTestBase {
 
     $this->drupalLogin($account);
     $response = $this->httpRequest('_session', 'GET', NULL);
-    $data = Json::decode($response);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertIdentical($expected, $data, ('Correct values in response.'));
+    $this->assertEquals('200', $response->getStatusCode());
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
+    $this->assertSame($expected, $data, ('Correct values in response.'));
   }
 
 }

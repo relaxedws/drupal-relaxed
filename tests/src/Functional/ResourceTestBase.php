@@ -2,8 +2,10 @@
 
 namespace Drupal\Tests\relaxed\Functional;
 
+use Behat\Mink\Driver\BrowserKitDriver;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\Tests\BrowserTestBase;
+use GuzzleHttp\RequestOptions;
 
 abstract class ResourceTestBase extends BrowserTestBase {
 
@@ -14,6 +16,21 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'relaxed',
     'relaxed_test',
   ];
+
+  /**
+   * @var string
+   */
+  protected $defaultFormat;
+
+  /**
+   * @var string
+   */
+  protected $defaultMimeType;
+
+  /**
+   * @var array
+   */
+  protected $defaultAuth;
 
   /**
    * @var string
@@ -73,7 +90,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $name = $this->randomMachineName();
     $this->workspace = $this->createWorkspace($name);
     $this->workspace->save();
-    $this->dbname = $this->workspace->getMachineName();
+    $this->dbname = $this->workspace->id();
 
     $this->entityManager = $this->container->get('entity.manager');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
@@ -82,13 +99,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   *
-   * @todo {@link https://www.drupal.org/node/2600494 Simplify this method}
-   *   when {@link https://drupal.org/node/2274153 core tests supporting HEAD
-   *   requests} gets committed.
+   * @param $url
+   * @param $method
+   * @param null $body
+   * @param null $mime_type
+   * @param null $headers
+   * @param null $query
+   * @return \Psr\Http\Message\ResponseInterface
+   * @throws \GuzzleHttp\Exception\GuzzleException
    */
   protected function httpRequest($url, $method, $body = NULL, $mime_type = NULL, $headers = NULL, $query = NULL) {
+    $request_options = [];
     // Keep in overridden method when removing the bulk of this method.
     $url = $this->apiRoot . '/' . $url;
 
@@ -103,6 +124,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     if (!in_array($method, ['GET', 'HEAD'])) {
       // GET the CSRF token first for writing requests.
       $token = $this->drupalGet('session/token');
+      $request_options[RequestOptions::HEADERS][] = 'X-CSRF-Token: ' . $token;
     }
 
     $additional_headers = [];
@@ -113,8 +135,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }
     }
     // Set query if there are additional parameters.
-    $options = isset($query) ? ['absolute' => TRUE, 'query' => $query] : ['absolute' => TRUE];
-    $curl_options = [];
     switch ($method) {
       case 'GET':
         $get_headers = array_merge(
@@ -123,12 +143,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
           ],
           $additional_headers
         );
-        $curl_options = [
-          CURLOPT_HTTPGET => TRUE,
-          CURLOPT_CUSTOMREQUEST => 'GET',
-          CURLOPT_URL => $this->buildUrl($url, $options),
-          CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => $get_headers,
+        $request_options = [
+          RequestOptions::HEADERS => $get_headers,
         ];
         break;
 
@@ -139,12 +155,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
           ],
           $additional_headers
         );
-        $curl_options = [
-          CURLOPT_HTTPGET => FALSE,
-          CURLOPT_CUSTOMREQUEST => 'HEAD',
-          CURLOPT_URL => $this->buildUrl($url, $options),
-          CURLOPT_NOBODY => TRUE,
-          CURLOPT_HTTPHEADER => $head_headers,
+        $request_options = [
+          RequestOptions::HEADERS => $head_headers,
         ];
         break;
 
@@ -152,17 +164,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $post_headers = array_merge(
           [
             'Content-Type: ' . $mime_type,
-            'X-CSRF-Token: ' . $token,
           ],
           $additional_headers
         );
-        $curl_options = [
-          CURLOPT_HTTPGET => FALSE,
-          CURLOPT_POST => TRUE,
-          CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => $this->buildUrl($url, $options),
-          CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => $post_headers,
+        $request_options = [
+          RequestOptions::HEADERS => $post_headers,
         ];
         break;
 
@@ -170,17 +176,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $put_headers = array_merge(
           [
             'Content-Type: ' . $mime_type,
-            'X-CSRF-Token: ' . $token,
           ],
           $additional_headers
         );
-        $curl_options = [
-          CURLOPT_HTTPGET => FALSE,
-          CURLOPT_CUSTOMREQUEST => 'PUT',
-          CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => $this->buildUrl($url, $options),
-          CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => $put_headers,
+        $request_options = [
+          RequestOptions::HEADERS => $put_headers,
         ];
         break;
 
@@ -188,17 +188,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $patch_headers = array_merge(
           [
             'Content-Type: ' . $mime_type,
-            'X-CSRF-Token: ' . $token,
           ],
           $additional_headers
         );
-        $curl_options = [
-          CURLOPT_HTTPGET => FALSE,
-          CURLOPT_CUSTOMREQUEST => 'PATCH',
-          CURLOPT_POSTFIELDS => $body,
-          CURLOPT_URL => $this->buildUrl($url, ['absolute' => TRUE]),
-          CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => $patch_headers,
+        $request_options = [
+          RequestOptions::HEADERS => $patch_headers,
         ];
         break;
 
@@ -209,57 +203,50 @@ abstract class ResourceTestBase extends BrowserTestBase {
           ],
           $additional_headers
         );
-        $curl_options = [
-          CURLOPT_HTTPGET => FALSE,
-          CURLOPT_CUSTOMREQUEST => 'DELETE',
-          CURLOPT_URL => $this->buildUrl($url, $options),
-          CURLOPT_NOBODY => FALSE,
-          CURLOPT_HTTPHEADER => $delete_headers,
+        $request_options = [
+          RequestOptions::HEADERS => $delete_headers,
         ];
         break;
     }
 
-    $response = $this->curlExec($curl_options);
-
-    // Ensure that any changes to variables in the other thread are picked up.
-    $this->refreshVariables();
-
-    $headers = $this->drupalGetHeaders();
-
-    $this->verbose($method . ' request to: ' . $url .
-      '<hr />Code: ' . curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE) .
-      '<hr />Response headers: ' . nl2br(print_r($headers, TRUE)) .
-      '<hr />Response body: ' . $response);
-
-    return $response;
+    $request_options[RequestOptions::HTTP_ERRORS] = FALSE;
+    $request_options[RequestOptions::ALLOW_REDIRECTS] = FALSE;
+    $request_options = $this->decorateWithXdebugCookie($request_options);
+    $client = $this->getHttpClient();
+    return $client->request($method, $this->buildUrl($url, ['absolute' => TRUE]), $request_options);
   }
 
   /**
-   * {@inheritdoc}
+   * Adds the Xdebug cookie to the request options.
    *
-   * This method is overridden to deal with a cURL quirk: the usage of
-   * CURLOPT_CUSTOMREQUEST cannot be unset on the cURL handle, so we need to
-   * override it every time it is omitted.
+   * @param array $request_options
+   *   The request options.
+   *
+   * @return array
+   *   Request options updated with the Xdebug cookie if present.
    */
-  protected function curlExec($curl_options, $redirect = FALSE) {
-    unset($this->response);
-
-    if (!isset($curl_options[CURLOPT_CUSTOMREQUEST])) {
-      if (!empty($curl_options[CURLOPT_HTTPGET])) {
-        $curl_options[CURLOPT_CUSTOMREQUEST] = 'GET';
-      }
-      if (!empty($curl_options[CURLOPT_POST])) {
-        $curl_options[CURLOPT_CUSTOMREQUEST] = 'POST';
+  protected function decorateWithXdebugCookie(array $request_options) {
+    $session = $this->getSession();
+    $driver = $session->getDriver();
+    if ($driver instanceof BrowserKitDriver) {
+      $client = $driver->getClient();
+      foreach ($client->getCookieJar()->all() as $cookie) {
+        if (isset($request_options[RequestOptions::HEADERS]['Cookie'])) {
+          $request_options[RequestOptions::HEADERS]['Cookie'] .= '; ' . $cookie->getName() . '=' . $cookie->getValue();
+        }
+        else {
+          $request_options[RequestOptions::HEADERS]['Cookie'] = $cookie->getName() . '=' . $cookie->getValue();
+        }
       }
     }
-    return parent::curlExec($curl_options, $redirect);
+    return $request_options;
   }
 
   /**
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
-    return workspace::create(['machine_name' => $name, 'label' => ucfirst($name), 'type' => 'basic']);
+    return workspace::create(['id' => $name, 'label' => ucfirst($name)]);
   }
 
   /**

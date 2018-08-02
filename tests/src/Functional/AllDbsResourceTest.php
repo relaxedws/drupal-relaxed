@@ -28,20 +28,16 @@ class AllDbsResourceTest extends ResourceTestBase {
       $machine_name = $this->randomMachineName();
       $entity = Workspace::create(['id' => $machine_name, 'label' => $machine_name]);
       $entity->save();
-      if ($i % 2 == 0) {
-        $entity->save();
-        continue;
-      }
       $workspaces[] = $machine_name;
     }
 
     $response = $this->httpRequest('_all_dbs', 'GET');
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $this->assertEquals('200', $response->getStatusCode());
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
     sort($data);
     sort($workspaces);
-    $this->assertEqual($data, $workspaces, 'All workspaces names received.');
+    $this->assertEquals($workspaces, $data, 'All workspaces names received.');
   }
 
 }
