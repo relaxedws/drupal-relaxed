@@ -218,6 +218,10 @@ services:
     class: Drupal\relaxed\Normalizer\CommentItemNormalizer
     tags:
       - { name: replication_normalizer, priority: 30 }
+  replication.normalizer.entity_reference_quantity_item:
+    class: Drupal\relaxed\Normalizer\EntityReferenceQuantityItemNormalizer
+    tags:
+    - { name: normalizer, priority: 60 }
 
 #Core Normalizers
   replication.normalizer.timestamp_item:
