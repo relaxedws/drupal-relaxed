@@ -205,6 +205,11 @@ services:
     class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
     tags:
       - { name: replication_normalizer, priority: 30 }
+  replication.normalizer.paragraph:
+    class: Drupal\relaxed\Normalizer\ParagraphNormalizer
+    arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@replication.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher']
+    tags:
+      - { name: normalizer, priority: 60 }
   replication.normalizer.entity_reference_item:
     class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
     tags:
