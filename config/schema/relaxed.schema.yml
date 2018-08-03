@@ -5,12 +5,39 @@ relaxed.settings:
     api_root:
       type: string
       label: 'Absolute base path to the API root, without trailing slash.'
+    username:
+      type: string
+      label: 'Replicator username'
+    password:
+      type: string
+      label: 'Replicator password'
+    encrypt:
+      type: integer
+      label: 'Encrypt sensitive data'
+    encrypt_profile:
+      type: string
+      label: 'Encryption profile to use'
     authentication:
       type: sequence
       label: 'Authentication Providers'
       sequence:
         type: string
         label: 'Authentication provider'
+    mapping_type:
+      type: string
+      label: 'Users mapping type'
+    uid:
+      type: integer
+      label: 'UID'
+    changes_limit:
+      type: integer
+      label: 'Changes limit'
+    bulk_docs_limit:
+      type: integer
+      label: 'Bulk docs limit'
+    verbose_logging:
+      type: boolean
+      label: 'Verbose logging'
 
 relaxed.endpoint.*:
   type: config_entity

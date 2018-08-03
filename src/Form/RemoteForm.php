@@ -10,8 +10,9 @@ use GuzzleHttp\Psr7\Uri;
  * Class RemoteForm.
  */
 class RemoteForm extends EntityForm {
+
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     if (!\Drupal::moduleHandler()->moduleExists('workspace')) {
@@ -86,7 +87,7 @@ class RemoteForm extends EntityForm {
       $form_state->getValue('username'),
       $form_state->getValue('password')
     );
-    $encoded = base64_encode($uri);
+    $encoded = \Drupal::service('relaxed.sensitive_data.transformer')->set((string) $uri);
     $remote->set('uri', $encoded);
     $status = $remote->save();
 

@@ -5,10 +5,14 @@ namespace Drupal\relaxed;
 use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
+use Drupal\relaxed\Event\RelaxedEvents;
+use Drupal\relaxed\Event\RelaxedReplicationFinishedEvent;
 use Drupal\relaxed\Entity\RemoteInterface;
-use Drupal\replication\Entity\ReplicationLog;
-use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
+use Drupal\relaxed\Entity\ReplicationLog;
+use Drupal\relaxed\Entity\ReplicationLogInterface;
+use Drupal\relaxed\ReplicationTask\ReplicationTaskInterface;
+use Drupal\workspace\Replication\ReplicationInterface;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
@@ -18,10 +22,21 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class CouchdbReplicator implements ReplicatorInterface{
 
+  /**
+   * Relaxed configuration settings.
+   */
   protected $relaxedSettings;
 
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  /**
+   * Relaxed sensitive data transformer service.
+   *
+   * @var Drupal\relaxed\SensitiveDataTransformer
+   */
+  protected $transformer;
+
+  public function __construct(ConfigFactoryInterface $config_factory, SensitiveDataTransformer $transformer) {
     $this->relaxedSettings = $config_factory->get('relaxed.settings');
+    $this->transformer = $transformer;
   }
 
   /**
@@ -38,7 +53,7 @@ class CouchdbReplicator implements ReplicatorInterface{
    */
   public function replicate(WorkspacePointerInterface $source, WorkspacePointerInterface $target, $task = NULL) {
     if ($task !== NULL && !$task instanceof ReplicationTaskInterface && !$task instanceof RelaxedReplicationTask) {
-      throw new UnexpectedTypeException($task, 'Drupal\replication\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
+      throw new UnexpectedTypeException($task, 'Drupal\relaxed\ReplicationTask\ReplicationTaskInterface or Relaxed\Replicator\ReplicationTask');
     }
 
     $source_db = $this->setupEndpoint($source);
@@ -59,18 +74,6 @@ class CouchdbReplicator implements ReplicatorInterface{
         $couchdb_task->setLimit($changes_limit ?: $task->getLimit());
         $bulk_docs_limit = \Drupal::config('replication.settings')->get('changes_limit');
         $couchdb_task->setBulkDocsLimit($bulk_docs_limit ?: $task->getBulkDocsLimit());
-
-        $replication_log_id = $source->generateReplicationId($target, $task);
-        /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
-        $replication_logs = \Drupal::entityTypeManager()
-          ->getStorage('replication_log')
-          ->loadByProperties(['uuid' => $replication_log_id]);
-        $replication_log = reset($replication_logs);
-        $since = 0;
-        if (!empty($replication_log) && $replication_log->get('ok')->value == TRUE) {
-          $since = $replication_log->getSourceLastSeq() ?: $since;
-        }
-        $couchdb_task->setSinceSeq($since);
       }
 
       $replicator = new Replicator($source_db, $target_db, $couchdb_task);
@@ -88,31 +91,45 @@ class CouchdbReplicator implements ReplicatorInterface{
             ->getStorage('replication_log')
             ->loadByProperties(['session_id' => $result['session_id']]);
         }
-        return reset($replication_logs);
+        $log = reset($replication_logs);
+        if (empty($log)) {
+          $log = $this->errorReplicationLog($source, $target, $task);
+        }
       }
       else {
-        return $this->errorReplicationLog($source, $target, $task);
+        $log = $this->errorReplicationLog($source, $target, $task);
       }
+
+      $this->dispatchReplicationFinishedEvent($source, $target, $log);
+      return $log;
     }
     catch (\Exception $e) {
       watchdog_exception('Relaxed', $e);
-      return $this->errorReplicationLog($source, $target, $task);
+      $log = $this->errorReplicationLog($source, $target, $task);
+      $this->dispatchReplicationFinishedEvent($source, $target, $log);
+      return $log;
     }
   }
 
-  protected function setupEndpoint(WorkspacePointerInterface $pointer) {
+
+  public function setupEndpoint(WorkspacePointerInterface $pointer) {
     if (!empty($pointer->getWorkspaceId())) {
       /** @var string $api_root */
       $api_root = trim($this->relaxedSettings->get('api_root'), '/');
       /** @var WorkspaceInterface $workspace */
       $workspace = $pointer->getWorkspace();
-      $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), [])
-        ->setAbsolute()
-        ->toString();
+      $url = Url::fromUri('base:/' . $api_root . '/' . $workspace->getMachineName(), []);
+      // This is a workaround for the case when the site/server is not configured
+      // correctly and 'base:/' returns the URL with 'http' instead of 'https';
+      if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
+        $url->setOption('https', TRUE);
+      }
+      $url = $url->setAbsolute()->toString();
       $uri = new Uri($url);
       $uri = $uri->withUserInfo(
         $this->relaxedSettings->get('username'),
-        $this->relaxedSettings->get('password')
+        $this->transformer->get($this->relaxedSettings->get('password'))
       );
     }
 
@@ -145,17 +162,32 @@ class CouchdbReplicator implements ReplicatorInterface{
       'start_time' => $time->format('D, d M Y H:i:s e'),
       'end_time' => $time->format('D, d M Y H:i:s e'),
       'session_id' => \md5((\microtime(true) * 1000000)),
-      'start_last_seq' => $source->getWorkspace()->getUpdateSeq(),
     ];
     $replication_log_id = $source->generateReplicationId($target, $task);
-    /** @var \Drupal\replication\Entity\ReplicationLogInterface $replication_log */
+    /** @var \Drupal\relaxed\Entity\ReplicationLogInterface $replication_log */
     $replication_log = ReplicationLog::loadOrCreate($replication_log_id);
+    if ($replication_log->isNew()) {
+      $replication_log->setSourceLastSeq(0);
+      $history['start_last_seq'] = 0;
+    }
     $replication_log->set('ok', FALSE);
-    $replication_log->setSourceLastSeq($source->getWorkspace()->getUpdateSeq());
     $replication_log->setSessionId($history['session_id']);
     $replication_log->setHistory($history);
     $replication_log->save();
     return $replication_log;
+  }
+
+  protected function dispatchReplicationFinishedEvent(WorkspacePointerInterface $source, WorkspacePointerInterface $target, ReplicationLogInterface $log) {
+    $replication_info = [
+      'source' => $source->label(),
+      'target' => $target->label(),
+      'status' => (int) !empty($log->get('ok')->value),
+      'last_seq' => $log->getSourceLastSeq(),
+      'session_id' => $log->getSessionId(),
+    ];
+    $event = new RelaxedReplicationFinishedEvent($replication_info);
+    $dispatcher = \Drupal::service('event_dispatcher');
+    $dispatcher->dispatch(RelaxedEvents::REPLICATION_FINISHED, $event);
   }
 
 }

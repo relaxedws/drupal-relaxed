@@ -3,8 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\multiversion\Entity\Workspace;
 use Drupal\relaxed\Http\ApiResourceResponse;
+use Drupal\workspaces\Entity\Workspace;
 
 /**
  * Implements http://docs.couchdb.org/en/latest/api/server/common.html#all-dbs
@@ -15,7 +15,7 @@ use Drupal\relaxed\Http\ApiResourceResponse;
  *   id = "all_dbs",
  *   label = "All Workspaces",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\Workspace",
+ *     "canonical" = "Drupal\workspaces\Entity\Workspace",
  *   },
  *   path = "/_all_dbs"
  * )
@@ -25,18 +25,20 @@ class AllDbsApiResource extends ApiResourceBase {
   /**
    * Retrieve list of all entity types.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function get() {
-    /** @var \Drupal\multiversion\Entity\WorkspaceInterface[] $workspaces */
+    /** @var \Drupal\workspaces\WorkspaceInterface[] $workspaces */
     $workspaces = Workspace::loadMultiple();
 
-    $workspace_machine_names = [];
+    $workspace_ids = [];
     foreach ($workspaces as $workspace) {
-      $workspace_machine_names[] = $workspace->getMachineName();
+      $workspace_ids[] = $workspace->id();
     }
 
-    $response = new ApiResourceResponse($workspace_machine_names, 200);
+    $response = new ApiResourceResponse($workspace_ids, 200);
     foreach ($workspaces as $workspace) {
       $response->addCacheableDependency($workspace);
     }
@@ -47,4 +49,5 @@ class AllDbsApiResource extends ApiResourceBase {
 
     return $response;
   }
+
 }

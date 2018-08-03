@@ -1,26 +1,26 @@
 # Remote routing definition
 entity.remote.collection:
-  path: '/admin/config/services/relaxed'
+  path: '/admin/config/workflow/remotes'
   defaults:
     _entity_list: 'remote'
     _title: 'Remote'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'access administration pages'
   options:
     _admin_route: TRUE
 
 entity.remote.add_form:
-  path: '/admin/config/services/relaxed/add'
+  path: '/admin/config/workflow/remotes/add'
   defaults:
     _entity_form: 'remote.add'
     _title: 'Add Remote'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'access administration pages'
   options:
     _admin_route: TRUE
 
 relaxed.settings_form:
-  path: '/admin/config/relaxed/settings'
+  path: '/admin/config/workflow/relaxed'
   defaults:
     _form: '\Drupal\relaxed\Form\SettingsForm'
     _title: 'RELAXed Web Services settings'

@@ -3,8 +3,7 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -18,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  *   id = "db",
  *   label = "Workspace",
  *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
+ *     "canonical" = "Drupal\workspaces\WorkspaceInterface",
  *     "post" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
  *   path = "/{db}",
@@ -56,7 +55,6 @@ class DbApiResource extends ApiResourceBase {
     // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
     $response =  new ApiResourceResponse($entity, 200);
     $response->addCacheableDependency($entity);
-
     return $response;
   }
 
@@ -72,19 +70,20 @@ class DbApiResource extends ApiResourceBase {
     if (!$entity instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
-    elseif (!$entity->isNew()) {
-      throw new PreconditionFailedHttpException(t('The database could not be created, it already exists'));
+    if (!$entity->isNew()) {
+      throw new PreconditionFailedHttpException(t('The workspace could not be created, it already exists.'));
     }
     elseif ($entity->validate()->count() != 0) {
-      throw new NotFoundHttpException(t('Invalid database'));
+      throw new NotFoundHttpException(t('Invalid workspace.'));
     }
 
     try {
       $entity->save();
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, t('Internal server error'), $e);
+    catch (\Exception $e) {
+      throw new HttpException(500, t($e->getMessage()), $e);
     }
+
     $response = new ApiResourceResponse(['ok' => TRUE], 201);
     $response->addCacheableDependency($entity);
 
@@ -133,13 +132,14 @@ class DbApiResource extends ApiResourceBase {
     try {
       $entity->save();
       $rev = $entity->_rev->value;
+
       $response = new ApiResourceResponse(['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev], 201, ['ETag' => $rev]);
       $response->addCacheableDependency($entity);
 
       return $response;
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, $e->getMessage());
+    catch (\Exception $e) {
+      throw new HttpException(500, $e->getMessage(), $e);
     }
   }
 
@@ -150,16 +150,21 @@ class DbApiResource extends ApiResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function delete(WorkspaceInterface $entity) {
+    if (!$entity->isPublished()) {
+      throw new HttpException(500, t('Workspace does not exist.'));
+    }
     try {
       // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
       $entity->delete();
     }
     catch (\Exception $e) {
-      throw new HttpException(500, NULL, $e);
+      throw new HttpException(500, $e->getMessage(), $e);
     }
+
     $response = new ApiResourceResponse(['ok' => TRUE], 200);
     $response->addCacheableDependency($entity);
 
     return $response;
   }
+
 }

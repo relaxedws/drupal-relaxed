@@ -8,13 +8,12 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\HttpFoundation\MultipartResponse as HttpFoundationMultipartResponse;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Drupal\relaxed\Plugin\ApiResourceManagerInterface;
 use Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface;
-use Drupal\replication\ProcessFileAttachment;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Drupal\relaxed\ProcessFileAttachment;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,10 +38,16 @@ class ResourceController implements ContainerInjectionInterface {
    */
   const DEFAULT_FORMAT = 'json';
 
+
   /**
-   * The resource configuration storage.
-   *
-   * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected function container() {
+    return \Drupal::getContainer();
+  }
+
+  /**
+   * @return \Symfony\Component\Serializer\SerializerInterface
    */
   protected $resourceManager;
 
@@ -53,6 +58,19 @@ class ResourceController implements ContainerInjectionInterface {
 
   /**
    * @var \Drupal\replication\ProcessFileAttachment
+   */
+  protected function getFormat() {
+    return $this->getResource()->isAttachment() ? 'stream' : $this->request->getRequestFormat('json');
+  }
+
+  /**
+   * @var \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface
+   */
+  protected $negotiatorManager;
+
+
+  /**
+   * @var \Drupal\relaxed\ProcessFileAttachment
    */
   protected $attachment;
 
@@ -68,7 +86,7 @@ class ResourceController implements ContainerInjectionInterface {
    *   The API resource manager.
    * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $negotiator_manager
    *   The format negotiator manager.
-   * @param \Drupal\replication\ProcessFileAttachment $attachment
+   * @param \Drupal\relaxed\ProcessFileAttachment $attachment
    *   The file attachment processor.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.

@@ -2,10 +2,8 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
-use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -24,7 +22,7 @@ class AllDocsApiResource extends ApiResourceBase {
   /**
    * @param string | \Drupal\Core\Config\Entity\ConfigEntityInterface $workspace
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    *
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
@@ -32,14 +30,14 @@ class AllDocsApiResource extends ApiResourceBase {
     if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
     }
-
+    /**
+     * @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs
+     */
     $all_docs = \Drupal::service('replication.alldocs_factory')->get($workspace);
-
     $request = Request::createFromGlobals();
     if ($request->query->get('include_docs') == 'true') {
       $all_docs->includeDocs(TRUE);
     }
-
     $response = new ApiResourceResponse($all_docs, 200);
     foreach (\Drupal::service('multiversion.manager')->getSupportedEntityTypes() as $entity_type) {
       $response->addCacheableDependency($entity_type);

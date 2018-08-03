@@ -3,9 +3,8 @@
 namespace Drupal\relaxed\Plugin\ApiResource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\FileInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -31,20 +30,22 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AttachmentApiResource extends ApiResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    * @param string $field_name
    * @param integer $delta
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface
-      || !$file instanceof FileInterface) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (!$entity instanceof ContentEntityInterface
+      || !$file instanceof FileInterface) {
+      throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
     }
 
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
@@ -56,20 +57,22 @@ class AttachmentApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
    * @param string | \Drupal\file\FileInterface $file
    * @param string $scheme
    * @param string $filename
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface
-      || !$file instanceof FileInterface) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (!$entity instanceof ContentEntityInterface
+      || !$file instanceof FileInterface) {
+      throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
     }
 
     if (!$entity->access('view') || !$entity->{$field_name}->access('view')) {
@@ -80,7 +83,7 @@ class AttachmentApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
@@ -89,12 +92,14 @@ class AttachmentApiResource extends ApiResourceBase {
    * @param string $filename
    * @param \Drupal\file\FileInterface $received_file
    *
-   * @return ApiResourceResponse
+   * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function put($workspace, $entity, $field_name, $delta, $existing_file, $scheme, $filename, FileInterface $received_file) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (!$entity instanceof ContentEntityInterface) {
+      throw new NotFoundHttpException(t('Specified document was not found.'));
     }
 
     // Check entity and field level access.
@@ -119,17 +124,16 @@ class AttachmentApiResource extends ApiResourceBase {
       $entity->save();
 
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $entity->_rev->value];
+
       return new ApiResourceResponse($data, 200, $this->responseHeaders($file, ['Content-MD5', 'X-Relaxed-ETag']));
     }
-    // @todo {@link https://www.drupal.org/node/2599912 Catch more generic
-    // exceptions here and on other places.}
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, NULL, $e);
+    catch (\Exception $e) {
+      throw new HttpException(500, t($e->getMessage()), $e);
     }
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
    * @param integer $delta
@@ -140,10 +144,12 @@ class AttachmentApiResource extends ApiResourceBase {
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity, $field_name, $delta, $file, $scheme, $filename) {
-    if (!$workspace instanceof WorkspaceInterface
-      || !$entity instanceof ContentEntityInterface
-      || !$file instanceof FileInterface) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (!$entity instanceof ContentEntityInterface
+      || !$file instanceof FileInterface) {
+      throw new NotFoundHttpException(t('Specified document or attachment was not found.'));
     }
 
     // Check entity and field level access.
@@ -161,10 +167,11 @@ class AttachmentApiResource extends ApiResourceBase {
       $entity->save();
       $rev = $entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $entity->uuid(), 'rev' => $rev];
+
       return new ApiResourceResponse($data, 200, $this->responseHeaders($file, ['X-Relaxed-ETag']), $rev);
     }
     catch (\Exception $e) {
-      throw new HttpException(500, $e->getMessage());
+      throw new HttpException(500, $e->getMessage(), $e);
     }
   }
 
@@ -193,4 +200,5 @@ class AttachmentApiResource extends ApiResourceBase {
     }
     return $return;
   }
+
 }

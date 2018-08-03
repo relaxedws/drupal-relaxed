@@ -7,8 +7,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\relaxed\Plugin\ApiResourceInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Base API resource plugin.

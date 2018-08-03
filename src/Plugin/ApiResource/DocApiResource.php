@@ -2,20 +2,15 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\file\FileInterface;
-use Drupal\multiversion\Entity\WorkspaceInterface;
-use Drupal\relaxed\Http\ApiResourceResponse;
+use Drupal\workspaces\WorkspaceInterface;
 use Drupal\relaxed\HttpMultipart\ResourceMultipartResponse;
+use Drupal\relaxed\Http\ApiResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Drupal\relaxed\HttpMultipart\Message\MultipartResponse as MultipartResponseParser;
-use GuzzleHttp\Psr7;
 
 /**
  * @ApiResource(
@@ -24,8 +19,7 @@ use GuzzleHttp\Psr7;
  *   serialization_class = {
  *     "canonical" = "Drupal\Core\Entity\ContentEntityInterface",
  *   },
- *   path = "/{db}/{docid}",
- *   no_cache = TRUE
+ *   path = "/{db}/{docid}"
  * )
  *
  * @todo {@link https://www.drupal.org/node/2600428 Implement real ETag.}
@@ -33,14 +27,17 @@ use GuzzleHttp\Psr7;
 class DocApiResource extends ApiResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function head($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (is_string($existing)) {
+      throw new NotFoundHttpException(t('Document does not exist.'));
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
@@ -56,14 +53,17 @@ class DocApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param mixed $existing
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function get($workspace, $existing) {
-    if (!$workspace instanceof WorkspaceInterface || is_string($existing)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (is_string($existing)) {
+      throw new NotFoundHttpException(t('Document does not exist.'));
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $revisions */
     $revisions = is_array($existing) ? $existing : [$existing];
@@ -114,7 +114,7 @@ class DocApiResource extends ApiResourceBase {
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $existing_entity
    * @param \Drupal\Core\Entity\ContentEntityInterface $received_entity
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -156,23 +156,26 @@ class DocApiResource extends ApiResourceBase {
       $received_entity->save();
       $rev = $received_entity->_rev->value;
       $data = ['ok' => TRUE, 'id' => $received_entity->uuid(), 'rev' => $rev];
+
       return new ApiResourceResponse($data, 201, ['X-Relaxed-ETag' => $rev]);
     }
-    catch (EntityStorageException $e) {
-      throw new HttpException(500, $e->getMessage());
+    catch (\Exception $e) {
+      throw new HttpException(500, $e->getMessage(), $e);
     }
   }
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param string | \Drupal\workspaces\WorkspaceInterface $workspace
    * @param string | \Drupal\Core\Entity\ContentEntityInterface $entity
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function delete($workspace, $entity) {
-    if (!($workspace instanceof WorkspaceInterface)
-      || !($entity instanceof ContentEntityInterface)) {
+    if (!$workspace instanceof WorkspaceInterface) {
       throw new NotFoundHttpException();
+    }
+    if (!($entity instanceof ContentEntityInterface)) {
+      throw new NotFoundHttpException(t('Document does not exist.'));
     }
 
     if (!$entity->access('delete')) {
