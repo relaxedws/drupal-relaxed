@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
@@ -49,15 +48,22 @@ class ResourceController implements ContainerInjectionInterface {
   /**
    * @return \Symfony\Component\Serializer\SerializerInterface
    */
-  protected $resourceManager;
+  protected function serializer() {
+    if (!$this->serializer) {
+      $this->serializer = $this->container()->get('serializer');
+    }
+    return $this->serializer;
+  }
 
   /**
-   * @var \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface
+   * @return string
    */
-  protected $negotiatorManager;
+  protected function getMethod() {
+    return strtolower($this->request->getMethod());
+  }
 
   /**
-   * @var \Drupal\replication\ProcessFileAttachment
+   * @return string
    */
   protected function getFormat() {
     return $this->getResource()->isAttachment() ? 'stream' : $this->request->getRequestFormat('json');
