@@ -43,7 +43,7 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     // We set this here just to test creation, saving and then getting
     // (with 'relaxed:attachment') entities on the same workspace.
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+    $this->workspaceManager->setActiveWorkspace($this->workspace);
 
     // Create a File field for testing.
     FieldStorageConfig::create([

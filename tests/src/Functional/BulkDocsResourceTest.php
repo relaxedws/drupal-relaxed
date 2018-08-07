@@ -55,7 +55,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     // We set this here just to test creation and saving
     // (with 'relaxed:bulk_docs') the entity on the same workspace.
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+    $this->workspaceManager->setActiveWorkspace($this->workspace);
 
     $input = ['docs' => []];
     $entities = $this->createTestEntities($entity_type, TRUE);

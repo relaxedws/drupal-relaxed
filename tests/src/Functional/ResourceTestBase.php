@@ -288,22 +288,4 @@ abstract class ResourceTestBase extends BrowserTestBase {
     return [];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function entityPermissions($entity_type, $operation) {
-    if (in_array($entity_type, array('entity_test_rev', 'entity_test_local'))) {
-      switch ($operation) {
-        case 'view':
-          return array('view test entity');
-        case 'create':
-        case 'update':
-        case 'delete':
-          return array('administer entity_test content');
-      }
-    }
-
-    return [];
-  }
-
 }

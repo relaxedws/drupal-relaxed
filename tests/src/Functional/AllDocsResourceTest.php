@@ -22,7 +22,7 @@ class AllDocsResourceTest extends ResourceTestBase {
 
     // We set this here just to test creation, saving and then getting
     // (with 'relaxed:all_docs') entities on the same workspace.
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+    $this->workspaceManager->setActiveWorkspace($this->workspace);
 
     $entities = [];
     $entity_types = ['entity_test_rev'];
