@@ -59,15 +59,15 @@ class BulkDocsFactory implements BulkDocsFactoryInterface {
   /**
    * Constructor.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspaces.manager
+   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
    * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
    * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    * @param \Drupal\Core\State\StateInterface $state
    */
-  public function __construct(WorkspaceManagerInterface $workspaces.manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, EntityTypeManagerInterface $entity_type_manager, LockBackendInterface $lock, LoggerChannelFactoryInterface $logger_factory, StateInterface $state) {
-    $this->workspaceManager = $workspaces.manager;
+  public function __construct(WorkspaceManagerInterface $workspace_manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, EntityTypeManagerInterface $entity_type_manager, LockBackendInterface $lock, LoggerChannelFactoryInterface $logger_factory, StateInterface $state) {
+    $this->workspaceManager = $workspace_manager;
     $this->uuidIndex = $uuid_index;
     $this->revIndex = $rev_index;
     $this->entityTypeManager = $entity_type_manager;

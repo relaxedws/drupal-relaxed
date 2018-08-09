@@ -22,7 +22,7 @@ class ChangesResourceTest extends ResourceTestBase {
 
     // We set this here just to test creation, saving and then getting
     // (with 'relaxed:changes') changes on the same workspace.
-    $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+    $this->workspaceManager->setActiveWorkspace($this->workspace);
 
     $expected_with_docs = $expected_without_docs = ['last_seq' => NULL, 'results' => []];
 

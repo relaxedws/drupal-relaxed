@@ -24,18 +24,21 @@ class ChangesFactoryTest extends KernelTestBase {
     'relaxed',
   ];
 
-  /** @var  Workspace */
+  /** @var  \Drupal\workspaces\WorkspaceInterface */
   protected $workspace;
 
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
+    $this->installEntitySchema('workspace');
+    $this->installEntitySchema('replication_log');
+    $this->installSchema('system', ['sequences']);
     $this->installSchema('key_value', ['key_value_sorted']);
     $this->installConfig(['multiversion']);
     \Drupal::service('multiversion.manager')->enableEntityTypes();
 
-    $this->workspace = Workspace::create(['machine_name' => 'default', 'type' => 'basic']);
+    $this->workspace = Workspace::create(['id' => 'default', 'label' => 'default']);
     $this->workspace->save();
   }
 

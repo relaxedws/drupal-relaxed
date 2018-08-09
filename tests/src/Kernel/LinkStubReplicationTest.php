@@ -40,13 +40,16 @@ class LinkStubReplicationTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('workspace');
+    $this->installEntitySchema('replication_log');
     $this->installSchema('key_value', ['key_value_sorted']);
     $this->installSchema('system', ['sequences']);
     $this->installSchema('node', ['node_access']);
-    $this->installConfig(['multiversion', 'replication']);
+    $this->installConfig(['multiversion']);
     $this->container->get('multiversion.manager')->enableEntityTypes();
     $this->serializer = $this->container->get('serializer');
-    Workspace::create(['machine_name' => 'live', 'label' => 'Live', 'type' => 'basic'])->save();
+    Workspace::create(['id' => 'live', 'label' => 'Live'])->save();
     NodeType::create(['type' => 'article_with_link', 'name' => 'article_with_link'])->save();
     NodeType::create(['type' => 'article', 'name' => 'article'])->save();
     $this->createLinkField('node', 'article_with_link', 'field_link');

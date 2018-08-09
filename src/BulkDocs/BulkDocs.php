@@ -76,7 +76,7 @@ class BulkDocs implements BulkDocsInterface {
   /**
    * Constructor.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspaces.manager
+   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
    * @param \Drupal\workspaces\WorkspaceInterface $workspace
    * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
    * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
@@ -84,8 +84,8 @@ class BulkDocs implements BulkDocsInterface {
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    * @param \Drupal\Core\State\StateInterface $state
    */
-  public function __construct(WorkspaceManagerInterface $workspaces.manager, WorkspaceInterface $workspace, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, EntityTypeManagerInterface $entity_type_manager, LockBackendInterface $lock, LoggerChannelInterface $logger, StateInterface $state) {
-    $this->workspaceManager = $workspaces.manager;
+  public function __construct(WorkspaceManagerInterface $workspace_manager, WorkspaceInterface $workspace, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, EntityTypeManagerInterface $entity_type_manager, LockBackendInterface $lock, LoggerChannelInterface $logger, StateInterface $state) {
+    $this->workspaceManager = $workspace_manager;
     $this->workspace = $workspace;
     $this->uuidIndex = $uuid_index;
     $this->revIndex = $rev_index;
