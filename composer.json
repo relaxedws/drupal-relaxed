@@ -4,6 +4,6 @@
   "type": "drupal-module",
   "license": "GPL-2.0+",
   "require": {
-    "relaxedws/replicator": "dev-master"
+    "relaxedws/replicator": "~1.0.1"
   }
 }
