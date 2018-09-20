@@ -3,10 +3,7 @@ api: 2
 core: 8.x
 
 projects:
-  drupal:
-    version: 8.7.x
-    patch:
-      2988562-16: https://www.drupal.org/files/issues/2018-07-27/2988562-16.patch
+  drupal: 8.7.x
   key_value: 1.x
   key: 1.x
   encrypt: 3.x
