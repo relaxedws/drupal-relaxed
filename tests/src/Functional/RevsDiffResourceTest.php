@@ -24,7 +24,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       // We set this here just to test creation and saving (with 'revs_diff')
       // the entity on the same workspace. Set this after the user has been
       // created and logged in.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       // Create a new test entity.
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();

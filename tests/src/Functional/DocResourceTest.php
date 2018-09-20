@@ -27,7 +27,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $this->httpRequest("$this->dbname/bogus", 'HEAD', NULL);
       $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
@@ -87,7 +87,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $this->httpRequest("$this->dbname/bogus", 'GET', NULL);
       $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
@@ -156,7 +156,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
@@ -225,7 +225,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
@@ -275,7 +275,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
@@ -338,7 +338,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity_uuid = 'fe36b529-e2d7-4625-9b07-7ee8f84928b2';
       $reference_uuid = '0aec21a0-8e36-11e5-8994-feff819cdc9f';

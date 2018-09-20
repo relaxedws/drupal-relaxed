@@ -22,7 +22,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
@@ -50,7 +50,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create();
       $entity->save();
@@ -80,7 +80,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      $this->multiversionManager->setActiveWorkspaceId($this->workspace->id());
+      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
