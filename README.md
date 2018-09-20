@@ -29,7 +29,6 @@ REQUIREMENTS
 This module requires:
 
  * [Multiversion](https://www.drupal.org/project/multiversion)
- * [Replication](https://www.drupal.org/project/replication)
 
 
 RECOMMENDED MODULES
