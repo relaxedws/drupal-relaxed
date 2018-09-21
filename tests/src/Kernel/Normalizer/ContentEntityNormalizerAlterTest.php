@@ -29,7 +29,7 @@ class ContentEntityNormalizerAlterTest extends NormalizerTestBase {
     'filter',
     'user',
     // This test module adds a subscriber to test with.
-    'replication_alter_test',
+    'relaxed_alter_test',
   ];
 
   /**

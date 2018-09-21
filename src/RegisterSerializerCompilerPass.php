@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds services tagged 'replication_normalizer' and 'replication_encoder' to the Serializer.
+ * Adds services tagged 'relaxed_normalizer' and 'relaxed_encoder' to the Serializer.
  */
 class RegisterSerializerCompilerPass implements CompilerPassInterface {
 
@@ -27,13 +27,13 @@ class RegisterSerializerCompilerPass implements CompilerPassInterface {
     $format_providers = [];
 
     // Retrieve registered Normalizers and Encoders from the container.
-    foreach ($container->findTaggedServiceIds('replication_normalizer') as $id => $attributes) {
+    foreach ($container->findTaggedServiceIds('relaxed_normalizer') as $id => $attributes) {
       $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
       $normalizers[$priority][] = new Reference($id);
       $normalizers_id[$priority][] = $id;
     }
 
-    foreach ($container->findTaggedServiceIds('replication_encoder') as $id => $attributes) {
+    foreach ($container->findTaggedServiceIds('relaxed_encoder') as $id => $attributes) {
       $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
       $encoders[$priority][] = new Reference($id);
 
