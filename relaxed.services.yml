@@ -77,7 +77,7 @@ services:
   relaxed.normalizer.replicate:
     class: Drupal\relaxed\Normalizer\ReplicateNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 60 }
+      - { name: normalizer, priority: 60 }
     arguments: ['@relaxed.replicate']
 # Routing
   relaxed.api_resource.route_generator:
@@ -143,68 +143,68 @@ services:
     class: Drupal\relaxed\Normalizer\FileEntityNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher', '@relaxed.process_file_attachment']
     tags:
-      - { name: relaxed_normalizer, priority: 70 }
+      - { name: normalizer, priority: 70 }
   relaxed.normalizer.attachment:
     class: Drupal\relaxed\Normalizer\AttachmentNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher']
     tags:
-          - { name: relaxed_normalizer, priority: 60 }
+          - { name: normalizer, priority: 60 }
   relaxed.normalizer.workspace:
     class: Drupal\relaxed\Normalizer\WorkspaceNormalizer
     arguments: ['@entity_type.manager']
     tags:
-      - { name: relaxed_normalizer, priority: 60 }
+      - { name: normalizer, priority: 60 }
   relaxed.normalizer.taxonomy_term:
     class: Drupal\relaxed\Normalizer\TaxonomyTermNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher']
     tags:
-      - { name: relaxed_normalizer, priority: 60 }
+      - { name: normalizer, priority: 60 }
   relaxed.normalizer.replication_log:
     class: Drupal\relaxed\Normalizer\ReplicationLogNormalizer
     arguments: ['@entity_type.manager', '@multiversion.entity_index.uuid']
     tags:
-      - { name: relaxed_normalizer, priority: 60 }
+      - { name: normalizer, priority: 60 }
   relaxed.normalizer.content_entity:
     class: Drupal\relaxed\Normalizer\ContentEntityNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher']
     tags:
-      - { name: relaxed_normalizer, priority: 50 }
+      - { name: normalizer, priority: 50 }
   relaxed.normalizer.bulk_docs:
     class: Drupal\relaxed\Normalizer\BulkDocsNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 50 }
+      - { name: normalizer, priority: 50 }
   relaxed.normalizer.all_docs:
     class: Drupal\relaxed\Normalizer\AllDocsNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
     tags:
-      - { name: relaxed_normalizer, priority: 50 }
+      - { name: normalizer, priority: 50 }
   relaxed.normalizer.changes:
     class: Drupal\relaxed\Normalizer\ChangesNormalizer
     tags:
-      - { name: relaxed_normalizer }
+      - { name: normalizer }
     arguments: ['@entity.manager']
   relaxed.normalizer.revs_diff:
     class: Drupal\relaxed\Normalizer\RevsDiffNormalizer
     arguments: ['@relaxed.revisiondiff_factory']
     tags:
-      - { name: relaxed_normalizer, priority: 50 }
+      - { name: normalizer, priority: 50 }
   relaxed.normalizer.link_item:
     class: Drupal\relaxed\Normalizer\LinkItemNormalizer
     arguments: ['@entity_type.manager', '@plugin.manager.entity_reference_selection']
     tags:
-      - { name: relaxed_normalizer, priority: 40 }
+      - { name: normalizer, priority: 40 }
   relaxed.normalizer.text_item:
     class: Drupal\relaxed\Normalizer\TextItemNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 30 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.deleted_flag_item_list:
     class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 30 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.revision_info_item_list:
     class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 30 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.paragraph:
     class: Drupal\relaxed\Normalizer\ParagraphNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher']
@@ -213,11 +213,11 @@ services:
   relaxed.normalizer.entity_reference_item:
     class: Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 30 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.comment_item:
     class: Drupal\relaxed\Normalizer\CommentItemNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 30 }
+      - { name: normalizer, priority: 30 }
   relaxed.normalizer.entity_reference_quantity_item:
     class: Drupal\relaxed\Normalizer\EntityReferenceQuantityItemNormalizer
     tags:
@@ -227,37 +227,37 @@ services:
   relaxed.normalizer.timestamp_item:
     class: Drupal\serialization\Normalizer\TimestampItemNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 20 }
+      - { name: normalizer, priority: 20 }
   relaxed.normalizer.complex_data:
     class: Drupal\serialization\Normalizer\ComplexDataNormalizer
     tags:
-      - { name: relaxed_normalizer }
+      - { name: normalizer }
   relaxed.normalizer.field_item:
     class: Drupal\serialization\Normalizer\FieldItemNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 10 }
+      - { name: normalizer, priority: 10 }
   relaxed.normalizer.field:
     class: Drupal\serialization\Normalizer\FieldNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 10 }
+      - { name: normalizer, priority: 10 }
   relaxed.normalizer.list:
     class: Drupal\serialization\Normalizer\ListNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 20 }
+      - { name: normalizer, priority: 20 }
   relaxed.normalizer.password_field_item:
       class: Drupal\serialization\Normalizer\NullNormalizer
       arguments: ['Drupal\Core\Field\Plugin\Field\FieldType\PasswordItem']
       tags:
-        - { name: relaxed_normalizer, priority: 100 }
+        - { name: normalizer, priority: 100 }
   relaxed.normalizer.safe_string:
       class: Drupal\serialization\Normalizer\MarkupNormalizer
       tags:
-        - { name: relaxed_normalizer }
+        - { name: normalizer }
   relaxed.normalizer.primitive_data:
     class: Drupal\serialization\Normalizer\PrimitiveDataNormalizer
     tags:
-      - { name: relaxed_normalizer, priority: 10 }
+      - { name: normalizer, priority: 10 }
   relaxed.normalizer.typed_data:
     class: Drupal\serialization\Normalizer\TypedDataNormalizer
     tags:
-      - { name: relaxed_normalizer }
+      - { name: normalizer }
