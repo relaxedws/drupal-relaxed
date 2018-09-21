@@ -40,7 +40,7 @@ class RevisionDiffFactoryTest extends KernelTestBase {
   }
 
   public function testChangesFactory() {
-    $changes = \Drupal::service('replication.revisiondiff_factory')->get($this->workspace);
+    $changes = \Drupal::service('relaxed.revisiondiff_factory')->get($this->workspace);
     $this->assertTrue(($changes instanceof RevisionDiffInterface));
   }
 

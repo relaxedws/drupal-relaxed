@@ -54,7 +54,7 @@ class ReplicationFilterTest extends BrowserTestBase {
    */
   public function testUuidsFilter() {
     $container = \Drupal::getContainer();
-    $changes_factory = $container->get('replication.changes_factory');
+    $changes_factory = $container->get('relaxed.changes_factory');
 
     $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
@@ -85,7 +85,7 @@ class ReplicationFilterTest extends BrowserTestBase {
    */
   public function testPublishedFilter() {
     $container = \Drupal::getContainer();
-    $changes_factory = $container->get('replication.changes_factory');
+    $changes_factory = $container->get('relaxed.changes_factory');
 
     $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
@@ -117,7 +117,7 @@ class ReplicationFilterTest extends BrowserTestBase {
    */
   public function testEntityTypeFilter() {
     $container = \Drupal::getContainer();
-    $changes_factory = $container->get('replication.changes_factory');
+    $changes_factory = $container->get('relaxed.changes_factory');
 
     $this->drupalCreateContentType(['type' => 'article2', 'name' => 'Article2']);
 

@@ -59,7 +59,7 @@ class ChangesApiResource extends ApiResourceBase implements ContainerFactoryPlug
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('replication.changes_factory')
+      $container->get('relaxed.changes_factory')
     );
   }
 

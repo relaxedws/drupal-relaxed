@@ -14,7 +14,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
   public function testPostCreate() {
     $entity_types = ['entity_test_rev'];
 
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
 
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
@@ -42,7 +42,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
   public function testPostUpdate() {
     /** @var \Symfony\Component\Serializer\SerializerInterface $serializer */
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
 
     $entity_type = 'entity_test_rev';
 

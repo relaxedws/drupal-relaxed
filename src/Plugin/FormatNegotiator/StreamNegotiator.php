@@ -38,7 +38,7 @@ class StreamNegotiator extends NegotiatorBase implements ContainerFactoryPluginI
       $plugin_id,
       $plugin_definition,
       // @todo Inject a different serializer for stream stuff only.
-      $container->get('replication.serializer')
+      $container->get('relaxed.serializer')
     );
   }
 

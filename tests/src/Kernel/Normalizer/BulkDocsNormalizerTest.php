@@ -47,7 +47,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
     $this->workspaceManager = $this->container->get('workspace.manager');
 
     $this->bulkDocs = $this->container
-      ->get('replication.bulkdocs_factory')
+      ->get('relaxed.bulkdocs_factory')
       ->get($this->workspaceManager->getActiveWorkspace());
 
     $this->bulkDocs->setEntities($this->testEntities);

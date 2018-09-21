@@ -195,7 +195,7 @@ class AttachmentResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
     $file_uri = 'public://new_example.txt';
     file_put_contents($file_uri, $this->randomMachineName());
     $file_stub = File::create(['uri' => $file_uri]);

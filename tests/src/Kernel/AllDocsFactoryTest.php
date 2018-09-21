@@ -32,6 +32,7 @@ class AllDocsFactoryTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('replication_log');
     $this->installSchema('system', ['sequences']);
     $this->installSchema('key_value', ['key_value_sorted']);
@@ -43,7 +44,7 @@ class AllDocsFactoryTest extends KernelTestBase {
   }
 
   public function testAllDocsFactory() {
-    $all_docs = \Drupal::service('replication.alldocs_factory')->get($this->workspace);
+    $all_docs = \Drupal::service('relaxed.alldocs_factory')->get($this->workspace);
     $this->assertTrue(($all_docs instanceof AllDocsInterface));
   }
 

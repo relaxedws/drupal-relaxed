@@ -32,7 +32,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
 
     try {
       /** @var \Drupal\relaxed\BulkDocs\BulkDocsInterface $bulk_docs */
-      $bulk_docs = \Drupal::service('replication.bulkdocs_factory')->get($context['workspace']);
+      $bulk_docs = \Drupal::service('relaxed.bulkdocs_factory')->get($context['workspace']);
 
       if (
         (isset($data['new_edits']) && ($data['new_edits']) === FALSE) ||

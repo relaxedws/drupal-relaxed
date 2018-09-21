@@ -111,7 +111,7 @@ class ResourceController implements ContainerInjectionInterface {
     return new static(
       $container->get('plugin.manager.api_resource'),
       $container->get('plugin.manager.format_negotiator'),
-      $container->get('replication.process_file_attachment'),
+      $container->get('relaxed.process_file_attachment'),
       $container->get('renderer')
     );
   }

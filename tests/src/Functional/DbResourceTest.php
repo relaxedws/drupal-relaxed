@@ -136,7 +136,7 @@ class DbResourceTest extends ResourceTestBase {
   }
 
   public function testPost() {
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
 
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {

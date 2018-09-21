@@ -45,6 +45,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('user');
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('file');
     $this->installEntitySchema('replication_log');
     $this->installSchema('system', ['url_alias', 'router', 'key_value_expire', 'sequences']);
@@ -73,8 +74,6 @@ abstract class NormalizerTestBase extends KernelTestBase {
     ])->save();
 
     $this->serializer = $this->container->get('serializer');
-    // Create default workspace.
-    Workspace::create(['machine_name' => 'live', 'label' => 'Live', 'type' => 'basic'])->save();
   }
 
   /**

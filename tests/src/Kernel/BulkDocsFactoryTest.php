@@ -32,6 +32,7 @@ class BulkDocsFactoryTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('replication_log');
     $this->installSchema('system', ['sequences']);
     $this->installSchema('key_value', ['key_value_sorted']);
@@ -43,7 +44,7 @@ class BulkDocsFactoryTest extends KernelTestBase {
   }
 
   public function testBulkDocsFactory() {
-    $bulk_docs = \Drupal::service('replication.bulkdocs_factory')->get($this->workspace);
+    $bulk_docs = \Drupal::service('relaxed.bulkdocs_factory')->get($this->workspace);
     $this->assertTrue(($bulk_docs instanceof BulkDocsInterface));
   }
 

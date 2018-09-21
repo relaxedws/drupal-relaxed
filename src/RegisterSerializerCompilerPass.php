@@ -14,7 +14,7 @@ class RegisterSerializerCompilerPass implements CompilerPassInterface {
   /**
    * The replication serializer service name.
    */
-  const SERIALIZER_SERVICE_NAME = 'replication.serializer';
+  const SERIALIZER_SERVICE_NAME = 'relaxed.serializer';
 
   /**
    * {@inheritdoc}

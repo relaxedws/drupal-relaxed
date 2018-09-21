@@ -32,6 +32,7 @@ class ChangesFactoryTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('replication_log');
     $this->installSchema('system', ['sequences']);
     $this->installSchema('key_value', ['key_value_sorted']);
@@ -43,7 +44,7 @@ class ChangesFactoryTest extends KernelTestBase {
   }
 
   public function testChangesFactory() {
-    $changes = \Drupal::service('replication.changes_factory')->get($this->workspace);
+    $changes = \Drupal::service('relaxed.changes_factory')->get($this->workspace);
     $this->assertTrue(($changes instanceof ChangesInterface));
   }
 

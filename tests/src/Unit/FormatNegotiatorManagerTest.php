@@ -31,6 +31,7 @@ class FormatNegotiatorManagerTest extends KernelTestBase {
 
     $this->installConfig(['multiversion', 'relaxed']);
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     // Create the default workspace because the multiversion_install() hook is
     // not executed in unit tests.
     Workspace::create(['id' => 'default', 'label' => 'Default'])->save();

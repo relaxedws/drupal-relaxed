@@ -40,7 +40,7 @@ class JsonNegotiator extends NegotiatorBase implements ContainerFactoryPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('replication.serializer')
+      $container->get('relaxed.serializer')
     );
   }
 

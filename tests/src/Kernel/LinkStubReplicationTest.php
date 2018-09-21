@@ -42,6 +42,7 @@ class LinkStubReplicationTest extends KernelTestBase {
 
     $this->installEntitySchema('node');
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('replication_log');
     $this->installSchema('key_value', ['key_value_sorted']);
     $this->installSchema('system', ['sequences']);
@@ -49,7 +50,6 @@ class LinkStubReplicationTest extends KernelTestBase {
     $this->installConfig(['multiversion']);
     $this->container->get('multiversion.manager')->enableEntityTypes();
     $this->serializer = $this->container->get('serializer');
-    Workspace::create(['id' => 'live', 'label' => 'Live'])->save();
     NodeType::create(['type' => 'article_with_link', 'name' => 'article_with_link'])->save();
     NodeType::create(['type' => 'article', 'name' => 'article'])->save();
     $this->createLinkField('node', 'article_with_link', 'field_link');

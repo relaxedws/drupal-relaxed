@@ -62,8 +62,8 @@ class ReplicationTestBase extends KernelTestBase {
     parent::setUp();
     $this->installConfig(['multiversion', 'workspaces', 'relaxed', 'relaxed_test']);
     $this->installEntitySchema('workspace');
+    $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('user');
-    Workspace::create(['id' => 'live', 'label' => 'Live'])->save();
 
     $this->sourceDb = 'source';
     $this->targetDb = 'target';

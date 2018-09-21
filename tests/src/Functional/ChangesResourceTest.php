@@ -12,7 +12,7 @@ use Drupal\Component\Serialization\Json;
 class ChangesResourceTest extends ResourceTestBase {
 
   public function testGet() {
-    $serializer = \Drupal::service('replication.serializer');
+    $serializer = \Drupal::service('relaxed.serializer');
 
     // Create a user with the correct permissions.
     $permissions[] = 'administer workspaces';

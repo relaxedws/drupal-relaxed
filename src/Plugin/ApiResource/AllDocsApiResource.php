@@ -33,7 +33,7 @@ class AllDocsApiResource extends ApiResourceBase {
     /**
      * @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs
      */
-    $all_docs = \Drupal::service('replication.alldocs_factory')->get($workspace);
+    $all_docs = \Drupal::service('relaxed.alldocs_factory')->get($workspace);
     $request = Request::createFromGlobals();
     if ($request->query->get('include_docs') == 'true') {
       $all_docs->includeDocs(TRUE);

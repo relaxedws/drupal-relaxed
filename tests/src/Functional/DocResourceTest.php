@@ -214,7 +214,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
@@ -325,7 +325,7 @@ class DocResourceTest extends ResourceTestBase {
   }
 
   public function testStub() {
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type_id) {
       // Create a user with the correct permissions.

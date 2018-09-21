@@ -67,7 +67,7 @@ class LocalDocResourceTest extends ResourceTestBase {
   }
 
   public function testPut() {
-    $serializer = $this->container->get('replication.serializer');
+    $serializer = $this->container->get('relaxed.serializer');
 
     $entity_types = ['entity_test_local'];
 

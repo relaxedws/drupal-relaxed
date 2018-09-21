@@ -29,7 +29,7 @@ class UsersMapping {
    * @return int
    */
   public function getUidFromConfig() {
-    return $this->configFactory->get('replication.settings')->get('uid');
+    return $this->configFactory->get('relaxed.settings')->get('uid');
   }
 
   /**

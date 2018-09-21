@@ -14,6 +14,6 @@ final class ReplicationDataEvents {
    *  is normalized by the ContentEntityNormalizer. The event listener method
    *  receives a \Drupal\relaxed\Event\ContentDataAlterEvent instance.
    */
-  const ALTER_CONTENT_DATA = 'replication.alter.content';
+  const ALTER_CONTENT_DATA = 'relaxed.alter.content';
 
 }
