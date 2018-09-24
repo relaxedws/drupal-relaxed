@@ -74,6 +74,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
     ])->save();
 
     $this->serializer = $this->container->get('serializer');
+    $this->container->set('workspaces.manager', NULL);
   }
 
   /**

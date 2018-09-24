@@ -96,6 +96,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->entityRepository = $this->container->get('entity.repository');
     $this->revTree = $this->container->get('multiversion.entity_index.rev.tree');
+    $this->container->get('multiversion.manager')->enableEntityTypes();
+    $this->container->set('workspaces.manager', NULL);
   }
 
   /**
