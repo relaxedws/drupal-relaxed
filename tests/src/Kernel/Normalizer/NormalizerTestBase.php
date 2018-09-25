@@ -51,21 +51,10 @@ abstract class NormalizerTestBase extends KernelTestBase {
     $this->installSchema('system', ['url_alias', 'router', 'key_value_expire', 'sequences']);
     $this->installSchema('key_value', ['key_value_sorted']);
     $this->installConfig(['multiversion', 'relaxed', 'language', 'field']);
+    $module_handler = \Drupal::moduleHandler();
+    $module_handler->invoke('workspaces', 'install');
     $this->container->get('multiversion.manager')->enableEntityTypes();
     $this->container->get('router.builder')->rebuild();
-
-    // Create two workspaces by default, 'live' and 'stage'.
-    Workspace::create([
-      'id' => 'live',
-      'label' => 'Live',
-      'uid' => 1,
-    ])->save();
-
-    Workspace::create([
-      'id' => 'stage',
-      'label' => 'Stage',
-      'uid' => 1,
-    ])->save();
 
     // Auto-create a field for testing.
     FieldStorageConfig::create([
