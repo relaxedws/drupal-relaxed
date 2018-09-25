@@ -88,7 +88,7 @@ class FileEntityNormalizerTest extends NormalizerTestBase{
           ['value' => $file->getSize()],
         ],
         'status' => [
-          ['value' => FALSE],
+          ['value' => TRUE],
         ],
         'created' => [
           $this->formatExpectedTimestampItemValues($file->created->value),

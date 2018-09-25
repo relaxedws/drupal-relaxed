@@ -139,6 +139,16 @@ class LinkItemNormalizerTest extends NormalizerTestBase {
             $referenced_entity2->getEntityType()->getKey('bundle') => $referenced_entity2->bundle(),
           ],
         ],
+        'status' => [
+          ['value' => TRUE],
+        ],
+        'non_mul_field' => [],
+        'revision_default' => [
+          ['value' => TRUE]
+        ],
+        'revision_translation_affected' => [
+          ['value' => TRUE]
+        ],
       ],
       '_id' => $this->entity->uuid(),
       '_rev' => $this->entity->_rev->value,
@@ -147,19 +157,6 @@ class LinkItemNormalizerTest extends NormalizerTestBase {
         'ids' => [$hash],
       ],
     ];
-
-    // Get the minor version only from the \Drupal::VERSION string.
-    $minor_version = substr(\Drupal::VERSION, 0, 3);
-
-    if (version_compare($minor_version, '8.4', '>=')) {
-      $expected['en']['revision_translation_affected'] = [['value' => TRUE]];
-    }
-
-    if (version_compare($minor_version, '8.5', '>=')) {
-      $expected['en']['non_mul_field'] = [];
-      $expected['en']['revision_default'] = [['value' => TRUE]];
-      $expected['en']['field_test_text'][0]['processed'] = '';
-    }
 
     // Test normalize.
     $normalized = $this->serializer->normalize($this->entity);

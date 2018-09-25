@@ -16,14 +16,6 @@ class EntityReferenceItemNormalizerTest extends NormalizerTestBase {
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->installSchema('system', ['sequences']);
-  }
-
-  /**
    * Tests normalization of entity reference fields that reference users.
    *
    * @todo Write a test of user ID mapping using normalization.
@@ -85,6 +77,16 @@ class EntityReferenceItemNormalizerTest extends NormalizerTestBase {
         ],
         'non_rev_field' => [],
         'field_test_text' => [],
+        'status' => [
+          ['value' => TRUE],
+        ],
+        'non_mul_field' => [],
+        'revision_default' => [
+          ['value' => TRUE]
+        ],
+        'revision_translation_affected' => [
+          ['value' => TRUE]
+        ],
       ],
       '_id' => $entity->uuid(),
       '_rev' => $entity->_rev->value,
@@ -93,18 +95,6 @@ class EntityReferenceItemNormalizerTest extends NormalizerTestBase {
         'ids' => [$hash],
       ],
     ];
-
-    // Get the minor version only from the \Drupal::VERSION string.
-    $minor_version = substr(\Drupal::VERSION, 0, 3);
-
-    if (version_compare($minor_version, '8.4', '>=')) {
-      $expected['en']['revision_translation_affected'] = [['value' => TRUE]];
-    }
-
-    if (version_compare($minor_version, '8.5', '>=')) {
-      $expected['en']['non_mul_field'] = [];
-      $expected['en']['revision_default'] = [['value' => TRUE]];
-    }
 
     // Test normalize.
     $normalized = $this->serializer->normalize($entity);
