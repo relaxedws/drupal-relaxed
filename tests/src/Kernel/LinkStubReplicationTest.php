@@ -49,7 +49,7 @@ class LinkStubReplicationTest extends KernelTestBase {
     $this->installSchema('node', ['node_access']);
     $this->installConfig(['multiversion']);
     $this->container->get('multiversion.manager')->enableEntityTypes();
-    $this->serializer = $this->container->get('serializer');
+    $this->serializer = $this->container->get('relaxed.serializer');
     NodeType::create(['type' => 'article_with_link', 'name' => 'article_with_link'])->save();
     NodeType::create(['type' => 'article', 'name' => 'article'])->save();
     $this->createLinkField('node', 'article_with_link', 'field_link');
