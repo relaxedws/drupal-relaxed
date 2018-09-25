@@ -44,7 +44,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
     parent::setUp();
     $this->testEntities = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
 
-    $this->workspaceManager = $this->container->get('workspace.manager');
+    $this->workspaceManager = $this->container->get('workspaces.manager');
 
     $this->bulkDocs = $this->container
       ->get('relaxed.bulkdocs_factory')

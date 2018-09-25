@@ -166,7 +166,7 @@ class LinkItemNormalizerTest extends NormalizerTestBase {
     $this->assertEquals(array_diff_key($normalized, $expected), [], 'No unexpected data is added to the normalized array.');
 
     // Test denormalize.
-    $context = ['workspace' => $this->container->get('workspace.manager')->getActiveWorkspace()];
+    $context = ['workspace' => $this->container->get('workspaces.manager')->getActiveWorkspace()];
     $denormalized = $this->serializer->denormalize($normalized, $this->entityClass, 'json', $context);
     $this->assertTrue($denormalized instanceof $this->entityClass, new FormattableMarkup('Denormalized entity is an instance of @class', ['@class' => $this->entityClass]));
     $this->assertSame($denormalized->getEntityTypeId(), $this->entity->getEntityTypeId(), 'Expected entity type found.');
