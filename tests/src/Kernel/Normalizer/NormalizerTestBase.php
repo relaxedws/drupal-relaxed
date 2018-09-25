@@ -54,6 +54,19 @@ abstract class NormalizerTestBase extends KernelTestBase {
     $this->container->get('multiversion.manager')->enableEntityTypes();
     $this->container->get('router.builder')->rebuild();
 
+    // Create two workspaces by default, 'live' and 'stage'.
+    Workspace::create([
+      'id' => 'live',
+      'label' => 'Live',
+      'uid' => 1,
+    ])->save();
+
+    Workspace::create([
+      'id' => 'stage',
+      'label' => 'Stage',
+      'uid' => 1,
+    ])->save();
+
     // Auto-create a field for testing.
     FieldStorageConfig::create([
       'entity_type' => 'entity_test_mulrev',

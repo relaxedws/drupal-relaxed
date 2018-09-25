@@ -122,7 +122,7 @@ services:
 #Serializers
   relaxed.serializer:
     class: Symfony\Component\Serializer\Serializer
-    arguments: [{  }, { }]
+    arguments: [{  }, {  }]
 
 #Encoders
   relaxed.encoder.json:
@@ -221,7 +221,7 @@ services:
   relaxed.normalizer.entity_reference_quantity_item:
     class: Drupal\relaxed\Normalizer\EntityReferenceQuantityItemNormalizer
     tags:
-    - { name: normalizer, priority: 60 }
+    - { name: relaxed_normalizer, priority: 60 }
 
 #Core Normalizers
   relaxed.normalizer.timestamp_item:

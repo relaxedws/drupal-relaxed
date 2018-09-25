@@ -28,12 +28,13 @@ class RegisterSerializerCompilerPass implements CompilerPassInterface {
 
     // Retrieve registered Normalizers and Encoders from the container.
     foreach ($container->findTaggedServiceIds('relaxed_normalizer') as $id => $attributes) {
+      $container->getDefinition($id)->setPublic(FALSE);
       $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
       $normalizers[$priority][] = new Reference($id);
-      $normalizers_id[$priority][] = $id;
     }
 
     foreach ($container->findTaggedServiceIds('relaxed_encoder') as $id => $attributes) {
+      $container->getDefinition($id)->setPublic(FALSE);
       $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
       $encoders[$priority][] = new Reference($id);
 
