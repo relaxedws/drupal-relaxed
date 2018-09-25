@@ -25,10 +25,10 @@ class AllDbsResourceTest extends ResourceTestBase {
     }
 
     for ($i = 0; $i < 3; $i++) {
-      $machine_name = $this->randomMachineName();
-      $entity = Workspace::create(['id' => $machine_name, 'label' => $machine_name]);
+      $id = $this->randomMachineName();
+      $entity = Workspace::create(['id' => $id, 'label' => $id]);
       $entity->save();
-      $workspaces[] = $machine_name;
+      $workspaces[] = $id;
     }
 
     $response = $this->httpRequest('_all_dbs', 'GET');

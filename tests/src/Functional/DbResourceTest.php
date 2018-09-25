@@ -33,7 +33,7 @@ class DbResourceTest extends ResourceTestBase {
     /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->getMachineName(), 'HEAD', NULL);
+    $this->httpRequest($workspace->id(), 'HEAD', NULL);
     $this->assertResponse('404', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertTrue(empty($response), 'HEAD request returned no body.');
@@ -78,7 +78,7 @@ class DbResourceTest extends ResourceTestBase {
     /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->getMachineName(), 'GET', NULL);
+    $this->httpRequest($workspace->id(), 'GET', NULL);
     $this->assertResponse('404', 'HTTP response code is correct.');
 
   }
@@ -91,12 +91,12 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     // Test using an invalid machine name
-    $machine_name = 'A!"£%^&*{}#~@?';
-    $response = $this->httpRequest($machine_name, 'PUT', NULL);
+    $id = 'A!"£%^&*{}#~@?';
+    $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('404', 'HTTP response code is correct for invalid database');
 
-    $machine_name = strtolower($this->randomMachineName());
-    $response = $this->httpRequest($machine_name, 'PUT', NULL);
+    $id = strtolower($this->randomMachineName());
+    $response = $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
@@ -106,7 +106,7 @@ class DbResourceTest extends ResourceTestBase {
     $entity->save();
 
     // Test putting an existing workspace.
-    $response = $this->httpRequest($entity->getMachineName(), 'PUT', NULL);
+    $response = $this->httpRequest($entity->id(), 'PUT', NULL);
     $this->assertResponse('412', 'HTTP response code is correct for existing database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['error']), 'PUT request returned error.');
@@ -131,7 +131,7 @@ class DbResourceTest extends ResourceTestBase {
     /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->getMachineName(), 'PUT', NULL);
+    $this->httpRequest($workspace->id(), 'PUT', NULL);
     $this->assertResponse('404', 'HTTP response code is correct.');
   }
 
@@ -179,7 +179,7 @@ class DbResourceTest extends ResourceTestBase {
       /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
       $workspace = $this->createWorkspace($this->randomMachineName());
       $workspace->setUnpublished()->save();
-      $this->httpRequest($workspace->getMachineName(), 'POST', $serialized);
+      $this->httpRequest($workspace->id(), 'POST', $serialized);
       $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
@@ -191,11 +191,11 @@ class DbResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $machine_name = $this->randomMachineName();
-    $entity = $this->createWorkspace($machine_name);
+    $id = $this->randomMachineName();
+    $entity = $this->createWorkspace($id);
     $entity->save();
 
-    $response = $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
+    $response = $this->httpRequest($entity->id(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct for new database');
     $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
@@ -206,28 +206,28 @@ class DbResourceTest extends ResourceTestBase {
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
 
     // Create a new workspace.
-    $machine_name = $this->randomMachineName();
-    $entity = $this->createWorkspace($machine_name);
+    $id = $this->randomMachineName();
+    $entity = $this->createWorkspace($id);
     $entity->save();
 
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
+    $this->httpRequest($entity->id(), 'DELETE', NULL);
     $this->assertResponse('403', 'HTTP response code is correct.');
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->getMachineName(), 'DELETE', NULL);
+    $this->httpRequest($entity->id(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
 
     /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
     $workspace = $this->createWorkspace($this->randomMachineName());
     $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->getMachineName(), 'DELETE', NULL);
+    $this->httpRequest($workspace->id(), 'DELETE', NULL);
     $this->assertResponse('500', 'HTTP response code is correct.');
   }
 

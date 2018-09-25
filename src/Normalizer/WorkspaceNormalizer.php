@@ -42,9 +42,7 @@ class WorkspaceNormalizer extends NormalizerBase implements DenormalizerInterfac
     $context['entity_type'] = 'workspace';
 
     $return_data = [];
-    if ($machine_name = (string) $entity->getMachineName()) {
-      $return_data['db_name'] = $machine_name;
-    }
+    $return_data['db_name'] = $entity->id();
 
     if ($update_seq = $entity->getUpdateSeq()) {
       $return_data['update_seq'] = (int) $update_seq;
@@ -66,7 +64,7 @@ class WorkspaceNormalizer extends NormalizerBase implements DenormalizerInterfac
    */
   public function denormalize($data, $class, $format = NULL, array $context = []) {
     if (isset($data['db_name'])) {
-      $data['machine_name'] = $data['db_name'];
+      $data['id'] = $data['db_name'];
       unset($data['db_name']);
     }
     if (isset($data['instance_start_time'])) {

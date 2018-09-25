@@ -35,7 +35,7 @@ class RevisionDiffFactoryTest extends KernelTestBase {
     $this->installConfig(['multiversion']);
     \Drupal::service('multiversion.manager')->enableEntityTypes();
 
-    $this->workspace = Workspace::create(['machine_name' => 'default', 'type' => 'basic']);
+    $this->workspace = Workspace::create(['id' => 'default']);
     $this->workspace->save();
   }
 

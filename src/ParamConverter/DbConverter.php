@@ -22,9 +22,9 @@ class DbConverter implements ParamConverterInterface {
   }
 
   /**
-   * Converts a machine name into an existing workspace entity.
+   * Converts an ID into an existing workspace entity.
    *
-   * @param string $machine_name
+   * @param string $id
    *   The raw value.
    * @param mixed $definition
    *   The parameter definition provided in the route options.
@@ -35,14 +35,14 @@ class DbConverter implements ParamConverterInterface {
    *
    * @return \Drupal\Core\Entity\EntityInterface
    */
-  public function convert($machine_name, $definition, $name, array $defaults) {
-    $workspace = Workspace::load($machine_name);
+  public function convert($id, $definition, $name, array $defaults) {
+    $workspace = Workspace::load($id);
     if (!$workspace) {
       $methods = $defaults['_route_object']->getMethods();
       if (in_array('PUT', $methods) && $defaults['_api_resource'] == 'db') {
         $workspace = Workspace::create([
-          'machine_name' => $machine_name,
-          'label' => ucfirst($machine_name),
+          'id' => $id,
+          'label' => ucfirst($id),
         ]);
       }
     }
