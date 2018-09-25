@@ -42,17 +42,12 @@ class WorkspaceNormalizer extends NormalizerBase implements DenormalizerInterfac
     $context['entity_type'] = 'workspace';
 
     $return_data = [];
-    $return_data['db_name'] = $entity->id();
+    $id = $entity->id();
+    $return_data['db_name'] = $id;
 
-    if ($update_seq = $entity->getUpdateSeq()) {
-      $return_data['update_seq'] = (int) $update_seq;
-    }
-    else {
-      // Replicator expects update_seq to be always set.
-      $return_data['update_seq'] = 0;
-    }
+    $return_data['update_seq'] = (int) \Drupal::service('multiversion.entity_index.sequence')->useWorkspace($id)->getLastSequenceId();
 
-    if ($created = (string) $entity->getStartTime()) {
+    if ($created = (string) $entity->created->value) {
       $return_data['instance_start_time'] = $created;
     }
 
@@ -71,12 +66,6 @@ class WorkspaceNormalizer extends NormalizerBase implements DenormalizerInterfac
       $data['created'] = $data['instance_start_time'];
       unset($data['instance_start_time']);
     }
-    $workspace_types = WorkspaceType::loadMultiple();
-    $workspace_type = reset($workspace_types);
-    if (!($workspace_type instanceof WorkspaceTypeInterface)) {
-      throw new \Exception('Invalid workspace type.');
-    }
-    $data['type'] = $workspace_type->id();
     return $this->entityTypeManager->getStorage('workspace')->create($data);
   }
 }
