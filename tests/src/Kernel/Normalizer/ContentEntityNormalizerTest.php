@@ -93,7 +93,18 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           [
             'value' => $this->values['field_test_text']['value'],
             'format' => $this->values['field_test_text']['format'],
+            'processed' => '',
           ],
+        ],
+        'status' => [
+          ['value' => TRUE],
+        ],
+        'non_mul_field' => [],
+        'revision_default' => [
+          ['value' => TRUE]
+        ],
+        'revision_translation_affected' => [
+          ['value' => TRUE]
         ],
       ],
       'ro' => [
@@ -126,7 +137,18 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
           [
             'value' => $this->values['field_test_text']['value'] . '_ro',
             'format' => $this->values['field_test_text']['format'],
+            'processed' => '',
           ],
+        ],
+        'status' => [
+          ['value' => TRUE],
+        ],
+        'non_mul_field' => [],
+        'revision_default' => [
+          ['value' => TRUE]
+        ],
+        'revision_translation_affected' => [
+          ['value' => TRUE]
         ],
       ],
       '_id' => $this->entity->uuid(),
@@ -136,23 +158,6 @@ class ContentEntityNormalizerTest extends NormalizerTestBase {
         'ids' => $revs,
       ],
     ];
-
-    // Get the minor version only from the \Drupal::VERSION string.
-    $minor_version = substr(\Drupal::VERSION, 0, 3);
-
-    if (version_compare($minor_version, '8.4', '>=')) {
-      $expected['en']['revision_translation_affected'] = [['value' => TRUE]];
-      $expected['ro']['revision_translation_affected'] = [['value' => TRUE]];
-    }
-
-    if (version_compare($minor_version, '8.5', '>=')) {
-      $expected['en']['non_mul_field'] = [];
-      $expected['en']['revision_default'] = [['value' => TRUE]];
-      $expected['en']['field_test_text'][0]['processed'] = '';
-      $expected['ro']['non_mul_field'] = [];
-      $expected['ro']['revision_default'] = [['value' => TRUE]];
-      $expected['ro']['field_test_text'][0]['processed'] = '';
-    }
 
     $normalized = $this->serializer->normalize($this->entity);
 
