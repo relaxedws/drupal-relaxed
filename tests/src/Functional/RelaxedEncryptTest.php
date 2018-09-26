@@ -54,7 +54,7 @@ class RelaxedEncryptTest extends BrowserTestBase {
 
     // Add a replication username and password, enable encryption and set
     // encryption profile.
-    $this->drupalGet('/admin/config/relaxed/settings');
+    $this->drupalGet('/admin/config/workflow/relaxed');
     $page = $this->getSession()->getPage();
     $page->fillField('edit-username', 'replication_user');
     $page->fillField('edit-password', 'replication_password');

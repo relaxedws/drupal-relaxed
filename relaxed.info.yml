@@ -9,5 +9,5 @@ dependencies:
   - drupal:basic_auth
   - multiversion:multiversion (>=8.x-2.x)
 test_dependencies:
-  - key
-  - encrypt
+  - key:key
+  - encrypt:encrypt

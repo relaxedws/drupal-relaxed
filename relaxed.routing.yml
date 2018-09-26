@@ -28,4 +28,3 @@ relaxed.settings_form:
     _permission: 'access administration pages'
   options:
     _admin_route: TRUE
-
