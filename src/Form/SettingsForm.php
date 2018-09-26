@@ -6,6 +6,8 @@ use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -237,7 +239,7 @@ class SettingsForm extends ConfigFormBase {
         // Warn the user when altering encryption settings to update remote
         // settings.
         $args = [
-          '@remotes' => \Drupal::l('relaxed remotes', Url::fromRoute('entity.remote.collection')),
+          '@remotes' => Link::fromTextAndUrl('relaxed remotes', Url::fromRoute('entity.remote.collection')),
         ];
         drupal_set_message(t('All @remotes must be updated when altering the encryption settings.', $args), 'warning');
       }
