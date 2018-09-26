@@ -105,7 +105,7 @@ class DbApiResource extends ApiResourceBase {
     // If the workspace parameter is a string it means it could not be upcasted
     // to an entity because none existed.
     if (!$workspace instanceof WorkspaceInterface) {
-      throw new NotFoundHttpException(t('Database does not exist'));
+      throw new NotFoundHttpException(t('Workspace does not exist'));
     }
     elseif (empty($entity)) {
       throw new BadRequestHttpException(t('No content received'));

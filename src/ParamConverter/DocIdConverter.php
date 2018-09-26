@@ -2,7 +2,7 @@
 
 namespace Drupal\relaxed\ParamConverter;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Drupal\multiversion\Entity\Index\RevisionIndexInterface;
 use Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface;
@@ -12,9 +12,9 @@ use Symfony\Component\Routing\Route;
 class DocIdConverter implements ParamConverterInterface {
 
   /**
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
@@ -32,13 +32,13 @@ class DocIdConverter implements ParamConverterInterface {
   protected $revTree;
 
   /**
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\multiversion\Entity\Index\UuidIndexInterface $uuid_index
    * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
    * @param \Drupal\multiversion\Entity\Index\RevisionTreeIndexInterface $rev_tree
    */
-  public function __construct(EntityManagerInterface $entity_manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, RevisionTreeIndexInterface $rev_tree) {
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, UuidIndexInterface $uuid_index, RevisionIndexInterface $rev_index, RevisionTreeIndexInterface $rev_tree) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->uuidIndex = $uuid_index;
     $this->revIndex = $rev_index;
     $this->revTree = $rev_tree;
@@ -59,6 +59,8 @@ class DocIdConverter implements ParamConverterInterface {
    * @return string | \Drupal\Core\Entity\EntityInterface[]
    *   An array of the entity or entity revisions that was requested, if
    *   existing, or else the original UUID string.
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @todo {@link https://www.drupal.org/node/2600374 Add test to make sure empty arrays are never returned.}
    * @todo {@link https://www.drupal.org/node/2600370 Fall back to a stub entity instead of UUID string.}
    */
@@ -92,7 +94,7 @@ class DocIdConverter implements ParamConverterInterface {
       return $uuid;
     }
 
-    $storage = $this->entityManager->getStorage($entity_type_id);
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
     if ($open_revs_query && in_array($request->getMethod(), ['GET', 'HEAD'])) {
       $open_revs = [];
       if ($open_revs_query == 'all') {

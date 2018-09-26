@@ -2,8 +2,8 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
+use Drupal\workspaces\WorkspaceInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -20,14 +20,14 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class RevsDiffApiResource extends ApiResourceBase {
 
   /**
-   * @param string | \Drupal\multiversion\Entity\WorkspaceInterface $workspace
-   * @param \Drupal\replication\RevisionDiff\RevisionDiffInterface $revs_diff
+   * @param $workspace
+   * @param $revs_diff
    *
    * @return \Drupal\relaxed\Http\ApiResourceResponse
    */
   public function post($workspace, $revs_diff) {
     if (!$workspace instanceof WorkspaceInterface) {
-      throw new BadRequestHttpException(t('Database does not exist'));
+      throw new BadRequestHttpException(t('Workspace does not exist'));
     }
     if (empty($revs_diff)) {
       throw new BadRequestHttpException(t('No content info received'));

@@ -17,13 +17,13 @@ class RootResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest('', 'GET', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $response = $this->httpRequest('', 'GET');
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
 
     $request = \Drupal::request();
-    $uuid = $uuid = MD5($request->getHost() . $request->getPort());
+    $uuid = MD5($request->getHost() . $request->getPort());
     $expected = [
       'couchdb' => 'Welcome',
       'uuid' => $uuid,
@@ -33,7 +33,7 @@ class RootResourceTest extends ResourceTestBase {
       ],
       'version' => \Drupal::VERSION,
     ];
-    $this->assertIdentical($expected, $data, ('Correct values in response.'));
+    $this->assertSame($expected, $data, ('Correct values in response.'));
   }
 
 }

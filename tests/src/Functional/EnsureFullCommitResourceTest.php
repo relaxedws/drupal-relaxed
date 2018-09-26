@@ -18,14 +18,14 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
-    $response = $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST', NULL);
+    $response = $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST');
     $this->assertEquals('201', $response->getStatusCode());
     $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
     $data = Json::decode($response->getBody());
 
     $expected = [
       'ok' => TRUE,
-      'instance_start_time' => (string) $this->workspace->getCreatedTime(),
+      'instance_start_time' => (string) $this->workspace->created->value,
     ];
     $this->assertSame($expected, $data, ('Correct values in response.'));
 
@@ -33,7 +33,7 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST', NULL);
+    $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST');
     $this->assertEquals('403', $response->getStatusCode());
   }
 

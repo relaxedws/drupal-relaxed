@@ -32,7 +32,7 @@ services:
 # Param converters
   paramconverter.docid:
     class: Drupal\relaxed\ParamConverter\DocIdConverter
-    arguments: ['@entity.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev', '@multiversion.entity_index.rev.tree']
     tags:
       - { name: paramconverter, priority: 30 }
   paramconverter.db:
@@ -42,7 +42,7 @@ services:
       - { name: paramconverter, priority: 20 }
   paramconverter.entity_uuid:
     class: Drupal\relaxed\ParamConverter\EntityUuidConverter
-    arguments: ['@entity.manager', '@multiversion.entity_index.uuid']
+    arguments: ['@entity_type.manager', '@multiversion.entity_index.uuid']
     tags:
       - { name: paramconverter, priority: 20 }
 

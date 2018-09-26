@@ -17,6 +17,8 @@ class SessionApiResource extends ApiResourceBase {
 
   /**
    * @return \Drupal\relaxed\Http\ApiResourceResponse
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function get() {
     $account = \Drupal::currentUser();

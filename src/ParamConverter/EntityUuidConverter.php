@@ -39,8 +39,11 @@ class EntityUuidConverter implements ParamConverterInterface {
    *   The name of the parameter.
    * @param array $defaults
    *   The route defaults array.
+   *
    * @return string | \Drupal\Core\Entity\EntityInterface
    *   The entity if it exists in the database or else the original UUID string.
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function convert($uuid, $definition, $name, array $defaults) {
     $entity_type_id = substr($definition['type'], strlen('entity_uuid:'));

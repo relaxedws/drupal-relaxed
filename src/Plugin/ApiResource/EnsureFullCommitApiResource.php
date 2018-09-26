@@ -2,8 +2,8 @@
 
 namespace Drupal\relaxed\Plugin\ApiResource;
 
-use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Http\ApiResourceResponse;
+use Drupal\workspaces\WorkspaceInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -24,12 +24,12 @@ class EnsureFullCommitApiResource extends ApiResourceBase {
 
   public function post($workspace) {
     if (!$workspace instanceof WorkspaceInterface) {
-      throw new BadRequestHttpException(t('Database does not exist'));
+      throw new BadRequestHttpException(t('Workspace does not exist'));
     }
 
     $response_data = [
       'ok' => TRUE,
-      'instance_start_time' => (string) $workspace->getStartTime(),
+      'instance_start_time' => (string) $workspace->created->value,
     ];
 
     return new ApiResourceResponse($response_data, 201);
