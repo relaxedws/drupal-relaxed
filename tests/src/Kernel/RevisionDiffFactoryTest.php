@@ -31,6 +31,9 @@ class RevisionDiffFactoryTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
+    $this->installEntitySchema('workspace');
+    $this->installEntitySchema('replication_log');
+    $this->installSchema('system', ['key_value_expire', 'sequences']);
     $this->installSchema('key_value', ['key_value_sorted']);
     $this->installConfig(['multiversion']);
     \Drupal::service('multiversion.manager')->enableEntityTypes();
