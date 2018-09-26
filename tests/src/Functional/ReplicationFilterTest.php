@@ -35,6 +35,11 @@ class ReplicationFilterTest extends BrowserTestBase {
   protected $user;
 
   /**
+   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   */
+  protected $workspacesManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -44,6 +49,8 @@ class ReplicationFilterTest extends BrowserTestBase {
     if ($this->profile != 'standard') {
       $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     }
+
+    $this->workspacesManager = $this->container->get('workspaces.manager');
 
     $this->user = $this->drupalCreateUser(['administer workspaces']);
     $this->drupalLogin($this->user);
@@ -58,13 +65,13 @@ class ReplicationFilterTest extends BrowserTestBase {
 
     $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
+    $this->workspacesManager->setActiveWorkspace($workspace);
 
     $entity1 = Node::create([
       'type' => 'article',
       'title' => 'Test Entity 1',
       'uid' => $this->user->id(),
     ]);
-    $entity1->workspace = $workspace;
     $entity1->save();
 
     $entity2 = Node::create([
@@ -72,7 +79,6 @@ class ReplicationFilterTest extends BrowserTestBase {
       'title' => 'Test Entity 2',
       'uid' => $this->user->id(),
     ]);
-    $entity2->workspace = $workspace;
     $entity2->save();
 
     $parameters = ['uuids' => [$entity1->uuid()]];
@@ -89,6 +95,7 @@ class ReplicationFilterTest extends BrowserTestBase {
 
     $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
+    $this->workspacesManager->setActiveWorkspace($workspace);
 
     $entity1 = Node::create([
       'type' => 'article',
@@ -96,7 +103,6 @@ class ReplicationFilterTest extends BrowserTestBase {
       'uid' => $this->user->id(),
       'status' => TRUE,
     ]);
-    $entity1->workspace = $workspace;
     $entity1->save();
 
     $entity2 = Node::create([
@@ -105,7 +111,6 @@ class ReplicationFilterTest extends BrowserTestBase {
       'uid' => $this->user->id(),
       'status' => FALSE,
     ]);
-    $entity2->workspace = $workspace;
     $entity2->save();
 
     $changes = $changes_factory->get($workspace)->filter('published')->getNormal();
@@ -123,6 +128,7 @@ class ReplicationFilterTest extends BrowserTestBase {
 
     $workspace = Workspace::create(['id' => 'default', 'label' => 'Default']);
     $workspace->save();
+    $this->workspacesManager->setActiveWorkspace($workspace);
 
     $entity1 = Node::create([
       'type' => 'article',
@@ -130,7 +136,6 @@ class ReplicationFilterTest extends BrowserTestBase {
       'uid' => $this->user->id(),
       'status' => TRUE,
     ]);
-    $entity1->workspace = $workspace;
     $entity1->save();
 
     $entity2 = Node::create([
@@ -139,7 +144,6 @@ class ReplicationFilterTest extends BrowserTestBase {
       'uid' => $this->user->id(),
       'status' => FALSE,
     ]);
-    $entity2->workspace = $workspace;
     $entity2->save();
 
     $parameters = ['types' => ['node.article']];
