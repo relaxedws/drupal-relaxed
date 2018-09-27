@@ -27,10 +27,10 @@ env:
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=2.0-dev
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.5.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.4.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=2.0-dev
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.4.x.make.yml COUCHDB_VERSION=1.6.1
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.4.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.6.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=1.6.1
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
 
 notifications:
   slack: det:YiOiwfzUBtt9aTnWvocK8uDI
