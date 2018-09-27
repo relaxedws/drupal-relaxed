@@ -55,7 +55,7 @@ before_install:
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
   - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
-  - composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade; fi
+  - composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade
 
 script:
   - cd ~/www && bash $SCRIPT
