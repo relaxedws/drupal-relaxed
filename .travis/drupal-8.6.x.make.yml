@@ -4,7 +4,7 @@ core: 8.x
 
 projects:
   drupal:
-    version: 8.4.x
+    version: 8.6.x
     patch:
       text-processed-fix: https://www.drupal.org/files/issues/2018-05-15/text-processed-fix.patch
   key_value: 1.x
