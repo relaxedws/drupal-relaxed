@@ -160,10 +160,10 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     }
 
     // Finally we remove certain fields that are "local" to this host.
-    unset($data['workspace'], $data[$id_key], $data[$revision_key], $data[$uuid_key]);
+    unset($data[$id_key], $data[$revision_key], $data[$uuid_key]);
     foreach ($entity_languages as $entity_language) {
       $langcode = $entity_language->getId();
-      unset($data[$langcode]['workspace'], $data[$langcode][$id_key], $data[$langcode][$revision_key], $data[$langcode][$uuid_key]);
+      unset($data[$langcode][$id_key], $data[$langcode][$revision_key], $data[$langcode][$uuid_key]);
     }
 
     $event = new ReplicationContentDataAlterEvent($entity, $data, $format, $context);
@@ -459,12 +459,6 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
             $target_entity = $selection_instance
               ->createNewEntity($target_entity_type_id, $target_bundle_id, rand(), 1);
 
-            // Set the target workspace if we have it in context.
-            if (isset($context['workspace'])
-              && ($context['workspace'] instanceof WorkspaceInterface)
-              && $target_entity->getEntityType()->get('workspace') !== FALSE) {
-              $target_entity->workspace->target_id = $context['workspace']->id();
-            }
             // Set the UUID to what we received to ensure it gets updated when
             // the full entity comes around later.
             $target_entity->uuid->value = $target_entity_uuid;

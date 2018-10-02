@@ -83,23 +83,23 @@ class BulkDocsResourceTest extends ResourceTestBase {
     foreach ($output as $key => $value) {
       $entity_number = $key+1;
       $this->assertTrue(isset($value['rev']), "POST request returned a revision hash for entity number $entity_number.");
-      $this->assertEqual($value['id'], $entities[$key]->uuid->value, "POST request returned correct ID for entity number $entity_number.");
+      $this->assertEquals($value['id'], $entities[$key]->uuid->value, "POST request returned correct ID for entity number $entity_number.");
     }
 
     foreach ($input['docs'] as $key => $value) {
       $entity_number = $key+1;
       $entity = $this->entityRepository->loadEntityByUuid($entity_type, $value['_id']);
       if ($key == 1) {
-        $this->assertEqual($entity, NULL, "Entity number $entity_number has been deleted.");
+        $this->assertEquals($entity, NULL, "Entity number $entity_number has been deleted.");
       }
       else {
-        $this->assertEqual(
+        $this->assertEquals(
           $entity->get('field_test_text')->value,
           $input['docs'][$key]['en']['field_test_text'][0]['value'],
           "Correct value for 'field_test_text' for entity number $entity_number."
         );
         list($count) = explode('-', $entity->_rev->value);
-        $this->assertEqual($count, 2, "Entity number $entity_number has two revisions.");
+        $this->assertEquals($count, 2, "Entity number $entity_number has two revisions.");
       }
     }
 
@@ -133,7 +133,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
       $new_rev = $entity_info['rev'];
       $old_rev = $patched_entities['docs'][$key]->_rev->value;
-      $this->assertEqual($new_rev, $old_rev, "POST request returned unchanged revision ID for entity number $entity_number.");
+      $this->assertEquals($new_rev, $old_rev, "POST request returned unchanged revision ID for entity number $entity_number.");
     }
 
   }
@@ -144,8 +144,9 @@ class BulkDocsResourceTest extends ResourceTestBase {
   protected function createTestEntities($entity_type, $save = FALSE, $number = 3) {
     $entities = [];
 
+    $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
     while ($number >= 1) {
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $storage->create();
       if ($save) {
         $entity->save();
       }

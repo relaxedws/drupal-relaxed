@@ -77,7 +77,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
       return $entity;
     }
     catch(\Exception $e) {
-      watchdog_exception('Replication', $e);
+      watchdog_exception('Relaxed', $e);
     }
   }
 

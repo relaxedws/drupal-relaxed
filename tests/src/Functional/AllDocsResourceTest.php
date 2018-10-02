@@ -27,7 +27,7 @@ class AllDocsResourceTest extends ResourceTestBase {
     $entities = [];
     $entity_types = ['entity_test_rev'];
     foreach ($entity_types as $entity_type) {
-      $storage = $this->entityTypeManager->getStorage($entity_type);
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
       $entities[0] = $storage->create();
       $entities[0]->save();
       $entities[1] = $storage->create();
@@ -54,18 +54,18 @@ class AllDocsResourceTest extends ResourceTestBase {
     ];
 
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET');
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
     usort($data['rows'], function($a, $b) {
       return ($a['id'] > $b['id']) ? +1 : -1;
     });
-    $this->assertEqual($expected['offset'], $data['offset'], "Correct value for offset key when not including docs.");
-    $this->assertEqual($expected['total_rows'], $data['total_rows'], "Correct value for total_rows key when not including docs.");
-    $this->assertEqual(count($expected['rows']), count($data['rows']), "Correct number of rows when not including docs.");
+    $this->assertEquals($expected['offset'], $data['offset'], "Correct value for offset key when not including docs.");
+    $this->assertEquals($expected['total_rows'], $data['total_rows'], "Correct value for total_rows key when not including docs.");
+    $this->assertEquals(count($expected['rows']), count($data['rows']), "Correct number of rows when not including docs.");
 
     foreach (array_keys($data['rows']) as $key) {
-      $this->assertEqual($expected['rows'][$key], $data['rows'][$key], "Correct value for $key key when not including docs.");
+      $this->assertEquals($expected['rows'][$key], $data['rows'][$key], "Correct value for $key key when not including docs.");
     }
 
     // Test with including docs.
@@ -90,18 +90,18 @@ class AllDocsResourceTest extends ResourceTestBase {
     ];
 
     $response = $this->httpRequest("$this->dbname/_all_docs", 'GET', NULL, NULL, NULL, ['include_docs' => 'true']);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response->getBody());
     usort($data['rows'], function($a, $b) {
       return ($a['id'] > $b['id']) ? +1 : -1;
     });
-    $this->assertEqual($expected['offset'], $data['offset'], "Correct value for offset key when including docs.");
-    $this->assertEqual($expected['total_rows'], $data['total_rows'], "Correct value for total_rows key when including docs.");
-    $this->assertEqual(count($expected['rows']), count($data['rows']), "Correct number of rows when including docs.");
+    $this->assertEquals($expected['offset'], $data['offset'], "Correct value for offset key when including docs.");
+    $this->assertEquals($expected['total_rows'], $data['total_rows'], "Correct value for total_rows key when including docs.");
+    $this->assertEquals(count($expected['rows']), count($data['rows']), "Correct number of rows when including docs.");
 
     foreach (array_keys($data['rows']) as $key) {
-      $this->assertEqual($expected['rows'][$key], $data['rows'][$key], "Correct value for $key key when including docs.");
+      $this->assertEquals($expected['rows'][$key], $data['rows'][$key], "Correct value for $key key when including docs.");
     }
   }
 

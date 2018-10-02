@@ -75,13 +75,14 @@ class StubTest extends BrowserTestBase {
     $entity = $serializer->deserialize(json_encode($normalized), '\Drupal\entity_test\Entity\EntityTestMulRev', 'json');
 
     $violations = $entity->validate();
-    $this->assertEqual(0, count($violations), 'There are no validation violations.');
+    $this->assertEquals(0, count($violations), 'There are no validation violations.');
 
     $entity->save();
 
     // Ensure that the references entity way created.
     $references = $entity_type_manager
       ->getStorage('entity_test_mulrev')
+      ->useWorkspace($this->workspace->id())
       ->loadByProperties(['uuid' => '0aec21a0-8e36-11e5-8994-feff819cdc9f']);
     $reference = reset($references);
 
@@ -91,9 +92,10 @@ class StubTest extends BrowserTestBase {
     // Ensure that we now have the correct number of entities in the system.
     $entities = $entity_type_manager
       ->getStorage('entity_test_mulrev')
+      ->useWorkspace($this->workspace->id())
       ->loadMultiple();
 
-    $this->assertEqual(2, count($entities), 'There total of entities is correct.');
+    $this->assertEquals(2, count($entities), 'There total of entities is correct.');
   }
 
 }

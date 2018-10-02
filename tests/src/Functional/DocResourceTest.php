@@ -32,7 +32,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->httpRequest("$this->dbname/bogus", 'HEAD', NULL);
       $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $first_rev = $entity->_rev->value;
 
@@ -92,7 +92,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->httpRequest("$this->dbname/bogus", 'GET', NULL);
       $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL);
@@ -102,12 +102,12 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       // Only assert one example property here, other properties should be
       // checked in serialization tests.
-      $this->assertEqual($data['_rev'], $entity->_rev->value, 'GET request returned correct revision hash.');
+      $this->assertEquals($data['_rev'], $entity->_rev->value, 'GET request returned correct revision hash.');
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['revs' => TRUE]);
       $data = Json::decode($response);
       $rev = $data['_revisions']['start'] . '-' . $data['_revisions']['ids'][0];
-      $this->assertEqual($rev, $entity->_rev->value, 'GET request returned correct revision list after first revision.');
+      $this->assertEquals($rev, $entity->_rev->value, 'GET request returned correct revision list after first revision.');
 
       // Save an additional revision.
       $entity->save();
@@ -115,13 +115,13 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['revs' => TRUE]);
       $data = Json::decode($response);
       $count = count($data['_revisions']['ids']);
-      $this->assertEqual($count, 2, 'GET request returned correct revision list after second revision.');
+      $this->assertEquals($count, 2, 'GET request returned correct revision list after second revision.');
 
       // Test the response for a fake revision.
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
       $this->assertResponse('404', 'HTTP response code is correct.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
@@ -158,7 +158,7 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
 
       $entity->name = $this->randomMachineName();
@@ -227,7 +227,7 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized);
@@ -235,7 +235,7 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
       $entity->save();
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
@@ -251,7 +251,7 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $first_rev]);
@@ -277,7 +277,7 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL);
@@ -285,10 +285,10 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response);
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
       $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
@@ -307,7 +307,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
       $this->assertResponse('404', 'HTTP response code is correct.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
@@ -367,7 +367,7 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertResponse('201', 'HTTP response code is correct');
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $storage = $this->entityManager->getStorage('taxonomy_term');
+      $storage = $this->entityManager->getStorage('taxonomy_term')->useWorkspace($this->workspace->id());
       $referenced_terms = $storage->loadByProperties(['uuid' => $reference_uuid]);
       /** @var \Drupal\taxonomy\TermInterface $referenced_term */
       $referenced_term = reset($referenced_terms);
@@ -386,7 +386,7 @@ class DocResourceTest extends ResourceTestBase {
       $referenced_terms = $storage->loadByProperties(['uuid' => $reference_uuid]);
       /** @var \Drupal\taxonomy\TermInterface $referenced_term */
       $referenced_term = reset($referenced_terms);
-      $this->assertEqual($new_name, $referenced_term->name->value, 'The name was updated successfully.');
+      $this->assertEquals($new_name, $referenced_term->name->value, 'The name was updated successfully.');
     }
   }
 

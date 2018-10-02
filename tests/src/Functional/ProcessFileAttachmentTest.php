@@ -9,6 +9,8 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Test the use of the ProcessFileAttachment service.
  *
+ * @see \Drupal\relaxed\ProcessFileAttachment
+ *
  * @group relaxed
  */
 class ProcessFileAttachmentTest extends BrowserTestBase {
@@ -24,6 +26,7 @@ class ProcessFileAttachmentTest extends BrowserTestBase {
   public function testProcessFileAttachment() {
     $live = Workspace::load('live');
     $stage = Workspace::load('stage');
+    $workspace_association_storage = $this->container->get('entity_type.manager')->getStorage('workspace_association');
 
     $data = [
       'data' => 'aGVsbG8gd29ybGQK',
@@ -34,7 +37,9 @@ class ProcessFileAttachmentTest extends BrowserTestBase {
     $file1 = \Drupal::service('relaxed.process_file_attachment')->process($data, 'base64_stream');
     $file1->save();
     $this->assertEquals('6f9e1f07-e713-4840-bf95-8326c8317800', $file1->uuid(), 'The file has the expected UUID.');
-    $this->assertEquals($live->id(), $file1->get('workspace')->entity->id(), 'Expected workspace');
+    $tracking_workspace_ids = $workspace_association_storage->getEntityTrackingWorkspaceIds($file1);
+    $this->assertTrue(in_array($live->id(), $tracking_workspace_ids), 'Tracked in the correct workspace.');
+    $this->assertFalse(in_array($stage->id(), $tracking_workspace_ids), 'Not tracked on Stage workspace.');
 
     /** @var FileInterface $file2 */
     $file2 = \Drupal::service('relaxed.process_file_attachment')->process($data, 'base64_stream');

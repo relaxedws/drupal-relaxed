@@ -34,7 +34,7 @@ class EntityAccessTest extends BrowserTestBase  {
         '@op' => $op,
       ]);
 
-      $this->assertEqual($result, $object->access($op, $account), $message);
+      $this->assertEquals($result, $object->access($op, $account), $message);
     }
   }
 

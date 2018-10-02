@@ -72,7 +72,7 @@ class BulkDocsFactory implements BulkDocsFactoryInterface {
     $this->revIndex = $rev_index;
     $this->entityTypeManager = $entity_type_manager;
     $this->lock = $lock;
-    $this->logger = $logger_factory->get('replication');
+    $this->logger = $logger_factory->get('relaxed');
     $this->state = $state;
   }
 

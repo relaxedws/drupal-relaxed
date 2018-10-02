@@ -150,9 +150,6 @@ class DbApiResource extends ApiResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function delete(WorkspaceInterface $entity) {
-    if (!$entity->isPublished()) {
-      throw new HttpException(500, t('Workspace does not exist.'));
-    }
     try {
       // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
       $entity->delete();

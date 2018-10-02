@@ -68,7 +68,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
       $bulk_docs->setEntities($entities);
     }
     catch (\Exception $e) {
-      watchdog_exception('Replication', $e);
+      watchdog_exception('Relaxed', $e);
     }
 
     return $bulk_docs;

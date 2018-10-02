@@ -26,7 +26,7 @@ class ChangesResourceTest extends ResourceTestBase {
 
     $expected_with_docs = $expected_without_docs = ['last_seq' => NULL, 'results' => []];
 
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
     // Update the field_test_text field.
     $entity->set('field_test_text', [['value' => $this->randomString(), 'format' => 'plain_text']]);
@@ -53,7 +53,7 @@ class ChangesResourceTest extends ResourceTestBase {
     ];
 
     // Create a new entity.
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
 
     // Update the field_test_text field.
@@ -80,48 +80,48 @@ class ChangesResourceTest extends ResourceTestBase {
     $expected_with_docs['last_seq'] = $expected_without_docs['last_seq'] = $this->multiversionManager->lastSequenceId();
 
     $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType);
-    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct when not including docs.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
-    $data = Json::decode($response);
-    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+    $data = Json::decode($response->getBody());
+    $this->assertEquals($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['include_docs' => 'true']);
-    $this->assertResponse('200', 'HTTP response code is correct when including docs.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct when including docs.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
-    $data = Json::decode($response);
-    $this->assertEqual($data, $expected_with_docs, 'The result is correct when including docs.');
+    $data = Json::decode($response->getBody());
+    $this->assertEquals($data, $expected_with_docs, 'The result is correct when including docs.');
 
     // Test when using 'since' query parameter.
     $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => 1]);
-    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct when not including docs.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
-    $data = Json::decode($response);
-    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+    $data = Json::decode($response->getBody());
+    $this->assertEquals($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $first_seq]);
-    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct when not including docs.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     // Unset first value from results, it shouldn't be returned when since == $first_seq.
     unset($expected_without_docs['results'][0]);
     // Reset the keys of the results array.
     $expected_without_docs['results'] = array_values($expected_without_docs['results']);
-    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+    $this->assertEquals($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     $response = $this->httpRequest("$this->dbname/_changes", 'GET', NULL, $this->defaultMimeType, NULL, ['since' => $second_seq]);
-    $this->assertResponse('200', 'HTTP response code is correct when not including docs.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct when not including docs.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     // The result array should be empty in this case.
     $expected_without_docs['results'] = [];
     // And last_seq == 0.
     $expected_without_docs['last_seq'] = 0;
-    $this->assertEqual($data, $expected_without_docs, 'The result is correct when not including docs.');
+    $this->assertEquals($data, $expected_without_docs, 'The result is correct when not including docs.');
 
     // @todo: {@link https://www.drupal.org/node/2600488 Assert the sort order.}
   }

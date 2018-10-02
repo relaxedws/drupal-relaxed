@@ -126,12 +126,6 @@ class LinkItemNormalizer extends FieldItemNormalizer {
           // We use a temporary label and entity owner ID as this will be
           // backfilled later anyhow, when the real entity comes around.
           $entity = $selection_instance->createNewEntity($entity_type, $data[$bundle_key], rand(), 1);
-          // Set the target workspace if we have it in context.
-          if (isset($context['workspace'])
-            && ($context['workspace'] instanceof WorkspaceInterface)
-            && $entity->getEntityType()->get('workspace') !== FALSE) {
-            $entity->workspace->target_id = $context['workspace']->id();
-          }
           // Set the UUID to what we received to ensure it gets updated when
           // the full entity comes around later.
           $entity->uuid->value = $entity_uuid;

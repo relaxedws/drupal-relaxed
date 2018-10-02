@@ -48,6 +48,20 @@ class LinkStubReplicationTest extends KernelTestBase {
     $this->installSchema('system', ['sequences']);
     $this->installSchema('node', ['node_access']);
     $this->installConfig(['multiversion']);
+
+    // Create two workspaces by default, 'live' and 'stage'.
+    Workspace::create([
+      'id' => 'live',
+      'label' => 'Live',
+      'uid' => 1,
+    ])->save();
+
+    Workspace::create([
+      'id' => 'stage',
+      'label' => 'Stage',
+      'uid' => 1,
+    ])->save();
+
     $this->container->get('multiversion.manager')->enableEntityTypes();
     $this->serializer = $this->container->get('relaxed.serializer');
     NodeType::create(['type' => 'article_with_link', 'name' => 'article_with_link'])->save();
@@ -60,7 +74,7 @@ class LinkStubReplicationTest extends KernelTestBase {
    * Tests replication of link stubs.
    */
   public function testLinkStubReplication() {
-    $workspace = Workspace::load(1);
+    $workspace = Workspace::load('live');
 
     $referenced_node = [
       '@context' => [

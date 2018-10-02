@@ -24,7 +24,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertHeader('content-type', $this->defaultMimeType);
@@ -32,7 +32,7 @@ class LocalDocResourceTest extends ResourceTestBase {
     }
 
     // Test with an entity type that is not local.
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
     $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
     $this->assertHeader('content-type', $this->defaultMimeType);
@@ -52,14 +52,14 @@ class LocalDocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
       $this->assertResponse('200', 'HTTP response code is correct.');
     }
 
     // Test with an entity type that is not local.
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
     $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
     $this->assertHeader('content-type', $this->defaultMimeType);
@@ -82,7 +82,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create(['user_id' => $account->id()]);
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
       $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'PUT', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct');
@@ -96,7 +96,7 @@ class LocalDocResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     // Test with an entity type that is not local.
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $serialized = $serializer->serialize($entity, $this->defaultFormat);
     $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'PUT', $serialized);
 
@@ -104,7 +104,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       'error' => 'bad_request',
       'reason' => 'This endpoint only supports local entity types.',
     ];
-    $this->assertEqual($serializer->serialize($expected, 'json'), $response);
+    $this->assertEquals($serializer->serialize($expected, 'json'), $response);
     $this->assertHeader('content-type', $this->defaultMimeType);
     $this->assertResponse('400', 'HTTP response code is correct.');
   }

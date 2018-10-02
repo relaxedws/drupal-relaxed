@@ -152,13 +152,10 @@ class AllDocs implements AllDocsInterface {
           $query = $this->entityTypeManager
             ->getStorage($entity_type_id)
             ->getQuery();
-          if ($entity_type->get('workspace') !== FALSE) {
-            $query->condition('workspace', $this->workspace->id());
-          }
           $ids = $query->execute();
         }
         catch (\Exception $e) {
-          watchdog_exception('replication', $e);
+          watchdog_exception('Relaxed', $e);
           continue;
         }
 
@@ -166,7 +163,7 @@ class AllDocs implements AllDocsInterface {
         foreach ($ids as $id) {
           $keys[] = $entity_type_id . ':' . $id;
         }
-        $items = $this->entityIndex->getMultiple($keys);
+        $items = $this->entityIndex->useWorkspace($this->workspace->id())->getMultiple($keys);
         foreach ($items as $item) {
           $rows[$item['uuid']] = ['rev' => $item['rev']];
         }

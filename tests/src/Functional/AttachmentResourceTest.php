@@ -164,7 +164,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
-    $this->assertEqual($response, $file_contents);
+    $this->assertEquals($response, $file_contents);
     $this->assertHeader('content-length', $this->files['1']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -176,7 +176,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
-    $this->assertEqual($response, $file_contents);
+    $this->assertEquals($response, $file_contents);
     $this->assertHeader('content-length', $this->files['2']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -188,7 +188,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->files['3']->getMimeType());
-    $this->assertEqual($response, $file_contents);
+    $this->assertEquals($response, $file_contents);
     $this->assertHeader('content-length', $this->files['3']->getSize());
     $this->assertHeader('x-relaxed-etag', $encoded_digest);
     $this->assertHeader('content-md5', $encoded_digest);
@@ -212,10 +212,10 @@ class AttachmentResourceTest extends ResourceTestBase {
     $files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
     $file = reset($files);
     $this->assertTrue(!empty($file), 'File was saved.');
-    $this->assertEqual($file->getFileUri(), $file_uri, 'File was saved with the correct URI.');
+    $this->assertEquals($file->getFileUri(), $file_uri, 'File was saved with the correct URI.');
 
     $entity = EntityTestRev::load($this->entity->id());
-    $this->assertEqual($entity->{$field_name}->get(0)->target_id, $file->id(), 'File was attached to the entity.');
+    $this->assertEquals($entity->{$field_name}->get(0)->target_id, $file->id(), 'File was attached to the entity.');
   }
 
   public function testDelete() {
@@ -229,7 +229,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $file = File::load($this->files['2']->id());
     $this->assertTrue(empty($file), 'The file was deleted.');
     $entity = EntityTestRev::load($this->entity->id());
-    $this->assertEqual($entity->{$field_name}->count(), 1, 'The file does not exist on the entity any more.');
+    $this->assertEquals($entity->{$field_name}->count(), 1, 'The file does not exist on the entity any more.');
   }
 
 }

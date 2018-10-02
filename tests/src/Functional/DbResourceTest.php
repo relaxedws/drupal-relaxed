@@ -29,14 +29,6 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($this->dbname, 'HEAD', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-
-    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
-    $workspace = $this->createWorkspace($this->randomMachineName());
-    $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->id(), 'HEAD', NULL);
-    $this->assertResponse('404', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertTrue(empty($response), 'HEAD request returned no body.');
   }
 
   public function testGet() {
@@ -47,7 +39,7 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     // Add an entity to the workspace to test the update_seq property.
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
     $entity->name = $this->randomMachineName();
     $entity->save();
@@ -58,7 +50,7 @@ class DbResourceTest extends ResourceTestBase {
     $data = Json::decode($response);
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
-    $this->assertEqual($data['db_name'], $this->dbname, 'GET request returned correct db_name.');
+    $this->assertEquals($data['db_name'], $this->dbname, 'GET request returned correct db_name.');
 
     // Create a user with the 'perform pull replication' permission and test the
     // response code. It should be 200.
@@ -73,13 +65,6 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($this->dbname, 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-
-    // Test getting an archived workspace.
-    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
-    $workspace = $this->createWorkspace($this->randomMachineName());
-    $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->id(), 'GET', NULL);
-    $this->assertResponse('404', 'HTTP response code is correct.');
 
   }
 
@@ -127,12 +112,6 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct.');
-
-    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
-    $workspace = $this->createWorkspace($this->randomMachineName());
-    $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->id(), 'PUT', NULL);
-    $this->assertResponse('404', 'HTTP response code is correct.');
   }
 
   public function testPost() {
@@ -149,6 +128,7 @@ class DbResourceTest extends ResourceTestBase {
 
       $entity = $this->entityTypeManager
         ->getStorage($entity_type)
+        ->useWorkspace($this->workspace->id())
         ->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
@@ -159,6 +139,7 @@ class DbResourceTest extends ResourceTestBase {
 
       $entity = $this->entityTypeManager
         ->getStorage($entity_type)
+        ->useWorkspace($this->workspace->id())
         ->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
@@ -175,12 +156,6 @@ class DbResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
       $this->httpRequest($this->dbname, 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct.');
-
-      /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
-      $workspace = $this->createWorkspace($this->randomMachineName());
-      $workspace->setUnpublished()->save();
-      $this->httpRequest($workspace->id(), 'POST', $serialized);
-      $this->assertResponse('404', 'HTTP response code is correct.');
     }
   }
 
@@ -202,6 +177,7 @@ class DbResourceTest extends ResourceTestBase {
 
     $entity = $this->entityTypeManager
       ->getStorage('workspace')
+      ->useWorkspace($this->workspace->id())
       ->load($entity->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
 
@@ -223,12 +199,6 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
     $this->httpRequest($entity->id(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
-
-    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
-    $workspace = $this->createWorkspace($this->randomMachineName());
-    $workspace->setUnpublished()->save();
-    $this->httpRequest($workspace->id(), 'DELETE', NULL);
-    $this->assertResponse('500', 'HTTP response code is correct.');
   }
 
 }

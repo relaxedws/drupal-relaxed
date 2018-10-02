@@ -52,7 +52,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest($this->dbname . '/_revs_diff', 'POST', Json::encode($data));
       $this->assertResponse('200', 'HTTP response code is correct.');
-      $this->assertEqual($response, '{}', 'Data format is correct.');
+      $this->assertEquals($response, '{}', 'Data format is correct.');
     }
   }
 
