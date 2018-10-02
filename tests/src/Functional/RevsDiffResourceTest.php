@@ -27,7 +27,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
       // Create a new test entity.
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
 
       // Update the field_test_text field.
@@ -42,7 +42,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       $entity->set('name', [['value' => $this->randomString(25), 'format' => 'plain_text']]);
       $entity->save();
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
       $data = [];
       $uuid = $entity->uuid();
       $revs = $this->revTree->getDefaultBranch($uuid);
@@ -96,7 +96,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
       ];
 
       // Create a second new test entity.
-      $entity = $this->entityTypeManager->getStorage($entity_type)->create();
+      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $id = $entity->uuid();
 

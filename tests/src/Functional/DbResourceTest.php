@@ -47,7 +47,7 @@ class DbResourceTest extends ResourceTestBase {
     $response = $this->httpRequest($this->dbname, 'GET', NULL);
     $this->assertResponse('200', 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->defaultMimeType);
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
     $this->assertEquals($data['db_name'], $this->dbname, 'GET request returned correct db_name.');
@@ -83,7 +83,7 @@ class DbResourceTest extends ResourceTestBase {
     $id = strtolower($this->randomMachineName());
     $response = $this->httpRequest($id, 'PUT', NULL);
     $this->assertResponse('201', 'HTTP response code is correct for new database');
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
 
     $id = strtolower($this->randomMachineName());
@@ -93,7 +93,7 @@ class DbResourceTest extends ResourceTestBase {
     // Test putting an existing workspace.
     $response = $this->httpRequest($entity->id(), 'PUT', NULL);
     $this->assertResponse('412', 'HTTP response code is correct for existing database');
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     $this->assertTrue(!empty($data['error']), 'PUT request returned error.');
 
     // Create a new ID.
@@ -134,7 +134,7 @@ class DbResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest($this->dbname, 'POST', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct when posting new entity');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
 
       $entity = $this->entityTypeManager
@@ -172,7 +172,7 @@ class DbResourceTest extends ResourceTestBase {
 
     $response = $this->httpRequest($entity->id(), 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct for new database');
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
     $entity = $this->entityTypeManager

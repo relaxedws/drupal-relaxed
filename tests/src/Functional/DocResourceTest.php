@@ -99,13 +99,13 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertResponse('200', 'HTTP response code is correct.');
       $this->assertHeader('content-type', $this->defaultMimeType);
       $this->assertHeader('x-relaxed-etag', $entity->_rev->value);
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       // Only assert one example property here, other properties should be
       // checked in serialization tests.
       $this->assertEquals($data['_rev'], $entity->_rev->value, 'GET request returned correct revision hash.');
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['revs' => TRUE]);
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $rev = $data['_revisions']['start'] . '-' . $data['_revisions']['ids'][0];
       $this->assertEquals($rev, $entity->_rev->value, 'GET request returned correct revision list after first revision.');
 
@@ -113,7 +113,7 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['revs' => TRUE]);
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $count = count($data['_revisions']['ids']);
       $this->assertEquals($count, 2, 'GET request returned correct revision list after second revision.');
 
@@ -202,7 +202,7 @@ class DocResourceTest extends ResourceTestBase {
         NULL,
         ['open_revs' => $open_revs_string]
       );
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $correct_data = TRUE;
       foreach ($open_revs as $key => $rev) {
         if (isset($data[$key]['ok']['_rev']) && $data[$key]['ok']['_rev'] != $rev) {
@@ -232,7 +232,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized);
       $this->assertResponse('201', 'HTTP response code is correct');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
@@ -248,7 +248,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, ['if-match' => $second_rev]);
       $this->assertResponse('201', 'HTTP response code is correct.');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
@@ -259,7 +259,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $entity->_rev->value]);
       $this->assertResponse('201', 'HTTP response code is correct.');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
     }
   }
@@ -282,7 +282,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL);
       $this->assertResponse('200', 'HTTP response code is correct for new database');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
@@ -300,7 +300,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => $second_rev]);
       $this->assertResponse('200', 'HTTP response code is correct.');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
       // Test the response for a fake revision.
@@ -319,7 +319,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, ['if-match' => $second_rev]);
       $this->assertResponse('200', 'HTTP response code is correct.');
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
     }
   }
@@ -363,7 +363,7 @@ class DocResourceTest extends ResourceTestBase {
       ];
 
       $response = $this->httpRequest("$this->dbname/" . $entity_uuid, 'PUT', Json::encode($normalized));
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertResponse('201', 'HTTP response code is correct');
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
@@ -379,7 +379,7 @@ class DocResourceTest extends ResourceTestBase {
       $referenced_term->name->value = $new_name;
       $serialized = $serializer->serialize($referenced_term, $this->defaultFormat);
       $response = $this->httpRequest("$this->dbname/" . $reference_uuid, 'PUT', $serialized);
-      $data = Json::decode($response);
+      $data = Json::decode($response->getBody());
       $this->assertResponse('201', 'HTTP response code is correct');
       $this->assertNotEqual('0-00000000000000000000000000000000', $data['rev'], 'PUT request returned a revision hash.');
 

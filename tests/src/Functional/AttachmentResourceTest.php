@@ -205,7 +205,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = $field_name . '/0/' . $file_stub->uuid() . '/public/' . $file_stub->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
     $this->assertResponse('200', 'HTTP response code is correct');
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
     /** @var \Drupal\file\FileInterface $file */
@@ -223,7 +223,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $attachment_info = $field_name . '/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
     $this->assertResponse('200', 'HTTP response code is correct for new database');
-    $data = Json::decode($response);
+    $data = Json::decode($response->getBody());
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
     $file = File::load($this->files['2']->id());
