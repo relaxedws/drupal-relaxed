@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "bulk_docs",
  *   label = "Bulk documents",
  *   serialization_class = {
- *     "canonical" = "Drupal\replication\BulkDocs\BulkDocs",
+ *     "canonical" = "Drupal\relaxed\BulkDocs\BulkDocsInterface",
  *   },
  *   path = "/{db}/_bulk_docs"
  * )

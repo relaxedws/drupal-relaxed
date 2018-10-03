@@ -9,7 +9,7 @@ use Drupal\relaxed\Http\ApiResourceResponse;
  *   id = "replicate",
  *   label = "Replicate",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\Replicate\Replicate",
+ *     "canonical" = "Drupal\relaxed\Replicate\ReplicateInterface",
  *   },
  *   path = "/_replicate"
  * )

@@ -11,7 +11,7 @@ class ReplicateNormalizer extends NormalizerBase implements DenormalizerInterfac
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\Replicate\Replicate'];
+  protected $supportedInterfaceOrClass = ['Drupal\relaxed\Replicate\ReplicateInterface'];
 
   /**
    * @var \Drupal\relaxed\Replicate\Replicate

@@ -37,6 +37,15 @@ class ResourceController implements ContainerInjectionInterface {
    */
   const DEFAULT_FORMAT = 'json';
 
+  /**
+   * @var \Drupal\relaxed\Plugin\ApiResourceManagerInterface
+   */
+  protected $resourceManager;
+
+  /**
+   * @var \Symfony\Component\Serializer\SerializerInterface
+   */
+  protected $serializer;
 
   /**
    * @return \Symfony\Component\DependencyInjection\ContainerInterface
@@ -129,11 +138,11 @@ class ResourceController implements ContainerInjectionInterface {
     $api_resource_id = $route->getDefault('_api_resource');
     $api_resource = $this->resourceManager->createInstance($api_resource_id);
 
-    $content_type_format = $this->getContentTypeFormat($route, $request, $api_resource);
+    $response_format = $this->getContentTypeFormat($route, $request, $api_resource);
 
     // Select the format negotiator for the request data.
-    $negotiator = $this->negotiatorManager->select($content_type_format, $method, 'request');
-    $serializer = $negotiator->serializer($content_type_format, $method, 'request');
+    $negotiator = $this->negotiatorManager->select($response_format, $method, 'request');
+    $serializer = $negotiator->serializer($response_format, $method, 'request');
 
     $content = $request->getContent();
     $parameters = $this->getParameters($route_match);
@@ -161,20 +170,12 @@ class ResourceController implements ContainerInjectionInterface {
     if (!empty($content)) {
       try {
         $class = isset($definition['serialization_class'][$method]) ? $definition['serialization_class'][$method] : $definition['serialization_class']['canonical'];
-        $entity = $serializer->deserialize($content, $class, $content_type_format, $context);
+        $entity = $serializer->deserialize($content, $class, $response_format, $context);
       }
       catch (\Exception $e) {
-        return $this->errorResponse($e, $content_type_format, $serializer, $request);
+        return $this->errorResponse($e, $response_format, $serializer, $request);
       }
     }
-
-    // Select the format negotiator for the response data. Do this before
-    // invoking the API resource method so we can return error responses in the
-    // required format too.
-    $response_format = $this->getResponseFormat($route, $request, $api_resource);
-
-    $negotiator = $this->negotiatorManager->select($response_format, $method, 'response');
-    $serializer = $negotiator->serializer($response_format, $method, 'response');
 
     // @todo This is not nice, it's hacky. Find a nicer way to get response
     // formats based on the chosen negotiator. We might have to switch to one

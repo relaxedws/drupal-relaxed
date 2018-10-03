@@ -14,9 +14,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * @ApiResource(
  *   id = "ensure_full_commit",
  *   label = "Ensure Full Commit",
- *   serialization_class = {
- *     "canonical" = "Drupal\multiversion\Entity\WorkspaceInterface",
- *   },
  *   path = "/{db}/_ensure_full_commit",
  * )
  */

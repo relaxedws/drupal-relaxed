@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "attachment",
  *   label = "Attachment",
  *   serialization_class = {
- *     "canonical" = "Drupal\file\Entity\File",
+ *     "canonical" = "Drupal\file\FileInterface",
  *   },
  *   allowed_formats = {"stream","base64_stream"},
  *   path = "/{db}/{docid}/{field_name}/{delta}/{file_uuid}/{scheme}/{filename}",

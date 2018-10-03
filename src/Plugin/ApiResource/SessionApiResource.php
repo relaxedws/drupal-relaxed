@@ -8,7 +8,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * @ApiResource(
- *   id = "relaxed:session",
+ *   id = "session",
  *   label = "Session",
  *   path = "/_session"
  * )

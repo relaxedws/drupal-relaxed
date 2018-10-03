@@ -78,7 +78,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
-    $output = Json::decode($response);
+    $output = Json::decode($response->getBody());
     $this->assertTrue(is_array($output), 'Data format is correct.');
     foreach ($output as $key => $value) {
       $entity_number = $key+1;

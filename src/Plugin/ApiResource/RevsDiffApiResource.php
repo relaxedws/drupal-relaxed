@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   id = "revs_diff",
  *   label = "Revisions diff",
  *   serialization_class = {
- *     "canonical" = "Drupal\replication\RevisionDiff\RevisionDiff",
+ *     "canonical" = "Drupal\relaxed\RevisionDiff\RevisionDiff",
  *   },
  *   path = "/{db}/_revs_diff",
  *   no_cache = TRUE

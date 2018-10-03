@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "changes",
  *   label = "Changes",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\Changes\Changes",
+ *     "canonical" = "Drupal\relaxed\Changes\ChangesInterface",
  *   },
  *   path = "/{db}/_changes",
  *   no_cache = TRUE

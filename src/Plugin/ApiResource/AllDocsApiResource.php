@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   id = "all_docs",
  *   label = "All Docs",
  *   serialization_class = {
- *     "canonical" = "Drupal\relaxed\AllDocs\AllDocs",
+ *     "canonical" = "Drupal\relaxed\AllDocs\AllDocsInterface",
  *   },
  *   path = "/{db}/_all_docs"
  * )
