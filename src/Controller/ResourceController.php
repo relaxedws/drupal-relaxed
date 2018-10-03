@@ -223,6 +223,9 @@ class ResourceController implements ContainerAwareInterface, ContainerInjectionI
 
     $render_contexts = [];
     $serializer = $this->serializer();
+    if(get_class($response) === "Symfony\Component\HttpFoundation\BinaryFileResponse") {
+      return $response;
+    }
     foreach ($responses as $response_part) {
       if ($response_data = $response_part->getResponseData()) {
         // Collect bubbleable metadata in a render context.

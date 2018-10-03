@@ -72,6 +72,7 @@ class DocIdConverter implements ParamConverterInterface {
         $rev_query = $request->headers->get('if-match');
       }
     }
+    $latest = $request->query->has('latest');
 
     $entity_type_id = NULL;
     $entity_id = NULL;
@@ -93,6 +94,12 @@ class DocIdConverter implements ParamConverterInterface {
     }
 
     $storage = $this->entityManager->getStorage($entity_type_id);
+    $revisions = [];
+      if($latest && $entity = $storage->load($entity_id) ?: $storage->loadDeleted($entity_id)) {
+        $revisions[] = $entity;
+        $open_revs_query = false;
+        return $revisions ?: $uuid;
+      } 
     if ($open_revs_query && in_array($request->getMethod(), ['GET', 'HEAD'])) {
       $open_revs = [];
       if ($open_revs_query == 'all') {
@@ -108,12 +115,12 @@ class DocIdConverter implements ParamConverterInterface {
           $revision_ids[] = $item['revision_id'];
         }
       }
-      $revisions = [];
+      
       foreach ($revision_ids as $revision_id) {
-        if ($revision = $storage->loadRevision($revision_id)) {
-          $revisions[] = $revision;
+          if ($revision = $storage->loadRevision($revision_id)) {
+            $revisions[] = $revision;
+          }
         }
-      }
       return $revisions ?: $uuid;
     }
     if ($revision_id) {
