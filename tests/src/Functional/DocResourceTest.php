@@ -29,17 +29,17 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $this->httpRequest("$this->dbname/bogus", 'HEAD', NULL);
-      $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
+      $response = $this->httpRequest("$this->dbname/bogus", 'HEAD', NULL);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct for non-existing entities.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
       $first_rev = $entity->_rev->value;
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertResponse('200', 'HTTP response code is correct.');
-      $this->assertHeader('x-relaxed-etag', $first_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
+      $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
       $this->assertTrue(empty($response), 'HEAD request returned no body.');
 
       $new_name = $this->randomMachineName();
@@ -48,28 +48,28 @@ class DocResourceTest extends ResourceTestBase {
       $second_rev = $entity->_rev->value;
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $second_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($second_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, NULL, ['rev' => $first_rev]);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $first_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       // Test the response for a fake revision.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
-      $this->assertResponse('404', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => $first_rev]);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $first_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => $second_rev]);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $second_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($second_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       // Test the response for a fake revision using if-none-match header.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => '11112222333344445555']);
-      $this->assertResponse('404', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => '11112222333344445555']);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
     }
   }
 
@@ -89,16 +89,16 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $this->httpRequest("$this->dbname/bogus", 'GET', NULL);
-      $this->assertResponse('404', 'HTTP response code is correct for non-existing entities.');
+      $response = $this->httpRequest("$this->dbname/bogus", 'GET', NULL);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct for non-existing entities.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL);
-      $this->assertResponse('200', 'HTTP response code is correct.');
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $entity->_rev->value);
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($entity->_rev->value, $response->getHeader('x-relaxed-etag')[0]);
       $data = Json::decode($response->getBody());
       // Only assert one example property here, other properties should be
       // checked in serialization tests.
@@ -118,8 +118,8 @@ class DocResourceTest extends ResourceTestBase {
       $this->assertEquals($count, 2, 'GET request returned correct revision list after second revision.');
 
       // Test the response for a fake revision.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
-      $this->assertResponse('404', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
@@ -129,16 +129,16 @@ class DocResourceTest extends ResourceTestBase {
       $second_rev = $entity->_rev->value;
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => $first_rev]);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $first_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => $second_rev]);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertHeader('x-relaxed-etag', $second_rev);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals($second_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       // Test the response for a fake revision using if-none-match header.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => '11112222333344445555']);
-      $this->assertResponse('404', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => '11112222333344445555']);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
     }
   }
 
@@ -178,7 +178,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $stream = Psr7\stream_for($response);
       $parts = MultipartResponse::parseMultipartBody($stream);
-      $this->assertResponse('200', 'HTTP response code is correct.');
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $data = [];
       foreach ($parts as $part) {
@@ -231,7 +231,7 @@ class DocResourceTest extends ResourceTestBase {
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized);
-      $this->assertResponse('201', 'HTTP response code is correct');
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct');
       $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
@@ -243,22 +243,22 @@ class DocResourceTest extends ResourceTestBase {
       $second_rev = $entity->_rev->value;
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, ['if-match' => $first_rev]);
-      $this->assertResponse('409', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, ['if-match' => $first_rev]);
+      $this->assertEquals('409', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, ['if-match' => $second_rev]);
-      $this->assertResponse('201', 'HTTP response code is correct.');
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct.');
       $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $first_rev]);
-      $this->assertResponse('409', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $first_rev]);
+      $this->assertEquals('409', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'PUT', $serialized, NULL, NULL, ['rev' => $entity->_rev->value]);
-      $this->assertResponse('201', 'HTTP response code is correct.');
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct.');
       $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
     }
@@ -281,7 +281,7 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL);
-      $this->assertResponse('200', 'HTTP response code is correct for new database');
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct for new database');
       $data = Json::decode($response->getBody());
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
@@ -295,17 +295,17 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
       $second_rev = $entity->_rev->value;
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => $first_rev]);
-      $this->assertResponse('409', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => $first_rev]);
+      $this->assertEquals('409', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => $second_rev]);
-      $this->assertResponse('200', 'HTTP response code is correct.');
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
       $data = Json::decode($response->getBody());
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
       // Test the response for a fake revision.
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
-      $this->assertResponse('404', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
+      $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
@@ -314,11 +314,11 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
       $second_rev = $entity->_rev->value;
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, ['if-match' => $first_rev]);
-      $this->assertResponse('409', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, ['if-match' => $first_rev]);
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, ['if-match' => $second_rev]);
-      $this->assertResponse('200', 'HTTP response code is correct.');
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
       $data = Json::decode($response->getBody());
       $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
     }
@@ -364,7 +364,7 @@ class DocResourceTest extends ResourceTestBase {
 
       $response = $this->httpRequest("$this->dbname/" . $entity_uuid, 'PUT', Json::encode($normalized));
       $data = Json::decode($response->getBody());
-      $this->assertResponse('201', 'HTTP response code is correct');
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct');
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
       $storage = $this->entityManager->getStorage('taxonomy_term')->useWorkspace($this->workspace->id());
@@ -380,8 +380,8 @@ class DocResourceTest extends ResourceTestBase {
       $serialized = $serializer->serialize($referenced_term, $this->defaultFormat);
       $response = $this->httpRequest("$this->dbname/" . $reference_uuid, 'PUT', $serialized);
       $data = Json::decode($response->getBody());
-      $this->assertResponse('201', 'HTTP response code is correct');
-      $this->assertNotEqual('0-00000000000000000000000000000000', $data['rev'], 'PUT request returned a revision hash.');
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct');
+      $this->assertNotEquals('0-00000000000000000000000000000000', $data['rev'], 'PUT request returned a revision hash.');
 
       $referenced_terms = $storage->loadByProperties(['uuid' => $reference_uuid]);
       /** @var \Drupal\taxonomy\TermInterface $referenced_term */

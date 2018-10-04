@@ -18,17 +18,26 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->dbname, 'HEAD', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertTrue(empty($response), 'HEAD request returned no body.');
+    $response = $this->httpRequest($this->dbname, 'HEAD', NULL);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $this->assertTrue(empty($response->getBody()), 'HEAD request returned no body.');
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->dbname, 'HEAD', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $response = $this->httpRequest($this->dbname, 'HEAD', NULL);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $response = $this->httpRequest($workspace->id(), 'HEAD', NULL);
+    $this->assertSame($response->getStatusCode(), 404, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $this->assertTrue(empty($response->getBody()), 'HEAD request returned no body.');
   }
 
   public function testGet() {
@@ -39,14 +48,14 @@ class DbResourceTest extends ResourceTestBase {
     $this->drupalLogin($account);
 
     // Add an entity to the workspace to test the update_seq property.
-    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
+    $entity = $this->entityTypeManager->getStorage('entity_test_rev')->create();
     $entity->save();
     $entity->name = $this->randomMachineName();
     $entity->save();
 
     $response = $this->httpRequest($this->dbname, 'GET', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-    $this->assertHeader('content-type', $this->defaultMimeType);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
     $data = Json::decode($response->getBody());
     // Only assert one example property here, other properties should be
     // checked in serialization tests.
@@ -56,16 +65,17 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->dbname, 'GET', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $response = $this->httpRequest($this->dbname, 'GET', NULL);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($this->dbname, 'GET', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
-
+    $response = $this->httpRequest($this->dbname, 'GET', NULL);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
   }
 
   public function testPut() {
@@ -77,13 +87,15 @@ class DbResourceTest extends ResourceTestBase {
 
     // Test using an invalid machine name
     $id = 'A!"£%^&*{}#~@?';
-    $this->httpRequest($id, 'PUT', NULL);
-    $this->assertResponse('404', 'HTTP response code is correct for invalid database');
+    $response = $this->httpRequest($id, 'PUT', NULL);
+    $this->assertSame($response->getStatusCode(), 404, 'HTTP response code is correct for missing database.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
     $id = strtolower($this->randomMachineName());
     $response = $this->httpRequest($id, 'PUT', NULL);
-    $this->assertResponse('201', 'HTTP response code is correct for new database');
-    $data = Json::decode($response->getBody());
+    $this->assertSame($response->getStatusCode(), 201, 'HTTP response code is correct for new database.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response);
     $this->assertTrue(!empty($data['ok']), 'PUT request returned ok.');
 
     $id = strtolower($this->randomMachineName());
@@ -92,8 +104,9 @@ class DbResourceTest extends ResourceTestBase {
 
     // Test putting an existing workspace.
     $response = $this->httpRequest($entity->id(), 'PUT', NULL);
-    $this->assertResponse('412', 'HTTP response code is correct for existing database');
-    $data = Json::decode($response->getBody());
+    $this->assertSame($response->getStatusCode(), 412, 'HTTP response code is correct for existing database.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $data = Json::decode($response);
     $this->assertTrue(!empty($data['error']), 'PUT request returned error.');
 
     // Create a new ID.
@@ -103,15 +116,24 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($id, 'PUT', NULL);
-    $this->assertResponse('403', 'HTTP response code is correct.');
+    $response = $this->httpRequest($id, 'PUT', NULL);
+    $this->assertSame($response->getStatusCode(), 403, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 201.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($id, 'PUT', NULL);
-    $this->assertResponse('201', 'HTTP response code is correct.');
+    $response = $this->httpRequest($id, 'PUT', NULL);
+    $this->assertSame($response->getStatusCode(), 201, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $response = $this->httpRequest($workspace->id(), 'PUT', NULL);
+    $this->assertSame($response->getStatusCode(), 404, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
   }
 
   public function testPost() {
@@ -128,18 +150,17 @@ class DbResourceTest extends ResourceTestBase {
 
       $entity = $this->entityTypeManager
         ->getStorage($entity_type)
-        ->useWorkspace($this->workspace->id())
         ->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
       $response = $this->httpRequest($this->dbname, 'POST', $serialized);
-      $this->assertResponse('201', 'HTTP response code is correct when posting new entity');
-      $data = Json::decode($response->getBody());
+      $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct when posting new entity.');
+      $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $data = Json::decode($response);
       $this->assertTrue(isset($data['rev']), 'POST request returned a revision hash.');
 
       $entity = $this->entityTypeManager
         ->getStorage($entity_type)
-        ->useWorkspace($this->workspace->id())
         ->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
 
@@ -147,15 +168,24 @@ class DbResourceTest extends ResourceTestBase {
       // response code. It should be 403.
       $account = $this->drupalCreateUser(['perform pull replication']);
       $this->drupalLogin($account);
-      $this->httpRequest($this->dbname, 'POST', $serialized);
-      $this->assertResponse('403', 'HTTP response code is correct.');
+      $response = $this->httpRequest($this->dbname, 'POST', $serialized);
+      $this->assertSame($response->getStatusCode(), 403, 'HTTP response code is correct.');
+      $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
       // Create a user with the 'perform push replication' permission and test the
       // response code. It should be 201.
       $account = $this->drupalCreateUser(['perform push replication']);
       $this->drupalLogin($account);
-      $this->httpRequest($this->dbname, 'POST', $serialized);
-      $this->assertResponse('201', 'HTTP response code is correct.');
+      $response = $this->httpRequest($this->dbname, 'POST', $serialized);
+      $this->assertSame($response->getStatusCode(), 201, 'HTTP response code is correct.');
+      $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+
+      /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
+      $workspace = $this->createWorkspace($this->randomMachineName());
+      $workspace->setUnpublished()->save();
+      $response = $this->httpRequest($workspace->id(), 'POST', $serialized);
+      $this->assertSame($response->getStatusCode(), 404, 'HTTP response code is correct.');
+      $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
     }
   }
 
@@ -171,13 +201,13 @@ class DbResourceTest extends ResourceTestBase {
     $entity->save();
 
     $response = $this->httpRequest($entity->id(), 'DELETE', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct for new database');
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
     $data = Json::decode($response->getBody());
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
     $entity = $this->entityTypeManager
       ->getStorage('workspace')
-      ->useWorkspace($this->workspace->id())
       ->load($entity->id());
     $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
 
@@ -190,15 +220,24 @@ class DbResourceTest extends ResourceTestBase {
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->id(), 'DELETE', NULL);
-    $this->assertResponse('403', 'HTTP response code is correct.');
+    $response = $this->httpRequest($entity->id(), 'DELETE', NULL);
+    $this->assertSame($response->getStatusCode(), 403, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
 
     // Create a user with the 'perform push replication' permission and test the
     // response code. It should be 200.
     $account = $this->drupalCreateUser(['perform push replication']);
     $this->drupalLogin($account);
-    $this->httpRequest($entity->id(), 'DELETE', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $response = $this->httpRequest($entity->id(), 'DELETE', NULL);
+    $this->assertSame($response->getStatusCode(), 200, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
+
+    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
+    $workspace = $this->createWorkspace($this->randomMachineName());
+    $workspace->setUnpublished()->save();
+    $response = $this->httpRequest($workspace->id(), 'DELETE', NULL);
+    $this->assertSame($response->getStatusCode(), 500, 'HTTP response code is correct.');
+    $this->assertSame($this->defaultMimeType, $response->getHeader('content-type')[0]);
   }
 
 }

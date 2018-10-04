@@ -26,17 +26,17 @@ class LocalDocResourceTest extends ResourceTestBase {
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
-      $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
-      $this->assertHeader('content-type', $this->defaultMimeType);
-      $this->assertResponse('200', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
+      $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     }
 
     // Test with an entity type that is not local.
     $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
-    $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertResponse('400', 'HTTP response code is correct.');
+    $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'HEAD', NULL);
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $this->assertEquals('400', $response->getStatusCode(), 'HTTP response code is correct.');
   }
 
   public function testGet() {
@@ -54,16 +54,16 @@ class LocalDocResourceTest extends ResourceTestBase {
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
-      $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
-      $this->assertResponse('200', 'HTTP response code is correct.');
+      $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     }
 
     // Test with an entity type that is not local.
     $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
     $entity->save();
-    $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertResponse('400', 'HTTP response code is correct.');
+    $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'GET', NULL);
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $this->assertEquals('400', $response->getStatusCode(), 'HTTP response code is correct.');
   }
 
   public function testPut() {
@@ -84,8 +84,8 @@ class LocalDocResourceTest extends ResourceTestBase {
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
-      $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'PUT', $serialized);
-      $this->assertResponse('201', 'HTTP response code is correct');
+      $response = $this->httpRequest("$this->dbname/_local/" . $entity->uuid(), 'PUT', $serialized);
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct');
     }
 
     // Create a user with the correct permissions.
@@ -105,8 +105,8 @@ class LocalDocResourceTest extends ResourceTestBase {
       'reason' => 'This endpoint only supports local entity types.',
     ];
     $this->assertEquals($serializer->serialize($expected, 'json'), $response);
-    $this->assertHeader('content-type', $this->defaultMimeType);
-    $this->assertResponse('400', 'HTTP response code is correct.');
+    $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
+    $this->assertEquals('400', $response->getStatusCode(), 'HTTP response code is correct.');
   }
 
 }

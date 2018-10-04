@@ -51,8 +51,8 @@ class RevsDiffResourceTest extends ResourceTestBase {
       }
 
       $response = $this->httpRequest($this->dbname . '/_revs_diff', 'POST', Json::encode($data));
-      $this->assertResponse('200', 'HTTP response code is correct.');
-      $this->assertEquals($response, '{}', 'Data format is correct.');
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
+      $this->assertEquals($response->getBody(), '{}', 'Data format is correct.');
     }
   }
 
@@ -108,7 +108,7 @@ class RevsDiffResourceTest extends ResourceTestBase {
         '44-1214293f06b11ea6da4c9da0594444zz',
       ];
       $response = $this->httpRequest($this->dbname . '/_revs_diff', 'POST', Json::encode($data));
-      $this->assertResponse('200', 'HTTP response code is correct.');
+      $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
       $response_data = Json::decode($response->getBody());
       $this->assertTrue(
         is_array($response_data) && !empty($response_data),

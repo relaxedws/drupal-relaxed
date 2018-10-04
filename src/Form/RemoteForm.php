@@ -15,7 +15,7 @@ class RemoteForm extends EntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    if (!\Drupal::moduleHandler()->moduleExists('workspace')) {
+    if (!\Drupal::moduleHandler()->moduleExists('workspaces')) {
       drupal_set_message($this->t('You have to install the <a href=":url">Workspace</a> module prior to setting up new workspaces.', [':url' => 'https://drupal.org/project/workspace']), 'warning');
       return [];
     }

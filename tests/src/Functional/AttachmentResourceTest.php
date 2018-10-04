@@ -126,11 +126,11 @@ class AttachmentResourceTest extends ResourceTestBase {
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
-    $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['1']->getSize());
-    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertEquals($encoded_digest, $response->getHeader('x-relaxed-etag')[0]);
     $this->assertHeader('content-md5', $encoded_digest);
 
     $file_contents = file_get_contents($this->files['2']->getFileUri());
@@ -138,21 +138,21 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertHeader('content-length', $this->files['2']->getSize());
-    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertEquals($encoded_digest, $response->getHeader('x-relaxed-etag')[0]);
     $this->assertHeader('content-md5', $encoded_digest);
 
     $file_contents = file_get_contents($this->files['3']->getFileUri());
     $encoded_digest = base64_encode(md5($file_contents));
 
     $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
-    $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'HEAD', NULL);
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->files['3']->getMimeType());
     $this->assertHeader('content-length', $this->files['3']->getSize());
-    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertEquals($encoded_digest, $response->getHeader('x-relaxed-etag')[0]);
     $this->assertHeader('content-md5', $encoded_digest);
   }
 
@@ -162,11 +162,11 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $attachment_info = 'field_test_file/0/' . $this->files['1']->uuid() . '/public/' . $this->files['1']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertEquals($response, $file_contents);
     $this->assertHeader('content-length', $this->files['1']->getSize());
-    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertEquals($encoded_digest, $response->getHeader('x-relaxed-etag')[0]);
     $this->assertHeader('content-md5', $encoded_digest);
 
     $file_contents = file_get_contents($this->files['2']->getFileUri());
@@ -174,11 +174,11 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $attachment_info = 'field_test_file/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     $this->assertHeader('content-type', 'text/plain; charset=UTF-8');
     $this->assertEquals($response, $file_contents);
     $this->assertHeader('content-length', $this->files['2']->getSize());
-    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertEquals($encoded_digest, $response->getHeader('x-relaxed-etag')[0]);
     $this->assertHeader('content-md5', $encoded_digest);
 
     $file_contents = file_get_contents($this->files['3']->getFileUri());
@@ -186,11 +186,11 @@ class AttachmentResourceTest extends ResourceTestBase {
 
     $attachment_info = 'field_test_image/0/' . $this->files['3']->uuid() . '/public/' . $this->files['3']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'GET', NULL, FALSE);
-    $this->assertResponse('200', 'HTTP response code is correct.');
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
     $this->assertHeader('content-type', $this->files['3']->getMimeType());
     $this->assertEquals($response, $file_contents);
     $this->assertHeader('content-length', $this->files['3']->getSize());
-    $this->assertHeader('x-relaxed-etag', $encoded_digest);
+    $this->assertEquals($encoded_digest, $response->getHeader('x-relaxed-etag')[0]);
     $this->assertHeader('content-md5', $encoded_digest);
   }
 
@@ -204,7 +204,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $field_name = 'field_test_file';
     $attachment_info = $field_name . '/0/' . $file_stub->uuid() . '/public/' . $file_stub->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'PUT', $serialized);
-    $this->assertResponse('200', 'HTTP response code is correct');
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct');
     $data = Json::decode($response->getBody());
     $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
@@ -222,7 +222,7 @@ class AttachmentResourceTest extends ResourceTestBase {
     $field_name = 'field_test_file';
     $attachment_info = $field_name . '/1/' . $this->files['2']->uuid() . '/public/' . $this->files['2']->getFileName();
     $response = $this->httpRequest("$this->dbname/" . $this->entity->uuid() . "/$attachment_info", 'DELETE', NULL);
-    $this->assertResponse('200', 'HTTP response code is correct for new database');
+    $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct for new database');
     $data = Json::decode($response->getBody());
     $this->assertTrue(!empty($data['ok']), 'DELETE request returned ok.');
 
