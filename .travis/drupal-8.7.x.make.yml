@@ -3,7 +3,10 @@ api: 2
 core: 8.x
 
 projects:
-  drupal: 8.7.x
+  drupal:
+    version: 8.7.x
+    patch:
+      text-processed-fix: https://www.drupal.org/files/issues/2018-05-15/text-processed-fix.patch
   key_value: 1.x
   key: 1.x
   encrypt: 3.x
