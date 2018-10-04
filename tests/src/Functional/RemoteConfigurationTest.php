@@ -39,10 +39,10 @@ class RemoteConfigurationTest extends WebTestBase {
     $edit = [];
     $edit['username'] = 'user';
     $edit['password'] = 'pass';
-    $this->drupalPostForm('admin/config/relaxed/settings/', $edit, t('Save configuration'));
+    $this->drupalPostForm('admin/config/workflow/relaxed/', $edit, t('Save configuration'));
     $this->assertResponse(200);
 
-    $this->drupalGet('admin/config/services/relaxed/add');
+    $this->drupalGet('admin/config/workflow/remotes/add');
     $this->assertResponse(200);
     $this->assertNoText('You have to install the Workspace module prior to setting up new workspaces.');
 
@@ -54,14 +54,14 @@ class RemoteConfigurationTest extends WebTestBase {
     $edit['uri'] = 'http://example.com/relaxed';
     $edit['username'] = 'user';
     $edit['password'] = 'pass';
-    $this->drupalPostForm('admin/config/services/relaxed/add/', $edit, t('Save'));
+    $this->drupalPostForm('admin/config/workflow/remotes/add/', $edit, t('Save'));
     $this->assertResponse(200);
 
     $this->assertText($label, "Make sure the label appears on the configuration page after we've saved the Remote.");
 
     // Make another POST request to the Remote edit page.
     $this->clickLink(t('Edit'));
-    preg_match('|admin/config/services/relaxed/(.+)/edit|', $this->getUrl(), $matches);
+    preg_match('|admin/config/workflow/remotes/(.+)/edit|', $this->getUrl(), $matches);
     $aid = $matches[1];
     $edit = [];
     $new_label = $this->randomMachineName();
@@ -78,15 +78,15 @@ class RemoteConfigurationTest extends WebTestBase {
     $this->clickLink(t('Edit'));
 
     // Make sure that deletions work properly.
-    $this->drupalGet('admin/config/services/relaxed');
+    $this->drupalGet('admin/config/workflow/remotes');
     $this->clickLink(t('Delete'));
     $this->assertResponse(200);
     $edit = [];
-    $this->drupalPostForm("admin/config/services/relaxed/$aid/delete", $edit, t('Delete'));
+    $this->drupalPostForm("admin/config/workflow/remotes/$aid/delete", $edit, t('Delete'));
     $this->assertResponse(200);
 
     // Make sure that the Remote was actually deleted.
-    $this->drupalGet('admin/config/services/relaxed');
+    $this->drupalGet('admin/config/workflow/remotes');
     $this->assertResponse(200);
     $this->assertNoText($new_label, "Make sure the Remote label does not appear on the overview page after we've deleted the Remote.");
 

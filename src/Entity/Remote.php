@@ -2,7 +2,6 @@
 
 namespace Drupal\relaxed\Entity;
 
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\encrypt\Entity\EncryptionProfile;

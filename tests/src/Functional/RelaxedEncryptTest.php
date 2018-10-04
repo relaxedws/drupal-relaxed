@@ -8,6 +8,7 @@ use Drupal\Tests\BrowserTestBase;
 
 /**
  * @group relaxed
+ * @dependencies key, encrypt
  */
 class RelaxedEncryptTest extends BrowserTestBase {
 

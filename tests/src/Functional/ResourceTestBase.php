@@ -249,27 +249,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   *
-   * This method is overridden to deal with a cURL quirk: the usage of
-   * CURLOPT_CUSTOMREQUEST cannot be unset on the cURL handle, so we need to
-   * override it every time it is omitted.
-   */
-  protected function curlExec($curl_options, $redirect = FALSE) {
-    unset($this->response);
-
-    if (!isset($curl_options[CURLOPT_CUSTOMREQUEST])) {
-      if (!empty($curl_options[CURLOPT_HTTPGET])) {
-        $curl_options[CURLOPT_CUSTOMREQUEST] = 'GET';
-      }
-      if (!empty($curl_options[CURLOPT_POST])) {
-        $curl_options[CURLOPT_CUSTOMREQUEST] = 'POST';
-      }
-    }
-    return parent::curlExec($curl_options, $redirect);
-  }
-
-  /**
    * Creates a custom workspace entity.
    */
   protected function createWorkspace($name) {
@@ -280,7 +259,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function entityPermissions($entity_type, $operation) {
-    if (in_array($entity_type, array('entity_test_rev', 'entity_test_local'))) {
+    if (in_array($entity_type, array('entity_test_rev', 'entity_test_mulrev', 'entity_test_local'))) {
       switch ($operation) {
         case 'view':
           return array('view test entity');

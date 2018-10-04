@@ -82,7 +82,6 @@ class StubTest extends BrowserTestBase {
     // Ensure that the references entity way created.
     $references = $entity_type_manager
       ->getStorage('entity_test_mulrev')
-      ->useWorkspace($this->workspace->id())
       ->loadByProperties(['uuid' => '0aec21a0-8e36-11e5-8994-feff819cdc9f']);
     $reference = reset($references);
 
@@ -92,7 +91,6 @@ class StubTest extends BrowserTestBase {
     // Ensure that we now have the correct number of entities in the system.
     $entities = $entity_type_manager
       ->getStorage('entity_test_mulrev')
-      ->useWorkspace($this->workspace->id())
       ->loadMultiple();
 
     $this->assertEquals(2, count($entities), 'There total of entities is correct.');
