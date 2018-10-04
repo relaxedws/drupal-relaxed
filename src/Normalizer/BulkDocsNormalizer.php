@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -57,7 +58,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
             }
             // Check if the document is a valid Relaxed format.
             elseif (isset($doc['@context'])) {
-              $entity = $this->serializer->denormalize($doc, 'Drupal\Core\Entity\ContentEntityInterface', $format, $context);
+              $entity = $this->serializer->denormalize($doc, ContentEntityInterface::class, $format, $context);
             }
             if (!empty($entity)) {
               $entities[] = $entity;

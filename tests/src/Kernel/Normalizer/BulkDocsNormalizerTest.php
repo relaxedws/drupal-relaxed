@@ -26,7 +26,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   protected $bulkDocs;
 
   /**
-   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
+   * @var \Drupal\workspaces\WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
@@ -43,8 +43,6 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
   protected function setUp() {
     parent::setUp();
     $this->testEntities = $this->createTestEntities('entity_test_mulrev', $this->testValuesNumber);
-
-    $this->workspaceManager = $this->container->get('workspaces.manager');
 
     $this->bulkDocs = $this->container
       ->get('relaxed.bulkdocs_factory')
@@ -104,7 +102,7 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
 
   protected function createTestEntities($entity_type, $number = 3) {
     $entities = [];
-    $entity_manager = \Drupal::entityManager();
+    $entity_type_manager = \Drupal::entityTypeManager();
 
     while ($number >= 1) {
       $values = [
@@ -116,7 +114,10 @@ class BulkDocsNormalizerTest extends NormalizerTestBase {
         ],
       ];
       $this->testValues[] = $values;
-      $entity = $entity_manager->getStorage($entity_type)->create($values);
+      $entity = $entity_type_manager
+        ->getStorage($entity_type)
+        ->useWorkspace($this->workspaceManager->getActiveWorkspace()->id())
+        ->create($values);
       $entity->save();
       $entities[] = $entity;
       $number--;

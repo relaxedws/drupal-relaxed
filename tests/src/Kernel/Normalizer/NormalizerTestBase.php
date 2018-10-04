@@ -37,6 +37,11 @@ abstract class NormalizerTestBase extends KernelTestBase {
    */
   protected $serializer;
 
+  /**
+   * @var \Drupal\workspaces\WorkspaceInterface
+   */
+  protected $workspaceManager;
+
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('entity_test_mulrev');
@@ -88,6 +93,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
 
     $this->serializer = $this->container->get('relaxed.serializer');
     $this->container->set('workspaces.manager', NULL);
+    $this->workspaceManager = $this->container->get('workspaces.manager');
   }
 
   /**

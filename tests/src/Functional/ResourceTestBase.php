@@ -15,6 +15,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'multiversion',
     'relaxed',
     'relaxed_test',
+    'workspaces',
   ];
 
   /**
@@ -171,6 +172,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         );
         $request_options = [
           RequestOptions::HEADERS => $post_headers,
+          RequestOptions::BODY => $body,
         ];
         break;
 
@@ -183,6 +185,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         );
         $request_options = [
           RequestOptions::HEADERS => $put_headers,
+          RequestOptions::BODY => $body,
         ];
         break;
 
@@ -195,6 +198,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         );
         $request_options = [
           RequestOptions::HEADERS => $patch_headers,
+          RequestOptions::BODY => $body,
         ];
         break;
 

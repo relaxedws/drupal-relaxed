@@ -30,7 +30,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       }
 
       $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($data));
-      $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
+      $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response->getBody());
       $this->assertTrue(is_array($data), 'Data format is correct.');
       foreach ($data as $key => $entity_info) {
@@ -77,7 +77,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
-    $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
+    $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct when entities are updated.');
     $output = Json::decode($response->getBody());
     $this->assertTrue(is_array($output), 'Data format is correct.');
     foreach ($output as $key => $value) {
@@ -124,7 +124,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $patched_entities['new_edits'] = FALSE;
     $serialized = $serializer->serialize($patched_entities, $this->defaultFormat);
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', $serialized);
-    $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
+    $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response->getBody());
     $this->assertTrue(is_array($data), 'Data format is correct.');
 
