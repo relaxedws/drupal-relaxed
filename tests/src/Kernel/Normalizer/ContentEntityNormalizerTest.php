@@ -13,7 +13,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
  */
 class ContentEntityNormalizerTest extends NormalizerTestBase {
 
-  protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
+  protected $entityClass = 'Drupal\entity_test\Entity\EntityTestMulRev';
 
   protected function setUp() {
     parent::setUp();

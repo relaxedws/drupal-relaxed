@@ -16,6 +16,11 @@ class EntityReferenceItemNormalizerTest extends NormalizerTestBase {
   protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
 
   /**
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
    * Tests normalization of entity reference fields that reference users.
    *
    * @todo Write a test of user ID mapping using normalization.
@@ -24,6 +29,13 @@ class EntityReferenceItemNormalizerTest extends NormalizerTestBase {
    * EntityReferenceItemNormalizer does special handling for users.
    */
   public function testUserReferenceFieldNormalization() {
+    $this->user = User::create([
+      'name' => 'user1',
+      'uid' => 1,
+      'mail' => 'example@example.com',
+    ]);
+    $this->user->save();
+
     $author = User::create([
       'name' => $this->randomMachineName(),
       'mail' => $this->randomMachineName() . '@localhost',
@@ -67,9 +79,12 @@ class EntityReferenceItemNormalizerTest extends NormalizerTestBase {
         ],
         'user_id' => [
           [
-            'entity_type_id' => $author->getEntityTypeId(),
-            'target_uuid' => $author->uuid(),
-            'username' => $author->label(),
+            // During normalization referenced user entity will reference the
+            // user from config.
+            // @see Drupal\relaxed\Normalizer\EntityReferenceItemNormalizer.
+            'entity_type_id' => $this->user->getEntityTypeId(),
+            'target_uuid' => $this->user->uuid(),
+            'username' => $this->user->label(),
           ],
         ],
         '_rev' => [
