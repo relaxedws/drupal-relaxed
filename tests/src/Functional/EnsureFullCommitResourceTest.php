@@ -33,7 +33,7 @@ class EnsureFullCommitResourceTest extends ResourceTestBase {
     // response code. It should be 403.
     $account = $this->drupalCreateUser(['perform pull replication']);
     $this->drupalLogin($account);
-    $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST');
+    $response = $this->httpRequest("$this->dbname/_ensure_full_commit", 'POST');
     $this->assertEquals('403', $response->getStatusCode());
   }
 
