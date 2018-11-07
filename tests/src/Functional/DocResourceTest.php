@@ -32,26 +32,28 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$this->dbname/bogus", 'HEAD', NULL);
       $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct for non-existing entities.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
       $first_rev = $entity->_rev->value;
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
       $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
-      $this->assertTrue(empty($response), 'HEAD request returned no body.');
+      $this->assertTrue(empty((string) $response->getBody()), 'HEAD request returned no body.');
 
       $new_name = $this->randomMachineName();
       $entity->name = $new_name;
       $entity->save();
       $second_rev = $entity->_rev->value;
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL);
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals($second_rev, $response->getHeader('x-relaxed-etag')[0]);
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, NULL, ['rev' => $first_rev]);
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, NULL, ['rev' => $first_rev]);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
 
@@ -59,11 +61,11 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
       $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => $first_rev]);
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => $first_rev]);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => $second_rev]);
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'HEAD', NULL, NULL, ['if-none-match' => $second_rev]);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals($second_rev, $response->getHeader('x-relaxed-etag')[0]);
 
@@ -92,8 +94,10 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$this->dbname/bogus", 'GET', NULL);
       $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct for non-existing entities.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL);
       $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
@@ -115,7 +119,7 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['revs' => TRUE]);
       $data = Json::decode($response->getBody());
       $count = count($data['_revisions']['ids']);
-      $this->assertEquals($count, 2, 'GET request returned correct revision list after second revision.');
+      $this->assertEquals($count, 3, 'GET request returned correct revision list after second revision.');
 
       // Test the response for a fake revision.
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
@@ -128,16 +132,16 @@ class DocResourceTest extends ResourceTestBase {
       $entity->save();
       $second_rev = $entity->_rev->value;
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => $first_rev]);
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => $first_rev]);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals($first_rev, $response->getHeader('x-relaxed-etag')[0]);
 
-      $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => $second_rev]);
+      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => $second_rev]);
       $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
       $this->assertEquals($second_rev, $response->getHeader('x-relaxed-etag')[0]);
 
       // Test the response for a fake revision using if-none-match header.
-      $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => '11112222333344445555']);
+      $response = $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'GET', NULL, NULL, ['if-none-match' => '11112222333344445555']);
       $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
     }
   }
@@ -158,8 +162,10 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
 
       $entity->name = $this->randomMachineName();
 
@@ -235,8 +241,10 @@ class DocResourceTest extends ResourceTestBase {
       $data = Json::decode($response->getBody());
       $this->assertTrue(isset($data['rev']), 'PUT request returned a revision hash.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
@@ -277,8 +285,10 @@ class DocResourceTest extends ResourceTestBase {
       // We set this here just for testing.
       \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
 
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL);
       $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct for new database');
@@ -288,8 +298,10 @@ class DocResourceTest extends ResourceTestBase {
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
       $this->assertTrue(empty($entity), 'The entity being DELETED was not loaded.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
@@ -307,8 +319,10 @@ class DocResourceTest extends ResourceTestBase {
       $response = $this->httpRequest("$this->dbname/" . $entity->uuid(), 'DELETE', NULL, NULL, NULL, ['rev' => '11112222333344445555']);
       $this->assertEquals('404', $response->getStatusCode(), 'HTTP response code is correct.');
 
-      $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
+      $storage = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id());
+      $entity = $storage->create();
       $entity->save();
+      $entity = $storage->load($entity->id());
       $first_rev = $entity->_rev->value;
       $entity->name = $this->randomMachineName();
       $entity->save();
