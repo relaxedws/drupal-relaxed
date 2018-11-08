@@ -4,11 +4,11 @@ namespace Drupal\relaxed;
 
 use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\relaxed\Event\RelaxedEvents;
 use Drupal\relaxed\Event\RelaxedReplicationFinishedEvent;
-use Drupal\relaxed\SensitiveDataTransformer;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\replication\Entity\ReplicationLog;
 use Drupal\replication\Entity\ReplicationLogInterface;
@@ -21,6 +21,8 @@ use Relaxed\Replicator\Replicator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class CouchdbReplicator implements ReplicatorInterface{
+
+  use StringTranslationTrait;
 
   /**
    * Relaxed configuration settings.
@@ -94,10 +96,12 @@ class CouchdbReplicator implements ReplicatorInterface{
         $log = reset($replication_logs);
         if (empty($log)) {
           $log = $this->errorReplicationLog($source, $target, $task);
+          $log->history->fail_info = $this->t('The replication returned a session ID but an existing replication log could not be found.');
         }
       }
       else {
         $log = $this->errorReplicationLog($source, $target, $task);
+        $log->history->fail_info = $this->t('The replication have not returned a session ID');
       }
 
       $this->dispatchReplicationFinishedEvent($source, $target, $log);
@@ -106,6 +110,7 @@ class CouchdbReplicator implements ReplicatorInterface{
     catch (\Exception $e) {
       watchdog_exception('Relaxed', $e);
       $log = $this->errorReplicationLog($source, $target, $task);
+      $log->history->fail_info = $e->getMessage();
       $this->dispatchReplicationFinishedEvent($source, $target, $log);
       return $log;
     }
