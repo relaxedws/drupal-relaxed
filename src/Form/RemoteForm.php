@@ -42,7 +42,7 @@ class RemoteForm extends EntityForm {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $remote->label(),
-      '#description' => $this->t("Label for the Remote."),
+      '#description' => $this->t("Label for the Remote, used to easily identify remote workspaces."),
       '#required' => TRUE,
     ];
 
