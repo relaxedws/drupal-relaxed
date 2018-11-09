@@ -28,7 +28,10 @@ class RevsDiffResource extends ResourceBase {
    * @return \Drupal\rest\ModifiedResourceResponse
    */
   public function post($workspace, $revs_diff) {
-    if (!$workspace instanceof WorkspaceInterface || !$workspace->isPublished()) {
+    try {
+      $this->checkWorkspaceExists($workspace);
+    }
+    catch (\Exception $e) {
       throw new BadRequestHttpException(t('Invalid workspace name.'));
     }
     if (empty($revs_diff)) {

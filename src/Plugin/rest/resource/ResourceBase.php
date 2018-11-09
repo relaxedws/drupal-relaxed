@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Plugin\rest\resource;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Routing\BcRoute;
 use Drupal\multiversion\Entity\WorkspaceInterface;
 use Drupal\rest\Plugin\ResourceBase as CoreResourceBase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
