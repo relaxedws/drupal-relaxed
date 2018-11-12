@@ -7,6 +7,9 @@ php:
   - 7.1
 
 matrix:
+  allow_failures:
+    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.5.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
   fast_finish: true
 
 services:
