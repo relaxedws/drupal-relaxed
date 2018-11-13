@@ -7,6 +7,7 @@ projects:
     version: 8.5.x
     patch:
       text-processed-fix: https://www.drupal.org/files/issues/2018-05-15/text-processed-fix.patch
+      drupal-menulinkcontent-getuuid-return-missing-2737741-2: https://www.drupal.org/files/issues/drupal-menulinkcontent-getuuid-return-missing-2737741-2.patch
   key_value: 1.x
   key: 1.x
   encrypt: 3.x
