@@ -3,7 +3,6 @@
 namespace Drupal\relaxed\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\relaxed\HttpMultipart\Message\MultipartResponse;
 use GuzzleHttp\Psr7;
 
