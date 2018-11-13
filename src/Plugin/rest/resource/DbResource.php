@@ -138,6 +138,8 @@ class DbResource extends ResourceBase {
     try {
       // @todo: {@link https://www.drupal.org/node/2600382 Access check.}
       $entity->delete();
+      // Run a cron job.
+      \Drupal::service('cron')->run();
     }
     catch (\Exception $e) {
       throw new HttpException(500, $e->getMessage(), $e);
