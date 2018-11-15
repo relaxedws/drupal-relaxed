@@ -13,7 +13,8 @@ abstract class ResourceTestBase extends RESTTestBase {
     'multiversion',
     'rest',
     'relaxed',
-    'relaxed_test'
+    'relaxed_test',
+    'replication',
   ];
 
   protected $strictConfigSchema = FALSE;
