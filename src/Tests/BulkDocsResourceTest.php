@@ -24,14 +24,16 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       $data = ['docs' => []];
+      /** @var \Symfony\Component\Serializer\SerializerInterface $serializer */
+      $serializer = $this->container->get('serializer');
       foreach ($this->createTestEntities($entity_type) as $entity) {
-        $data['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+        $data['docs'][] = $serializer->serialize($entity, $this->defaultFormat);
       }
 
       $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($data));
       $this->assertResponse('201', 'HTTP response code is correct when entities are created or updated.');
       $data = Json::decode($response);
-      $this->assertTrue(is_array($data), 'Data format is correct.');
+      $this->assertTrue(is_array($data) && !empty($data), 'Data format is correct.');
       foreach ($data as $key => $entity_info) {
         $entity_number = $key+1;
         $this->assertTrue(isset($entity_info['rev']), "POST request returned a revision hash for entity number $entity_number.");
@@ -73,13 +75,13 @@ class BulkDocsResourceTest extends ResourceTestBase {
         // Delete an entity.
         $entity->delete();
       }
-      $input['docs'][] = $this->container->get('replication.normalizer.content_entity')->normalize($entity, $this->defaultFormat);
+      $input['docs'][] = $serializer->serialize($entity, $this->defaultFormat);
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $output = Json::decode($response);
-    $this->assertTrue(is_array($output), 'Data format is correct.');
+    $this->assertTrue(is_array($output) && !empty($output), 'Data format is correct.');
     foreach ($output as $key => $value) {
       $entity_number = $key+1;
       $this->assertTrue(isset($value['rev']), "POST request returned a revision hash for entity number $entity_number.");
@@ -87,6 +89,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
 
     foreach ($input['docs'] as $key => $value) {
+      $value = Json::decode($value);
       $entity_number = $key+1;
       $entity = $this->entityRepository->loadEntityByUuid($entity_type, $value['_id']);
       if ($key == 1) {
@@ -95,7 +98,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       else {
         $this->assertEqual(
           $entity->get('field_test_text')->value,
-          $input['docs'][$key]['en']['field_test_text'][0]['value'],
+          $value['en']['field_test_text'][0]['value'],
           "Correct value for 'field_test_text' for entity number $entity_number."
         );
         list($count) = explode('-', $entity->_rev->value);
@@ -126,7 +129,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', $serialized);
     $this->assertResponse('201', 'HTTP response code is correct when entities are updated.');
     $data = Json::decode($response);
-    $this->assertTrue(is_array($data), 'Data format is correct.');
+    $this->assertTrue(is_array($data) && !empty($data), 'Data format is correct.');
 
     foreach ($data as $key => $entity_info) {
       $entity_number = $key+1;
