@@ -2,10 +2,10 @@
   "name": "pouchdb-replication",
   "version": "1.0.0",
   "dependencies": {
-    "mocha-phantomjs": "~4.0.2",
-    "chai": "~3.5.0",
-    "es5-shim": "~4.5.8",
-    "mocha": "~2.5.3",
+    "mocha-phantomjs": "~4.1.0",
+    "chai": "~4.2.0",
+    "es5-shim": "~4.5.12",
+    "mocha": "~5.2.0",
     "whatwg-fetch": "~3.0.0",
     "pouchdb": "~6.0.5"
   }
