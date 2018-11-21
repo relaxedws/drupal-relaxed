@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\RemoteCheck;
 
+use Drupal\Core\Site\Settings;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\relaxed\Plugin\RemoteCheckBase;
 
@@ -19,8 +20,14 @@ Class Ping extends RemoteCheckBase {
   public function execute(RemoteInterface $remote) {
     $url = (string) $remote->uri();
     $client = \Drupal::httpClient();
+    $options = [];
+    // If the self signed certificates are allowed then verify value should
+    // be FALSE.
+    if (Settings::get('allow_self_signed_certificates', FALSE)) {
+      $options = ['verify' => FALSE];
+    }
     try {
-      $response = $client->request('GET', $url);
+      $response = $client->request('GET', $url, $options);
       if ($response->getStatusCode() === 200) {
         $this->result = true;
         $this->message = t('Remote is reachable.');
