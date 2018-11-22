@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Plugin\RemoteCheck;
 
+use Drupal\Core\Site\Settings;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\relaxed\Plugin\RemoteCheckBase;
 
@@ -23,8 +24,13 @@ Class ValidRemote extends RemoteCheckBase {
   public function execute(RemoteInterface $remote) {
     $url = (string) $remote->uri();
     $client = \Drupal::httpClient();
+    $options = [];
+    // If self signed certificates are allowed then verify value should be FALSE.
+    if (Settings::get('allow_self_signed_certificates', FALSE)) {
+      $options = ['verify' => FALSE];
+    }
     try {
-      $response = $client->request('GET', $url . '/_all_dbs');
+      $response = $client->request('GET', $url . '/_all_dbs', $options);
       if ($response->getStatusCode() === 200) {
         $databases = json_decode($response->getBody());
         if (!empty($databases)) {

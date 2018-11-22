@@ -4,6 +4,7 @@ namespace Drupal\relaxed;
 
 use Doctrine\CouchDB\CouchDBClient;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\multiversion\Entity\WorkspaceInterface;
@@ -152,10 +153,17 @@ class CouchdbReplicator implements ReplicatorInterface{
         $port = ($uri->getScheme() == 'https') ? 443 : 80;
       }
 
+      $verify = TRUE;
+      // If the self signed certificates are allowed then verify value should
+      // be FALSE.
+      if (Settings::get('allow_self_signed_certificates', FALSE)) {
+        $verify = FALSE;
+      }
       return CouchDBClient::create([
         'url' => (string) $uri,
         'port' => $port,
-        'timeout' => 10
+        'timeout' => 10,
+        'verify' => $verify,
       ]);
     }
   }

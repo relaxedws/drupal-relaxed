@@ -3,6 +3,7 @@
 namespace Drupal\relaxed;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;
 use Drupal\workspace\Entity\WorkspacePointer;
@@ -45,8 +46,14 @@ class RemotePointer implements RemotePointerInterface {
    */
   public function getRemoteDatabases(RemoteInterface $remote) {
     $uri = $remote->uri();
+    $options = [];
+    // If the self signed certificates are allowed then verify value should
+    // be FALSE.
+    if (Settings::get('allow_self_signed_certificates', FALSE)) {
+      $options = ['verify' => FALSE];
+    }
     try {
-      $response = $this->httpClient->request('GET', $uri . '/_all_dbs');
+      $response = $this->httpClient->request('GET', $uri . '/_all_dbs', $options);
       if ($response->getStatusCode() === 200) {
         return json_decode($response->getBody());
       }
