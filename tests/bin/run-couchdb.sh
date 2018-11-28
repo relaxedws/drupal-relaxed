@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ $COUCHDB_VERSION = "2.0-dev" ]; then
-  docker run -d -p 3001:5984 klaemo/couchdb:$COUCHDB_VERSION --with-haproxy --with-admin-party-please -n 1
+if [ $COUCHDB_VERSION = "2.2.0" ]; then
+  docker run -d -p 3001:5984 apache/couchdb:$COUCHDB_VERSION --with-haproxy --with-admin-party-please -n 1
   export COUCH_PORT=3001
 elif [ $COUCHDB_VERSION = "1.6.1" ]; then
   export COUCH_PORT=5984

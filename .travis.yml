@@ -23,12 +23,8 @@ addons:
 
 env:
   matrix:
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.6.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=2.0-dev
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=1.6.1
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.7.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=2.0-dev
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=2.2.0
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
 
@@ -37,7 +33,7 @@ notifications:
 
 cache:
   directories:
-  - $HOME/.drush/cache/download
+    - $HOME/.drush/cache/download
 
 before_install:
   - composer self-update
@@ -48,7 +44,6 @@ before_install:
   - nginx -c $TRAVIS_BUILD_DIR/.travis/nginx.conf
   - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.1.16/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
-  - composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
   - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
@@ -56,6 +51,7 @@ before_install:
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
   - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
+  - composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade
 
 script:
   - cd ~/www && bash $SCRIPT
