@@ -17,6 +17,10 @@ class AllDocsNormalizer extends NormalizerBase {
       'rows' => [],
     ];
 
+    if (!empty($context['query']['include_docs'])) {
+      $all_docs->includeDocs(TRUE);
+    }
+
     /** @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs */
     $rows = $all_docs->execute();
 

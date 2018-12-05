@@ -4,8 +4,8 @@ namespace Drupal\relaxed\AllDocs;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\multiversion\Entity\Index\EntityIndexInterface;
-use Drupal\workspaces\WorkspaceInterface;
 use Drupal\multiversion\MultiversionManagerInterface;
+use Drupal\workspaces\WorkspaceInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
@@ -91,7 +91,7 @@ class AllDocs implements AllDocsInterface {
    * {@inheritdoc}
    */
   public function includeDocs($include_docs) {
-    $this->includeDocs = $include_docs;
+    $this->includeDocs = (bool) $include_docs;
   }
 
   /**
@@ -165,6 +165,9 @@ class AllDocs implements AllDocsInterface {
         }
         $items = $this->entityIndex->useWorkspace($this->workspace->id())->getMultiple($keys);
         foreach ($items as $item) {
+          if ($item['is_stub'] == TRUE) {
+            continue;
+          }
           $rows[$item['uuid']] = ['rev' => $item['rev']];
         }
 
