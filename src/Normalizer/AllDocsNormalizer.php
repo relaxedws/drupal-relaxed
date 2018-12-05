@@ -17,11 +17,10 @@ class AllDocsNormalizer extends NormalizerBase {
       'rows' => [],
     ];
 
+    /** @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs */
     if (!empty($context['query']['include_docs'])) {
       $all_docs->includeDocs(TRUE);
     }
-
-    /** @var \Drupal\relaxed\AllDocs\AllDocsInterface $all_docs */
     $rows = $all_docs->execute();
 
     foreach ($rows as $key => $value) {
