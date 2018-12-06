@@ -190,7 +190,7 @@ services:
       - { name: relaxed_normalizer, priority: 50 }
   relaxed.normalizer.link_item:
     class: Drupal\relaxed\Normalizer\LinkItemNormalizer
-    arguments: ['@entity_type.manager', '@plugin.manager.entity_reference_selection']
+    arguments: ['@entity_type.manager', '@path.alias_manager', '@plugin.manager.entity_reference_selection']
     tags:
       - { name: relaxed_normalizer, priority: 40 }
   relaxed.normalizer.text_item:
