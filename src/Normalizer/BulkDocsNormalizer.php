@@ -2,14 +2,17 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\relaxed\BulkDocs\BulkDocsInterface;
+use Drupal\relaxed\Entity\ReplicationLogInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface {
 
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\BulkDocs\BulkDocsInterface'];
+  protected $supportedInterfaceOrClass = [BulkDocsInterface::class];
 
   /**
    * {@inheritdoc}
@@ -46,6 +49,9 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
       if (isset($data['docs'])) {
         foreach ($data['docs'] as $doc) {
           if (!empty($doc)) {
+            if (is_string($doc)) {
+              $doc = Json::decode($doc);
+            }
             // @todo {@link https://www.drupal.org/node/2599934 Find a more generic way to denormalize.}
             if (!empty($doc['_id']) && strpos($doc['_id'], 'local') !== FALSE) {
               // Denormalize replication_log entities. This is used when the
@@ -53,7 +59,7 @@ class BulkDocsNormalizer extends NormalizerBase implements DenormalizerInterface
               // replicating content from PouchDB.
               list($prefix, $entity_uuid) = explode('/', $doc['_id']);
               if ($prefix == '_local' && $entity_uuid) {
-                $entity = $this->serializer->denormalize($doc, 'Drupal\relaxed\Entity\ReplicationLog', $format, $context);
+                $entity = $this->serializer->denormalize($doc, ReplicationLogInterface::class, $format, $context);
               }
             }
             // Check if the document is a valid Relaxed format.

@@ -13,9 +13,6 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
   public function testPostCreate() {
     $entity_types = ['entity_test_rev'];
-
-    $serializer = $this->container->get('relaxed.serializer');
-
     foreach ($entity_types as $entity_type) {
       // Create a user with the correct permissions.
       $permissions = $this->entityPermissions($entity_type, 'create');
@@ -25,8 +22,10 @@ class BulkDocsResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       $data = ['docs' => []];
+      /** @var \Symfony\Component\Serializer\SerializerInterface $serializer */
+      $serializer = $this->container->get('relaxed.serializer');
       foreach ($this->createTestEntities($entity_type) as $entity) {
-        $data['docs'][] = $serializer->normalize($entity, $this->defaultFormat);
+        $data['docs'][] = $serializer->serialize($entity, $this->defaultFormat);
       }
 
       $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($data));
@@ -73,7 +72,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
         // Delete an entity.
         $entity->delete();
       }
-      $input['docs'][] = $serializer->normalize($entity, $this->defaultFormat);
+      $input['docs'][] = $serializer->serialize($entity, $this->defaultFormat);
     }
 
     $response = $this->httpRequest("$this->dbname/_bulk_docs", 'POST', Json::encode($input));
@@ -87,6 +86,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
     }
 
     foreach ($input['docs'] as $key => $value) {
+      $value = Json::decode($value);
       $entity_number = $key+1;
       $entity = $this->entityRepository->loadEntityByUuid($entity_type, $value['_id']);
       if ($key == 1) {
@@ -95,7 +95,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
       else {
         $this->assertEquals(
           $entity->get('field_test_text')->value,
-          $input['docs'][$key]['en']['field_test_text'][0]['value'],
+          $value['en']['field_test_text'][0]['value'],
           "Correct value for 'field_test_text' for entity number $entity_number."
         );
         list($count) = explode('-', $entity->_rev->value);
@@ -105,7 +105,7 @@ class BulkDocsResourceTest extends ResourceTestBase {
 
     $entities = $this->createTestEntities($entity_type, TRUE);
     foreach ($entities as $key => $entity) {
-      $patched_entities['docs'][$key] = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->load($entity->id());
+      $patched_entities['docs'][$key] = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
       $patched_entities['docs'][$key]->set(
         'field_test_text',
         [

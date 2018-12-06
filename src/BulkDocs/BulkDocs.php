@@ -191,7 +191,6 @@ class BulkDocs implements BulkDocsInterface {
           $entity->{$id_key}->value = NULL;
         }
 
-        $entity->workspace->target_id = $this->workspace->id();
         $entity->_rev->new_edit = $this->newEdits;
         $this->entityTypeManager->getStorage($entity->getEntityTypeId())->useWorkspace($this->workspace->id());
         if ($entity->save()) {
