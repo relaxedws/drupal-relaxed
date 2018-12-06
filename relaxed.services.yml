@@ -197,14 +197,6 @@ services:
     class: Drupal\relaxed\Normalizer\TextItemNormalizer
     tags:
       - { name: relaxed_normalizer, priority: 30 }
-  relaxed.normalizer.deleted_flag_item_list:
-    class: Drupal\relaxed\Normalizer\DeletedFlagItemListNormalizer
-    tags:
-      - { name: relaxed_normalizer, priority: 30 }
-  relaxed.normalizer.revision_info_item_list:
-    class: Drupal\relaxed\Normalizer\RevisionInfoItemListNormalizer
-    tags:
-      - { name: relaxed_normalizer, priority: 30 }
   relaxed.normalizer.paragraph:
     class: Drupal\relaxed\Normalizer\ParagraphNormalizer
     arguments: ['@entity.manager', '@multiversion.entity_index.factory', '@language_manager', '@relaxed.users_mapping', '@module_handler', '@plugin.manager.entity_reference_selection', '@event_dispatcher']

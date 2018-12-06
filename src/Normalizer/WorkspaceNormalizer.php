@@ -3,9 +3,8 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\workspaces\Entity\WorkspaceType;
-use Drupal\workspaces\Entity\WorkspaceTypeInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
+use Drupal\workspaces\WorkspaceInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -16,7 +15,7 @@ class WorkspaceNormalizer extends NormalizerBase implements DenormalizerInterfac
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\workspaces\WorkspaceInterface'];
+  protected $supportedInterfaceOrClass = [WorkspaceInterface::class];
 
   /**
    * The entity manager.

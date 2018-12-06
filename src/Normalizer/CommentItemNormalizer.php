@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use \Drupal\serialization\Normalizer\FieldItemNormalizer;
 
 class CommentItemNormalizer extends FieldItemNormalizer  {
@@ -11,7 +12,7 @@ class CommentItemNormalizer extends FieldItemNormalizer  {
    *
    * @var string
    */
-  protected $supportedInterfaceOrClass = 'Drupal\comment\Plugin\Field\FieldType\CommentItem';
+  protected $supportedInterfaceOrClass = [CommentItemInterface::class];
 
   /**
    * {@inheritdoc}

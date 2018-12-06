@@ -9,7 +9,7 @@ class TaxonomyTermNormalizer extends ContentEntityNormalizer {
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['\Drupal\taxonomy\Entity\Term'];
+  protected $supportedInterfaceOrClass = [TermInterface::class];
 
   /**
    * {@inheritdoc}

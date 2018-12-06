@@ -2,11 +2,12 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\relaxed\AllDocs\AllDocsInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 
 class AllDocsNormalizer extends NormalizerBase {
 
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\AllDocs\AllDocsInterface'];
+  protected $supportedInterfaceOrClass = [AllDocsInterface::class];
 
   /**
    * {@inheritdoc}

@@ -2,11 +2,12 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\relaxed\Changes\ChangesInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 
 class ChangesNormalizer extends NormalizerBase {
 
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\Changes\ChangesInterface'];
+  protected $supportedInterfaceOrClass = [ChangesInterface::class];
 
   /**
    * {@inheritdoc}

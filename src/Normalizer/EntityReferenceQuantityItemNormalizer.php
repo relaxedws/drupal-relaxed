@@ -2,6 +2,8 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\entity_reference_quantity\Plugin\Field\FieldType\EntityReferenceQuantity;
+
 /**
  * Normalizer for entity_reference_quantity field type.
  */
@@ -12,7 +14,7 @@ class EntityReferenceQuantityItemNormalizer extends EntityReferenceItemNormalize
    *
    * @var string
    */
-  protected $supportedInterfaceOrClass = 'Drupal\entity_reference_quantity\Plugin\Field\FieldType\EntityReferenceQuantity';
+  protected $supportedInterfaceOrClass = [EntityReferenceQuantity::class];
 
   /**
    * Format.

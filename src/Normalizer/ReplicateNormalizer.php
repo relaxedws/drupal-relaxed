@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\relaxed\Replicate\Replicate;
+use Drupal\relaxed\Replicate\ReplicateInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -11,7 +12,7 @@ class ReplicateNormalizer extends NormalizerBase implements DenormalizerInterfac
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\Replicate\ReplicateInterface'];
+  protected $supportedInterfaceOrClass = [ReplicateInterface::class];
 
   /**
    * @var \Drupal\relaxed\Replicate\Replicate

@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\relaxed\RevisionDiff\RevisionDiffInterface;
 use Drupal\relaxed\RevisionDiffFactoryInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -12,7 +13,7 @@ class RevsDiffNormalizer extends NormalizerBase implements DenormalizerInterface
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\RevisionDiff\RevisionDiffInterface'];
+  protected $supportedInterfaceOrClass = [RevisionDiffInterface::class];
 
   /** @var  \Drupal\relaxed\RevisionDiffFactoryInterface */
   protected $revisionDiffFactory;

@@ -23,6 +23,7 @@ class RelaxedWorkspaceNegotiator implements WorkspaceNegotiatorInterface {
   protected $configFactory;
 
   /**
+   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    */
   public function __construct(WorkspaceManagerInterface $workspace_manager, ConfigFactoryInterface $config_factory) {

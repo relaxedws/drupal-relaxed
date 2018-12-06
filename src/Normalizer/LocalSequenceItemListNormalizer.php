@@ -10,7 +10,7 @@ class LocalSequenceItemListNormalizer extends NormalizerBase implements Denormal
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\multiversion\Plugin\Field\FieldType\LocalSequenceItemList'];
+  protected $supportedInterfaceOrClass = [LocalSequenceItemListNormalizer::class];
 
   /**
    * {@inheritdoc}

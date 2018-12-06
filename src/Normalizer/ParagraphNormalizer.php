@@ -4,6 +4,7 @@ namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Drupal\paragraphs\Entity\Paragraph;
 
 /**
  * Class ParagraphNormalizer
@@ -14,7 +15,7 @@ class ParagraphNormalizer extends ContentEntityNormalizer implements Denormalize
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\paragraphs\Entity\Paragraph'];
+  protected $supportedInterfaceOrClass = [Paragraph::class];
 
   /**
    * {@inheritdoc}
@@ -85,7 +86,7 @@ class ParagraphNormalizer extends ContentEntityNormalizer implements Denormalize
    * {@inheritdoc}
    */
   public function supportsDenormalization($data, $type, $format = NULL) {
-    if (in_array($type, ['Drupal\paragraphs\Entity\Paragraph', 'Drupal\Core\Entity\ContentEntityInterface'])) {
+    if (in_array($type, [Paragraph::class, ContentEntityInterface::class])) {
       if (isset($data['@type']) && $data['@type'] == 'paragraph') {
         return TRUE;
       }

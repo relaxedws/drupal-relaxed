@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
+use Drupal\multiversion\EntityReferenceItem;
 use Drupal\serialization\Normalizer\FieldItemNormalizer;
 
 class EntityReferenceItemNormalizer extends FieldItemNormalizer {
@@ -12,7 +13,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer {
    *
    * @var string
    */
-  protected $supportedInterfaceOrClass = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
+  protected $supportedInterfaceOrClass = [EntityReferenceItem::class];
 
   /**
    * {@inheritdoc}

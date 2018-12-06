@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -18,7 +19,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer implements Denormaliz
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\file\FileInterface'];
+  protected $supportedInterfaceOrClass = [FileInterface::class];
 
   /**
    * @var string[]
@@ -90,7 +91,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer implements Denormaliz
   public function supportsDenormalization($data, $type, $format = NULL) {
     // We need to accept both FileInterface and ContentEntityInterface classes.
     // File entities are treated as standard content entities.
-    if (in_array($type, ['Drupal\Core\Entity\ContentEntityInterface', 'Drupal\file\FileInterface'], true)) {
+    if (in_array($type, [ContentEntityInterface::class, FileInterface::class], true)) {
       // If a document has _attachment then we assume it's a file entity.
       if (!empty($data['@attachment'])) {
         return true;

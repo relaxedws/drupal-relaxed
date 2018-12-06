@@ -18,6 +18,11 @@ class RevisionDiff implements RevisionDiffInterface {
   protected $revs;
 
   /**
+   * @var int
+   */
+  protected $workspaceId;
+
+  /**
    * @param \Drupal\multiversion\Entity\Index\RevisionIndexInterface $rev_index
    * @param \Drupal\workspaces\WorkspaceInterface $workspace
    */

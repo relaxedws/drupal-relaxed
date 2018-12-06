@@ -11,7 +11,7 @@ class AttachmentNormalizer extends ContentEntityNormalizer implements Denormaliz
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\file\FileInterface'];
+  protected $supportedInterfaceOrClass = [FileInterface::class];
 
   /**
    * @var string[]

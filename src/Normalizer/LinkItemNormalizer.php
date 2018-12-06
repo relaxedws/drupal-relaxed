@@ -2,12 +2,17 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\workspaces\WorkspaceInterface;
+use Drupal\Core\Path\AliasManagerInterface;
+use Drupal\Core\Url;
+use Drupal\link\LinkItemInterface;
+use Drupal\multiversion\Entity\Storage\ContentEntityStorageInterface;
 use Drupal\serialization\Normalizer\FieldItemNormalizer;
+use Drupal\workspaces\WorkspaceInterface;
 
 class LinkItemNormalizer extends FieldItemNormalizer {
 
@@ -16,7 +21,7 @@ class LinkItemNormalizer extends FieldItemNormalizer {
    *
    * @var string
    */
-  protected $supportedInterfaceOrClass = 'Drupal\link\Plugin\Field\FieldType\LinkItem';
+  protected $supportedInterfaceOrClass = [LinkItemInterface::class];
 
   /**
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -29,12 +34,19 @@ class LinkItemNormalizer extends FieldItemNormalizer {
   private $selectionManager;
 
   /**
+   * @var \Drupal\Core\Path\AliasManagerInterface
+   */
+  private $aliasManager;
+
+  /**
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Path\AliasManagerInterface $alias_manager
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface|null $selection_manager
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, SelectionPluginManagerInterface $selection_manager = NULL) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, AliasManagerInterface $alias_manager, SelectionPluginManagerInterface $selection_manager = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->selectionManager = $selection_manager;
+    $this->aliasManager = $alias_manager;
   }
 
   /**
@@ -57,29 +69,39 @@ class LinkItemNormalizer extends FieldItemNormalizer {
     // Use the entity UUID instead of ID in urls like internal:/node/1.
     if (isset($attributes['uri'])) {
       $scheme = parse_url($attributes['uri'], PHP_URL_SCHEME);
-      if (($scheme != 'internal' && $scheme != 'entity') ) {
+      if (!in_array($scheme, ['internal', 'entity'])) {
         return $attributes;
       }
       $path = parse_url($attributes['uri'], PHP_URL_PATH);
-      $path_arguments = explode('/', $path);
-      if (isset($path[0]) && $path[0] == '/' && isset($path_arguments[1]) && isset($path_arguments[2]) && is_numeric($path_arguments[2]) && empty($path_arguments[3])) {
-        $entity_type = $path_arguments[1];
-        $entity_id = $path_arguments[2];
-      }
-      elseif (isset($path[0]) && $path[0] != '/' && isset($path_arguments[0]) && isset($path_arguments[1]) && is_numeric($path_arguments[1]) && empty($path_arguments[2])) {
-        $entity_type = $path_arguments[0];
-        $entity_id = $path_arguments[1];
+      // This service is not injected to avoid circular reference error when
+      // installing page_manager contrib module.
+      $url = \Drupal::service('path.validator')->getUrlIfValidWithoutAccessCheck($path);
+      if ($url instanceof Url) {
+        $internal_path = ltrim($url->getInternalPath(), '/');
+        $path = ltrim($path, '/');
+        // Return attributes as they are if uri is an alias.
+        if ($path != $internal_path) {
+          return $attributes;
+        }
+        $route_name = $url->getRouteName();
+        $route_name_parts = explode('.', $route_name);
+        if ($route_name_parts[0] === 'entity' && $this->isMultiversionableEntityType($route_name_parts[1])) {
+          $entity_type = $route_name_parts[1];
+          $entity_id = $url->getRouteParameters()[$entity_type];
+        }
+        else {
+          return $attributes;
+        }
       }
       else {
         return $attributes;
       }
-      $entity_types = array_keys($this->entityTypeManager->getDefinitions());
-      if (!in_array($entity_type, $entity_types)) {
-        return $attributes;
-      }
       $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity_id);
       if ($entity instanceof EntityInterface) {
-        $attributes['uri'] = ($scheme == 'entity') ? "$scheme:$entity_type/" . $entity->uuid() : "$scheme:/$entity_type/" . $entity->uuid();
+        $entity_uuid = $entity->uuid();
+        $attributes['uri'] = str_replace($entity_id, $entity_uuid, $attributes['uri']);
+        $attributes['_entity_uuid'] = $entity_uuid;
+        $attributes['_entity_type'] = $entity_type;
         $bundle_key = $entity->getEntityType()->getKey('bundle');
         $bundle = $entity->bundle();
         if ($bundle_key && $bundle) {
@@ -96,29 +118,21 @@ class LinkItemNormalizer extends FieldItemNormalizer {
   public function denormalize($data, $class, $format = NULL, array $context = []) {
     if (isset($data['uri'])) {
       $scheme = parse_url($data['uri'], PHP_URL_SCHEME);
-      if (($scheme != 'internal' && $scheme != 'entity') ) {
+      if (!in_array($scheme, ['internal', 'entity']) || !isset($data['_entity_uuid']) || !isset($data['_entity_type'])) {
         return parent::denormalize($data, $class, $format, $context);
       }
-      $path = parse_url($data['uri'], PHP_URL_PATH);
-      $path_arguments = explode('/', $path);
-      if (isset($path[0]) && $path[0] == '/' && isset($path_arguments[1]) && isset($path_arguments[2]) && empty($path_arguments[3])) {
-        $entity_type = $path_arguments[1];
-        $entity_uuid = $path_arguments[2];
+      $entity_uuid = $data['_entity_uuid'];
+      $entity_type = $data['_entity_type'];
+      $entity = NULL;
+      if (isset($context['workspace']) && ($context['workspace'] instanceof WorkspaceInterface)) {
+        $entities = $this->entityTypeManager
+          ->getStorage($entity_type)
+          ->useWorkspace($context['workspace']->id())
+          ->loadByProperties(['uuid' => $entity_uuid]
+          );
+        $entity = reset($entities);
       }
-      elseif (isset($path[0]) && $path[0] != '/' && isset($path_arguments[0]) && isset($path_arguments[1]) && empty($path_arguments[2])) {
-        $entity_type = $path_arguments[0];
-        $entity_uuid = $path_arguments[1];
-      }
-      else {
-        return parent::denormalize($data, $class, $format, $context);;
-      }
-      $entity_types = array_keys($this->entityTypeManager->getDefinitions());
-      if (!in_array($entity_type, $entity_types)) {
-        return parent::denormalize($data, $class, $format, $context);
-      }
-      $entities = $this->entityTypeManager->getStorage($entity_type)->loadByProperties(['uuid' => $entity_uuid]);
-      $entity = reset($entities);
-      if (!($entity instanceof EntityInterface)) {
+      if (!($entity instanceof ContentEntityInterface)) {
         $bundle_key = $this->entityTypeManager->getStorage($entity_type)->getEntityType()->getKey('bundle');
         if (isset($data[$bundle_key])) {
           /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $selection_instance */
@@ -135,7 +149,7 @@ class LinkItemNormalizer extends FieldItemNormalizer {
         }
       }
       if ($entity instanceof EntityInterface) {
-        $data['uri'] = ($scheme == 'entity') ? "$scheme:$entity_type/" . $entity->id() : "$scheme:/$entity_type/" . $entity->id();
+        $data['uri'] = str_replace($entity_uuid, $entity->id(), $data['uri']);
       }
     }
 
@@ -143,14 +157,45 @@ class LinkItemNormalizer extends FieldItemNormalizer {
   }
 
   /**
-   * Determines whether the item holds an unsaved entity.
-   *
-   * @param $data
-   *
-   * @return bool TRUE if the item holds an unsaved entity.
+   * {@inheritdoc}
    */
-  protected function hasNewEntity($data) {
-    return $data['uri'] instanceof ContentEntityInterface && $data['uri']->isNew();
+  public function supportsDenormalization($data, $type, $format = NULL) {
+    if (in_array($type, ['Drupal\link\Plugin\Field\FieldType\LinkItem'])) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * @param string $entity_type_id
+   *
+   * @return bool
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  protected function isMultiversionableEntityType($entity_type_id) {
+    try {
+      $storage = $this->entityTypeManager->getStorage($entity_type_id);
+    }
+    catch (InvalidPluginDefinitionException $exception) {
+      return FALSE;
+    }
+    $entity_type = $storage->getEntityType();
+    if (is_subclass_of($entity_type->getStorageClass(), ContentEntityStorageInterface::class)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function checkFormat($format = NULL) {
+    // Don't support HAL normalization because that expects a different format.
+    // @see \Drupal\hal\Normalizer\FieldItemNormalizer::normalize()
+    if ($format == 'hal_json') {
+      return FALSE;
+    }
+    return parent::checkFormat($format);
   }
 
 }

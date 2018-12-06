@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -30,7 +31,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\Core\Entity\ContentEntityInterface'];
+  protected $supportedInterfaceOrClass = [ContentEntityInterface::class];
 
   /**
    * @var \Drupal\multiversion\Entity\Index\MultiversionIndexFactory
@@ -332,7 +333,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    * @param $context
    * @param $rev
    * @param array $revisions
+   *
    * @return mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   private function denormalizeTranslation($translation, $entity_id, $entity_uuid, $entity_type_id, $bundle_key, $entity_type, $id_key, $context, $rev = null, array $revisions = []) {
     // Add the _rev field to the $translation array.
@@ -524,6 +529,8 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
    *
    * @return \Drupal\Core\Entity\EntityInterface
    *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @see \Drupal\serialization\Normalizer\FieldableEntityNormalizerTrait
    */
   private function createEntityInstance(array $data, EntityTypeInterface $entity_type, $format, array $context = []) {
@@ -556,7 +563,11 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
   /**
    * @param $data
    * @param $context
+   *
    * @return string
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function denormalizeMenuLinkParent($data, $context) {
     if (strpos($data, 'menu_link_content') === 0) {

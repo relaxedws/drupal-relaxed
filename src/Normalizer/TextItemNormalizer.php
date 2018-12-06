@@ -3,6 +3,7 @@
 namespace Drupal\relaxed\Normalizer;
 
 use Drupal\serialization\Normalizer\FieldItemNormalizer;
+use Drupal\text\Plugin\Field\FieldType\TextItemBase;
 
 /**
  * Converts TextItem fields to an array including computed values.
@@ -14,7 +15,7 @@ class TextItemNormalizer extends FieldItemNormalizer {
    *
    * @var string
    */
-  protected $supportedInterfaceOrClass = 'Drupal\text\Plugin\Field\FieldType\TextItemBase';
+  protected $supportedInterfaceOrClass = [TextItemBase::class];
 
   /**
    * {@inheritdoc}

@@ -2,6 +2,7 @@
 
 namespace Drupal\relaxed\Normalizer;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\multiversion\Entity\Index\UuidIndexInterface;
 use Drupal\relaxed\Entity\ReplicationLog;
@@ -14,7 +15,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = ['Drupal\relaxed\Entity\ReplicationLog'];
+  protected $supportedInterfaceOrClass = [ReplicationLogInterface::class];
 
   /**
    * @var \Drupal\multiversion\Entity\Index\UuidIndexInterface
@@ -84,7 +85,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   public function supportsDenormalization($data, $type, $format = NULL) {
     // We need to accept both ReplicationLog and ContentEntityInterface classes.
     // LocalDocResource entities are treated as standard documents (content entities)
-    if (in_array($type, ['Drupal\Core\Entity\ContentEntityInterface', 'Drupal\relaxed\Entity\ReplicationLog'], true)) {
+    if (in_array($type, [ContentEntityInterface::class, ReplicationLogInterface::class], true)) {
       // If a document doesn't have a type set, we assume it's a replication log.
       // We also support documents specifically specified as replication logs.
       if (!isset($data['@type']) || $data['@type'] === 'replication_log') {
