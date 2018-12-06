@@ -114,7 +114,7 @@ services:
     arguments: ['@multiversion.entity_index.rev']
   relaxed.bulkdocs_factory:
     class: Drupal\relaxed\BulkDocsFactory
-    arguments: ['@workspaces.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev','@entity_type.manager', '@lock', '@logger.factory', '@state']
+    arguments: ['@workspaces.manager', '@multiversion.entity_index.uuid', '@multiversion.entity_index.rev','@entity_type.manager', '@lock', '@logger.factory', '@state', '@config.factory']
   relaxed.alldocs_factory:
     class: Drupal\relaxed\AllDocsFactory
     arguments: ['@entity_type.manager', '@multiversion.manager', '@multiversion.entity_index.id', '@relaxed.serializer']
