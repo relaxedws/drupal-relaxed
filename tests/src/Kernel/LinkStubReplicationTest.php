@@ -41,6 +41,7 @@ class LinkStubReplicationTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('workspace_association');
     $this->installEntitySchema('replication_log');
