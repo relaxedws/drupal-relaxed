@@ -85,7 +85,7 @@ class ReplicationLogNormalizer extends NormalizerBase implements DenormalizerInt
   public function supportsDenormalization($data, $type, $format = NULL) {
     // We need to accept both ReplicationLog and ContentEntityInterface classes.
     // LocalDocResource entities are treated as standard documents (content entities)
-    if (in_array($type, [ContentEntityInterface::class, ReplicationLogInterface::class], true)) {
+    if (in_array($type, [ContentEntityInterface::class, ReplicationLog::class], true)) {
       // If a document doesn't have a type set, we assume it's a replication log.
       // We also support documents specifically specified as replication logs.
       if (!isset($data['@type']) || $data['@type'] === 'replication_log') {

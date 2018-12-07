@@ -11,7 +11,7 @@ use Drupal\relaxed\Entity\ReplicationLog;
  */
 class ReplicationLogNormalizerTest extends NormalizerTestBase {
 
-  protected $entityClass = 'Drupal\relaxed\Entity\ReplicationLog';
+  protected $entityClass = ReplicationLog::class;
 
   protected function setUp() {
     parent::setUp();
