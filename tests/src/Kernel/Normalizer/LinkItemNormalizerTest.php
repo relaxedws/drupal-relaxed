@@ -118,6 +118,7 @@ class LinkItemNormalizerTest extends NormalizerTestBase {
           [
             'value' => $this->values['field_test_text']['value'],
             'format' => $this->values['field_test_text']['format'],
+            'processed' => '',
           ],
         ],
         'field_test_link' => [
