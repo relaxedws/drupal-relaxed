@@ -22,7 +22,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
+      $this->workspaceManager->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
@@ -50,7 +50,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->drupalLogin($account);
 
       // We set this here just for testing.
-      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
+      $this->workspaceManager->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create();
       $entity->save();
@@ -72,15 +72,18 @@ class LocalDocResourceTest extends ResourceTestBase {
     $entity_types = ['entity_test_local'];
 
     foreach ($entity_types as $entity_type) {
-      // Create a user with the correct permissions.
-      $permissions = $this->entityPermissions($entity_type, 'create');
-      $permissions[] = 'administer workspaces';
-      $permissions[] = 'perform push replication';
-      $account = $this->drupalCreateUser($permissions);
-      $this->drupalLogin($account);
+      $account = $this->workspaceManager->executeInWorkspace('live', function () use ($entity_type) {
+        // Create a user with the correct permissions.
+        $permissions = $this->entityPermissions($entity_type, 'create');
+        $permissions[] = 'administer workspaces';
+        $permissions[] = 'perform push replication';
+        $account = $this->drupalCreateUser($permissions);
+        $this->drupalLogin($account);
+        return $account;
+      });
 
       // We set this here just for testing.
-      \Drupal::service('workspaces.manager')->setActiveWorkspace($this->workspace);
+      $this->workspaceManager->setActiveWorkspace($this->workspace);
 
       $entity = $this->entityTypeManager->getStorage($entity_type)->useWorkspace($this->workspace->id())->create(['user_id' => $account->id()]);
       $serialized = $serializer->serialize($entity, $this->defaultFormat);
@@ -88,12 +91,14 @@ class LocalDocResourceTest extends ResourceTestBase {
       $this->assertEquals('201', $response->getStatusCode(), 'HTTP response code is correct');
     }
 
-    // Create a user with the correct permissions.
-    $permissions = $this->entityPermissions('entity_test_rev', 'create');
-    $permissions[] = 'administer workspaces';
-    $permissions[] = 'perform push replication';
-    $account = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($account);
+    $this->workspaceManager->executeInWorkspace('live', function () {
+      // Create a user with the correct permissions.
+      $permissions = $this->entityPermissions('entity_test_rev', 'create');
+      $permissions[] = 'administer workspaces';
+      $permissions[] = 'perform push replication';
+      $account = $this->drupalCreateUser($permissions);
+      $this->drupalLogin($account);
+    });
 
     // Test with an entity type that is not local.
     $entity = $this->entityTypeManager->getStorage('entity_test_rev')->useWorkspace($this->workspace->id())->create();
@@ -104,7 +109,7 @@ class LocalDocResourceTest extends ResourceTestBase {
       'error' => 'bad_request',
       'reason' => 'This endpoint only supports local entity types.',
     ];
-    $this->assertEquals($serializer->serialize($expected, 'json'), $response);
+    $this->assertEquals($serializer->serialize($expected, 'json'), $response->getBody());
     $this->assertEquals($this->defaultMimeType, $response->getHeader('content-type')[0]);
     $this->assertEquals('400', $response->getStatusCode(), 'HTTP response code is correct.');
   }
