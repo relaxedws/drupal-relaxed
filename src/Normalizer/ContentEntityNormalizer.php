@@ -306,7 +306,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
 
     foreach ($site_languages as $site_language) {
       $langcode = $site_language->getId();
-      if ($entity->language()->getId() != $langcode && isset($translations[$langcode])) {
+      if ($entity->language()->getId() != $langcode && isset($translations[$langcode]) && !$entity->hasTranslation($langcode)) {
         $entity->addTranslation($langcode, $translations[$langcode]);
       }
     }
