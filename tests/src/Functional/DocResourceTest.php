@@ -182,7 +182,7 @@ class DocResourceTest extends ResourceTestBase {
         ['open_revs' => $open_revs_string, '_format' => 'mixed']
       );
 
-      $stream = Psr7\stream_for($response);
+      $stream = Psr7\stream_for($response->getBody());
       $parts = MultipartResponse::parseMultipartBody($stream);
       $this->assertEquals('200', $response->getStatusCode(), 'HTTP response code is correct.');
 
