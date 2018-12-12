@@ -2,7 +2,9 @@
 
 namespace Drupal\Tests\relaxed\Functional;
 
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
+use Drupal\Component\Serialization\Json;
+use Drupal\entity_test\Entity\EntityTestMulRev;
+use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -72,7 +74,7 @@ class StubTest extends BrowserTestBase {
     ];
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $serializer->deserialize(json_encode($normalized), '\Drupal\entity_test\Entity\EntityTestMulRev', 'json');
+    $entity = $serializer->deserialize(Json::encode($normalized), EntityTestMulRev::class, 'json');
 
     $violations = $entity->validate();
     $this->assertEquals(0, count($violations), 'There are no validation violations.');
