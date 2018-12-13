@@ -63,6 +63,9 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('relaxed.settings');
 
+    $authentication_providers = array_keys($this->authenticationCollector->getSortedProviders());
+    $authentication_providers = array_combine($authentication_providers, $authentication_providers);
+
     $encrypt = \Drupal::service('module_handler')->moduleExists('encrypt');
     if ($encrypt) {
       $encrypt_profiles = \Drupal::service('encrypt.encryption_profile.manager')->getEncryptionProfileNamesAsOptions();
@@ -75,6 +78,13 @@ class SettingsForm extends ConfigFormBase {
       '#size' => 60,
       '#maxlength' => 128,
       '#required' => TRUE,
+    ];
+    $form['authentication'] = [
+      '#title' => $this->t('Authentication providers'),
+      '#description' => $this->t('The allowed authentication providers for relaxed routes.'),
+      '#type' => 'checkboxes',
+      '#options' => $authentication_providers,
+      '#default_value' => $config->get('authentication'),
     ];
     $form['creds'] = [
       '#type' => 'fieldset',

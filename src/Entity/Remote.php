@@ -39,10 +39,10 @@ use GuzzleHttp\Psr7\Uri;
  *     "uri",
  *   },
  *   links = {
- *     "canonical" = "/admin/config/services/relaxed/{remote}",
- *     "edit-form" = "/admin/config/services/relaxed/{remote}/edit",
- *     "delete-form" = "/admin/config/services/relaxed/{remote}/delete",
- *     "collection" = "/admin/config/services/relaxed"
+ *     "canonical" = "/admin/config/workflow/remotes/{remote}",
+ *     "edit-form" = "/admin/config/workflow/remotes/{remote}/edit",
+ *     "delete-form" = "/admin/config/workflow/remotes/{remote}/delete",
+ *     "collection" = "/admin/config/workflow/remotes"
  *   }
  * )
  */

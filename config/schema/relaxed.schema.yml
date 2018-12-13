@@ -5,6 +5,12 @@ relaxed.settings:
     api_root:
       type: string
       label: 'Absolute base path to the API root, without trailing slash.'
+    authentication:
+      type: sequence
+      label: 'Authentication Providers'
+      sequence:
+        type: string
+        label: 'Authentication provider'
     username:
       type: string
       label: 'Replicator username'
@@ -17,12 +23,6 @@ relaxed.settings:
     encrypt_profile:
       type: string
       label: 'Encryption profile to use'
-    authentication:
-      type: sequence
-      label: 'Authentication Providers'
-      sequence:
-        type: string
-        label: 'Authentication provider'
     mapping_type:
       type: string
       label: 'Users mapping type'

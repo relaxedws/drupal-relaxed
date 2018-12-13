@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\relaxed\Functional;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests Remote configuration by adding, editing, and deleting an Remote.
@@ -10,7 +10,7 @@ use Drupal\simpletest\WebTestBase;
  * @group relaxed
  * @dependencies workspaces
  */
-class RemoteConfigurationTest extends WebTestBase {
+class RemoteConfigurationTest extends BrowserTestBase {
 
   /**
    * Modules to install.
@@ -40,11 +40,12 @@ class RemoteConfigurationTest extends WebTestBase {
     $edit['username'] = 'user';
     $edit['password'] = 'pass';
     $this->drupalPostForm('admin/config/workflow/relaxed/', $edit, t('Save configuration'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     $this->drupalGet('admin/config/workflow/remotes/add');
-    $this->assertResponse(200);
-    $this->assertNoText('You have to install the Workspace module prior to setting up new workspaces.');
+    $session = $this->assertSession();
+    $session->statusCodeEquals(200);
+    $session->pageTextNotContains('You have to install the Workspace module prior to setting up new workspaces.');
 
     // Make a POST request to the individual Remote configuration page.
     $edit = [];
@@ -55,9 +56,9 @@ class RemoteConfigurationTest extends WebTestBase {
     $edit['username'] = 'user';
     $edit['password'] = 'pass';
     $this->drupalPostForm('admin/config/workflow/remotes/add/', $edit, t('Save'));
-    $this->assertResponse(200);
-
-    $this->assertText($label, "Make sure the label appears on the configuration page after we've saved the Remote.");
+    $session = $this->assertSession();
+    $session->statusCodeEquals(200);
+    $session->pageTextContains($label, "Make sure the label appears on the configuration page after we've saved the Remote.");
 
     // Make another POST request to the Remote edit page.
     $this->clickLink(t('Edit'));
@@ -69,26 +70,28 @@ class RemoteConfigurationTest extends WebTestBase {
     $edit['username'] = 'user';
     $edit['password'] = 'pass';
     $this->drupalPostForm(NULL, $edit, t('Save'));
-    $this->assertResponse(200);
+    $session = $this->assertSession();
+    $session->statusCodeEquals(200);
 
     // Make sure that the Remote updated properly.
-    $this->assertNoText($label, "Make sure the old Remote label does NOT appear on the configuration page after we've updated the Remote.");
-    $this->assertText($new_label, "Make sure the Remote label appears on the configuration page after we've updated the Remote.");
+    $session->pageTextNotContains($label, "Make sure the old Remote label does NOT appear on the configuration page after we've updated the Remote.");
+    $session->pageTextContains($new_label, "Make sure the Remote label appears on the configuration page after we've updated the Remote.");
 
     $this->clickLink(t('Edit'));
 
     // Make sure that deletions work properly.
     $this->drupalGet('admin/config/workflow/remotes');
     $this->clickLink(t('Delete'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
     $edit = [];
     $this->drupalPostForm("admin/config/workflow/remotes/$aid/delete", $edit, t('Delete'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Make sure that the Remote was actually deleted.
     $this->drupalGet('admin/config/workflow/remotes');
-    $this->assertResponse(200);
-    $this->assertNoText($new_label, "Make sure the Remote label does not appear on the overview page after we've deleted the Remote.");
+    $session = $this->assertSession();
+    $session->statusCodeEquals(200);
+    $session->pageTextNotContains($new_label, "Make sure the Remote label does not appear on the overview page after we've deleted the Remote.");
 
     $remote = \Drupal::entityTypeManager()->getStorage('remote')->load($aid);
     $this->assertFalse($remote, 'Make sure the Remote is gone after being deleted.');

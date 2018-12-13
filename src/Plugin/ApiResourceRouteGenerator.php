@@ -72,8 +72,8 @@ class ApiResourceRouteGenerator implements ApiResourceRouteGeneratorInterface {
   /**
    * Constructs an ApiResourceRoutes object.
    *
-   * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $manager
-   *   The format negotiator plugin manager.
+   * @param \Drupal\relaxed\Plugin\FormatNegotiatorManagerInterface $format_manager
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   A logger instance.
    */
