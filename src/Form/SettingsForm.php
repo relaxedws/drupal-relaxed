@@ -249,9 +249,9 @@ class SettingsForm extends ConfigFormBase {
         // Warn the user when altering encryption settings to update remote
         // settings.
         $args = [
-          '@remotes' => Link::fromTextAndUrl('relaxed remotes', Url::fromRoute('entity.remote.collection')),
+          '@remotes' => Link::fromTextAndUrl('relaxed remotes', Url::fromRoute('entity.remote.collection'))->toString(),
         ];
-        drupal_set_message(t('All @remotes must be updated when altering the encryption settings.', $args), 'warning');
+        $this->messenger()->addMessage($this->t('All @remotes must be updated when altering the encryption settings.', $args), 'warning');
       }
     }
 
