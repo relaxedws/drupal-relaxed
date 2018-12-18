@@ -46,7 +46,7 @@ class AttachmentNormalizer extends ContentEntityNormalizer implements Denormaliz
       $file_data['uri'] = $context['uri'];
     }
 
-    $file_info_keys = ['uuid', 'status', 'uid', 'workspace'];
+    $file_info_keys = ['uuid', 'status', 'uid'];
     foreach ($file_info_keys as $key) {
       if (isset($context[$key])) {
         $file_data[$key] = $context[$key];
@@ -70,6 +70,13 @@ class AttachmentNormalizer extends ContentEntityNormalizer implements Denormaliz
       }
     }
     return $this->entityManager->getStorage('file')->create($file_data);
+  }
+
+  public function supportsDenormalization($data, $type, $format = NULL) {
+    if ($type == FileInterface::class && in_array($format, $this->format)) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

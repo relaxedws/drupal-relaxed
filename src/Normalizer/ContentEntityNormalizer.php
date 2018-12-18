@@ -188,7 +188,7 @@ class ContentEntityNormalizer extends NormalizerBase implements DenormalizerInte
     $site_languages = $this->languageManager->getLanguages();
 
     // Resolve the UUID.
-    if (empty($entity_uuid) && !empty($data['_id'])) {
+    if (!empty($data['_id'])) {
       $entity_uuid = $data['_id'];
     }
     else {

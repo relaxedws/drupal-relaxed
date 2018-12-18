@@ -60,18 +60,20 @@ class ProcessFileAttachment {
         }
         $file = \Drupal::getContainer()
           ->get('relaxed.serializer')
-          ->deserialize($data['data'], '\Drupal\file\FileInterface', $format, $file_context);
+          ->deserialize($data['data'], FileInterface::class, $format, $file_context);
       }
       return $file;
     }
 
     // Create the new entity file and the file itself.
-    // Check if exists a file with this $uri, if it exists then rename the file.
+    // Check if exists a file with this $uri first.
     $existing_files = $this->entity_type_manager
       ->getStorage('file')
+      ->getOriginalStorage()
       ->loadByProperties(['uri' => $uri]);
-    if (count($existing_files)) {
-      $uri = file_destination($uri, FILE_EXISTS_RENAME);
+    $file = reset($existing_files);
+    if ($file) {
+      return $file;
     }
     $file_context = [
       'uri' => $uri,
@@ -82,7 +84,7 @@ class ProcessFileAttachment {
     ];
     $file = \Drupal::getContainer()
       ->get('relaxed.serializer')
-      ->deserialize($data['data'], '\Drupal\file\FileInterface', $format, $file_context);
+      ->deserialize($data['data'], FileInterface::class, $format, $file_context);
 
     return $file;
   }

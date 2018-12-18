@@ -19,7 +19,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer implements Denormaliz
   /**
    * @var string[]
    */
-  protected $supportedInterfaceOrClass = [FileInterface::class];
+  protected $supportedInterfaceOrClass = ['Drupal\file\FileInterface'];
 
   /**
    * @var string[]
@@ -54,23 +54,28 @@ class FileEntityNormalizer extends ContentEntityNormalizer implements Denormaliz
     $file_system = \Drupal::service('file_system');
     $uri = $data->getFileUri();
 
-    $file_contents = file_get_contents($uri);
-    if (in_array($file_system->uriScheme($uri), ['public', 'private']) == FALSE) {
-      $file_data = '';
-    }
-    else {
-      $file_data = base64_encode($file_contents);
+    if (empty($uri)) {
+      return $normalized;
     }
 
-    // @todo {@link https://www.drupal.org/node/2600360 Add revpos and other missing properties to the result array.}
-    $normalized['@attachment'] = [
-      'uuid' => $data->uuid(),
-      'uri' => $uri,
-      'content_type' => $data->getMimeType(),
-      'digest' => 'md5-' . base64_encode(md5($file_contents)),
-      'length' => $data->getSize(),
-      'data' => $file_data,
-    ];
+    if ($file_contents = @file_get_contents($uri)) {
+      if (in_array($file_system->uriScheme($uri), ['public', 'private']) == FALSE) {
+        $file_data = '';
+      }
+      else {
+        $file_data = base64_encode($file_contents);
+      }
+
+      // @todo {@link https://www.drupal.org/node/2600360 Add revpos and other missing properties to the result array.}
+      $normalized['@attachment'] = [
+        'uuid' => $data->uuid(),
+        'uri' => $uri,
+        'content_type' => $data->getMimeType(),
+        'digest' => 'md5-' . base64_encode(md5($file_contents)),
+        'length' => $data->getSize(),
+        'data' => $file_data,
+      ];
+    }
     return $normalized;
   }
 
@@ -82,7 +87,12 @@ class FileEntityNormalizer extends ContentEntityNormalizer implements Denormaliz
     if (!empty($data['@attachment']['uuid'])) {
       $workspace = isset($context['workspace']) ? $context['workspace'] : NULL;
       /** @var FileInterface $file */
-      $this->processFileAttachment->process($data['@attachment'], 'base64_stream', $workspace);
+      if ($file = $this->processFileAttachment->process($data['@attachment'], 'base64_stream', $workspace)) {
+        // Update the data, because file name could change.
+        $language_code = $file->language()->getId();
+        $data[$language_code]['filename'][0]['value'] = $file->get('filename')->value;
+        $data[$language_code]['uri'][0]['value'] = $file->get('uri')->value;
+      }
       unset($data['@attachment']);
     }
     return parent::denormalize($data, $class, $format, $context);
@@ -94,10 +104,10 @@ class FileEntityNormalizer extends ContentEntityNormalizer implements Denormaliz
     if (in_array($type, [ContentEntityInterface::class, FileInterface::class], true)) {
       // If a document has _attachment then we assume it's a file entity.
       if (!empty($data['@attachment'])) {
-        return true;
+        return TRUE;
       }
     }
-    return false;
+    return FALSE;
   }
 
 }
