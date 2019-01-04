@@ -5,6 +5,7 @@ namespace Drupal\relaxed\Plugin\ApiResource;
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\relaxed\Event\RelaxedEnsureFullCommitEvent;
 use Drupal\relaxed\Event\RelaxedEvents;
 use Drupal\relaxed\Http\ApiResourceResponse;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  *   path = "/{db}/_ensure_full_commit",
  * )
  */
-class EnsureFullCommitApiResource extends ApiResourceBase {
+class EnsureFullCommitApiResource extends ApiResourceBase implements ContainerFactoryPluginInterface {
 
   /**
    * The Module Handler.
