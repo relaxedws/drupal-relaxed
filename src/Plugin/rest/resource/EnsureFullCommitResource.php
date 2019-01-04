@@ -6,7 +6,10 @@ use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\multiversion\Entity\WorkspaceInterface;
+use Drupal\relaxed\Event\RelaxedEnsureFullCommitEvent;
+use Drupal\relaxed\Event\RelaxedEvents;
 use Drupal\rest\ModifiedResourceResponse;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -53,6 +56,13 @@ class EnsureFullCommitResource extends ResourceBase {
   protected $jsCollectionOptimizer;
 
   /**
+   * The event dispatcher service.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructs a Drupal\rest\Plugin\ResourceBase object.
    *
    * @param array $configuration
@@ -71,12 +81,15 @@ class EnsureFullCommitResource extends ResourceBase {
    *   The CSS Collection Optimizer.
    * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $js_collection_optimizer
    *   The JS Collection Optimizer.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger, ModuleHandlerInterface $module_handler, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger, ModuleHandlerInterface $module_handler, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer, EventDispatcherInterface $event_dispatcher) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
     $this->moduleHandler = $module_handler;
     $this->cssCollectionOptimizer = $css_collection_optimizer;
     $this->jsCollectionOptimizer = $js_collection_optimizer;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -91,7 +104,8 @@ class EnsureFullCommitResource extends ResourceBase {
       $container->get('logger.factory')->get('rest'),
       $container->get('module_handler'),
       $container->get('asset.css.collection_optimizer'),
-      $container->get('asset.js.collection_optimizer')
+      $container->get('asset.js.collection_optimizer'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -126,6 +140,9 @@ class EnsureFullCommitResource extends ResourceBase {
     $this->cssCollectionOptimizer->deleteAll();
     $this->jsCollectionOptimizer->deleteAll();
     _drupal_flush_css_js();
+
+    $this->eventDispatcher->dispatch(RelaxedEvents::REPLICATION_ENSURE_FULL_COMMIT, new RelaxedEnsureFullCommitEvent($workspace));
+
     return new ModifiedResourceResponse($response_data, 201);
   }
 
