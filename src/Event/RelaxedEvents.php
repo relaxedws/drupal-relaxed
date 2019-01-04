@@ -16,4 +16,9 @@ final class RelaxedEvents {
    */
   const REPLICATION_FINISHED = 'relaxed.replication_finished';
 
+  /**
+   * Event fired when replication handles the Ensure Full Commit request.
+   */
+  const REPLICATION_ENSURE_FULL_COMMIT = 'relaxed.replication_ensure_full_commit';
+
 }
