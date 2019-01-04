@@ -33,7 +33,7 @@ class CouchdbReplicator implements ReplicatorInterface{
   /**
    * Relaxed sensitive data transformer service.
    *
-   * @var Drupal\relaxed\SensitiveDataTransformer
+   * @var \Drupal\relaxed\SensitiveDataTransformer
    */
   protected $transformer;
 
@@ -46,6 +46,14 @@ class CouchdbReplicator implements ReplicatorInterface{
    * {@inheritDoc}
    */
   public function applies(WorkspacePointerInterface $source, WorkspacePointerInterface $target) {
+    if (empty($source->get('remote_pointer')->target_id)
+      && empty($source->get('remote_database')->value)
+      && empty($target->get('remote_pointer')->target_id)
+      && empty($target->get('remote_database')->value)) {
+      // When both the source and target don't have remote pointers and remote
+      // databases, don't apply this replicator.
+      return FALSE;
+    }
     if ($this->setupEndpoint($source) && $this->setupEndpoint($target)) {
       return TRUE;
     }
