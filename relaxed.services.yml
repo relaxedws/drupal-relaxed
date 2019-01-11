@@ -46,6 +46,11 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@serializer', '@renderer', '@current_route_match']
+  relaxed.ensure_full_commit.subscriber:
+    class: Drupal\relaxed\EventSubscriber\EnsureFullCommitSubscriber
+    arguments: ['@entity_type.manager', '@workspace.manager', '@?plugin.manager.alias_type', '@?pathauto.generator']
+    tags:
+      - { name: event_subscriber }
   relaxed.sensitive_data.transformer:
     class: Drupal\relaxed\SensitiveDataTransformer
     arguments: ['@config.factory']
