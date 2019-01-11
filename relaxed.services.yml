@@ -88,7 +88,12 @@ services:
     class: Drupal\relaxed\Routing\ApiResourceRoutes
     arguments: ['@plugin.manager.api_resource', '@relaxed.api_resource.route_generator', '@logger.channel.relaxed']
     tags:
-      - { name: 'event_subscriber' }
+      - { name: event_subscriber }
+  relaxed.ensure_full_commit.subscriber:
+    class: Drupal\relaxed\EventSubscriber\EnsureFullCommitSubscriber
+    arguments: ['@entity_type.manager', '@workspace.manager', '@?plugin.manager.alias_type', '@?pathauto.generator']
+    tags:
+      - { name: event_subscriber }
   relaxed.sensitive_data.transformer:
     class: Drupal\relaxed\SensitiveDataTransformer
     arguments: ['@config.factory']
