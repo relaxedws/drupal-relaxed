@@ -4,7 +4,7 @@ namespace Drupal\relaxed\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\multiversion\Entity\Storage\ContentEntityStorageInterface;
-use Drupal\multiversion\Workspace\WorkspaceManagerInterface;
+use Drupal\workspaces\WorkspaceManagerInterface;
 use Drupal\pathauto\AliasTypeManager;
 use Drupal\pathauto\PathautoGeneratorInterface;
 use Drupal\relaxed\Event\RelaxedEnsureFullCommitEvent;
@@ -42,7 +42,7 @@ class EnsureFullCommitSubscriber implements EventSubscriberInterface {
   /**
    * The Workspace manager.
    *
-   * @var \Drupal\multiversion\Workspace\WorkspaceManagerInterface
+   * @var \Drupal\workspaces\WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
@@ -51,7 +51,7 @@ class EnsureFullCommitSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\multiversion\Workspace\WorkspaceManagerInterface $workspace_manager
+   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
    *   The workspace manager.
    * @param \Drupal\pathauto\AliasTypeManager $alias_type_manager
    *   The AliasType manager.

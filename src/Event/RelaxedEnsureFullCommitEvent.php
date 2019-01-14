@@ -13,7 +13,7 @@ class RelaxedEnsureFullCommitEvent extends Event {
   /**
    * The target workspace during the replication.
    *
-   * @var \Drupal\multiversion\Entity\WorkspaceInterface
+   * @var \Drupal\workspaces\WorkspaceInterface
    */
   protected $workspace;
 

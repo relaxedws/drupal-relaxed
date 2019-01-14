@@ -91,13 +91,12 @@ services:
       - { name: event_subscriber }
   relaxed.ensure_full_commit.subscriber:
     class: Drupal\relaxed\EventSubscriber\EnsureFullCommitSubscriber
-    arguments: ['@entity_type.manager', '@workspace.manager', '@?plugin.manager.alias_type', '@?pathauto.generator']
+    arguments: ['@entity_type.manager', '@workspaces.manager', '@?plugin.manager.alias_type', '@?pathauto.generator']
     tags:
       - { name: event_subscriber }
   relaxed.sensitive_data.transformer:
     class: Drupal\relaxed\SensitiveDataTransformer
     arguments: ['@config.factory']
-
   relaxed.process_file_attachment:
     class: Drupal\relaxed\ProcessFileAttachment
     arguments: ['@current_user', '@entity_type.manager', '@multiversion.entity_index.factory']
