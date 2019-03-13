@@ -74,24 +74,6 @@ abstract class RelaxedResourceTestBase extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
-    switch ($method) {
-      case 'GET':
-        $this->grantPermissionsToTestedRole(['restful get relaxed:changes']);
-        break;
-
-      case 'POST':
-        $this->grantPermissionsToTestedRole(['restful post relaxed:changes']);
-        break;
-
-      default:
-        throw new \UnexpectedValueException();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function assertNormalizationEdgeCases($method, Url $url, array $request_options) {}
 
   /**

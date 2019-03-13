@@ -23,6 +23,11 @@ class ChangesResourceTest extends RelaxedResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $resourceConfigId = 'relaxed.changes';
+
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -46,11 +51,6 @@ class ChangesResourceTest extends RelaxedResourceTestBase {
     $this->entitiesData = $uuids;
     $this->drupalLogout();
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $resourceConfigId = 'relaxed.changes';
 
   public function testPost() {
     $method = 'POST';
@@ -198,6 +198,24 @@ class ChangesResourceTest extends RelaxedResourceTestBase {
         'user.permissions',
       ]
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpAuthorization($method) {
+    switch ($method) {
+      case 'GET':
+        $this->grantPermissionsToTestedRole(['restful get relaxed:changes']);
+        break;
+
+      case 'POST':
+        $this->grantPermissionsToTestedRole(['restful post relaxed:changes']);
+        break;
+
+      default:
+        throw new \UnexpectedValueException();
+    }
   }
 
 }
