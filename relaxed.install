@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Serialization\Yaml;
 use Drupal\user\Entity\Role;
 
 /**
@@ -44,4 +45,18 @@ function relaxed_update_8302() {
   \Drupal::configFactory()->getEditable('rest.settings')
     ->clear('resources')
     ->save();
+}
+
+/**
+ * Update REST config for Changes endpoint.
+ */
+function relaxed_update_8303() {
+  $config_factory = \Drupal::configFactory();
+  $config_name = 'rest.resource.relaxed.changes';
+  $config_data = file_get_contents(__DIR__ . "/config/optional/{$config_name}.yml");
+  $config = Yaml::decode($config_data);
+
+  $config_factory->getEditable($config_name)
+    ->setData($config)
+    ->save(TRUE);
 }

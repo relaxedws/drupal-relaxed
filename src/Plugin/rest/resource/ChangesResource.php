@@ -62,11 +62,39 @@ class ChangesResource extends ResourceBase {
     );
   }
 
+  /**
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface$workspace
+   *
+   * @return \Drupal\rest\ResourceResponse
+   */
   public function get($workspace) {
     $this->checkWorkspaceExists($workspace);
 
     /** @var ChangesInterface $changes */
     $changes = $this->changesFactory->get($workspace);
+
+    $request = Request::createFromGlobals();
+    if ($request->query->get('include_docs') == 'true') {
+      $changes->includeDocs(TRUE);
+    }
+
+    return new ResourceResponse($changes, 200);
+  }
+
+  /**
+   * @param \Drupal\multiversion\Entity\WorkspaceInterface $workspace
+   * @param \Drupal\replication\Changes\ChangesInterface $changes
+   *
+   * @return \Drupal\rest\ResourceResponse
+   */
+  public function post($workspace, $changes) {
+    $this->checkWorkspaceExists($workspace);
+
+    // $changes is null if the request doesn't contain a body.
+    if (empty($changes)) {
+      /** @var ChangesInterface $changes */
+      $changes = $this->changesFactory->get($workspace);
+    }
 
     $request = Request::createFromGlobals();
     if ($request->query->get('include_docs') == 'true') {
