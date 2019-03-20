@@ -156,6 +156,28 @@ abstract class ReplicationTestBase extends KernelTestBase {
   }
 
   /**
+   * Creates a new workspace.
+   */
+  protected function createWorkspace($relaxed_root, $workspace_name) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+      CURLOPT_HTTPGET => FALSE,
+      CURLOPT_CUSTOMREQUEST => 'PUT',
+      CURLOPT_URL => "$relaxed_root/$workspace_name",
+      CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'Accept: application/json',
+      ],
+    ]);
+
+    curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    return $code;
+  }
+
+  /**
    * Creates delete a database.
    */
   protected function deleteDb($db_name) {
@@ -181,7 +203,7 @@ abstract class ReplicationTestBase extends KernelTestBase {
   /**
    * Replicates content from source to target using the PHP replicator.
    */
-  protected function phpReplicate($data) {
+  protected function phpReplicate($data, $task = NULL) {
     $json = json_decode($data, true);
     if (json_last_error() != JSON_ERROR_NONE) {
       throw new Exception('Invalid JSON.');
@@ -190,7 +212,9 @@ abstract class ReplicationTestBase extends KernelTestBase {
     $source = CouchDBClient::create($json['source']);
     $target = CouchDBClient::create($json['target']);
 
-    $task = new ReplicationTask(null, false, null, null, false, null, 10000, 10000, false, "all_docs", 0, 2, 2);
+    if (!$task) {
+      $task = new ReplicationTask(null, false, null, null, false, null, 10000, 10000, false, "all_docs", 0, 2, 2);
+    }
     $replicator = new Replicator($source, $target, $task);
 
     return $replicator->startReplication();

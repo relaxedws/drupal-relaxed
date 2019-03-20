@@ -33,5 +33,5 @@ projects:
     type: module
     download:
       type: git
-      branch: 8.x-1.x
+      branch: selective-content-replication
       url: "https://github.com/timmillwood/drupal-workspace.git"
