@@ -11,6 +11,8 @@ matrix:
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.5.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
+    - php: 7.3
+      env: MAKE_FILE=drupal-8.5.x.make.yml
   fast_finish: true
 
 services:
