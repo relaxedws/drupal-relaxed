@@ -12,7 +12,11 @@ matrix:
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
     - php: 7.3
-      env: MAKE_FILE=drupal-8.5.x.make.yml
+      env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.5.x.make.yml
+    - php: 7.3
+      env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=2.3.0
+    - php: 7.3
+      env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=1.6.1
   fast_finish: true
 
 services:
@@ -30,15 +34,15 @@ addons:
 env:
   matrix:
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.5.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=2.2.0
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=2.3.0
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.5.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.6.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=2.2.0
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=2.3.0
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.7.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=2.2.0
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=2.3.0
     - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=1.6.1
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
 
@@ -56,7 +60,7 @@ before_install:
   - cp $TRAVIS_BUILD_DIR/.travis/php-fpm.conf ~/.phpenv/versions/$(phpenv version-name)/etc/
   - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
   - nginx -c $TRAVIS_BUILD_DIR/.travis/nginx.conf
-  - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.1.16/drush.phar && chmod +x ~/drush.phar
+  - wget -P ~/ https://github.com/drush-ops/drush/releases/download/8.2.3/drush.phar && chmod +x ~/drush.phar
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
