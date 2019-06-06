@@ -80,6 +80,7 @@ class CouchdbReplicator implements ReplicatorInterface{
 
       if ($task !== NULL) {
         $couchdb_task->setFilter($task->getFilter());
+        $couchdb_task->setDocIds($task->getDocIds());
         $couchdb_task->setParameters($task->getParameters());
         $changes_limit = \Drupal::config('replication.settings')->get('changes_limit');
         $couchdb_task->setLimit($changes_limit ?: $task->getLimit());
