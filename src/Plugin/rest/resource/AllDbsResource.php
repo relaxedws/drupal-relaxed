@@ -36,14 +36,14 @@ class AllDbsResource extends ResourceBase {
 
     $workspace_machine_names = [];
     foreach ($workspaces as $workspace) {
-      if ($workspace->isPublished()) {
+      if ($workspace->isPublished() && !$workspace->getQueuedForDelete()) {
         $workspace_machine_names[] = $workspace->getMachineName();
       }
     }
 
     $response = new ResourceResponse($workspace_machine_names, 200);
     foreach ($workspaces as $workspace) {
-      if ($workspace->isPublished()) {
+      if ($workspace->isPublished() && !$workspace->getQueuedForDelete()) {
         $response->addCacheableDependency($workspace);
       }
     }
