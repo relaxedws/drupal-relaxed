@@ -18,9 +18,9 @@ relaxed.settings:
       type: string
       label: 'Encryption profile to use'
 
-relaxed.endpoint.*:
+relaxed.remote.*:
   type: config_entity
-  label: 'Endpoint config'
+  label: 'Remote config'
   mapping:
     id:
       type: string
