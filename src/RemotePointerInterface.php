@@ -26,4 +26,17 @@ interface RemotePointerInterface {
    * Adds pointers for all remotes.
    */
   public function addAllPointers();
+
+  /**
+   * Cleanup pointers for given remote.
+   *
+   * @param \Drupal\relaxed\Entity\RemoteInterface $remote
+   */
+  public function cleanupPointersForRemote(RemoteInterface $remote);
+
+  /**
+   * Cleanup pointers that no longer exist for all remotes.
+   */
+  public function cleanupPointers();
+
 }

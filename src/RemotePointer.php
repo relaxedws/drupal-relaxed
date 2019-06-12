@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\relaxed\Entity\Remote;
 use Drupal\relaxed\Entity\RemoteInterface;
+use Drupal\workspace\Entity\Replication;
 use Drupal\workspace\Entity\WorkspacePointer;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\ClientInterface;
@@ -42,7 +43,7 @@ class RemotePointer implements RemotePointerInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getRemoteDatabases(RemoteInterface $remote) {
     $uri = $remote->uri();
@@ -65,7 +66,7 @@ class RemotePointer implements RemotePointerInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function addPointers(RemoteInterface $remote) {
     $databases = $this->getRemoteDatabases($remote);
@@ -85,4 +86,54 @@ class RemotePointer implements RemotePointerInterface {
       $this->addPointers($remote);
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function cleanupPointersForRemote(RemoteInterface $remote) {
+    $databases = $this->getRemoteDatabases($remote);
+
+    $pointers = $this->entityTypeManager
+      ->getStorage('workspace_pointer')
+      ->loadByProperties(['remote_pointer' => $remote->id()]);
+
+    /** @var WorkspacePointerInterface $pointer */
+    foreach ($pointers as $pointer) {
+      // Loop over all the pointers for our given remote and compare the
+      // remote_database name with the ones we received from our remote.
+      $database_name = $pointer->get('remote_database')->value;
+      if (!empty($database_name) && !in_array($database_name, $databases)) {
+        $deployments = $this->entityTypeManager
+          ->getStorage('replication')
+          ->loadByProperties(['source' => $pointer->id()]);
+        $deployments += $this->entityTypeManager
+          ->getStorage('replication')
+          ->loadByProperties(['target' => $pointer->id()]);
+        /** @var Replication $deployment */
+        foreach ($deployments as $deployment) {
+          $replication_status = $deployment->get('replication_status')->value;
+          if (!in_array($replication_status, [Replication::QUEUED, Replication::REPLICATING])) {
+            continue;
+          }
+          $deployment->set('fail_info', t('The workspace pointer ' .
+            'does not exist, this could be cause by the missing target workspace.'));
+          $deployment
+            ->setReplicationStatusFailed()
+            ->save();
+        }
+        $pointer->delete();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function cleanupPointers() {
+    $remotes = Remote::loadMultiple();
+    foreach ($remotes as $remote) {
+      $this->cleanupPointersForRemote($remote);
+    }
+  }
+
 }

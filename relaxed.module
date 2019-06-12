@@ -193,7 +193,10 @@ function relaxed_entity_base_field_info(EntityTypeInterface $entity_type) {
  * Implements hook_cron().
  */
 function relaxed_cron() {
-  \Drupal::service('relaxed.remote_pointer')->addAllPointers();
+  /** @var \Drupal\relaxed\RemotePointerInterface $remote_pointer_service */
+  $remote_pointer_service = \Drupal::service('relaxed.remote_pointer');
+  $remote_pointer_service->addAllPointers();
+  $remote_pointer_service->cleanupPointers();
 }
 
 function relaxed_entity_type_alter(array &$entity_types) {
