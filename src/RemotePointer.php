@@ -116,7 +116,8 @@ class RemotePointer implements RemotePointerInterface {
             continue;
           }
           $deployment->set('fail_info', t('The workspace pointer ' .
-            'does not exist, this could be cause by the missing target workspace.'));
+            'does not exist, this could be cause by the missing source or ' .
+            'target workspace.'));
           $deployment
             ->setReplicationStatusFailed()
             ->save();
