@@ -17,6 +17,7 @@ use Drupal\replication\ReplicationTask\ReplicationTaskInterface;
 use Drupal\workspace\ReplicatorInterface;
 use Drupal\workspace\WorkspacePointerInterface;
 use GuzzleHttp\Psr7\Uri;
+use Relaxed\Replicator\Exception\PeerNotReachableException;
 use Relaxed\Replicator\ReplicationTask as RelaxedReplicationTask;
 use Relaxed\Replicator\Replicator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -115,6 +116,9 @@ class CouchdbReplicator implements ReplicatorInterface{
 
       $this->dispatchReplicationFinishedEvent($source, $target, $log);
       return $log;
+    }
+    catch (PeerNotReachableException $e) {
+      throw $e;
     }
     catch (\Exception $e) {
       watchdog_exception('Relaxed', $e);

@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\relaxed\Entity\Remote;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -196,12 +197,32 @@ function relaxed_cron() {
   /** @var \Drupal\relaxed\RemotePointerInterface $remote_pointer_service */
   $remote_pointer_service = \Drupal::service('relaxed.remote_pointer');
   $remote_pointer_service->addAllPointers();
-  $remote_pointer_service->cleanupPointers();
+  $remote_pointer_service->updatePointers();
 }
 
 function relaxed_entity_type_alter(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   if (isset($entity_types['rest_resource_config'])) {
     $entity_types['rest_resource_config']->setClass('Drupal\relaxed\Entity\RestResourceConfig');
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function relaxed_form_workspace_basic_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  foreach ($form['upstream']['widget']['#options'] as $option) {
+    if (is_string($option) && substr($option, -1) == '*') {
+      $form['upstream']['widget']['#suffix'] = '<div class="description">* ' .
+        t('One or more options for selecting the target ' .
+          'workspace is/are disabled because the remote workspace could not ' .
+          'be accessed during the last availability check, this can happen ' .
+          'because of different reasons, for example network connection ' .
+          'issues, the remote workspace has been deleted and other. The ' .
+          'availability of the remote workspace is checked on every cron run ' .
+          'and if it becomes available, the option to select the workspace ' .
+          'is activated again.') . '</div>';
+      return;
+    }
   }
 }
