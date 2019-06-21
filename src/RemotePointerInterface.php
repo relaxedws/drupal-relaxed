@@ -28,15 +28,15 @@ interface RemotePointerInterface {
   public function addAllPointers();
 
   /**
-   * Update pointers for given remote depending on workspace availability.
+   * Cleanup pointers for given remote.
    *
    * @param \Drupal\relaxed\Entity\RemoteInterface $remote
    */
-  public function updatePointersForRemote(RemoteInterface $remote);
+  public function cleanupPointersForRemote(RemoteInterface $remote);
 
   /**
-   * Update pointers for all remotes.
+   * Cleanup pointers that no longer exist for all remotes.
    */
-  public function updatePointers();
+  public function cleanupPointers();
 
 }

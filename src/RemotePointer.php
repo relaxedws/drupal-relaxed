@@ -90,23 +90,48 @@ class RemotePointer implements RemotePointerInterface {
   /**
    * {@inheritdoc}
    */
-  public function updatePointersForRemote(RemoteInterface $remote) {
+  public function cleanupPointersForRemote(RemoteInterface $remote) {
     $databases = $this->getRemoteDatabases($remote);
 
     $pointers = $this->entityTypeManager
       ->getStorage('workspace_pointer')
       ->loadByProperties(['remote_pointer' => $remote->id()]);
 
-    /** @var WorkspacePointerInterface $pointer */
-    foreach ($pointers as $pointer) {
-      // Loop over all the pointers for our given remote and compare the
-      // remote_database name with the ones we received from our remote.
-      $database_name = $pointer->get('remote_database')->value;
-      if (!empty($database_name) && !in_array($database_name, $databases)) {
+    if (empty($databases)) {
+      /** @var WorkspacePointerInterface $pointer */
+      foreach ($pointers as $pointer) {
+        // Set all remote workspaces as not available, maybe there is a
+        // connection problem and the remote is not available for the moment.
         $pointer->setWorkspaceAvailable(FALSE)->save();
       }
-      elseif (!$pointer->getWorkspaceAvailable()) {
-        $pointer->setWorkspaceAvailable()->save();
+    }
+    else {
+      /** @var WorkspacePointerInterface $pointer */
+      foreach ($pointers as $pointer) {
+        // Loop over all the pointers for our given remote and compare the
+        // remote_database name with the ones we received from our remote.
+        $database_name = $pointer->get('remote_database')->value;
+        if (!empty($database_name) && !in_array($database_name, $databases)) {
+          $deployments = $this->entityTypeManager
+            ->getStorage('replication')
+            ->loadByProperties(['source' => $pointer->id()]);
+          $deployments += $this->entityTypeManager
+            ->getStorage('replication')
+            ->loadByProperties(['target' => $pointer->id()]);
+          /** @var Replication $deployment */
+          foreach ($deployments as $deployment) {
+            $replication_status = $deployment->get('replication_status')->value;
+            if (!in_array($replication_status, [Replication::QUEUED, Replication::REPLICATING])) {
+              continue;
+            }
+            $deployment->set('fail_info', t('The workspace pointer does not exist, this could be caused by the missing source or target workspace.'));
+            $deployment->setReplicationStatusFailed()->save();
+          }
+          $pointer->delete();
+        }
+        elseif (!$pointer->getWorkspaceAvailable()) {
+          $pointer->setWorkspaceAvailable()->save();
+        }
       }
     }
   }
@@ -114,10 +139,10 @@ class RemotePointer implements RemotePointerInterface {
   /**
    * {@inheritdoc}
    */
-  public function updatePointers() {
+  public function cleanupPointers() {
     $remotes = Remote::loadMultiple();
     foreach ($remotes as $remote) {
-      $this->updatePointersForRemote($remote);
+      $this->cleanupPointersForRemote($remote);
     }
   }
 
