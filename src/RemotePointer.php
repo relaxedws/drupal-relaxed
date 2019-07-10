@@ -120,12 +120,14 @@ class RemotePointer implements RemotePointerInterface {
             ->loadByProperties(['target' => $pointer->id()]);
           /** @var Replication $deployment */
           foreach ($deployments as $deployment) {
-            $replication_status = $deployment->get('replication_status')->value;
+            $replication_status = $deployment->getReplicationStatus();
             if (!in_array($replication_status, [Replication::QUEUED, Replication::REPLICATING])) {
               continue;
             }
-            $deployment->set('fail_info', t('The workspace pointer does not exist, this could be caused by the missing source or target workspace.'));
-            $deployment->setReplicationStatusFailed()->save();
+            $deployment
+              ->setReplicationStatusFailed()
+              ->setReplicationFailInfo(t('The workspace pointer does not exist, this could be caused by the missing source or target workspace.'))
+              ->save();
           }
           $pointer->delete();
         }

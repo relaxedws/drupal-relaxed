@@ -55,13 +55,12 @@ class RemoteDeleteForm extends EntityConfirmFormBase {
       // workspace pointer that is being deleted.
       /** @var Replication $deployment */
       foreach ($deployments as $deployment) {
-        $replication_status = $deployment->get('replication_status')->value;
+        $replication_status = $deployment->getReplicationStatus();
         if (!in_array($replication_status, [Replication::QUEUED, Replication::REPLICATING])) {
           continue;
         }
-        $deployment->set('fail_info', t('The workspace pointer ' .
-          'does not exist, this could be cause by the missing target workspace.'));
         $deployment
+          ->setReplicationFailInfo(t('The workspace pointer does not exist, this could be cause by the missing target workspace.'))
           ->setReplicationStatusFailed()
           ->save();
       }
