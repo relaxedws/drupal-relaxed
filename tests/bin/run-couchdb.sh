@@ -1,13 +1,8 @@
 #!/bin/sh
 
-if [ $COUCHDB_VERSION = "2.3.0" ]; then
-  docker run -d -p 3001:5984 apache/couchdb:$COUCHDB_VERSION --with-haproxy --with-admin-party-please -n 1
-  export COUCH_PORT=3001
-elif [ $COUCHDB_VERSION = "1.6.1" ]; then
-  export COUCH_PORT=5984
-else
-  echo "Unknown CouchDB version."
-fi
+COUCHDB_VERSION=2.3.1
+docker run -d -p 3001:5984 apache/couchdb:$COUCHDB_VERSION --with-haproxy --with-admin-party-please -n 1
+export COUCH_PORT=3001
 
 npm -g install npm@latest
 # Wait for couchdb to start, add CORS.
