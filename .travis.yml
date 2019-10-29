@@ -58,6 +58,7 @@ before_install:
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
+  - export COUCH_PORT=3001
   - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
 
 install:
@@ -66,7 +67,6 @@ install:
   - if [ $MAKE_FILE != drupal-8.8.x.make.yml ]; then composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade; fi
 
 script:
-  - export COUCH_PORT=3001
   - cd ~/www && bash $SCRIPT
 
 after_script:
