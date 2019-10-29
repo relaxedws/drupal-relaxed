@@ -59,7 +59,8 @@ before_install:
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
   - export COUCH_PORT=3001
-  - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
+  - export COUCHDB_VERSION=2.3.1
+  - source ./tests/bin/run-couchdb.sh
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
