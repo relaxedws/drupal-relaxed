@@ -8,13 +8,11 @@ php:
 
 matrix:
   allow_failures:
-    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.8.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
-    - php: 7.3
-      env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.8.x.make.yml
-    - php: 7.3
-      env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.8.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.8.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.8.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.8.x.make.yml
   fast_finish: true
 
 services:
