@@ -8,23 +8,19 @@ php:
 
 matrix:
   allow_failures:
-    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.5.x.make.yml
+    # One of the Drupal 8.6.x tests should fail because of an incompatibility in the Key module.
+    - env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.6.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.8.x.make.yml
+    - env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.8.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
-    - php: 7.3
-      env: SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.5.x.make.yml
-    - php: 7.3
-      env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=2.3.0
-    - php: 7.3
-      env: SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=1.6.1
+    - env: SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.8.x.make.yml
   fast_finish: true
 
 services:
   - mysql
   # In Docker we will have CouchDB 2.2.0 on 127.0.0.1:3001.
   - docker
-  # CouchDB 1.6.1 on 127.0.0.1:5984.
-  - couchdb
 
 addons:
   apt:
@@ -33,18 +29,15 @@ addons:
 
 env:
   matrix:
-    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.5.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=2.3.0
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.5.x.make.yml COUCHDB_VERSION=1.6.1
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.5.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.6.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=2.3.0
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml COUCHDB_VERSION=1.6.1
-    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.7.x.make.yml
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=2.3.0
-    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml COUCHDB_VERSION=1.6.1
+    - SCRIPT='modules/relaxed/tests/bin/drupal.sh' MAKE_FILE=drupal-8.6.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.6.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.7.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/replication.sh' MAKE_FILE=drupal-8.8.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.6.x.make.yml
     - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.7.x.make.yml
+    - SCRIPT='modules/relaxed/tests/bin/pouchdb.sh' MAKE_FILE=drupal-8.8.x.make.yml
 
 notifications:
   slack: det:YiOiwfzUBtt9aTnWvocK8uDI
@@ -64,12 +57,14 @@ before_install:
   - php ~/drush.phar make $TRAVIS_BUILD_DIR/.travis/$MAKE_FILE $HOME/www
   - composer --working-dir=$HOME/www require relaxedws/replicator:dev-master
   # Install CouchDB.
-  - if [ $COUCHDB_VERSION ]; then source ./tests/bin/run-couchdb.sh; fi
+  - export COUCH_PORT=5984
+  - export COUCHDB_VERSION=2.3.1
+  - source ./tests/bin/run-couchdb.sh
 
 install:
   - ln -s $TRAVIS_BUILD_DIR ~/www/modules/relaxed
   - php ~/drush.phar --root=$HOME/www --yes site-install --account-pass=admin --db-url=mysql://root:@127.0.0.1/drupal0 testing
-  - composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade
+  - if [ $MAKE_FILE != drupal-8.8.x.make.yml ]; then composer --working-dir=$HOME/www run-script drupal-phpunit-upgrade; fi
 
 script:
   - cd ~/www && bash $SCRIPT
