@@ -1,10 +1,10 @@
-name: 'Relaxed API tests'
+name: 'Relaxed API Tests'
 type: module
 description: 'Configures a site for external testing.'
 package: Testing
 version: VERSION
 core: 8.x
 dependencies:
-  - entity_test
-  - taxonomy
-  - relaxed
+  - entity:entity_test
+  - drupal:taxonomy
+  - relaxed:relaxed

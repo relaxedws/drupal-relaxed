@@ -4,12 +4,12 @@ description: 'Provides a RESTful API that exposes all content entities over UUID
 package: Web services
 core: 8.x
 dependencies:
-  - rest
-  - basic_auth
-  - multiversion
-  - replication
-  - system (>=8.3.x)
+  - drupal:rest
+  - drupal:basic_auth
+  - multiversion:multiversion
+  - replication:replication
+  - drupal:system (>=8.3.x)
 test_dependencies:
-  - workspace
-  - key
-  - encrypt
+  - workspace:workspace
+  - key:key
+  - encrypt:encrypt
